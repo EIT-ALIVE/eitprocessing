@@ -8,23 +8,36 @@ authors:
     email: d.bodor@esciencecenter.nl
     affiliation: Netherlands eScience Center
     orcid: "https://orcid.org/0000-0003-2109-2349"
+
   - family-names: Jonkman
     given-names: Annemijn
+    email: xxx@xxx.xx 
     affiliation: Erasmus MC
+    orcid: "https://orcid.org/0000-000-0000-0000"
+
   - given-names: Candace Makeda
     family-names: Moore
     email: c.moore@esciencecenter.nl
     affiliation: Netherlands eScience Center
     orcid: 'https://orcid.org/0000-0003-1672-7565'
+
   - given-names: Walter
     family-names: Baccinelli
     email: w.baccinelli@esciencecenter.nl
     affiliation: Netherlands eScience Center
     orcid: 'https://orcid.org/0000-0001-8888-4792'
+
   - family-names: Somhorst
     given-names: Peter
+    email: xxx@xxx.xx 
+    affiliation: Erasmus MC
+    orcid: "https://orcid.org/0000-000-0000-0000"
+
   - family-names: Wisse-Smit
     given-names: Jantine
+    email: xxx@xxx.xx 
+    affiliation: Erasmus MC
+    orcid: "https://orcid.org/0000-000-0000-0000"
 
 date-released: 2023-03-23
 doi: 10.0000/FIXME
