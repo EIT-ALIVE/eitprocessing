@@ -19,7 +19,6 @@ docs/_build
 # ide
 .idea
 .eclipse
-.vscode
 
 # Mac
 .DS_Store
