@@ -1,0 +1,18 @@
+# YAML 1.2
+---
+cff-version: "1.2.0"
+title: "eitprocessing"
+authors:
+  -
+    family-names: Bodor
+    given-names: Dani
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+date-released: 20??-MM-DD
+doi: <insert your DOI here>
+version: "0.1.0"
+repository-code: "git@github.com:EIT-ALIVE/eitprocessing"
+keywords:
+  - impedance
+  - ventilation
+message: "If you use this software, please cite it using these metadata."
+license: Apache-2.0
