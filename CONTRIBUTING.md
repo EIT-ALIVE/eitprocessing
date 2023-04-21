@@ -5,9 +5,9 @@ We welcome any kind of contribution to our software, from simple comment or ques
 A contribution can be one of the following cases:
 
 1. you have a question;
-1. you think you may have found a bug (including unexpected behavior);
-1. you want to make some kind of change to the code base (e.g. to fix a bug, to add a new feature, to update documentation);
-1. you want to make a new release of the code base.
+2. you think you may have found a bug (including unexpected behavior);
+3. you want to make some kind of change to the code base (e.g. to fix a bug, to add a new feature, to update documentation);
+4. you want to make a new release of the code base.
 
 The sections below outline the steps in each case.
 
