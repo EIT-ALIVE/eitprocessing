@@ -17,6 +17,9 @@
           "pattern": "^https://test.pypi.org"
         },
         {
+          "pattern": "git@github.com:EIT-ALIVE/eitprocessing/*"
+        },
+        {
           "pattern": "^https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>"
         },
         {
