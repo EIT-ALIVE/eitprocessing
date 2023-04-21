@@ -11,14 +11,8 @@ checklist](https://guide.esciencecenter.nl/#/best_practices/checklist).
 
 This repository is set up with Python versions:
 
-- 3.6
-- 3.7
-- 3.8
-- 3.9
+- 3.10
 
-Add or remove Python versions based on project requirements. See [the
-guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python) for more information about Python
-versions.
 
 ## Package management and dependencies
 
