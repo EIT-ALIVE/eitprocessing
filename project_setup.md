@@ -61,10 +61,7 @@ help you decide which tool to use for packaging.
 
 ## Continuous code quality
 
-[Sonarcloud](https://sonarcloud.io/) is used to perform quality analysis and code coverage report
-
-- `sonar-project.properties` is the SonarCloud [configuration](https://docs.sonarqube.org/latest/analysis/analysis-parameters/) file
-- `.github/workflows/sonarcloud.yml` is the GitHub action workflow which performs the SonarCloud analysis
+We check code quality by hand, and continously upgrade as time allows. 
 
 ## Package version number
 
