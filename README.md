@@ -35,6 +35,17 @@ git clone git@github.com:EIT-ALIVE/eitprocessing.git
 cd eitprocessing
 python3 -m pip install .
 ```
+## Building environments
+
+You can build an environment by hand or with conda. To build with conda
+you can install all Python packages required, using conda and the
+    `environment.yml` file.
+
+  * The command for Windows/Anaconda users will be:
+     `conda env create -f environment.yml`
+
+
+
 
 ## Documentation
 

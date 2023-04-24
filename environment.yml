@@ -1,0 +1,21 @@
+# environment file to pull all from consistent conda-channel
+
+name: eit_made
+channels:
+  - conda-forge
+  
+dependencies:
+
+  - python = 3.10.5
+  - flit=3.8.0
+  - ipykernel=6.15.2
+  - ipython=8.4.0
+  - jupyter=1.0.0
+  - jupytext=1.14.5
+  - matplotlib=3.7.1
+  - notebook=6.4.12
+  - numpy=1.24.2
+  - pycodestyle
+  - scipy=1.10.1
+  - tqdm=4.65.0
+  - sphinx=4.5.0
