@@ -11,13 +11,10 @@
 | (5/5) checklist                    | [![workflow cii badge](https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>/badge)](https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>) |
 | howfairis                          | [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu) |
 | **Other best practices**           | &nbsp; |
-| Static analysis                    | [![workflow scq badge](https://sonarcloud.io/api/project_badges/measure?project=EIT-ALIVE_eitprocessing&metric=alert_status)](https://sonarcloud.io/dashboard?id=EIT-ALIVE_eitprocessing) |
-| Coverage                           | [![workflow scc badge](https://sonarcloud.io/api/project_badges/measure?project=EIT-ALIVE_eitprocessing&metric=coverage)](https://sonarcloud.io/dashboard?id=EIT-ALIVE_eitprocessing) |
 | Documentation                      | [![Documentation Status](https://readthedocs.org/projects/eitprocessing/badge/?version=latest)](https://eitprocessing.readthedocs.io/en/latest/?badge=latest) |
 | **GitHub Actions**                 | &nbsp; |
 | Build                              | [![build](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/build.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/build.yml) |
 | Citation data consistency               | [![cffconvert](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/cffconvert.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/cffconvert.yml) |
-| SonarCloud                         | [![sonarcloud](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/sonarcloud.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/sonarcloud.yml) |
 | MarkDown link checker              | [![markdown-link-check](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/markdown-link-check.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/markdown-link-check.yml) |
 
 ## How to use eitprocessing
