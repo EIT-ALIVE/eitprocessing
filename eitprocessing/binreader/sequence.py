@@ -1,14 +1,26 @@
-from dataclasses import dataclass, field
-from pathlib import Path
-import numpy as np
-from typing import List, Tuple, Dict
-import copy
+"""
+Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
+Licensed under the Apache License, version 2.0. See LICENSE for details.
 
-from .reader import Reader
-from .frameset import Frameset
+This file contains methods related to parts of electrical impedance tomographs 
+as they are read.
+"""
+
+import copy
+from dataclasses import dataclass
+from dataclasses import field
+from pathlib import Path
+from typing import Dict
+from typing import List
+from typing import Tuple
+import numpy as np
 from .event import Event
+from .frameset import Frameset
+from .phases import MaxValue
+from .phases import MinValue
+from .phases import PhaseIndicator
+from .reader import Reader
 from .timing_error import TimingError
-from .phases import MinValue, MaxValue, PhaseIndicator
 
 
 @dataclass
