@@ -1,8 +1,18 @@
-from dataclasses import dataclass, field
-import numpy as np
-from matplotlib import pyplot as plt, animation
-from IPython.display import display, HTML
+"""
+Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
+Licensed under the Apache License, version 2.0. See LICENSE for details.
+
+This file contains methods related to when electrical impedance tomographs are read.
+"""
+
 import copy
+from dataclasses import dataclass
+from dataclasses import field
+import numpy as np
+from IPython.display import HTML
+from IPython.display import display
+from matplotlib import animation
+from matplotlib import pyplot as plt
 
 
 @dataclass
