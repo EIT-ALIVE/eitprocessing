@@ -32,3 +32,8 @@ env
 env3
 venv
 venv3
+
+
+# temporary test data
+
+test_data/*
