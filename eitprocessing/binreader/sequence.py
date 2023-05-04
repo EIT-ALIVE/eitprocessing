@@ -7,6 +7,8 @@ as they are read.
 """
 
 import copy
+import functools
+import itertools
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
@@ -36,6 +38,65 @@ class Sequence:
 
     def __len__(self):
         return self.n_frames
+
+    @classmethod
+    def merge(cls, a, b):
+
+        path = list(itertools.chain([a.path, b.path]))
+
+        # Create time axis
+        if (a_ := a.framerate) != (b_ := b.framerate):
+            raise ValueError(f"Framerates are not equal: {a_}, {b_}")
+
+        n_frames = len(a) + len(b)
+        time = np.arange(n_frames) / a.framerate + a.time[0]
+
+        # Merge framesets
+        if (a_ := a.framesets.keys()) != (b_ := b.framesets.keys()):
+            raise AttributeError(f"Sequences don't contain the same framesets: {a_}, {b_}")
+
+        framesets = {
+            name: Frameset.merge(a.framesets[name], b.framesets[name])
+            for name in a.framesets.keys()
+        }
+
+        # Merge events
+        other_events = copy.deepcopy(b.events)
+        for event in other_events:
+            event.index += a.n_frames
+
+        events = a.events + other_events
+
+        # Merge timing_errors
+        other_timing_errors = copy.deepcopy(b.timing_errors)
+        for timing_error in other_timing_errors:
+            timing_error.index += a.n_frames
+
+        timing_errors = a.timing_errors + other_timing_errors
+
+        # Merge phases
+        other_phases = copy.deepcopy(b.phases)
+        for phase in other_phases:
+            phase.index += a.n_frames
+
+        phases = a.phases + other_phases
+
+        return cls(
+            path=path,
+            time=time,
+            n_frames=n_frames,
+            framerate=a.framerate,
+            framesets=framesets,
+            events=events,
+            timing_errors=timing_errors,
+            phases=phases
+        )
+
+    @classmethod
+    def from_paths(cls, paths: List[Path], framerate: int = None):
+        sequences = (cls.from_path(path, framerate=framerate) for path in paths)
+        return functools.reduce(lambda a, b: cls.merge(a, b), sequences)
+        
 
     @classmethod
     def from_path(
