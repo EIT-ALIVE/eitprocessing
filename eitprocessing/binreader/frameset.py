@@ -13,6 +13,8 @@ from IPython.display import HTML
 from IPython.display import display
 from matplotlib import animation
 from matplotlib import pyplot as plt
+from tqdm import tqdm
+from tqdm.notebook import tqdm as notebook_tqdm
 
 
 @dataclass
@@ -57,30 +59,45 @@ class Frameset:
         ax = fig.add_subplot(1, 1, 1)
 
         array = self.pixel_values
-        
+
         vmin = array.min()
         vmax = array.max()
-        
+
         im = ax.imshow(array[0, :, :], vmin=vmin, vmax=vmax, cmap=cmap)
         plt.colorbar(im)
 
         if show_progress:
-            if show_progress == 'notebook':
-                from tqdm.notebook import tqdm
-            elif show_progress:
-                from tqdm import tqdm    
-                    
             progress_bar = tqdm(total=len(self))
+            if show_progress == 'notebook':
+                progress_bar = notebook_tqdm(total=len(self))
             progress_bar.update(1)
-        
+
         def update(i):
             im.set(data=array[i, :, :])
             if show_progress:
                 progress_bar.update(1)
 
-        anim = animation.FuncAnimation(fig, update, frames=range(1,len(self)), repeat=False)
+        anim = animation.FuncAnimation(fig, update, frames=range(1, len(self)), repeat=False)
         display(HTML(anim.to_jshtml(self.params['framerate'])))
-        
+
         plt.close()
+
+    @classmethod
+    def merge(cls, a, b):
+        if (a_ := a.name) != (b_ := b.name):
+            raise ValueError(f"Frameset names don't match: {a_}, {b_}")
+
+        if (a_ := a.description) != (b_ := b.description):
+            raise ValueError(f"Frameset descriptions don't match: {a_}, {b_}")
+
+        if (a_ := a.params) != (b_ := b.params):
+            raise ValueError(f"Frameset params don't match: {a_}, {b_}")
+
+        return cls(
+            name=a.name,
+            description=a.description,
+            params=a.params,
+            pixel_values=np.concatenate([a.pixel_values, b.pixel_values], axis=0),
+        )
 
     deepcopy = copy.deepcopy
