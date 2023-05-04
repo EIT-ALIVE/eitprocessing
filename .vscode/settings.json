@@ -4,6 +4,6 @@
             "source.organizeImports": true
         }
     },
-    "python.linting.prospectorEnabled": true,
+    // "python.linting.prospectorEnabled": true,
     "notebook.lineNumbers": "on",
 }
