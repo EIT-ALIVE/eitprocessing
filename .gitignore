@@ -14,6 +14,10 @@ coverage.xml
 .pytest_cache
 .tox
 
+test_data/*
+
+conda.deps
+
 docs/_build
 
 # ide
