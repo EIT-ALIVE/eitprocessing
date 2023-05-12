@@ -36,19 +36,6 @@ Install eitprocessing as follows:
     - For basic use: `pip install -e .`
     - For full developer options (testing, etc): `pip install -e .[dev]`
 
-
-## Building environments
-
-You can build an environment by hand or with conda. To build with conda
-you can install all Python packages required, using conda and the
-    `environment.yml` file.
-
-  * The command for Windows/Anaconda users will be:
-     `conda env create -f environment.yml`
-
-
-
-
 ## Documentation
 
 Include a link to your project's full documentation here.
