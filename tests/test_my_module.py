@@ -1,7 +1,6 @@
 """Tests for the eitprocessing.my_module module.
 """
 import os
-import pytest
 from eitprocessing.binreader.sequence import Sequence
 
 

@@ -5,7 +5,6 @@ Licensed under the Apache License, version 2.0. See LICENSE for details.
 This file contains methods related to when electrical impedance tomographs are read.
 """
 
-import os
 import struct
 from functools import partialmethod
 import numpy as np
