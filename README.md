@@ -25,13 +25,17 @@ The project setup is documented in [project_setup.md](project_setup.md). Feel fr
 
 ## Installation
 
-To install eitprocessing from GitHub repository, do:
+Install eitprocessing as follows:
+- Create fresh environment
+  - Make sure you are in your base environment: `conda activate`
+  - Create a new environment: `conda create -n <envname> python=3.10`
+  - Activate new environment: `conda activate <envname>`
+- Clone and install
+  - Clone the repository: `git clone git@github.com:EIT-ALIVE/eitprocessing.git`
+  - Install:
+    - For basic use: `pip install -e .`
+    - For full developer options (testing, etc): `pip install -e .[dev]`
 
-```console
-git clone git@github.com:EIT-ALIVE/eitprocessing.git
-cd eitprocessing
-python3 -m pip install .
-```
 ## Building environments
 
 You can build an environment by hand or with conda. To build with conda
