@@ -40,7 +40,7 @@ class Sequence:
         return self.n_frames
 
     @classmethod
-    def merge(cls, a, b):
+    def merge(cls, a, b):  # pylint: disable = too-many-locals
 
         path = list(itertools.chain([a.path, b.path]))
 
@@ -95,7 +95,7 @@ class Sequence:
     @classmethod
     def from_paths(cls, paths: List[Path], framerate: int = None):
         sequences = (cls.from_path(path, framerate=framerate) for path in paths)
-        return functools.reduce(lambda a, b: cls.merge(a, b), sequences)
+        return functools.reduce(lambda a, b: cls.merge(a, b), sequences) # pylint: disable = unnecessary-lambda
         
 
     @classmethod
@@ -141,8 +141,7 @@ class Sequence:
                     if indices.step not in (None, 1):
                         raise NotImplementedError("Can't skip intermediate frames while slicing")
                     return item.index >= indices.start and item.index < indices.stop
-                else:
-                    return item.index in indices
+                return item.index in indices
 
             new_list = list(filter(helper, list_))
             for item in new_list:
@@ -220,9 +219,9 @@ class Sequence:
         event_marker = reader.int32()
         event_text = reader.string(length=30)
         timing_error = reader.int32()
-        medibus_data = reader.float32(length=52)
+        medibus_data = reader.float32(length=52) # pylint: disable = unused-variable
 
-        if len(self.events):
+        if self.events:
             previous_event = self.events[-1]
         else:
             previous_event = None
