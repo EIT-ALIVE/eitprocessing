@@ -219,6 +219,7 @@ class Sequence:
         event_marker = reader.int32()
         event_text = reader.string(length=30)
         timing_error = reader.int32()
+        medibus_data = reader.float32(length=52)  # noqa; code crashes if line is removed
 
         if self.events:
             previous_event = self.events[-1]
