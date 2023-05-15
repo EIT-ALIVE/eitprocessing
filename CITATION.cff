@@ -11,9 +11,9 @@ authors:
 
   - family-names: Somhorst
     given-names: Peter
-    email: xxx@xxx.xx 
+    email: p.somhorst@erasmusmc.nl
     affiliation: Erasmus MC
-    orcid: "https://orcid.org/0000-000-0000-0000"
+    orcid: "https://orcid.org/0000-0003-3490-2080"
 
   - family-names: Jonkman
     given-names: Annemijn
@@ -37,7 +37,7 @@ authors:
     given-names: Jantine
     email: xxx@xxx.xx 
     affiliation: Erasmus MC
-    orcid: "https://orcid.org/0000-000-0000-0000"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
 
 date-released: 2023-03-23
 doi: 10.0000/FIXME
