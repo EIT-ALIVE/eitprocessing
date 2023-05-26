@@ -55,6 +55,7 @@ isort eitprocessing
 To fix readability of your code style you can use [yapf](https://github.com/google/yapf).
 
 
+# The following sections are untested
 ## Generating the API docs
 
 ```shell
