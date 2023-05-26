@@ -8,8 +8,10 @@ If you're looking for user documentation, go [here](README.md).
 Make sure you have developer options installed as described in the [README](README.md)
 (otherwise run: `pip install -e .[dev]` on the repository folder in your environment)
 
-For testing all you need to do is run: `pytest`
-
+For testing all you need to do is run: 
+```shell
+pytest
+```
 
 ### Test coverage
 
@@ -31,9 +33,9 @@ coverage report
 
 ## Running linters locally
 
-For linting we will use [prospector](https://pypi.org/project/prospector/) and to sort imports we will use
-[isort](https://pycqa.github.io/isort/). Running the linters requires an activated virtual environment with the
-development tools installed.
+For linting we will use [prospector](https://pypi.org/project/prospector/).
+To sort imports we will use [isort](https://pycqa.github.io/isort/). Note that in VS Code sorting occurs
+automatically upon file saving.
 
 ```shell
 # linter
@@ -52,11 +54,6 @@ isort eitprocessing
 
 To fix readability of your code style you can use [yapf](https://github.com/google/yapf).
 
-You can enable automatic linting with `prospector` and `isort` on commit by enabling the git hook from `.githooks/pre-commit`, like so:
-
-```shell
-git config --local core.hooksPath .githooks
-```
 
 ## Generating the API docs
 
