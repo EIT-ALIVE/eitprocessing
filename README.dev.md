@@ -2,45 +2,14 @@
 
 If you're looking for user documentation, go [here](README.md).
 
-## Development install
-
-```shell
-# Create a virtual environment, e.g. with
-python3 -m venv env
-
-# activate virtual environment
-source env/bin/activate
-
-# make sure to have a recent version of pip and setuptools
-python3 -m pip install --upgrade pip setuptools
-
-# (from the project root directory)
-# install eitprocessing as an editable package
-python3 -m pip install --no-cache-dir --editable .
-# install development dependencies
-python3 -m pip install --no-cache-dir --editable .[dev]
-```
-
-Afterwards check that the install directory is present in the `PATH` environment variable.
 
 ## Running the tests
 
-There are two ways to run tests.
+Make sure you have developer options installed as described in the [README](README.md)
+(otherwise run: `pip install -e .[dev]` on the repository folder in your environment)
 
-The first way requires an activated virtual environment with the development tools installed:
+For testing all you need to do is run: `pytest`
 
-```shell
-pytest -v
-```
-
-The second is to use `tox`, which can be installed separately (e.g. with `pip install tox`), i.e. not necessarily inside the virtual environment you use for installing `eitprocessing`, but then builds the necessary virtual environments itself by simply running:
-
-```shell
-tox
-```
-
-Testing with `tox` allows for keeping the testing environment separate from your development environment.
-The development environment will typically accumulate (old) packages during development that interfere with testing; this problem is avoided by testing with `tox`.
 
 ### Test coverage
 
