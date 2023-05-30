@@ -15,17 +15,12 @@ pytest
 
 ### Test coverage
 
-In addition to just running the tests to see if they pass, they can be used for coverage statistics, i.e. to determine how much of the package's code is actually executed during tests.
-In an activated virtual environment with the development tools installed, inside the package directory, run:
+To determine the coverage percentage, i.e. how much of the package's code is actually executed during tests, run:
 
 ```shell
 coverage run
-```
-
-This runs tests and stores the result in a `.coverage` file.
-To see the results on the command line, run
-
-```shell
+# This runs tests and stores the result in a `.coverage` file.
+# To see the results on the command line, run
 coverage report
 ```
 
@@ -34,8 +29,8 @@ coverage report
 ## Running linters locally
 
 For linting we will use [prospector](https://pypi.org/project/prospector/).
-To sort imports we will use [isort](https://pycqa.github.io/isort/). Note that in VS Code sorting occurs
-automatically upon file saving.
+To sort imports we will use [isort](https://pycqa.github.io/isort/). Note that if you use VS Code, 
+sorting is automated upon file saving.
 
 ```shell
 # linter
