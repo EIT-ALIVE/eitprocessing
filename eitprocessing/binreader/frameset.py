@@ -82,21 +82,21 @@ class Frameset:
 
         plt.close()
 
-    def __add__(self, other):
+    def __add__(self, other:Frameset):
+        """
+        Add other frameset to existing frameset
+        """
         if self.name != other.name:
             raise ValueError(f"Frameset names don't match: {self.name}, {other.name}")
 
-        if (a_ := a.description) != (b_ := b.description):
-            raise ValueError(f"Frameset descriptions don't match: {a_}, {b_}")
+        if self.description != other.description:
+            raise ValueError(f"Frameset descriptions don't match: {self.description}, {other.description}")
 
-        if (a_ := a.params) != (b_ := b.params):
-            raise ValueError(f"Frameset params don't match: {a_}, {b_}")
+        if self.params != other.params:
+            raise ValueError(f"Frameset params don't match: {self.params}, {other.params}")
 
-        return cls(
-            name=a.name,
-            description=a.description,
-            params=a.params,
-            pixel_values=np.concatenate([a.pixel_values, b.pixel_values], axis=0),
+        return self.pixel_values(
+            pixel_values=np.concatenate([self.pixel_values, other.pixel_values], axis=0),
         )
 
     deepcopy = copy.deepcopy
