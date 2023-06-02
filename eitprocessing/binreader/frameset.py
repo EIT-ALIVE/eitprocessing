@@ -82,10 +82,9 @@ class Frameset:
 
         plt.close()
 
-    @classmethod
-    def merge(cls, a, b):
-        if (a_ := a.name) != (b_ := b.name):
-            raise ValueError(f"Frameset names don't match: {a_}, {b_}")
+    def __add__(self, other):
+        if self.name != other.name:
+            raise ValueError(f"Frameset names don't match: {self.name}, {other.name}")
 
         if (a_ := a.description) != (b_ := b.description):
             raise ValueError(f"Frameset descriptions don't match: {a_}, {b_}")
