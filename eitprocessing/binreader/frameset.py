@@ -21,8 +21,8 @@ from tqdm.notebook import tqdm as notebook_tqdm
 class Frameset:
     name: str
     description: str
-    params: dict
-    pixel_values: np.ndarray = field(repr=False)
+    params: dict = field(default_factory=dict)
+    pixel_values: np.ndarray = field(repr=False, default=None)
 
     def __len__(self):
         return self.pixel_values.shape[0]
