@@ -23,3 +23,8 @@ class MinValue(PhaseIndicator):
 @dataclass
 class MaxValue(PhaseIndicator):
     pass
+
+
+@dataclass
+class QRSMark(PhaseIndicator):
+    pass
