@@ -23,6 +23,7 @@ class Frameset:
     description: str
     params: dict = field(default_factory=dict)
     pixel_values: np.ndarray = field(repr=False, default=None)
+    waveform_values: dict = field(repr=False, default_factory=dict)
 
     def __len__(self):
         return self.pixel_values.shape[0]
@@ -30,6 +31,8 @@ class Frameset:
     def select_by_indices(self, indices):
         obj = copy.copy(self)
         obj.pixel_values = self.pixel_values[indices, :, :]
+        for key in self.waveform_values.keys():
+            obj.waveform_values[key] = self.waveform_values[key][indices]
         return obj
 
     __getitem__ = select_by_indices
@@ -92,12 +95,35 @@ class Frameset:
 
         if (a_ := a.params) != (b_ := b.params):
             raise ValueError(f"Frameset params don't match: {a_}, {b_}")
+        
+        a_waveform_keys = set(a.waveform_values.keys())
+        b_waveform_keys = set(b.waveform_values.keys())
+        shared_waveform_keys = a_waveform_keys & b_waveform_keys
+        not_shared_waveform_keys = a_waveform_keys ^ b_waveform_keys
+        
+        if len(not_shared_waveform_keys):
+            warnings.warn(f"Some waveforms are not available in both framesets: {not_shared_waveform_keys}", UserWarning)
+
+        waveform_values = dict()
+        for key in shared_waveform_keys:
+            waveform_values[key] = np.concatenate([a.waveform_values[key], b_waveform_keys[key]])
+        
+        # for waveforms in a but not in b
+        for key in a_waveform_keys - b_waveform_keys:
+            b_values = np.full((len(b), ), np.nan)
+            waveform_values[key] = np.concatenate([a.waveform_values[key], b_values])
+
+        # for waveforms in b but not in a
+        for key in b_waveform_keys - a_waveform_keys:
+            a_values = np.full((len(a), ), np.nan)
+            waveform_values[key] = np.concatenate([a_values, b.waveform_values[key]])
 
         return cls(
             name=a.name,
             description=a.description,
             params=a.params,
             pixel_values=np.concatenate([a.pixel_values, b.pixel_values], axis=0),
+            waveform_values=waveform_values
         )
 
     deepcopy = copy.deepcopy
