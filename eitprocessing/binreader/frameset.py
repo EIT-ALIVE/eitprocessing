@@ -6,6 +6,7 @@ This file contains methods related to when electrical impedance tomographs are r
 """
 
 import copy
+import warnings
 from dataclasses import dataclass
 from dataclasses import field
 import numpy as np
@@ -56,18 +57,55 @@ class Frameset:
     @property
     def global_impedance(self):
         return np.sum(self.pixel_values, axis=(1, 2))
+    
+    def plot_waveforms(self, waveforms=None):
+        if waveforms is None:
+            waveforms = list(self.waveform_values.keys())
 
-    def animate(self, cmap='plasma', show_progress='notebook'):
-        fig = plt.figure(figsize=(5, 5))
-        ax = fig.add_subplot(1, 1, 1)
+        n_waveforms = len(waveforms)
+        fig, axes = plt.subplots(n_waveforms, 1, sharex=True, figsize=(8, 3*n_waveforms))
+        fig.tight_layout()
+
+        for ax, key in zip(axes, waveforms):
+            ax.plot(self.waveform_values[key])
+            ax.set_title(key)
+
+    def animate(self, cmap='plasma', show_progress='notebook', waveforms=False):
+
+        if waveforms is True:
+            waveforms = list(self.waveform_values.keys())
+
+        if waveforms:
+            n_waveforms = len(waveforms)
+            fig = plt.figure(figsize=(10, 5))
+            ax = fig.add_subplot(1, 2, 1)
+        else:
+            fig = plt.figure(figsize=(5, 5))
+            ax = fig.add_subplot(1, 1, 1)
 
         array = self.pixel_values
 
-        vmin = array.min()
-        vmax = array.max()
+        vmin = np.nanmin(array)
+        vmax = np.nanmax(array)
 
         im = ax.imshow(array[0, :, :], vmin=vmin, vmax=vmax, cmap=cmap)
         plt.colorbar(im)
+
+        if waveforms:
+            wf_axes = list()
+            wf_lines = list()
+            last_wf_ax = None
+            for n, key in enumerate(reversed(waveforms)):
+                
+                wf_ax = fig.add_subplot(n_waveforms, 2, 2*(n + 1), sharex=last_wf_ax)
+                wf_axes.append(wf_ax)
+                if n == 0:
+                    last_wf_ax = wf_ax
+                
+                wf_data = self.waveform_values[key][0]
+                wf_lines.append(wf_ax.plot([0], wf_data))
+                wf_ax.set_xlim((0, len(self)))
+                wf_ax.set_ylim((wf_data.min(), wf_data.max()))
 
         if show_progress:
             progress_bar = tqdm(total=len(self))
@@ -77,6 +115,12 @@ class Frameset:
 
         def update(i):
             im.set(data=array[i, :, :])
+            
+            if waveforms:
+                for key, line in zip(waveforms, wf_lines):
+                    line[0].set_xdata(range(i))
+                    line[0].set_ydata(self.waveform_values[key][:i+1])
+
             if show_progress:
                 progress_bar.update(1)
 
