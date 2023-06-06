@@ -9,6 +9,7 @@ as they are read.
 import copy
 import functools
 import itertools
+import warnings
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
@@ -173,7 +174,7 @@ class Sequence:
 
         file_size = self.path.stat().st_size
         if file_size % FRAME_SIZE_BYTES:
-            raise ValueError(f"File size {file_size} not divisible by {FRAME_SIZE_BYTES}")
+            warnings.warn(f"File size {file_size} not divisible by {FRAME_SIZE_BYTES}. Importing will continue. Check data before continuing.")
 
         max_n_frames = file_size // FRAME_SIZE_BYTES
 
