@@ -11,23 +11,31 @@ import functools
 import itertools
 from dataclasses import dataclass
 from dataclasses import field
+from enum import auto
 from pathlib import Path
 from typing import Dict
 from typing import List
 from typing import Tuple
 import numpy as np
+from strenum import LowercaseStrEnum
 from .event import Event
 from .frameset import Frameset
 from .phases import MaxValue
 from .phases import MinValue
 from .phases import PhaseIndicator
+from .phases import QRSMark
 from .reader import Reader
 from .timing_error import TimingError
 
 
+class Vendor(LowercaseStrEnum):
+    DRAEGER = auto()
+    TIMPEL = auto()
+    SENTEC = auto()
+
 @dataclass
 class Sequence:
-    path: Path
+    path: Path | str
     time: np.ndarray = None
     n_frames: int = None
     framerate: int = 20
@@ -35,6 +43,7 @@ class Sequence:
     events: List[Event] = field(default_factory=list, repr=False)
     timing_errors: List[TimingError] = field(default_factory=list, repr=False)
     phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
+    vendor: Vendor = None
 
     def __len__(self):
         return self.n_frames
@@ -44,10 +53,13 @@ class Sequence:
 
         path = list(itertools.chain([a.path, b.path]))
 
-        # Create time axis
+        if a.vendor != b.vendor:
+            raise ValueError("Vendors aren't equal")
+
         if (a_ := a.framerate) != (b_ := b.framerate):
             raise ValueError(f"Framerates are not equal: {a_}, {b_}")
 
+        # Create time axis
         n_frames = len(a) + len(b)
         time = np.arange(n_frames) / a.framerate + a.time[0]
 
@@ -93,19 +105,36 @@ class Sequence:
         )
 
     @classmethod
-    def from_paths(cls, paths: List[Path], framerate: int = None):
-        sequences = (cls.from_path(path, framerate=framerate) for path in paths)
-        return functools.reduce(lambda a, b: cls.merge(a, b), sequences) # pylint: disable = unnecessary-lambda
+    def from_paths(cls, paths: List[Path], framerate: int = None, vendor: Vendor=None):
+        sequences = (cls.from_path(path, framerate=framerate, vendor=vendor) for path in paths)
+        return functools.reduce(lambda a, b: cls.merge(a, b), sequences)
+    
+    @classmethod
+    def from_path(cls, path: Path | str, framerate: int = None, limit_frames:slice | Tuple[int, int] = None, vendor:Vendor=None):
+
+        path = Path(path)
+
+        if not vendor:
+            if path.suffix == '.bin': 
+                vendor = Vendor.DRAEGER
+            elif path.suffix == '.txt':
+                vendor = Vendor.TIMPEL
+
+        if vendor == Vendor.DRAEGER:
+            return cls.from_path_draeger(path, framerate, limit_frames)
+        raise NotImplementedError(f"cannot load data from vendor {vendor}")
+    
         
 
     @classmethod
-    def from_path(
+    def from_path_draeger(
         cls,
         path: Path | str,
         framerate: int = None,
         limit_frames: slice | Tuple[int, int] = None,
     ):
         obj = cls(path=Path(path))
+        obj.vendor = Vendor.DRAEGER
 
         if framerate:
             obj.framerate = framerate
@@ -118,7 +147,7 @@ class Sequence:
         else:
             time_offset = 0
 
-        obj.read(limit_frames=limit_frames)
+        obj.read_draeger(limit_frames=limit_frames)
         obj.time = np.arange(len(obj)) / framerate + time_offset
 
         return obj
@@ -130,12 +159,14 @@ class Sequence:
         obj.time = self.time[indices]
         obj.n_frames = len(obj.time)
 
-        def filter_by_index(list_):
-            if isinstance(indices, slice):
-                first = indices.start
-            else:
-                first = indices[0]
+        if isinstance(indices, slice):
+            if indices.start is None:
+                indices = slice(0, indices.stop, indices.step)
+            first = indices.start
+        else:
+            first = indices[0]
 
+        def filter_by_index(list_):
             def helper(item):
                 if isinstance(indices, slice):
                     if indices.step not in (None, 1):
@@ -168,7 +199,7 @@ class Sequence:
 
         return self.select_by_indices(slice(start_index, end_index))
 
-    def read(self, limit_frames: slice = None, framerate: int = 20):
+    def read_draeger(self, limit_frames: slice = None, framerate: int = 20):
         FRAME_SIZE_BYTES = 4358
 
         file_size = self.path.stat().st_size
@@ -199,14 +230,14 @@ class Sequence:
 
             reader = Reader(fh)
             for index in range(self.n_frames):
-                self.read_frame(reader, index, pixel_values)
+                self.read_frame_draeger(reader, index, pixel_values)
 
         params = {"framerate": framerate}
         self.framesets["raw"] = Frameset(
             name="raw", description="raw impedance data", params=params, pixel_values=pixel_values
         )
 
-    def read_frame(self, reader, index, pixel_values):
+    def read_frame_draeger(self, reader, index, pixel_values):
         def reshape_frame(frame):
             return np.reshape(frame, (32, 32), "C")
 
