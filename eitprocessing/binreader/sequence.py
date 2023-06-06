@@ -122,9 +122,72 @@ class Sequence:
 
         if vendor == Vendor.DRAEGER:
             return cls.from_path_draeger(path, framerate, limit_frames)
+        
+        if vendor == Vendor.TIMPEL:
+            return cls.from_path_timpel(path, framerate, limit_frames)
+        
         raise NotImplementedError(f"cannot load data from vendor {vendor}")
     
+    @classmethod
+    def from_path_timpel(
+        cls,
+        path: Path | str,
+        framerate: int = None,
+        limit_frames: slice | Tuple[int, int] = None
+    ):
+        obj = cls(path=Path(path))
+        obj.vendor = Vendor.TIMPEL
+
+        if framerate:
+            obj.framerate = framerate
         
+        if isinstance(limit_frames, tuple):
+            limit_frames = slice(*limit_frames)
+
+        if limit_frames:
+            time_offset = limit_frames.start / framerate
+        else:
+            time_offset = 0
+
+        data = np.loadtxt(path, dtype=float, delimiter=',')
+        obj.n_frames = data.shape[0]
+
+        obj.time = np.arange(obj.n_frames) / obj.framerate + time_offset
+        
+        if data.shape[1] != 1030:
+            raise ValueError('csv file does not contain 1030 columns')
+        
+        pixel_data = data[:, :1024]
+        pixel_data = np.reshape(pixel_data, newshape=(-1, 32, 32), order='C')
+        pixel_data = np.where(pixel_data == -1000, np.nan, pixel_data)
+
+        waveform_data = dict(
+            airway_pressure=data[:, 1024],
+            flow=data[:, 1025],
+            volume = data[:, 1026]
+        )
+
+        # extract breath start, breath end and QRS marks
+        for index in np.flatnonzero(data[:, 1027] == 1):
+            obj.phases.append(MinValue(index, obj.time[index]))
+
+        for index in np.flatnonzero(data[:, 1028] == 1):
+            obj.phases.append(MaxValue(index, obj.time[index]))
+
+        for index in np.flatnonzero(data[:, 1029] == 1):
+            obj.phases.append(QRSMark(index, obj.time[index]))
+
+        obj.phases.sort(key=lambda x: x.index)
+
+        obj.framesets["raw"] = Frameset(
+            name='raw', 
+            description='raw timpel data', 
+            params=dict(framerate=obj.framerate), 
+            pixel_values=pixel_data, 
+            waveform_values=waveform_data
+        )
+
+        return obj
 
     @classmethod
     def from_path_draeger(
