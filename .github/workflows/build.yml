@@ -32,7 +32,7 @@ jobs:
           docker run
           --rm
           -v ${{ github.workspace }}:/ci
-          -e EIT_PROCESSING_TEST_DATA=/eitprocessing/test_data
+          -e EIT_PROCESSING_TEST_DATA=/eitprocessing
           ghcr.io/eit-alive/eittestdata:latest
           sh -c 'set -xe ;
                  cd /ci ;
