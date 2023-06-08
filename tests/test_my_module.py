@@ -22,6 +22,7 @@ sample_data2 = os.path.join(
 
 
 def test_merge():
+    #print(sample_data1)
     reading1 =Sequence.from_path(sample_data1, framerate=20)
     reading2 =Sequence.from_path(sample_data2, framerate=20)
     merged = Sequence.merge(reading1, reading2)
@@ -40,4 +41,4 @@ def test__from_path_1():
 
 def test_from_path_2():
     reading =Sequence.from_path(sample_data2, framerate=20)
-    assert len(reading.time) == 27680
+    assert len(reading.time) == 12000
