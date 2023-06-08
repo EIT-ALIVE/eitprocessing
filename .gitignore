@@ -38,3 +38,4 @@ venv3
 
 test_data/*
 .helpers/dock_test_data/*
+.helpers/dock_test_add/*
