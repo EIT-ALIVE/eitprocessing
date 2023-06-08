@@ -32,8 +32,8 @@ jobs:
           docker run
           --rm
           -v ${{ github.workspace }}:/ci
-          ghcr.io/eit-alive/eittestdata:latest
           -e EIT_PROCESSING_TEST_DATA=/eitprocessing/test_data
+          ghcr.io/eit-alive/eittestdata:latest
           sh -c 'set -xe ;
                  cd /ci ;
                  python -m pip install ".[dev,publishing]" ; 
