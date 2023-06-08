@@ -11,13 +11,13 @@ from eitprocessing.binreader.sequence import Sequence
 sample_data1 = os.path.join(
     os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
     'test_data',
-    'Testdata_FCVstudy.bin',
+    'Testdata.bin',
 )
 
 sample_data2 = os.path.join(
     os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
     'test_data',
-    'Testdata_PEEPtrial.bin',
+    'Testdata2.bin',
 )
 
 
