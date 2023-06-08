@@ -8,14 +8,20 @@ from eitprocessing.binreader.sequence import Sequence
 
 # sample data needs to be reset to potentially come from 
 # a container if we will not share samples
-sample_data1 = os.path.join(
+
+data_directory = os.environ.get(
+    'EIT_PROCESSING_TEST_DATA',
     os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+)
+
+sample_data1 = os.path.join(
+    data_directory,
     'test_data',
     'Testdata.bin',
 )
 
 sample_data2 = os.path.join(
-    os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+    data_directory,
     'test_data',
     'Testdata2.bin',
 )
