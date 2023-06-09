@@ -7,6 +7,7 @@ from .phases import MaxValue
 from .phases import MinValue
 from .phases import QRSMark
 from .sequence import Sequence
+from .sequence import Vendor
 
 
-__all__ = ['Frameset', 'MaxValue', 'MinValue', 'QRSMark',  'Sequence', ]
+__all__ = ['Frameset', 'MaxValue', 'MinValue', 'QRSMark',  'Sequence', 'Vendor']
