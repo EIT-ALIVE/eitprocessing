@@ -32,6 +32,8 @@ class Vendor(LowercaseStrEnum):
     DRAEGER = auto()
     TIMPEL = auto()
     SENTEC = auto()
+    DRAGER = DRAEGER
+    DRÄGER = DRAEGER
 
 @dataclass
 class Sequence:
