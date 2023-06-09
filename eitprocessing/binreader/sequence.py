@@ -184,7 +184,7 @@ class Sequence:
             description='raw timpel data', 
             params=dict(framerate=obj.framerate), 
             pixel_values=pixel_data, 
-            waveform_values=waveform_data
+            waveform_data=waveform_data
         )
 
         return obj
