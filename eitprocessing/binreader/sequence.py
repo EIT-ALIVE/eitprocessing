@@ -57,6 +57,7 @@ class Sequence:
 
         if a.vendor != b.vendor:
             raise ValueError("Vendors aren't equal")
+        vendor = a.vendor
 
         if (a_ := a.framerate) != (b_ := b.framerate):
             raise ValueError(f"Framerates are not equal: {a_}, {b_}")
@@ -93,7 +94,8 @@ class Sequence:
             framesets=framesets,
             events=events,
             timing_errors=timing_errors,
-            phases=phases
+            phases=phases,
+            vendor=vendor
         )
 
     @classmethod
