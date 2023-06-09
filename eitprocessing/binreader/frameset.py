@@ -24,7 +24,7 @@ class Frameset:
     description: str
     params: dict = field(default_factory=dict)
     pixel_values: np.ndarray = field(repr=False, default=None)
-    waveform_values: dict = field(repr=False, default_factory=dict)
+    waveform_data: dict = field(repr=False, default_factory=dict)
 
     def __len__(self):
         return self.pixel_values.shape[0]
@@ -32,8 +32,8 @@ class Frameset:
     def select_by_indices(self, indices):
         obj = copy.copy(self)
         obj.pixel_values = self.pixel_values[indices, :, :]
-        for key in self.waveform_values.keys():
-            obj.waveform_values[key] = self.waveform_values[key][indices]
+        for key in self.waveform_data.keys():
+            obj.waveform_data[key] = self.waveform_data[key][indices]
         return obj
 
     __getitem__ = select_by_indices
@@ -60,20 +60,20 @@ class Frameset:
     
     def plot_waveforms(self, waveforms=None):
         if waveforms is None:
-            waveforms = list(self.waveform_values.keys())
+            waveforms = list(self.waveform_data.keys())
 
         n_waveforms = len(waveforms)
         fig, axes = plt.subplots(n_waveforms, 1, sharex=True, figsize=(8, 3*n_waveforms))
         fig.tight_layout()
 
         for ax, key in zip(axes, waveforms):
-            ax.plot(self.waveform_values[key])
+            ax.plot(self.waveform_data[key])
             ax.set_title(key)
 
     def animate(self, cmap='plasma', show_progress='notebook', waveforms=False):
 
         if waveforms is True:
-            waveforms = list(self.waveform_values.keys())
+            waveforms = list(self.waveform_data.keys())
 
         if waveforms:
             n_waveforms = len(waveforms)
@@ -102,7 +102,7 @@ class Frameset:
                 if n == 0:
                     last_wf_ax = wf_ax
                 
-                wf_data = self.waveform_values[key][0]
+                wf_data = self.waveform_data[key][0]
                 wf_lines.append(wf_ax.plot([0], wf_data))
                 wf_ax.set_xlim((0, len(self)))
                 wf_ax.set_ylim((wf_data.min(), wf_data.max()))
@@ -119,7 +119,7 @@ class Frameset:
             if waveforms:
                 for key, line in zip(waveforms, wf_lines):
                     line[0].set_xdata(range(i))
-                    line[0].set_ydata(self.waveform_values[key][:i+1])
+                    line[0].set_ydata(self.waveform_data[key][:i+1])
 
             if show_progress:
                 progress_bar.update(1)
@@ -140,34 +140,34 @@ class Frameset:
         if (a_ := a.params) != (b_ := b.params):
             raise ValueError(f"Frameset params don't match: {a_}, {b_}")
         
-        a_waveform_keys = set(a.waveform_values.keys())
-        b_waveform_keys = set(b.waveform_values.keys())
+        a_waveform_keys = set(a.waveform_data.keys())
+        b_waveform_keys = set(b.waveform_data.keys())
         shared_waveform_keys = a_waveform_keys & b_waveform_keys
         not_shared_waveform_keys = a_waveform_keys ^ b_waveform_keys
         
         if len(not_shared_waveform_keys):
             warnings.warn(f"Some waveforms are not available in both framesets: {not_shared_waveform_keys}", UserWarning)
 
-        waveform_values = dict()
+        waveform_data = dict()
         for key in shared_waveform_keys:
-            waveform_values[key] = np.concatenate([a.waveform_values[key], b_waveform_keys[key]])
+            waveform_data[key] = np.concatenate([a.waveform_data[key], b.waveform_data[key]])
         
         # for waveforms in a but not in b
         for key in a_waveform_keys - b_waveform_keys:
             b_values = np.full((len(b), ), np.nan)
-            waveform_values[key] = np.concatenate([a.waveform_values[key], b_values])
+            waveform_data[key] = np.concatenate([a.waveform_data[key], b_values])
 
         # for waveforms in b but not in a
         for key in b_waveform_keys - a_waveform_keys:
             a_values = np.full((len(a), ), np.nan)
-            waveform_values[key] = np.concatenate([a_values, b.waveform_values[key]])
+            waveform_data[key] = np.concatenate([a_values, b.waveform_data[key]])
 
         return cls(
             name=a.name,
             description=a.description,
             params=a.params,
             pixel_values=np.concatenate([a.pixel_values, b.pixel_values], axis=0),
-            waveform_values=waveform_values
+            waveform_data=waveform_data
         )
 
     deepcopy = copy.deepcopy
