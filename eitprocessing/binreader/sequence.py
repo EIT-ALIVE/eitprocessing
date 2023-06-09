@@ -72,27 +72,17 @@ class Sequence:
             for name in a.framesets.keys()
         }
 
-        # Merge events
-        other_events = copy.deepcopy(b.events)
-        for event in other_events:
-            event.index += a.n_frames
+        def merge_lists(list_name):
+            a_items = getattr(a, list_name)
+            b_items = copy.deepcopy(getattr(b, list_name))  # make a copy to prevent overwriting b
+            for item in b_items:
+                item.index += a.n_frames
+            return a_items + b_items
 
-        events = a.events + other_events
-
-        # Merge timing_errors
-        other_timing_errors = copy.deepcopy(b.timing_errors)
-        for timing_error in other_timing_errors:
-            timing_error.index += a.n_frames
-
-        timing_errors = a.timing_errors + other_timing_errors
-
-        # Merge phases
-        other_phases = copy.deepcopy(b.phases)
-        for phase in other_phases:
-            phase.index += a.n_frames
-
-        phases = a.phases + other_phases
-
+        events = merge_lists("events")
+        timing_errors = merge_lists("timing_errors")
+        phases = merge_lists("phases")
+        
         return cls(
             path=path,
             time=time,
