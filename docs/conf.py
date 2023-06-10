@@ -12,6 +12,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 import os
+import subprocess
 import sys
 
 
@@ -28,10 +29,23 @@ author = u"Dani Bodor"
 # built documents.
 #
 # The short X.Y version.
-version = "0.0.0"
+##version = "0.0.0"
 # The full version, including alpha/beta/rc tags.
-release = version
+##release = version
 
+try:
+    tag = subprocess.check_output([
+        'git',
+        '--no-pager',
+        'describe',
+        '--abbrev=0',
+        '--tags',
+    ]).strip().decode()
+except subprocess.CalledProcessError as e:
+    print(e.output)
+    tag = 'v0.0.0'
+
+release = tag[1:]
 # -- General configuration ------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
