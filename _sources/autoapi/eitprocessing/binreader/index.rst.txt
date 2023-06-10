@@ -1,0 +1,220 @@
+:py:mod:`eitprocessing.binreader`
+=================================
+
+.. py:module:: eitprocessing.binreader
+
+.. autoapi-nested-parse::
+
+   Loading and processing binary EIT data from the Dräger Pulmovista 500
+
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   event/index.rst
+   frameset/index.rst
+   phases/index.rst
+   reader/index.rst
+   sequence/index.rst
+   timing_error/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.binreader.Frameset
+   eitprocessing.binreader.MaxValue
+   eitprocessing.binreader.MinValue
+   eitprocessing.binreader.Reader
+   eitprocessing.binreader.Sequence
+
+
+
+
+.. py:class:: Frameset
+
+   .. py:property:: global_baseline
+
+
+   .. py:property:: pixel_values_global_offset
+
+
+   .. py:property:: pixel_baseline
+
+
+   .. py:property:: pixel_values_individual_offset
+
+
+   .. py:property:: global_impedance
+
+
+   .. py:attribute:: name
+      :type: str
+
+      
+
+   .. py:attribute:: description
+      :type: str
+
+      
+
+   .. py:attribute:: params
+      :type: dict
+
+      
+
+   .. py:attribute:: pixel_values
+      :type: numpy.ndarray
+
+      
+
+   .. py:attribute:: __getitem__
+
+      
+
+   .. py:attribute:: deepcopy
+
+      
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: select_by_indices(indices)
+
+
+   .. py:method:: animate(cmap='plasma', show_progress='notebook')
+
+
+   .. py:method:: merge(a, b)
+      :classmethod:
+
+
+
+.. py:class:: MaxValue
+
+   Bases: :py:obj:`PhaseIndicator`
+
+
+.. py:class:: MinValue
+
+   Bases: :py:obj:`PhaseIndicator`
+
+
+.. py:class:: Reader(file_handle)
+
+   .. py:attribute:: file_handle
+
+      
+
+   .. py:attribute:: float32
+
+      
+
+   .. py:attribute:: float64
+
+      
+
+   .. py:attribute:: int32
+
+      
+
+   .. py:attribute:: string
+
+      
+
+   .. py:method:: read(type_code, length=1, cast=None)
+
+
+   .. py:method:: cast_string(data)
+      :staticmethod:
+
+
+
+.. py:class:: Sequence
+
+   .. py:attribute:: path
+      :type: pathlib.Path
+
+      
+
+   .. py:attribute:: time
+      :type: numpy.ndarray
+
+      
+
+   .. py:attribute:: n_frames
+      :type: int
+
+      
+
+   .. py:attribute:: framerate
+      :type: int
+      :value: 20
+
+      
+
+   .. py:attribute:: framesets
+      :type: Dict[str, eitprocessing.binreader.frameset.Frameset]
+
+      
+
+   .. py:attribute:: events
+      :type: List[eitprocessing.binreader.event.Event]
+
+      
+
+   .. py:attribute:: timing_errors
+      :type: List[eitprocessing.binreader.timing_error.TimingError]
+
+      
+
+   .. py:attribute:: phases
+      :type: List[eitprocessing.binreader.phases.PhaseIndicator]
+
+      
+
+   .. py:attribute:: __getitem__
+
+      
+
+   .. py:attribute:: deepcopy
+
+      
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: merge(a, b)
+      :classmethod:
+
+
+   .. py:method:: from_paths(paths: List[pathlib.Path], framerate: int = None)
+      :classmethod:
+
+
+   .. py:method:: from_path(path: Path | str, framerate: int = None, limit_frames: slice | Tuple[int, int] = None)
+      :classmethod:
+
+
+   .. py:method:: select_by_indices(indices)
+
+
+   .. py:method:: select_by_time(start=None, end=None, end_inclusive=False)
+
+
+   .. py:method:: read(limit_frames: slice = None, framerate: int = 20)
+
+
+   .. py:method:: read_frame(reader, index, pixel_values)
+
+
+

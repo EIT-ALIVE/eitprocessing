@@ -1,0 +1,52 @@
+:py:mod:`eitprocessing.binreader.phases`
+========================================
+
+.. py:module:: eitprocessing.binreader.phases
+
+.. autoapi-nested-parse::
+
+   Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
+   Licensed under the Apache License, version 2.0. See LICENSE for details.
+
+   This file contains methods related to when electrical impedance tomographs are read.
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.binreader.phases.PhaseIndicator
+   eitprocessing.binreader.phases.MinValue
+   eitprocessing.binreader.phases.MaxValue
+
+
+
+
+.. py:class:: PhaseIndicator
+
+   .. py:attribute:: index
+      :type: int
+
+      
+
+   .. py:attribute:: time
+      :type: float
+
+      
+
+
+.. py:class:: MinValue
+
+   Bases: :py:obj:`PhaseIndicator`
+
+
+.. py:class:: MaxValue
+
+   Bases: :py:obj:`PhaseIndicator`
+
+

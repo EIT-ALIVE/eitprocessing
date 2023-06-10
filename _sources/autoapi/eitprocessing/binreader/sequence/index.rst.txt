@@ -1,0 +1,107 @@
+:py:mod:`eitprocessing.binreader.sequence`
+==========================================
+
+.. py:module:: eitprocessing.binreader.sequence
+
+.. autoapi-nested-parse::
+
+   Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
+   Licensed under the Apache License, version 2.0. See LICENSE for details.
+
+   This file contains methods related to parts of electrical impedance tomographs
+   as they are read.
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.binreader.sequence.Sequence
+
+
+
+
+.. py:class:: Sequence
+
+   .. py:attribute:: path
+      :type: pathlib.Path
+
+      
+
+   .. py:attribute:: time
+      :type: numpy.ndarray
+
+      
+
+   .. py:attribute:: n_frames
+      :type: int
+
+      
+
+   .. py:attribute:: framerate
+      :type: int
+      :value: 20
+
+      
+
+   .. py:attribute:: framesets
+      :type: Dict[str, eitprocessing.binreader.frameset.Frameset]
+
+      
+
+   .. py:attribute:: events
+      :type: List[eitprocessing.binreader.event.Event]
+
+      
+
+   .. py:attribute:: timing_errors
+      :type: List[eitprocessing.binreader.timing_error.TimingError]
+
+      
+
+   .. py:attribute:: phases
+      :type: List[eitprocessing.binreader.phases.PhaseIndicator]
+
+      
+
+   .. py:attribute:: __getitem__
+
+      
+
+   .. py:attribute:: deepcopy
+
+      
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: merge(a, b)
+      :classmethod:
+
+
+   .. py:method:: from_paths(paths: List[pathlib.Path], framerate: int = None)
+      :classmethod:
+
+
+   .. py:method:: from_path(path: Path | str, framerate: int = None, limit_frames: slice | Tuple[int, int] = None)
+      :classmethod:
+
+
+   .. py:method:: select_by_indices(indices)
+
+
+   .. py:method:: select_by_time(start=None, end=None, end_inclusive=False)
+
+
+   .. py:method:: read(limit_frames: slice = None, framerate: int = 20)
+
+
+   .. py:method:: read_frame(reader, index, pixel_values)
+
+
+

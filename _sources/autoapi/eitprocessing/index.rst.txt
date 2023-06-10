@@ -1,0 +1,38 @@
+:py:mod:`eitprocessing`
+=======================
+
+.. py:module:: eitprocessing
+
+.. autoapi-nested-parse::
+
+   Documentation about eitprocessing
+
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   binreader/index.rst
+
+
+Package Contents
+----------------
+
+.. py:data:: __author__
+   :value: 'Dani Bodor'
+
+   
+
+.. py:data:: __email__
+   :value: 'd.bodor@esciencecenter.nl'
+
+   
+
+.. py:data:: __version__
+   :value: '0.1.0'
+
+   
+
