@@ -4,9 +4,11 @@ on:
   push:
     branches:
     - main
+    - drcandacemakedamoore/improve_docu
   pull_request:
     branches:
     - main
+    - drcandacemakedamoore/improve_docu
 
 jobs:
   build-documentation:
@@ -32,6 +34,10 @@ jobs:
       - name: Install pandoc using apt
         run: sudo apt install pandoc        
       - name: Build documentation
-        run: make coverage doctest html
+        run: make html
         working-directory: docs
-        
+      - name: Publish Docs to Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          branch: drcandacemakedamoore/improve_docu
+          folder: docs/_build/html
