@@ -39,5 +39,5 @@ jobs:
       - name: Publish Docs to Pages
         uses: JamesIves/github-pages-deploy-action@4.1.1
         with:
-          branch: drcandacemakedamoore/improve_docu
+          branch: gh-pages
           folder: docs/_build/html
