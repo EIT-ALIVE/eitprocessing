@@ -38,7 +38,7 @@ class Vendor(LowercaseStrEnum):
 
 @dataclass(eq=False)
 class Sequence:
-    path: Path | str
+    path: Path | str = None
     time: np.ndarray = None
     n_frames: int = None
     framerate: int = None
