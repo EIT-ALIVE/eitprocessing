@@ -57,7 +57,7 @@ class Frameset:
         return True
 
     def select_by_indices(self, indices):
-        obj = copy.copy(self)
+        obj = self.deepcopy()
         obj.pixel_values = self.pixel_values[indices, :, :]
         for key in self.waveform_data.keys():
             obj.waveform_data[key] = self.waveform_data[key][indices]
