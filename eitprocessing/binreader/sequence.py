@@ -204,7 +204,7 @@ class Sequence:
                         raise NotImplementedError(
                             "Can't skip intermediate frames while slicing"
                         )
-                    return item.index >= indices.start and item.index < indices.stop
+                    return item.index >= indices.start and (indices.stop is None or item.index < indices.stop)
                 return item.index in indices
 
             new_list = list(filter(helper, list_))
