@@ -68,7 +68,6 @@ class Sequence:
 
         if a.vendor != b.vendor:
             raise ValueError("Vendors aren't equal")
-        vendor = a.vendor
 
         if (a_ := a.framerate) != (b_ := b.framerate):
             raise ValueError(f"Framerates are not equal: {a_}, {b_}")
@@ -93,20 +92,16 @@ class Sequence:
                 item.index += a.n_frames
             return a_items + b_items
 
-        events = merge_lists("events")
-        timing_errors = merge_lists("timing_errors")
-        phases = merge_lists("phases")
-        
         return cls(
             path=path,
             time=time,
             n_frames=n_frames,
             framerate=a.framerate,
             framesets=framesets,
-            events=events,
-            timing_errors=timing_errors,
-            phases=phases,
-            vendor=vendor
+            events=merge_list_attribute("events"),
+            timing_errors=merge_list_attribute("timing_errors"),
+            phases=merge_list_attribute("phases"),
+            vendor=a.vendor
         )
 
     @classmethod
