@@ -210,6 +210,7 @@ class Sequence:
             new_list = list(filter(helper, list_))
             for item in new_list:
                 item.index = item.index - first
+                item.time = obj.time[item.index]
 
             return new_list
 
@@ -252,13 +253,13 @@ class DraegerSequence(Sequence):
 
         limit_frames = obj.parse_limit_frames(limit_frames)
 
+        skip_frames = 0
         if limit_frames:
-            time_offset = limit_frames.start / obj.framerate
-        else:
-            time_offset = 0
+            skip_frames = limit_frames.start
 
         obj.read(limit_frames=limit_frames)
-        obj.time = np.arange(len(obj)) / obj.framerate + time_offset
+        obj.time = np.arange(len(obj) + skip_frames) / obj.framerate
+        obj.time = obj.time[skip_frames:]
 
         return obj
 
@@ -363,16 +364,12 @@ class TimpelSequence(Sequence):
 
         limit_frames = obj.parse_limit_frames(limit_frames)
 
-        skiprows, max_rows = None, None
+        skiprows, max_rows = 0, None
         if limit_frames:
             skiprows = limit_frames.start
             if limit_frames.stop:
                 max_rows = limit_frames.stop - limit_frames.start
-
-        if limit_frames:
-            time_offset = limit_frames.start / obj.framerate
-        else:
-            time_offset = 0
+            
 
         data = np.loadtxt(
             path, dtype=float, delimiter=",", skiprows=skiprows, max_rows=max_rows
@@ -384,7 +381,11 @@ class TimpelSequence(Sequence):
                 "Fewer rows were loaded than indicated with `limit_frames`"
             )
 
-        obj.time = np.arange(obj.n_frames) / obj.framerate + time_offset
+        # Below method seems convoluted: it's easier to create an array with n_frames and add a
+        # time_offset. However, this results in floating points errors, creating issues with
+        # comparing times later on.
+        obj.time = np.arange(obj.n_frames + skiprows) / obj.framerate
+        obj.time = obj.time[skiprows:]
 
         if data.shape[1] != 1030:
             raise ValueError("CSV file does not contain 1030 columns")
