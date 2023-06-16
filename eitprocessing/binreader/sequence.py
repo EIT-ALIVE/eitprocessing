@@ -170,7 +170,14 @@ class Sequence:
         else:
             time_offset = 0
 
-        data = np.loadtxt(path, dtype=float, delimiter=',')
+        skiprows, max_rows = None, None
+        if limit_frames:
+            skiprows = limit_frames.start
+            if limit_frames.stop:
+                max_rows = limit_frames.stop - limit_frames.start
+        
+        data = np.loadtxt(path, dtype=float, delimiter=',', skiprows=skiprows, max_rows=max_rows)
+        
         obj.n_frames = data.shape[0]
 
         obj.time = np.arange(obj.n_frames) / obj.framerate + time_offset
