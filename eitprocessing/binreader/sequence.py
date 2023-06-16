@@ -129,6 +129,27 @@ class Sequence:
         
         raise NotImplementedError(f"cannot load data from vendor {vendor}")
     
+    @staticmethod
+    def parse_limit_frames(limit_frames: tuple | slice) -> slice:
+        if isinstance(limit_frames, tuple):
+            if len(limit_frames) != 2:
+                raise ValueError("`limit_frames` should be a tuple (start, stop) or a slice.")
+            limit_frames = slice(*limit_frames)
+        
+        if limit_frames and not isinstance(limit_frames, slice):
+            raise TypeError(f"`limit_frames` should be a slice or tuple (to be converted to a slice), not {type(limit_frames)!r}")
+        
+        if limit_frames.step != 1 and limit_frames.step is not None:
+            raise NotImplementedError("Can't skip frames when loading data.")
+        
+        if limit_frames.start is None and limit_frames.stop is None:
+            return None
+        
+        if limit_frames.start is None:
+            limit_frames = slice(0, limit_frames.stop)
+
+        return limit_frames
+    
     @classmethod
     def from_path_timpel(
         cls,
@@ -142,8 +163,7 @@ class Sequence:
         if framerate:
             obj.framerate = framerate
         
-        if isinstance(limit_frames, tuple):
-            limit_frames = slice(*limit_frames)
+        limit_frames = obj.parse_limit_frames(limit_frames)
 
         if limit_frames:
             time_offset = limit_frames.start / framerate
@@ -203,8 +223,7 @@ class Sequence:
         if framerate:
             obj.framerate = framerate
 
-        if isinstance(limit_frames, tuple):
-            limit_frames = slice(*limit_frames)
+        limit_frames = obj.parse_limit_frames(limit_frames)
 
         if limit_frames:
             time_offset = limit_frames.start / framerate
