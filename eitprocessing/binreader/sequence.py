@@ -40,7 +40,7 @@ class Sequence:
     path: Path | str
     time: np.ndarray = None
     n_frames: int = None
-    framerate: int = 20
+    framerate: int = None
     framesets: Dict[str, Frameset] = field(default_factory=dict)
     events: List[Event] = field(default_factory=list, repr=False)
     timing_errors: List[TimingError] = field(default_factory=list, repr=False)
@@ -148,7 +148,7 @@ class Sequence:
     def from_path_timpel(
         cls,
         path: Path | str,
-        framerate: int = None,
+        framerate: int = 50,
         limit_frames: slice | Tuple[int, int] = None
     ):
         obj = cls(path=Path(path))
@@ -215,7 +215,7 @@ class Sequence:
     def from_path_draeger(
         cls,
         path: Path | str,
-        framerate: int = None,
+        framerate: int = 20,
         limit_frames: slice | Tuple[int, int] = None,
     ):
         obj = cls(path=Path(path))
