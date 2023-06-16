@@ -49,6 +49,17 @@ class Sequence:
 
     def __len__(self):
         return self.n_frames
+    
+    def __eq__(self, other) -> bool:
+        for attr in ['n_frames', 'framerate', 'framesets', 'vendor']:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+        
+        for attr in ['time', 'phases', 'events', 'timing_errors']:
+            if not np.all(np.equal(getattr(self, attr), getattr(other, attr))):
+                return False
+            
+        return True
 
     @classmethod
     def merge(cls, a, b):  # pylint: disable = too-many-locals
