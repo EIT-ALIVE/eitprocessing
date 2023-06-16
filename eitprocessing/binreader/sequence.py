@@ -47,7 +47,7 @@ class Sequence:
     phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
     vendor: Vendor = None
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.n_frames
     
     def __eq__(self, other) -> bool:
@@ -62,7 +62,7 @@ class Sequence:
         return True
 
     @classmethod
-    def merge(cls, a, b):  # pylint: disable = too-many-locals
+    def merge(cls, a, b) -> "Sequence":  # pylint: disable = too-many-locals
 
         path = list(itertools.chain([a.path, b.path]))
 
@@ -79,15 +79,14 @@ class Sequence:
         # Merge framesets
         if (a_ := a.framesets.keys()) != (b_ := b.framesets.keys()):
             raise AttributeError(f"Sequences don't contain the same framesets: {a_}, {b_}")
-
         framesets = {
             name: Frameset.merge(a.framesets[name], b.framesets[name])
             for name in a.framesets.keys()
         }
 
-        def merge_lists(list_name):
-            a_items = getattr(a, list_name)
-            b_items = copy.deepcopy(getattr(b, list_name))  # make a copy to prevent overwriting b
+        def merge_list_attribute(attr: str) -> list:
+            a_items = getattr(a, attr)
+            b_items = copy.deepcopy(getattr(b, attr))  # make a copy to prevent overwriting b
             for item in b_items:
                 item.index += a.n_frames
                 item.time = time[item.index]
@@ -106,12 +105,26 @@ class Sequence:
         )
 
     @classmethod
-    def from_paths(cls, paths: List[Path],  vendor: Vendor, framerate: int = None):
+    def from_paths(cls, paths: List[Path],  vendor: Vendor, framerate: int = None) -> "Sequence":
         sequences = (cls.from_path(path, framerate=framerate, vendor=vendor) for path in paths)
         return functools.reduce(lambda a, b: cls.merge(a, b), sequences)
     
     @classmethod
-    def from_path(cls, path: Path | str, vendor:Vendor, framerate: int = None, limit_frames:slice | Tuple[int, int] = None):
+    def from_path(cls, path: Path | str, vendor:Vendor, framerate: int = None, limit_frames:slice | Tuple[int, int] = None) -> "Sequence":
+        """Load sequence from path
+
+        Args:
+            path (Path | str): path to data file
+            vendor (Vendor): vendor indicating the device used
+            framerate (int, optional): framerate at which the data was recorded. Defaults to None.
+            limit_frames (slice | Tuple[int, int], optional): limit the range of frames to be loaded. Defaults to None.
+
+        Raises:
+            NotImplementedError: is raised when there is no loading method for the given vendor.
+
+        Returns:
+            Sequence: a sequence containing the loaded data
+        """
 
         path = Path(path)
 
@@ -150,7 +163,7 @@ class Sequence:
         path: Path | str,
         framerate: int = 50,
         limit_frames: slice | Tuple[int, int] = None
-    ):
+    ) -> "Sequence":
         obj = cls(path=Path(path))
         obj.vendor = Vendor.TIMPEL
 
@@ -217,7 +230,7 @@ class Sequence:
         path: Path | str,
         framerate: int = 20,
         limit_frames: slice | Tuple[int, int] = None,
-    ):
+    ) -> "Sequence":
         obj = cls(path=Path(path))
         obj.vendor = Vendor.DRAEGER
 
@@ -236,7 +249,7 @@ class Sequence:
 
         return obj
 
-    def select_by_indices(self, indices):
+    def select_by_indices(self, indices) -> "Sequence":
         obj = self.deepcopy()
 
         obj.framesets = {k: v.select_by_indices(indices) for k, v in self.framesets.items()}
@@ -272,7 +285,7 @@ class Sequence:
 
     __getitem__ = select_by_indices
 
-    def select_by_time(self, start=None, end=None, end_inclusive=False):
+    def select_by_time(self, start=None, end=None, end_inclusive=False) -> "Sequence":
         if not any((start, end)):
             raise ValueError("Pass either start or end")
         start_index = np.nonzero(self.time >= start)[0][0]
@@ -283,7 +296,7 @@ class Sequence:
 
         return self.select_by_indices(slice(start_index, end_index))
 
-    def read_draeger(self, limit_frames: slice = None, framerate: int = 20):
+    def read_draeger(self, limit_frames: slice = None, framerate: int = 20) -> None:
         FRAME_SIZE_BYTES = 4358
 
         file_size = self.path.stat().st_size
@@ -321,7 +334,7 @@ class Sequence:
             name="raw", description="raw impedance data", params=params, pixel_values=pixel_values
         )
 
-    def read_frame_draeger(self, reader, index, pixel_values):
+    def read_frame_draeger(self, reader, index, pixel_values) -> None:
         def reshape_frame(frame):
             return np.reshape(frame, (32, 32), "C")
 
