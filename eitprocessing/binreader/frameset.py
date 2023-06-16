@@ -28,6 +28,33 @@ class Frameset:
 
     def __len__(self):
         return self.pixel_values.shape[0]
+    
+    def __eq__(self, other):
+        for attr in ['name', 'description', 'params']:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+        
+        for attr in ['pixel_values']:
+            # NaN values are not equal. Check whether values are equal or both NaN.
+            s = getattr(self, attr)
+            o = getattr(other, attr)
+            if not np.all((s == o) | (np.isnan(s) & np.isnan(o))):
+                return False
+            
+        for attr in ['waveform_data']:
+            s = getattr(self, attr)
+            o = getattr(other, attr)
+            
+            # check whether they contain the same types of data
+            if set(s.keys()) != set(o.keys()):
+                return False
+
+            # NaN values are not equal. Check whether values are equal or both NaN
+            for key in s.keys():
+                if not np.all((s[key] == o[key]) | (np.isnan(s[key]) & np.isnan(o[key]))):
+                    return False
+            
+        return True
 
     def select_by_indices(self, indices):
         obj = copy.copy(self)
@@ -40,7 +67,7 @@ class Frameset:
 
     @property
     def global_baseline(self):
-        return np.min(self.pixel_values)
+        return np.nanmin(self.pixel_values)
 
     @property
     def pixel_values_global_offset(self):
@@ -48,7 +75,7 @@ class Frameset:
 
     @property
     def pixel_baseline(self):
-        return np.min(self.pixel_values, axis=0)
+        return np.nanmin(self.pixel_values, axis=0)
 
     @property
     def pixel_values_individual_offset(self):
@@ -56,7 +83,7 @@ class Frameset:
 
     @property
     def global_impedance(self):
-        return np.sum(self.pixel_values, axis=(1, 2))
+        return np.nansum(self.pixel_values, axis=(1, 2))
     
     def plot_waveforms(self, waveforms=None):
         if waveforms is None:
