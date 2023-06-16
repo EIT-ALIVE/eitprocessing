@@ -18,6 +18,15 @@ sample_data1 = os.path.join(data_directory, "tests", "test_data", "testdata_timp
 def test_read():
     assert TimpelSequence.from_path(sample_data1)
 
+def test_direct_vs_indirect_reading():
+    direct = TimpelSequence.from_path(sample_data1)
+    indirect = Sequence.from_path(sample_data1, vendor=Vendor.TIMPEL)
+    indirect_str = Sequence.from_path(sample_data1, vendor="timpel")
+
+    assert direct == indirect
+    assert type(direct) == type(indirect)
+    assert indirect == indirect_str
+
 
 def test_equals():
     full_data = TimpelSequence.from_path(sample_data1)
