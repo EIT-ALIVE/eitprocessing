@@ -57,7 +57,10 @@ class Sequence:
                 return False
 
         for attr in ["time", "phases", "events", "timing_errors"]:
-            if not np.all(np.equal(getattr(self, attr), getattr(other, attr))):
+            self_attr, other_attr = getattr(self, attr), getattr(other, attr)
+            if len(self_attr) != len(other_attr):
+                return False
+            if not np.all(np.equal(self_attr, other_attr)):
                 return False
 
         return True
