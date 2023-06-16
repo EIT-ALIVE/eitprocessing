@@ -155,6 +155,9 @@ class Sequence:
 
     @staticmethod
     def parse_limit_frames(limit_frames: tuple | slice) -> slice:
+        if not limit_frames:
+            return None
+        
         if isinstance(limit_frames, tuple):
             if len(limit_frames) != 2:
                 raise ValueError(
