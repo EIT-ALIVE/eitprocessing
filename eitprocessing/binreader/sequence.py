@@ -36,7 +36,7 @@ class Vendor(LowercaseStrEnum):
     DRÄGER = DRAEGER
 
 
-@dataclass
+@dataclass(eq=False)
 class Sequence:
     path: Path | str
     time: np.ndarray = None
@@ -227,7 +227,7 @@ class Sequence:
     __getitem__ = select_by_indices
     deepcopy = copy.deepcopy
 
-
+@dataclass(eq=False)
 class DraegerSequence(Sequence):
     framerate: int = 20
     vendor: Vendor = Vendor.DRAEGER
@@ -338,7 +338,7 @@ class DraegerSequence(Sequence):
         elif min_max_flag == -1:
             self.phases.append(MinValue(index, time))
 
-
+@dataclass(eq=False)
 class TimpelSequence(Sequence):
     framerate: int = 50
     vendor: Vendor = Vendor.TIMPEL
