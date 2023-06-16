@@ -106,20 +106,14 @@ class Sequence:
         )
 
     @classmethod
-    def from_paths(cls, paths: List[Path], framerate: int = None, vendor: Vendor=None):
+    def from_paths(cls, paths: List[Path],  vendor: Vendor, framerate: int = None):
         sequences = (cls.from_path(path, framerate=framerate, vendor=vendor) for path in paths)
         return functools.reduce(lambda a, b: cls.merge(a, b), sequences)
     
     @classmethod
-    def from_path(cls, path: Path | str, framerate: int = None, limit_frames:slice | Tuple[int, int] = None, vendor:Vendor=None):
+    def from_path(cls, path: Path | str, vendor:Vendor, framerate: int = None, limit_frames:slice | Tuple[int, int] = None):
 
         path = Path(path)
-
-        if not vendor:
-            if path.suffix == '.bin': 
-                vendor = Vendor.DRAEGER
-            elif path.suffix == '.txt':
-                vendor = Vendor.TIMPEL
 
         if vendor == Vendor.DRAEGER:
             return cls.from_path_draeger(path, framerate, limit_frames)
