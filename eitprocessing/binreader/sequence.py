@@ -90,6 +90,7 @@ class Sequence:
             b_items = copy.deepcopy(getattr(b, list_name))  # make a copy to prevent overwriting b
             for item in b_items:
                 item.index += a.n_frames
+                item.time = time[item.index]
             return a_items + b_items
 
         return cls(
