@@ -105,7 +105,7 @@ class Sequence:
         )
 
     @classmethod
-    def from_paths(cls, paths: List[Path],  vendor: Vendor, framerate: int = None) -> "Sequence":
+    def from_paths(cls, paths: List[Path], vendor: Vendor, framerate: int = None) -> "Sequence":
         sequences = (cls.from_path(path, framerate=framerate, vendor=vendor) for path in paths)
         return functools.reduce(lambda a, b: cls.merge(a, b), sequences)
     
@@ -192,8 +192,7 @@ class Sequence:
 
         return obj
 
-    __getitem__ = select_by_indices
-
+    
     def select_by_time(self, start=None, end=None, end_inclusive=False) -> "Sequence":
         if not any((start, end)):
             raise ValueError("Pass either start or end")
@@ -206,6 +205,7 @@ class Sequence:
         return self.select_by_indices(slice(start_index, end_index))
 
     
+    __getitem__ = select_by_indices
     deepcopy = copy.deepcopy
 
 class DraegerSequence(Sequence):
