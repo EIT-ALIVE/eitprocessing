@@ -28,6 +28,7 @@ Classes
 
 .. py:class:: Sequence
 
+
    .. py:attribute:: path
       :type: pathlib.Path
 
@@ -88,7 +89,7 @@ Classes
       :classmethod:
 
 
-   .. py:method:: from_path(path: Path | str, framerate: int = None, limit_frames: slice | Tuple[int, int] = None)
+   .. py:method:: from_path(path: pathlib.Path | str, framerate: int = None, limit_frames: slice | Tuple[int, int] = None)
       :classmethod:
 
 

@@ -42,6 +42,7 @@ Classes
 
 .. py:class:: Frameset
 
+
    .. py:property:: global_baseline
 
 
@@ -101,15 +102,18 @@ Classes
 
 .. py:class:: MaxValue
 
+
    Bases: :py:obj:`PhaseIndicator`
 
 
 .. py:class:: MinValue
 
+
    Bases: :py:obj:`PhaseIndicator`
 
 
 .. py:class:: Reader(file_handle)
+
 
    .. py:attribute:: file_handle
 
@@ -140,6 +144,7 @@ Classes
 
 
 .. py:class:: Sequence
+
 
    .. py:attribute:: path
       :type: pathlib.Path
@@ -201,7 +206,7 @@ Classes
       :classmethod:
 
 
-   .. py:method:: from_path(path: Path | str, framerate: int = None, limit_frames: slice | Tuple[int, int] = None)
+   .. py:method:: from_path(path: pathlib.Path | str, framerate: int = None, limit_frames: slice | Tuple[int, int] = None)
       :classmethod:
 
 

@@ -29,6 +29,7 @@ Classes
 
 .. py:class:: PhaseIndicator
 
+
    .. py:attribute:: index
       :type: int
 
@@ -42,10 +43,12 @@ Classes
 
 .. py:class:: MinValue
 
+
    Bases: :py:obj:`PhaseIndicator`
 
 
 .. py:class:: MaxValue
+
 
    Bases: :py:obj:`PhaseIndicator`
 

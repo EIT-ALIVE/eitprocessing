@@ -27,6 +27,7 @@ Classes
 
 .. py:class:: Frameset
 
+
    .. py:property:: global_baseline
 
 

@@ -27,6 +27,7 @@ Classes
 
 .. py:class:: Reader(file_handle)
 
+
    .. py:attribute:: file_handle
 
       
