@@ -29,6 +29,9 @@ from .timing_error import TimingError
 
 
 class Vendor(LowercaseStrEnum):
+    """Enum indicating the vendor (manufacturer) of the EIT device with which the data was
+    gathered"""
+
     DRAEGER = auto()
     TIMPEL = auto()
     SENTEC = auto()
@@ -38,7 +41,17 @@ class Vendor(LowercaseStrEnum):
 
 @dataclass(eq=False)
 class Sequence:
-    path: Path | str = None
+    """Sequence of timepoints containing EIT and/or waveform data
+
+    A Sequence is meant as a representation of a continuous set of data, either EIT frames,
+    waveform data, or both. A Sequence could consist of an entire measurement, a section of a
+    measurement, a single breath or even a portion of a breath.
+
+    EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
+
+    """
+
+    path: Path | str | List[Path | str] = None
     time: np.ndarray = None
     n_frames: int = None
     framerate: int = None
