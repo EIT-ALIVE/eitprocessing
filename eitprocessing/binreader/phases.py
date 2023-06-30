@@ -15,9 +15,12 @@ class PhaseIndicator:
     time: float = field(repr=False)
 
     def __eq__(self, other):
-        if self.index != other.index: return False
-        if self.time != other.time: return False
-        if type(self) != type(other): return False
+        if self.index != other.index:
+            return False
+        if self.time != other.time:
+            return False
+        if type(self) != type(other):
+            return False
         return True
 
 
