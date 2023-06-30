@@ -10,10 +10,13 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+
+import os
+import subprocess
+import sys
+
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # -- Project information -----------------------------------------------------
 
@@ -26,10 +29,23 @@ author = u"Dani Bodor"
 # built documents.
 #
 # The short X.Y version.
-version = "0.0.0"
+##version = "0.0.0"
 # The full version, including alpha/beta/rc tags.
-release = version
+##release = version
 
+try:
+    tag = subprocess.check_output([
+        'git',
+        '--no-pager',
+        'describe',
+        '--abbrev=0',
+        '--tags',
+    ]).strip().decode()
+except subprocess.CalledProcessError as e:
+    print(e.output)
+    tag = 'v0.0.0'
+
+release = tag[1:]
 # -- General configuration ------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be

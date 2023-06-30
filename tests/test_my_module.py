@@ -8,20 +8,27 @@ from eitprocessing.binreader.sequence import Sequence
 
 # sample data needs to be reset to potentially come from 
 # a container if we will not share samples
-sample_data1 = os.path.join(
+
+data_directory = os.environ.get(
+    'EIT_PROCESSING_TEST_DATA',
     os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+)
+
+sample_data1 = os.path.join(
+    data_directory,
     'test_data',
-    'Testdata_FCVstudy.bin',
+    'Testdata.bin',
 )
 
 sample_data2 = os.path.join(
-    os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+    data_directory,
     'test_data',
-    'Testdata_PEEPtrial.bin',
+    'Testdata2.bin',
 )
 
 
 def test_merge():
+    #print(sample_data1)
     reading1 =Sequence.from_path(sample_data1, framerate=20)
     reading2 =Sequence.from_path(sample_data2, framerate=20)
     merged = Sequence.merge(reading1, reading2)
@@ -40,4 +47,4 @@ def test__from_path_1():
 
 def test_from_path_2():
     reading =Sequence.from_path(sample_data2, framerate=20)
-    assert len(reading.time) == 27680
+    assert len(reading.time) == 12000

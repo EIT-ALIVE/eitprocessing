@@ -2,59 +2,25 @@
 
 If you're looking for user documentation, go [here](README.md).
 
-## Development install
-
-```shell
-# Create a virtual environment, e.g. with
-python3 -m venv env
-
-# activate virtual environment
-source env/bin/activate
-
-# make sure to have a recent version of pip and setuptools
-python3 -m pip install --upgrade pip setuptools
-
-# (from the project root directory)
-# install eitprocessing as an editable package
-python3 -m pip install --no-cache-dir --editable .
-# install development dependencies
-python3 -m pip install --no-cache-dir --editable .[dev]
-```
-
-Afterwards check that the install directory is present in the `PATH` environment variable.
 
 ## Running the tests
 
-There are two ways to run tests.
+Make sure you have developer options installed as described in the [README](README.md)
+(otherwise run: `pip install -e .[dev]` on the repository folder in your environment)
 
-The first way requires an activated virtual environment with the development tools installed:
-
+For testing all you need to do is run: 
 ```shell
-pytest -v
+pytest
 ```
-
-The second is to use `tox`, which can be installed separately (e.g. with `pip install tox`), i.e. not necessarily inside the virtual environment you use for installing `eitprocessing`, but then builds the necessary virtual environments itself by simply running:
-
-```shell
-tox
-```
-
-Testing with `tox` allows for keeping the testing environment separate from your development environment.
-The development environment will typically accumulate (old) packages during development that interfere with testing; this problem is avoided by testing with `tox`.
 
 ### Test coverage
 
-In addition to just running the tests to see if they pass, they can be used for coverage statistics, i.e. to determine how much of the package's code is actually executed during tests.
-In an activated virtual environment with the development tools installed, inside the package directory, run:
+To determine the coverage percentage, i.e. how much of the package's code is actually executed during tests, run:
 
 ```shell
 coverage run
-```
-
-This runs tests and stores the result in a `.coverage` file.
-To see the results on the command line, run
-
-```shell
+# This runs tests and stores the result in a `.coverage` file.
+# To see the results on the command line, run
 coverage report
 ```
 
@@ -62,9 +28,9 @@ coverage report
 
 ## Running linters locally
 
-For linting we will use [prospector](https://pypi.org/project/prospector/) and to sort imports we will use
-[isort](https://pycqa.github.io/isort/). Running the linters requires an activated virtual environment with the
-development tools installed.
+For linting we will use [prospector](https://pypi.org/project/prospector/).
+To sort imports we will use [isort](https://pycqa.github.io/isort/). Note that if you use VS Code, 
+sorting is automated upon file saving.
 
 ```shell
 # linter
@@ -83,12 +49,8 @@ isort eitprocessing
 
 To fix readability of your code style you can use [yapf](https://github.com/google/yapf).
 
-You can enable automatic linting with `prospector` and `isort` on commit by enabling the git hook from `.githooks/pre-commit`, like so:
 
-```shell
-git config --local core.hooksPath .githooks
-```
-
+# The following sections are untested
 ## Generating the API docs
 
 ```shell

@@ -37,3 +37,5 @@ venv3
 # temporary test data
 
 test_data/*
+.helpers/dock_test_data/*
+.helpers/dock_test_add/*
