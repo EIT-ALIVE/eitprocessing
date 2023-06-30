@@ -50,7 +50,7 @@ class Frameset:
                 return False
 
             # NaN values are not equal. Check whether values are equal or both NaN
-            for key in s.keys():
+            for key in s:
                 if not np.all(
                     (s[key] == o[key]) | (np.isnan(s[key]) & np.isnan(o[key]))
                 ):
@@ -61,7 +61,7 @@ class Frameset:
     def select_by_indices(self, indices):
         obj = self.deepcopy()
         obj.pixel_values = self.pixel_values[indices, :, :]
-        for key in self.waveform_data.keys():
+        for key in self.waveform_data:
             obj.waveform_data[key] = self.waveform_data[key][indices]
         return obj
 
@@ -122,8 +122,8 @@ class Frameset:
         plt.colorbar(im)
 
         if waveforms:
-            wf_axes = list()
-            wf_lines = list()
+            wf_axes = []
+            wf_lines = []
             last_wf_ax = None
             for n, key in enumerate(reversed(waveforms)):
                 wf_ax = fig.add_subplot(n_waveforms, 2, 2 * (n + 1), sharex=last_wf_ax)
@@ -182,7 +182,7 @@ class Frameset:
                 UserWarning,
             )
 
-        waveform_data = dict()
+        waveform_data = {}
         for key in shared_waveform_keys:
             waveform_data[key] = np.concatenate(
                 [a.waveform_data[key], b.waveform_data[key]]
