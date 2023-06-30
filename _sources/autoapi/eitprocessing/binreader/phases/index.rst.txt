@@ -23,7 +23,6 @@ Classes
    eitprocessing.binreader.phases.PhaseIndicator
    eitprocessing.binreader.phases.MinValue
    eitprocessing.binreader.phases.MaxValue
-   eitprocessing.binreader.phases.QRSMark
 
 
 
@@ -41,11 +40,6 @@ Classes
 
       
 
-   .. py:method:: __eq__(other)
-
-      Return self==value.
-
-
 
 .. py:class:: MinValue
 
@@ -54,12 +48,6 @@ Classes
 
 
 .. py:class:: MaxValue
-
-
-   Bases: :py:obj:`PhaseIndicator`
-
-
-.. py:class:: QRSMark
 
 
    Bases: :py:obj:`PhaseIndicator`

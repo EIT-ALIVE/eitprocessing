@@ -21,61 +21,16 @@ Classes
 
 .. autoapisummary::
 
-   eitprocessing.binreader.sequence.Vendor
    eitprocessing.binreader.sequence.Sequence
-   eitprocessing.binreader.sequence.DraegerSequence
-   eitprocessing.binreader.sequence.TimpelSequence
 
 
-
-
-.. py:class:: Vendor
-
-
-   Bases: :py:obj:`strenum.LowercaseStrEnum`
-
-   A ``StrEnum`` where ``auto()`` will convert the name to `lowercase` to
-   produce each member's value.
-
-   Example usage::
-
-       class Example(LowercaseStrEnum):
-           UPPER_CASE = auto()
-           lower_case = auto()
-           MixedCase = auto()
-
-       assert Example.UPPER_CASE == "upper_case"
-       assert Example.lower_case == "lower_case"
-       assert Example.MixedCase == "mixedcase"
-
-   .. versionadded:: 0.4.3
-
-   .. py:attribute:: DRAEGER
-
-      
-
-   .. py:attribute:: TIMPEL
-
-      
-
-   .. py:attribute:: SENTEC
-
-      
-
-   .. py:attribute:: DRAGER
-
-      
-
-   .. py:attribute:: DRÄGER
-
-      
 
 
 .. py:class:: Sequence
 
 
    .. py:attribute:: path
-      :type: pathlib.Path | str
+      :type: pathlib.Path
 
       
 
@@ -91,6 +46,7 @@ Classes
 
    .. py:attribute:: framerate
       :type: int
+      :value: 20
 
       
 
@@ -114,11 +70,6 @@ Classes
 
       
 
-   .. py:attribute:: vendor
-      :type: Vendor
-
-      
-
    .. py:attribute:: __getitem__
 
       
@@ -127,130 +78,31 @@ Classes
 
       
 
-   .. py:method:: __len__() -> int
+   .. py:method:: __len__()
 
 
-   .. py:method:: __eq__(other) -> bool
-
-      Return self==value.
-
-
-   .. py:method:: merge(a, b) -> Sequence
+   .. py:method:: merge(a, b)
       :classmethod:
 
 
-   .. py:method:: from_paths(paths: List[pathlib.Path], vendor: Vendor, framerate: int = None) -> Sequence
+   .. py:method:: from_paths(paths: List[pathlib.Path], framerate: int = None)
       :classmethod:
 
 
-   .. py:method:: from_path(path: pathlib.Path | str, vendor: Vendor, framerate: int = None, limit_frames: slice | Tuple[int, int] = None) -> Sequence
+   .. py:method:: from_path(path: pathlib.Path | str, framerate: int = None, limit_frames: slice | Tuple[int, int] = None)
       :classmethod:
 
-      Load sequence from path
 
-      :param path: path to data file
-      :type path: Path | str
-      :param vendor: vendor indicating the device used
-      :type vendor: Vendor
-      :param framerate: framerate at which the data was recorded. Defaults to None.
-      :type framerate: int, optional
-      :param limit_frames: limit the range of frames to be loaded. Defaults to None.
-      :type limit_frames: slice | Tuple[int, int], optional
-
-      :raises NotImplementedError: is raised when there is no loading method for the given vendor.
-
-      :returns: a sequence containing the loaded data
-      :rtype: Sequence
+   .. py:method:: select_by_indices(indices)
 
 
-   .. py:method:: parse_limit_frames(limit_frames: tuple | slice) -> slice
-      :staticmethod:
+   .. py:method:: select_by_time(start=None, end=None, end_inclusive=False)
 
 
-   .. py:method:: select_by_indices(indices) -> Sequence
+   .. py:method:: read(limit_frames: slice = None, framerate: int = 20)
 
 
-   .. py:method:: select_by_time(start=None, end=None, end_inclusive=False) -> Sequence
-
-
-
-.. py:class:: DraegerSequence
-
-
-   Bases: :py:obj:`Sequence`
-
-   .. py:attribute:: framerate
-      :type: int
-      :value: 20
-
-      
-
-   .. py:attribute:: vendor
-      :type: Vendor
-
-      
-
-   .. py:method:: from_path(path: pathlib.Path | str, framerate: int = None, limit_frames: slice | Tuple[int, int] = None) -> DraegerSequence
-      :classmethod:
-
-      Load sequence from path
-
-      :param path: path to data file
-      :type path: Path | str
-      :param vendor: vendor indicating the device used
-      :type vendor: Vendor
-      :param framerate: framerate at which the data was recorded. Defaults to None.
-      :type framerate: int, optional
-      :param limit_frames: limit the range of frames to be loaded. Defaults to None.
-      :type limit_frames: slice | Tuple[int, int], optional
-
-      :raises NotImplementedError: is raised when there is no loading method for the given vendor.
-
-      :returns: a sequence containing the loaded data
-      :rtype: Sequence
-
-
-   .. py:method:: read(limit_frames: slice = None, framerate: int = 20) -> None
-
-
-   .. py:method:: read_frame(reader, index, pixel_values) -> None
-
-
-
-.. py:class:: TimpelSequence
-
-
-   Bases: :py:obj:`Sequence`
-
-   .. py:attribute:: framerate
-      :type: int
-      :value: 50
-
-      
-
-   .. py:attribute:: vendor
-      :type: Vendor
-
-      
-
-   .. py:method:: from_path(path: pathlib.Path | str, framerate: int = None, limit_frames: slice | Tuple[int, int] = None) -> TimpelSequence
-      :classmethod:
-
-      Load sequence from path
-
-      :param path: path to data file
-      :type path: Path | str
-      :param vendor: vendor indicating the device used
-      :type vendor: Vendor
-      :param framerate: framerate at which the data was recorded. Defaults to None.
-      :type framerate: int, optional
-      :param limit_frames: limit the range of frames to be loaded. Defaults to None.
-      :type limit_frames: slice | Tuple[int, int], optional
-
-      :raises NotImplementedError: is raised when there is no loading method for the given vendor.
-
-      :returns: a sequence containing the loaded data
-      :rtype: Sequence
+   .. py:method:: read_frame(reader, index, pixel_values)
 
 
 
