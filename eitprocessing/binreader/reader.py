@@ -11,7 +11,6 @@ import numpy as np
 
 
 class Reader:
-
     file_handle = None
 
     def __init__(self, file_handle):
@@ -28,17 +27,17 @@ class Reader:
 
         if length == 1:
             data = data[0]
-        
-        if cast: 
+
+        if cast:
             return cast(data)
-        
+
         return data
 
     @staticmethod
     def cast_string(data):
         return data[0].decode().rstrip()
 
-    float32 = partialmethod(read, type_code='f', cast=np.float32)
-    float64 = partialmethod(read, type_code='d', cast=np.float64)
-    int32 = partialmethod(read, type_code='i', cast=np.int32)
-    string = partialmethod(read, type_code='s', cast=cast_string)
+    float32 = partialmethod(read, type_code="f", cast=np.float32)
+    float64 = partialmethod(read, type_code="d", cast=np.float64)
+    int32 = partialmethod(read, type_code="i", cast=np.int32)
+    string = partialmethod(read, type_code="s", cast=cast_string)
