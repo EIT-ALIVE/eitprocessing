@@ -16,12 +16,14 @@ data_directory = os.environ.get(
 
 sample_data1 = os.path.join(
     data_directory,
+    "tests",
     "test_data",
     "Testdata.bin",
 )
 
 sample_data2 = os.path.join(
     data_directory,
+    "tests",
     "test_data",
     "Testdata2.bin",
 )
