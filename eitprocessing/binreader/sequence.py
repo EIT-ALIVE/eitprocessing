@@ -157,7 +157,7 @@ class Sequence:
     def parse_limit_frames(limit_frames: tuple | slice) -> slice:
         if not limit_frames:
             return None
-        
+
         if isinstance(limit_frames, tuple):
             if len(limit_frames) != 2:
                 raise ValueError(
@@ -204,7 +204,9 @@ class Sequence:
                         raise NotImplementedError(
                             "Can't skip intermediate frames while slicing"
                         )
-                    return item.index >= indices.start and (indices.stop is None or item.index < indices.stop)
+                    return item.index >= indices.start and (
+                        indices.stop is None or item.index < indices.stop
+                    )
                 return item.index in indices
 
             new_list = list(filter(helper, list_))
@@ -233,6 +235,7 @@ class Sequence:
 
     __getitem__ = select_by_indices
     deepcopy = copy.deepcopy
+
 
 @dataclass(eq=False)
 class DraegerSequence(Sequence):
@@ -296,7 +299,7 @@ class DraegerSequence(Sequence):
 
             reader = Reader(fh)
             for index in range(self.n_frames):
-                self.read_frame_draeger(reader, index, pixel_values)
+                self.read_frame(reader, index, pixel_values)
 
         params = {"framerate": framerate}
         self.framesets["raw"] = Frameset(
@@ -345,6 +348,7 @@ class DraegerSequence(Sequence):
         elif min_max_flag == -1:
             self.phases.append(MinValue(index, time))
 
+
 @dataclass(eq=False)
 class TimpelSequence(Sequence):
     framerate: int = 50
@@ -369,7 +373,6 @@ class TimpelSequence(Sequence):
             skiprows = limit_frames.start
             if limit_frames.stop:
                 max_rows = limit_frames.stop - limit_frames.start
-            
 
         data = np.loadtxt(
             path, dtype=float, delimiter=",", skiprows=skiprows, max_rows=max_rows
