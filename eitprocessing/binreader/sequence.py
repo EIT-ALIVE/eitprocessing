@@ -33,7 +33,7 @@ class Vendor(LowercaseStrEnum):
     TIMPEL = auto()
     SENTEC = auto()
     DRAGER = DRAEGER
-    DRÄGER = DRAEGER
+    DRÄGER = DRAEGER  # pylint: disable = non-ascii-name
 
 
 @dataclass(eq=False)
@@ -66,7 +66,7 @@ class Sequence:
         return True
 
     @classmethod
-    def merge(cls, a, b) -> "Sequence":  # pylint: disable = too-many-locals
+    def merge(cls, a, b) -> "Sequence":
         path = list(itertools.chain([a.path, b.path]))
 
         if a.vendor != b.vendor:
@@ -118,7 +118,7 @@ class Sequence:
         sequences = (
             cls.from_path(path, framerate=framerate, vendor=vendor) for path in paths
         )
-        return functools.reduce(lambda a, b: cls.merge(a, b), sequences)
+        return functools.reduce(cls.merge, sequences)
 
     @classmethod
     def from_path(
@@ -324,9 +324,7 @@ class DraegerSequence(Sequence):
         timing_error = reader.int32()
 
         # TODO: parse medibus data into waveform data
-        medibus_data = reader.float32(
-            length=52
-        )  # noqa; code crashes if line is removed
+        medibus_data = reader.float32(length=52)  # pylint: disable = unused-variable
 
         # The event marker stays the same until the next event occurs. Therefore, check whether the
         # event marker has changed with respect to the most recent event. If so, create a new event.
@@ -398,9 +396,11 @@ class TimpelSequence(Sequence):
         pixel_data = np.where(pixel_data == -1000, np.nan, pixel_data)
 
         # extract waveform data
-        waveform_data = dict(
-            airway_pressure=data[:, 1024], flow=data[:, 1025], volume=data[:, 1026]
-        )
+        waveform_data = {
+            "airway_pressure": data[:, 1024],
+            "flow": data[:, 1025],
+            "volume": data[:, 1026],
+        }
 
         # extract breath start, breath end and QRS marks
         for index in np.flatnonzero(data[:, 1027] == 1):
@@ -417,7 +417,7 @@ class TimpelSequence(Sequence):
         obj.framesets["raw"] = Frameset(
             name="raw",
             description="raw timpel data",
-            params=dict(framerate=obj.framerate),
+            params={"framerate": obj.framerate},
             pixel_values=pixel_data,
             waveform_data=waveform_data,
         )

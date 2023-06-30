@@ -18,13 +18,14 @@ sample_data1 = os.path.join(data_directory, "tests", "test_data", "testdata_timp
 def test_read():
     assert TimpelSequence.from_path(sample_data1)
 
+
 def test_direct_vs_indirect_reading():
     direct = TimpelSequence.from_path(sample_data1)
     indirect = Sequence.from_path(sample_data1, vendor=Vendor.TIMPEL)
     indirect_str = Sequence.from_path(sample_data1, vendor="timpel")
 
     assert direct == indirect
-    assert type(direct) == type(indirect)
+    assert isinstance(direct, type(indirect))
     assert indirect == indirect_str
 
 
@@ -69,12 +70,14 @@ def test_copy():
     full_data_copy = full_data.deepcopy()
     assert full_data == full_data_copy
 
+
 def test_slicing():
     full_data = TimpelSequence.from_path(sample_data1)
-    
+
     assert full_data[:100] == full_data[:100]  # tests whether slicing alters full_data
     assert full_data[0:100] == full_data[:100]
-    assert full_data[100:len(full_data)] == full_data[100:]
+    assert full_data[100 : len(full_data)] == full_data[100:]
+
 
 def test_limit_frames_tuple_v_slice():
     limit_tuple1 = TimpelSequence.from_path(sample_data1, limit_frames=(0, 100))
@@ -86,6 +89,7 @@ def test_limit_frames_tuple_v_slice():
     assert limit_slice1 == limit_slice2
     assert limit_tuple1 == limit_slice1
 
+
 def test_limit_frames_merged_equals_full_data():
     full_data = TimpelSequence.from_path(sample_data1)
     limit_first_part = TimpelSequence.from_path(sample_data1, limit_frames=(None, 100))
@@ -94,4 +98,3 @@ def test_limit_frames_merged_equals_full_data():
     assert limit_first_part == full_data[:100]
     assert limit_second_part == full_data[100:]
     assert Sequence.merge(limit_first_part, limit_second_part) == full_data
-

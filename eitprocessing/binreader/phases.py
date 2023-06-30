@@ -19,7 +19,7 @@ class PhaseIndicator:
             return False
         if self.time != other.time:
             return False
-        if type(self) != type(other):
+        if not isinstance(other, type(self)):
             return False
         return True
 
