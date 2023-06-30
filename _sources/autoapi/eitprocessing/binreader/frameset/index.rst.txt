@@ -63,6 +63,11 @@ Classes
 
       
 
+   .. py:attribute:: waveform_data
+      :type: dict
+
+      
+
    .. py:attribute:: __getitem__
 
       
@@ -74,10 +79,18 @@ Classes
    .. py:method:: __len__()
 
 
+   .. py:method:: __eq__(other)
+
+      Return self==value.
+
+
    .. py:method:: select_by_indices(indices)
 
 
-   .. py:method:: animate(cmap='plasma', show_progress='notebook')
+   .. py:method:: plot_waveforms(waveforms=None)
+
+
+   .. py:method:: animate(cmap='plasma', show_progress='notebook', waveforms=False)
 
 
    .. py:method:: merge(a, b)
