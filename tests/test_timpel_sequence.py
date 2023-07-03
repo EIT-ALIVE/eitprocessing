@@ -1,5 +1,6 @@
 import copy
 import os
+import pytest
 from eitprocessing.binreader.sequence import Sequence
 from eitprocessing.binreader.sequence import TimpelSequence
 from eitprocessing.binreader.sequence import Vendor
@@ -98,3 +99,8 @@ def test_limit_frames_merged_equals_full_data():
     assert limit_first_part == full_data[:100]
     assert limit_second_part == full_data[100:]
     assert Sequence.merge(limit_first_part, limit_second_part) == full_data
+
+
+def test_nondefault_vendor():
+    with pytest.raises(ValueError):
+        TimpelSequence.from_path(sample_data1, vendor="draeger")
