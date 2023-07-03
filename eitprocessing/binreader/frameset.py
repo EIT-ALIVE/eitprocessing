@@ -9,6 +9,7 @@ import copy
 import warnings
 from dataclasses import dataclass
 from dataclasses import field
+from typing import List
 import numpy as np
 from IPython.display import HTML
 from IPython.display import display
@@ -102,7 +103,12 @@ class Frameset:
             ax.plot(self.waveform_data[key])
             ax.set_title(key)
 
-    def animate(self, cmap="plasma", show_progress="notebook", waveforms=False):
+    def animate(
+        self,
+        cmap: str = "plasma",
+        show_progress: bool | str = "notebook",
+        waveforms: bool | List[str] = False,
+    ):  # pylint: disable = too-many-locals
         if waveforms is True:
             waveforms = list(self.waveform_data.keys())
 
@@ -138,9 +144,10 @@ class Frameset:
                 wf_ax.set_ylim((wf_data.min(), wf_data.max()))
 
         if show_progress:
-            progress_bar = tqdm(total=len(self))
             if show_progress == "notebook":
                 progress_bar = notebook_tqdm(total=len(self))
+            else:
+                progress_bar = tqdm(total=len(self))
             progress_bar.update(1)
 
         def update(i):
