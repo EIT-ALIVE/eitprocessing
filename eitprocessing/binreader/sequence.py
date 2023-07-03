@@ -159,10 +159,14 @@ class Sequence:
         path = Path(path)
 
         if vendor == Vendor.DRAEGER:
-            return DraegerSequence.from_path(path, framerate, limit_frames)
+            return DraegerSequence.from_path(
+                path, framerate=framerate, limit_frames=limit_frames
+            )
 
         if vendor == Vendor.TIMPEL:
-            return TimpelSequence.from_path(path, framerate, limit_frames)
+            return TimpelSequence.from_path(
+                path, framerate=framerate, limit_frames=limit_frames
+            )
 
         raise NotImplementedError(f"cannot load data from vendor {vendor}")
 
@@ -259,9 +263,13 @@ class DraegerSequence(Sequence):
     def from_path(
         cls,
         path: Path | str,
+        vendor: Vendor = Vendor.DRAEGER,
         framerate: int = None,
         limit_frames: slice | Tuple[int, int] = None,
     ) -> "DraegerSequence":
+        if vendor != Vendor.DRAEGER:
+            raise ValueError(f"Vendor can't be different from '{Vendor.DRAEGER}'")
+
         obj = cls(path=Path(path))
 
         if framerate:
@@ -337,7 +345,9 @@ class DraegerSequence(Sequence):
         timing_error = reader.int32()
 
         # TODO: parse medibus data into waveform data
-        medibus_data = reader.float32(length=52)  # pylint: disable = unused-variable
+        medibus_data = reader.float32(
+            length=52
+        )  # noqa; variable will be used in future version
 
         # The event marker stays the same until the next event occurs. Therefore, check whether the
         # event marker has changed with respect to the most recent event. If so, create a new event.
@@ -369,9 +379,13 @@ class TimpelSequence(Sequence):
     def from_path(
         cls,
         path: Path | str,
+        vendor: Vendor = Vendor.TIMPEL,
         framerate: int = None,
         limit_frames: slice | Tuple[int, int] = None,
     ) -> "TimpelSequence":
+        if vendor != Vendor.TIMPEL:
+            raise ValueError(f"Vendor can't be different from '{Vendor.TIMPEL}'")
+
         obj = cls(path=Path(path))
 
         if framerate:
