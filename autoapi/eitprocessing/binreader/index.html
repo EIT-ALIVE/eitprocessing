@@ -76,11 +76,20 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.binreader.MinValue" title="eitprocessing.binreader.MinValue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MinValue</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.binreader.Reader" title="eitprocessing.binreader.Reader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reader</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.binreader.QRSMark" title="eitprocessing.binreader.QRSMark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QRSMark</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sequence</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.binreader.DraegerSequence" title="eitprocessing.binreader.DraegerSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DraegerSequence</span></code></a></p></td>
+<td><p>Sequence of timepoints containing EIT and/or waveform data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sequence</span></code></a></p></td>
+<td><p>Sequence of timepoints containing EIT and/or waveform data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.binreader.TimpelSequence" title="eitprocessing.binreader.TimpelSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimpelSequence</span></code></a></p></td>
+<td><p>Sequence of timepoints containing EIT and/or waveform data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Vendor</span></code></a></p></td>
+<td><p>Enum indicating the vendor (manufacturer) of the EIT device with which the data was</p></td>
 </tr>
 </tbody>
 </table>
@@ -133,6 +142,11 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Frameset.waveform_data">
+<span class="sig-name descname"><span class="pre">waveform_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></em><a class="headerlink" href="#eitprocessing.binreader.Frameset.waveform_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Frameset.__getitem__">
 <span class="sig-name descname"><span class="pre">__getitem__</span></span><a class="headerlink" href="#eitprocessing.binreader.Frameset.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -148,13 +162,24 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Frameset.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/frameset.html#Frameset.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Frameset.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Frameset.select_by_indices">
 <span class="sig-name descname"><span class="pre">select_by_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/frameset.html#Frameset.select_by_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Frameset.select_by_indices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Frameset.plot_waveforms">
+<span class="sig-name descname"><span class="pre">plot_waveforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveforms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/frameset.html#Frameset.plot_waveforms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Frameset.plot_waveforms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Frameset.animate">
-<span class="sig-name descname"><span class="pre">animate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plasma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'notebook'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/frameset.html#Frameset.animate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Frameset.animate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">animate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'plasma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_progress</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'notebook'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waveforms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/frameset.html#Frameset.animate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Frameset.animate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -177,41 +202,63 @@
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="eitprocessing.binreader.Reader">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.binreader.</span></span><span class="sig-name descname"><span class="pre">Reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_handle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/reader.html#Reader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Reader" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.binreader.Reader.file_handle">
-<span class="sig-name descname"><span class="pre">file_handle</span></span><a class="headerlink" href="#eitprocessing.binreader.Reader.file_handle" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="eitprocessing.binreader.QRSMark">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.binreader.</span></span><span class="sig-name descname"><span class="pre">QRSMark</span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/phases.html#QRSMark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.QRSMark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">PhaseIndicator</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.binreader.DraegerSequence">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.binreader.</span></span><span class="sig-name descname"><span class="pre">DraegerSequence</span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#DraegerSequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.DraegerSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sequence</span></code></a></p>
+<p>Sequence of timepoints containing EIT and/or waveform data</p>
+<p>A Sequence is meant as a representation of a continuous set of data, either EIT frames,
+waveform data, or both. A Sequence could consist of an entire measurement, a section of a
+measurement, a single breath or even a portion of a breath.</p>
+<p>EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.binreader.DraegerSequence.framerate">
+<span class="sig-name descname"><span class="pre">framerate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#eitprocessing.binreader.DraegerSequence.framerate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.binreader.Reader.float32">
-<span class="sig-name descname"><span class="pre">float32</span></span><a class="headerlink" href="#eitprocessing.binreader.Reader.float32" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.binreader.Reader.float64">
-<span class="sig-name descname"><span class="pre">float64</span></span><a class="headerlink" href="#eitprocessing.binreader.Reader.float64" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.binreader.Reader.int32">
-<span class="sig-name descname"><span class="pre">int32</span></span><a class="headerlink" href="#eitprocessing.binreader.Reader.int32" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.binreader.Reader.string">
-<span class="sig-name descname"><span class="pre">string</span></span><a class="headerlink" href="#eitprocessing.binreader.Reader.string" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="eitprocessing.binreader.DraegerSequence.vendor">
+<span class="sig-name descname"><span class="pre">vendor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><span class="pre">Vendor</span></a></em><a class="headerlink" href="#eitprocessing.binreader.DraegerSequence.vendor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.binreader.Reader.read">
-<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/reader.html#Reader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Reader.read" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="eitprocessing.binreader.DraegerSequence.from_path">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><span class="pre">Vendor</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Vendor.DRAEGER</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit_frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><span class="pre">slice</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.binreader.DraegerSequence" title="eitprocessing.binreader.DraegerSequence"><span class="pre">DraegerSequence</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#DraegerSequence.from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.DraegerSequence.from_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load sequence from path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>Path</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – path to data file</p></li>
+<li><p><strong>vendor</strong> (<a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><em>Vendor</em></a>) – vendor indicating the device used</p></li>
+<li><p><strong>framerate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – framerate at which the data was recorded. Defaults to None.</p></li>
+<li><p><strong>limit_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><em>slice</em></a><em> | </em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>, </em><em>optional</em>) – limit the range of frames to be loaded. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.11)"><strong>NotImplementedError</strong></a> – is raised when there is no loading method for the given vendor.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a sequence containing the loaded data</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence">Sequence</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.binreader.DraegerSequence.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit_frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><span class="pre">slice</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#DraegerSequence.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.DraegerSequence.read" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.binreader.Reader.cast_string">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cast_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/reader.html#Reader.cast_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Reader.cast_string" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="eitprocessing.binreader.DraegerSequence.read_frame">
+<span class="sig-name descname"><span class="pre">read_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_values</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#DraegerSequence.read_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.DraegerSequence.read_frame" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -219,9 +266,14 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Sequence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.binreader.</span></span><span class="sig-name descname"><span class="pre">Sequence</span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py attribute">
+<dd><p>Sequence of timepoints containing EIT and/or waveform data</p>
+<p>A Sequence is meant as a representation of a continuous set of data, either EIT frames,
+waveform data, or both. A Sequence could consist of an entire measurement, a section of a
+measurement, a single breath or even a portion of a breath.</p>
+<p>EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.</p>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.path">
-<span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a></em><a class="headerlink" href="#eitprocessing.binreader.Sequence.path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#eitprocessing.binreader.Sequence.path" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -236,7 +288,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.framerate">
-<span class="sig-name descname"><span class="pre">framerate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#eitprocessing.binreader.Sequence.framerate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">framerate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#eitprocessing.binreader.Sequence.framerate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -260,6 +312,11 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.vendor">
+<span class="sig-name descname"><span class="pre">vendor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><span class="pre">Vendor</span></a></em><a class="headerlink" href="#eitprocessing.binreader.Sequence.vendor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.__getitem__">
 <span class="sig-name descname"><span class="pre">__getitem__</span></span><a class="headerlink" href="#eitprocessing.binreader.Sequence.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -271,42 +328,142 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.__len__">
-<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.__len__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.__len__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.merge">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.merge" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence"><span class="pre">Sequence</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.merge" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.from_paths">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.from_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.from_paths" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><span class="pre">Vendor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">framerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence"><span class="pre">Sequence</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.from_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.from_paths" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.from_path">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">framerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit_frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><span class="pre">slice</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.from_path" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><span class="pre">Vendor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">framerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit_frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><span class="pre">slice</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence"><span class="pre">Sequence</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.from_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load sequence from path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>Path</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – path to data file</p></li>
+<li><p><strong>vendor</strong> (<a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><em>Vendor</em></a>) – vendor indicating the device used</p></li>
+<li><p><strong>framerate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – framerate at which the data was recorded. Defaults to None.</p></li>
+<li><p><strong>limit_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><em>slice</em></a><em> | </em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>, </em><em>optional</em>) – limit the range of frames to be loaded. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.11)"><strong>NotImplementedError</strong></a> – is raised when there is no loading method for the given vendor.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a sequence containing the loaded data</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence">Sequence</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.parse_limit_frames">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parse_limit_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit_frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><span class="pre">slice</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><span class="pre">slice</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.parse_limit_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.parse_limit_frames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.select_by_indices">
-<span class="sig-name descname"><span class="pre">select_by_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.select_by_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.select_by_indices" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">select_by_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence"><span class="pre">Sequence</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.select_by_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.select_by_indices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.select_by_time">
-<span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_inclusive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.select_by_time" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_inclusive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence"><span class="pre">Sequence</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.select_by_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.binreader.TimpelSequence">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.binreader.</span></span><span class="sig-name descname"><span class="pre">TimpelSequence</span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#TimpelSequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.TimpelSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sequence</span></code></a></p>
+<p>Sequence of timepoints containing EIT and/or waveform data</p>
+<p>A Sequence is meant as a representation of a continuous set of data, either EIT frames,
+waveform data, or both. A Sequence could consist of an entire measurement, a section of a
+measurement, a single breath or even a portion of a breath.</p>
+<p>EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.binreader.TimpelSequence.framerate">
+<span class="sig-name descname"><span class="pre">framerate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></em><a class="headerlink" href="#eitprocessing.binreader.TimpelSequence.framerate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.binreader.TimpelSequence.vendor">
+<span class="sig-name descname"><span class="pre">vendor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><span class="pre">Vendor</span></a></em><a class="headerlink" href="#eitprocessing.binreader.TimpelSequence.vendor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.read">
-<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit_frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><span class="pre">slice</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.read" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="eitprocessing.binreader.TimpelSequence.from_path">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><span class="pre">Vendor</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Vendor.TIMPEL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit_frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><span class="pre">slice</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.binreader.TimpelSequence" title="eitprocessing.binreader.TimpelSequence"><span class="pre">TimpelSequence</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#TimpelSequence.from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.TimpelSequence.from_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load sequence from path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>Path</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – path to data file</p></li>
+<li><p><strong>vendor</strong> (<a class="reference internal" href="#eitprocessing.binreader.Vendor" title="eitprocessing.binreader.Vendor"><em>Vendor</em></a>) – vendor indicating the device used</p></li>
+<li><p><strong>framerate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – framerate at which the data was recorded. Defaults to None.</p></li>
+<li><p><strong>limit_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.11)"><em>slice</em></a><em> | </em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>, </em><em>optional</em>) – limit the range of frames to be loaded. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.11)"><strong>NotImplementedError</strong></a> – is raised when there is no loading method for the given vendor.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a sequence containing the loaded data</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#eitprocessing.binreader.Sequence" title="eitprocessing.binreader.Sequence">Sequence</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Vendor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.binreader.</span></span><span class="sig-name descname"><span class="pre">Vendor</span></span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Vendor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Vendor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">strenum.LowercaseStrEnum</span></code></p>
+<p>Enum indicating the vendor (manufacturer) of the EIT device with which the data was
+gathered</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Vendor.DRAEGER">
+<span class="sig-name descname"><span class="pre">DRAEGER</span></span><a class="headerlink" href="#eitprocessing.binreader.Vendor.DRAEGER" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.binreader.Sequence.read_frame">
-<span class="sig-name descname"><span class="pre">read_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/binreader/sequence.html#Sequence.read_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.Sequence.read_frame" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Vendor.TIMPEL">
+<span class="sig-name descname"><span class="pre">TIMPEL</span></span><a class="headerlink" href="#eitprocessing.binreader.Vendor.TIMPEL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Vendor.SENTEC">
+<span class="sig-name descname"><span class="pre">SENTEC</span></span><a class="headerlink" href="#eitprocessing.binreader.Vendor.SENTEC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.binreader.Vendor.DRAGER">
+<span class="sig-name descname"><span class="pre">DRAGER</span></span><a class="headerlink" href="#eitprocessing.binreader.Vendor.DRAGER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">DRÄGER</span></span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -339,24 +496,26 @@
 <li><a class="reference internal" href="#eitprocessing.binreader.Frameset.description"><code class="docutils literal notranslate"><span class="pre">Frameset.description</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Frameset.params"><code class="docutils literal notranslate"><span class="pre">Frameset.params</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Frameset.pixel_values"><code class="docutils literal notranslate"><span class="pre">Frameset.pixel_values</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.Frameset.waveform_data"><code class="docutils literal notranslate"><span class="pre">Frameset.waveform_data</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Frameset.__getitem__"><code class="docutils literal notranslate"><span class="pre">Frameset.__getitem__</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Frameset.deepcopy"><code class="docutils literal notranslate"><span class="pre">Frameset.deepcopy</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Frameset.__len__"><code class="docutils literal notranslate"><span class="pre">Frameset.__len__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.Frameset.__eq__"><code class="docutils literal notranslate"><span class="pre">Frameset.__eq__()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Frameset.select_by_indices"><code class="docutils literal notranslate"><span class="pre">Frameset.select_by_indices()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.Frameset.plot_waveforms"><code class="docutils literal notranslate"><span class="pre">Frameset.plot_waveforms()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Frameset.animate"><code class="docutils literal notranslate"><span class="pre">Frameset.animate()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Frameset.merge"><code class="docutils literal notranslate"><span class="pre">Frameset.merge()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#eitprocessing.binreader.MaxValue"><code class="docutils literal notranslate"><span class="pre">MaxValue</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.MinValue"><code class="docutils literal notranslate"><span class="pre">MinValue</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.binreader.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.binreader.Reader.file_handle"><code class="docutils literal notranslate"><span class="pre">Reader.file_handle</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.binreader.Reader.float32"><code class="docutils literal notranslate"><span class="pre">Reader.float32</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.binreader.Reader.float64"><code class="docutils literal notranslate"><span class="pre">Reader.float64</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.binreader.Reader.int32"><code class="docutils literal notranslate"><span class="pre">Reader.int32</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.binreader.Reader.string"><code class="docutils literal notranslate"><span class="pre">Reader.string</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.binreader.Reader.read"><code class="docutils literal notranslate"><span class="pre">Reader.read()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.binreader.Reader.cast_string"><code class="docutils literal notranslate"><span class="pre">Reader.cast_string()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.QRSMark"><code class="docutils literal notranslate"><span class="pre">QRSMark</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.DraegerSequence"><code class="docutils literal notranslate"><span class="pre">DraegerSequence</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.binreader.DraegerSequence.framerate"><code class="docutils literal notranslate"><span class="pre">DraegerSequence.framerate</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.DraegerSequence.vendor"><code class="docutils literal notranslate"><span class="pre">DraegerSequence.vendor</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.DraegerSequence.from_path"><code class="docutils literal notranslate"><span class="pre">DraegerSequence.from_path()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.DraegerSequence.read"><code class="docutils literal notranslate"><span class="pre">DraegerSequence.read()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.DraegerSequence.read_frame"><code class="docutils literal notranslate"><span class="pre">DraegerSequence.read_frame()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence"><code class="docutils literal notranslate"><span class="pre">Sequence</span></code></a><ul>
@@ -368,16 +527,31 @@
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.events"><code class="docutils literal notranslate"><span class="pre">Sequence.events</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.timing_errors"><code class="docutils literal notranslate"><span class="pre">Sequence.timing_errors</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.phases"><code class="docutils literal notranslate"><span class="pre">Sequence.phases</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.Sequence.vendor"><code class="docutils literal notranslate"><span class="pre">Sequence.vendor</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.__getitem__"><code class="docutils literal notranslate"><span class="pre">Sequence.__getitem__</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.deepcopy"><code class="docutils literal notranslate"><span class="pre">Sequence.deepcopy</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.__len__"><code class="docutils literal notranslate"><span class="pre">Sequence.__len__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.Sequence.__eq__"><code class="docutils literal notranslate"><span class="pre">Sequence.__eq__()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.merge"><code class="docutils literal notranslate"><span class="pre">Sequence.merge()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.from_paths"><code class="docutils literal notranslate"><span class="pre">Sequence.from_paths()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.from_path"><code class="docutils literal notranslate"><span class="pre">Sequence.from_path()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.Sequence.parse_limit_frames"><code class="docutils literal notranslate"><span class="pre">Sequence.parse_limit_frames()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.select_by_indices"><code class="docutils literal notranslate"><span class="pre">Sequence.select_by_indices()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.Sequence.select_by_time"><code class="docutils literal notranslate"><span class="pre">Sequence.select_by_time()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.binreader.Sequence.read"><code class="docutils literal notranslate"><span class="pre">Sequence.read()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.binreader.Sequence.read_frame"><code class="docutils literal notranslate"><span class="pre">Sequence.read_frame()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.binreader.TimpelSequence"><code class="docutils literal notranslate"><span class="pre">TimpelSequence</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.binreader.TimpelSequence.framerate"><code class="docutils literal notranslate"><span class="pre">TimpelSequence.framerate</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.TimpelSequence.vendor"><code class="docutils literal notranslate"><span class="pre">TimpelSequence.vendor</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.TimpelSequence.from_path"><code class="docutils literal notranslate"><span class="pre">TimpelSequence.from_path()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.binreader.Vendor"><code class="docutils literal notranslate"><span class="pre">Vendor</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.binreader.Vendor.DRAEGER"><code class="docutils literal notranslate"><span class="pre">Vendor.DRAEGER</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.Vendor.TIMPEL"><code class="docutils literal notranslate"><span class="pre">Vendor.TIMPEL</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.Vendor.SENTEC"><code class="docutils literal notranslate"><span class="pre">Vendor.SENTEC</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.Vendor.DRAGER"><code class="docutils literal notranslate"><span class="pre">Vendor.DRAGER</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Vendor.DRÄGER</span></code></a></li>
 </ul>
 </li>
 </ul>
