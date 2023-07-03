@@ -50,9 +50,10 @@ class Frameset:
                 return False
 
             # NaN values are not equal. Check whether values are equal or both NaN
-            for key in s:
+            for key, s_values in s.items():
+                o_values = o[key]
                 if not np.all(
-                    (s[key] == o[key]) | (np.isnan(s[key]) & np.isnan(o[key]))
+                    (s_values == o_values) | (np.isnan(s_values) & np.isnan(o_values))
                 ):
                     return False
 
@@ -61,8 +62,8 @@ class Frameset:
     def select_by_indices(self, indices):
         obj = self.deepcopy()
         obj.pixel_values = self.pixel_values[indices, :, :]
-        for key in self.waveform_data:
-            obj.waveform_data[key] = self.waveform_data[key][indices]
+        for key, values in self.waveform_data.items():
+            obj.waveform_data[key] = values[indices]
         return obj
 
     __getitem__ = select_by_indices
