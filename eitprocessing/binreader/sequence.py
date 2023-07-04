@@ -345,9 +345,9 @@ class DraegerSequence(Sequence):
         timing_error = reader.int32()
 
         # TODO: parse medibus data into waveform data
-        medibus_data = reader.float32(
+        medibus_data = reader.float32(  # noqa; variable will be used in future version
             length=52
-        )  # noqa; variable will be used in future version
+        )  
 
         # The event marker stays the same until the next event occurs. Therefore, check whether the
         # event marker has changed with respect to the most recent event. If so, create a new event.
