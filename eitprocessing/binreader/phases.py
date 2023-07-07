@@ -14,6 +14,15 @@ class PhaseIndicator:
     index: int
     time: float = field(repr=False)
 
+    def __eq__(self, other):
+        if self.index != other.index:
+            return False
+        if self.time != other.time:
+            return False
+        if not isinstance(other, type(self)):
+            return False
+        return True
+
 
 @dataclass
 class MinValue(PhaseIndicator):
@@ -22,4 +31,9 @@ class MinValue(PhaseIndicator):
 
 @dataclass
 class MaxValue(PhaseIndicator):
+    pass
+
+
+@dataclass
+class QRSMark(PhaseIndicator):
     pass
