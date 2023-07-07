@@ -33,11 +33,15 @@ jobs:
           registry: ghcr.io
           username: drcandacemakedamoore
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: log
+        run: |
+          git branch
+          git log | head
       - name: Run Tests in Container
         run: >
           docker run
           --rm
-          -v .:/ci
+          -v ${{ github.workspace }}:/ci
           -e EIT_PROCESSING_TEST_DATA=/eitprocessing
           ghcr.io/eit-alive/eittestdata:latest
           sh -c 'set -xe ;
