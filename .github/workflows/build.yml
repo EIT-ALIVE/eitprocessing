@@ -93,6 +93,7 @@ jobs:
           -v ${{ github.workspace }}:/ci
           -e EIT_PROCESSING_TEST_DATA=/eitprocessing
           -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          -e COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }}
           -e COVERALLS_FLAG_NAME=python-${{ matrix.version }}
           ghcr.io/eit-alive/eittestdata:latest
           sh -c 'set -xe ; 
