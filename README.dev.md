@@ -125,6 +125,7 @@ source env/bin/activate
 python3 -m pip install --upgrade pip setuptools
 
 # install runtime dependencies and publishing dependencies
+cd eitprocessing
 python3 -m pip install --no-cache-dir .
 python3 -m pip install --no-cache-dir .[publishing]
 

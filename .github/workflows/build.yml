@@ -6,19 +6,25 @@ on:
     - main
     - drcandacemakedamoore/docker
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - "**.md"
+      - "**.rst"
+      - "**.ipynb"
     branches:
     - main
 
 jobs:
 
   build:
+    if: github.event.pull_request.draft == false
     name: Build for (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest']
-        python-version: ['3.10', '3.11']
+        python-version: ['3.10']
     steps:
       - uses: actions/checkout@v3
       - name: Connect to Container Registry
@@ -35,12 +41,13 @@ jobs:
           -e EIT_PROCESSING_TEST_DATA=/eitprocessing
           ghcr.io/eit-alive/eittestdata:latest
           sh -c 'set -xe ;
-                 cd /ci ;
-                 python -m pip install ".[dev,publishing]" ; 
-                 pytest -v ; 
-                 python setup.py sdist bdist_wheel'
+            cd /ci ;
+            python -m pip install ".[dev,publishing]" ; 
+            pytest -v ; 
+            python setup.py sdist bdist_wheel'
 
   lint:
+    if: github.event.pull_request.draft == false
     name: Linting build
     runs-on: ubuntu-latest
     strategy:
@@ -64,3 +71,35 @@ jobs:
         run: prospector
       - name: Check import order
         run: isort --check-only eitprocessing --diff
+
+  coveralls:
+    if: github.event.pull_request.draft == false
+    name: Coveralls build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - name: Connect to Container Registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ghcr.io
+          username: drcandacemakedamoore
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Tests in Container
+        run: >
+          docker run
+          --rm
+          -v ${{ github.workspace }}:/ci
+          -e EIT_PROCESSING_TEST_DATA=/eitprocessing
+          -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          -e COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }}
+          -e COVERALLS_FLAG_NAME=python-${{ matrix.version }}
+          ghcr.io/eit-alive/eittestdata:latest
+          sh -c 'set -xe ; 
+            cd /ci ; 
+            python -m pip install --upgrade pip setuptools ; 
+            python -m pip install ".[dev,publishing]" ; 
+            pytest --cov --cov-append --cov-report xml --cov-report term --cov-report html ; 
+            coveralls --service=github ; 
+            python setup.py sdist bdist_wheel'

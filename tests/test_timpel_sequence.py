@@ -13,7 +13,7 @@ data_directory = os.environ.get(
 
 print(__file__)
 
-sample_data1 = os.path.join(data_directory, "tests", "test_data", "testdata_timpel.txt")
+sample_data1 = os.path.join(data_directory, "test_data", "testdata_timpel.txt")
 
 
 def test_read():
