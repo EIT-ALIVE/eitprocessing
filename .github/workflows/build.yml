@@ -95,10 +95,10 @@ jobs:
           -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
           -e COVERALLS_FLAG_NAME=python-${{ matrix.version }}
           ghcr.io/eit-alive/eittestdata:latest
-          sh -c 'set -xe ;
-            cd /ci ;
-            python -m pip install --upgrade pip setuptools
-            python -m pip install ".[dev,publishing]" ;
-            pytest --cov --cov-append --cov-report xml --cov-report term --cov-report html ;
-            coveralls --service=github
+          sh -c 'set -xe ; 
+            cd /ci ; 
+            python -m pip install --upgrade pip setuptools ; 
+            python -m pip install ".[dev,publishing]" ; 
+            pytest --cov --cov-append --cov-report xml --cov-report term --cov-report html ; 
+            coveralls --service=github ; 
             python setup.py sdist bdist_wheel'
