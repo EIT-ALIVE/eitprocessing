@@ -2,7 +2,7 @@
 Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
 Licensed under the Apache License, version 2.0. See LICENSE for details.
 
-This file contains methods related to parts of electrical impedance tomographs 
+This file contains methods related to parts of electrical impedance tomographs
 as they are read.
 """
 
@@ -61,8 +61,22 @@ class Sequence:
     phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
     vendor: Vendor = None
 
+
+    def __post_init__(self):
+        if isinstance(self.vendor, str):
+            self.vendor = self.vendor.lower()
+
+        if self.vendor == Vendor.DRAEGER:
+            self.__class__ = DraegerSequence
+        elif self.vendor == Vendor.TIMPEL:
+            self.__class__ = TimpelSequence
+        elif self.vendor is not None:
+            raise NotImplementedError(f'vendor {self.vendor} is not implemented')
+
+
     def __len__(self) -> int:
         return self.n_frames
+
 
     def __eq__(self, other) -> bool:
         for attr in ["n_frames", "framerate", "framesets", "vendor"]:
@@ -347,7 +361,7 @@ class DraegerSequence(Sequence):
         # TODO: parse medibus data into waveform data
         medibus_data = reader.float32(  # noqa; variable will be used in future version
             length=52
-        )  
+        )
 
         # The event marker stays the same until the next event occurs. Therefore, check whether the
         # event marker has changed with respect to the most recent event. If so, create a new event.
