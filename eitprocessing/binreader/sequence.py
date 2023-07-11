@@ -92,25 +92,31 @@ class Sequence:
 
         return True
 
-    @classmethod
-    def merge(cls, a, b) -> "Sequence":
-        path = list(itertools.chain([a.path, b.path]))
-
+    @staticmethod
+    def check_equivalence(a: "Sequence", b: "Sequence"):
         if a.vendor != b.vendor:
             raise ValueError("Vendors aren't equal")
-
         if (a_ := a.framerate) != (b_ := b.framerate):
             raise ValueError(f"Framerates are not equal: {a_}, {b_}")
+        if (a_ := a.framesets.keys()) != (b_ := b.framesets.keys()):
+            raise AttributeError(
+                f"Sequences don't contain the same framesets: {a_}, {b_}"
+            )
+        return True
+
+
+    @classmethod
+    def merge(cls, a: "Sequence", b: "Sequence") -> "Sequence":
+        path = list(itertools.chain([a.path, b.path]))
+
+        if Sequence.check_equivalence(a, b):
+            pass
 
         # Create time axis
         n_frames = len(a) + len(b)
         time = np.arange(n_frames) / a.framerate + a.time[0]
 
         # Merge framesets
-        if (a_ := a.framesets.keys()) != (b_ := b.framesets.keys()):
-            raise AttributeError(
-                f"Sequences don't contain the same framesets: {a_}, {b_}"
-            )
         framesets = {
             name: Frameset.merge(a.framesets[name], b.framesets[name])
             for name in a.framesets.keys()
