@@ -107,26 +107,20 @@ class Sequence:
 
     @classmethod
     def merge(cls, a: "Sequence", b: "Sequence") -> "Sequence":
-        path = list(itertools.chain([a.path, b.path]))
-
         if Sequence.check_equivalence(a, b):
             pass
 
-        # Create time axis
+        path = [a.path, b.path]
         n_frames = len(a) + len(b)
         time = np.arange(n_frames) / a.framerate + a.time[0]
-
-        # Merge framesets
         framesets = {
             name: Frameset.merge(a.framesets[name], b.framesets[name])
-            for name in a.framesets.keys()
+            for name in a.framesets
         }
 
-        def merge_list_attribute(attr: str) -> list:
+        def merge_attribute(attr: str) -> list:
             a_items = getattr(a, attr)
-            b_items = copy.deepcopy(
-                getattr(b, attr)
-            )  # make a copy to prevent overwriting b
+            b_items = getattr(b, attr)
             for item in b_items:
                 item.index += a.n_frames
                 item.time = time[item.index]
@@ -138,9 +132,9 @@ class Sequence:
             n_frames=n_frames,
             framerate=a.framerate,
             framesets=framesets,
-            events=merge_list_attribute("events"),
-            timing_errors=merge_list_attribute("timing_errors"),
-            phases=merge_list_attribute("phases"),
+            events=merge_attribute("events"),
+            timing_errors=merge_attribute("timing_errors"),
+            phases=merge_attribute("phases"),
             vendor=a.vendor,
         )
 
