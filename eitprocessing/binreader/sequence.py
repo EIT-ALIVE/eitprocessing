@@ -2,7 +2,7 @@
 Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
 Licensed under the Apache License, version 2.0. See LICENSE for details.
 
-This file contains methods related to parts of electrical impedance tomographs 
+This file contains methods related to parts of electrical impedance tomographs
 as they are read.
 """
 
@@ -61,8 +61,22 @@ class Sequence:
     phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
     vendor: Vendor = None
 
+
+    def __post_init__(self):
+        if isinstance(self.vendor, str):
+            self.vendor = self.vendor.lower()
+
+        if self.vendor == Vendor.DRAEGER:
+            self.__class__ = DraegerSequence
+        elif self.vendor == Vendor.TIMPEL:
+            self.__class__ = TimpelSequence
+        elif self.vendor is not None:
+            raise NotImplementedError(f'vendor {self.vendor} is not implemented')
+
+
     def __len__(self) -> int:
         return self.n_frames
+
 
     def __eq__(self, other) -> bool:
         for attr in ["n_frames", "framerate", "framesets", "vendor"]:
@@ -78,35 +92,35 @@ class Sequence:
 
         return True
 
-    @classmethod
-    def merge(cls, a, b) -> "Sequence":
-        path = list(itertools.chain([a.path, b.path]))
-
+    @staticmethod
+    def check_equivalence(a: "Sequence", b: "Sequence"):
         if a.vendor != b.vendor:
             raise ValueError("Vendors aren't equal")
-
         if (a_ := a.framerate) != (b_ := b.framerate):
             raise ValueError(f"Framerates are not equal: {a_}, {b_}")
-
-        # Create time axis
-        n_frames = len(a) + len(b)
-        time = np.arange(n_frames) / a.framerate + a.time[0]
-
-        # Merge framesets
         if (a_ := a.framesets.keys()) != (b_ := b.framesets.keys()):
             raise AttributeError(
                 f"Sequences don't contain the same framesets: {a_}, {b_}"
             )
+        return True
+
+
+    @classmethod
+    def merge(cls, a: "Sequence", b: "Sequence") -> "Sequence":
+        if Sequence.check_equivalence(a, b):
+            pass
+
+        path = [a.path, b.path]
+        n_frames = len(a) + len(b)
+        time = np.arange(n_frames) / a.framerate + a.time[0]
         framesets = {
             name: Frameset.merge(a.framesets[name], b.framesets[name])
-            for name in a.framesets.keys()
+            for name in a.framesets
         }
 
-        def merge_list_attribute(attr: str) -> list:
+        def merge_attribute(attr: str) -> list:
             a_items = getattr(a, attr)
-            b_items = copy.deepcopy(
-                getattr(b, attr)
-            )  # make a copy to prevent overwriting b
+            b_items = getattr(b, attr)
             for item in b_items:
                 item.index += a.n_frames
                 item.time = time[item.index]
@@ -118,9 +132,9 @@ class Sequence:
             n_frames=n_frames,
             framerate=a.framerate,
             framesets=framesets,
-            events=merge_list_attribute("events"),
-            timing_errors=merge_list_attribute("timing_errors"),
-            phases=merge_list_attribute("phases"),
+            events=merge_attribute("events"),
+            timing_errors=merge_attribute("timing_errors"),
+            phases=merge_attribute("phases"),
             vendor=a.vendor,
         )
 
@@ -347,7 +361,7 @@ class DraegerSequence(Sequence):
         # TODO: parse medibus data into waveform data
         medibus_data = reader.float32(  # noqa; variable will be used in future version
             length=52
-        )  
+        )
 
         # The event marker stays the same until the next event occurs. Therefore, check whether the
         # event marker has changed with respect to the most recent event. If so, create a new event.
