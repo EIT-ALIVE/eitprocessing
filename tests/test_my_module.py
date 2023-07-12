@@ -1,6 +1,7 @@
 """Tests for the eitprocessing.my_module module.
 """
 import os
+import pytest
 from eitprocessing.binreader.sequence import Sequence
 
 
@@ -29,23 +30,17 @@ sample_data2 = os.path.join(
 
 def test_merge():
     # print(sample_data1)
-    reading1 = Sequence.from_path(sample_data1, framerate=20, vendor="draeger")
-    reading2 = Sequence.from_path(sample_data2, framerate=20, vendor="draeger")
+    reading1 = Sequence.from_path(sample_data1, vendor="draeger")
+    reading2 = Sequence.from_path(sample_data2, vendor="draeger")
     merged = Sequence.merge(reading1, reading2)
     assert merged.n_frames == (reading1.n_frames + reading2.n_frames)
 
 
-def test__from_path_1():
-    reading = Sequence.from_path(sample_data1, framerate=20, vendor="draeger")
+def test_from_path_1():
+    reading = Sequence.from_path(sample_data1, vendor="draeger")
     assert reading.framerate == 20
 
 
-# def test_hello_with_error():
-#     with pytest.raises(ValueError) as excinfo:
-#         hello('nobody')
-#     assert 'Can not say hello to nobody' in str(excinfo.value)
-
-
 def test_from_path_2():
-    reading = Sequence.from_path(sample_data2, framerate=20, vendor="draeger")
+    reading = Sequence.from_path(sample_data2, vendor="draeger")
     assert len(reading.time) == 12000

@@ -153,7 +153,8 @@ class Sequence:
         path: Path | str,
         vendor: Vendor,
         framerate: int = None,
-        limit_frames: slice | Tuple[int, int] = None,
+        first_frame: int = 0,
+        n_frames: int | None = None,
     ) -> "Sequence":
         """Load sequence from path
 
@@ -174,43 +175,22 @@ class Sequence:
 
         if vendor == Vendor.DRAEGER:
             return DraegerSequence.from_path(
-                path, framerate=framerate, limit_frames=limit_frames
+                path,
+                framerate=framerate,
+                first_frame=first_frame,
+                n_frames=n_frames,
             )
 
         if vendor == Vendor.TIMPEL:
             return TimpelSequence.from_path(
-                path, framerate=framerate, limit_frames=limit_frames
+                path,
+                framerate=framerate,
+                first_frame=first_frame,
+                n_frames=n_frames,
             )
 
         raise NotImplementedError(f"cannot load data from vendor {vendor}")
 
-    @staticmethod
-    def parse_limit_frames(limit_frames: tuple | slice) -> slice:
-        if not limit_frames:
-            return None
-
-        if isinstance(limit_frames, tuple):
-            if len(limit_frames) != 2:
-                raise ValueError(
-                    "`limit_frames` should be a tuple (start, stop) or a slice."
-                )
-            limit_frames = slice(*limit_frames)
-
-        if limit_frames and not isinstance(limit_frames, slice):
-            raise TypeError(
-                f"`limit_frames` should be a slice or tuple (to be converted to a slice), not {type(limit_frames)!r}"
-            )
-
-        if limit_frames.step != 1 and limit_frames.step is not None:
-            raise NotImplementedError("Can't skip frames when loading data.")
-
-        if limit_frames.start is None and limit_frames.stop is None:
-            return None
-
-        if limit_frames.start is None:
-            limit_frames = slice(0, limit_frames.stop)
-
-        return limit_frames
 
     def select_by_indices(self, indices) -> "Sequence":
         obj = self.deepcopy()
@@ -270,73 +250,65 @@ class Sequence:
 
 @dataclass(eq=False)
 class DraegerSequence(Sequence):
-    framerate: int = 20
     vendor: Vendor = Vendor.DRAEGER
 
     @classmethod
     def from_path(
         cls,
         path: Path | str,
-        vendor: Vendor = Vendor.DRAEGER,
         framerate: int = None,
-        limit_frames: slice | Tuple[int, int] = None,
+        first_frame: int = 0,
+        n_frames: int | None = None,
+        vendor: Vendor = Vendor.DRAEGER,
     ) -> "DraegerSequence":
         if vendor != Vendor.DRAEGER:
             raise ValueError(f"Vendor can't be different from '{Vendor.DRAEGER}'")
 
-        obj = cls(path=Path(path))
+        if not framerate:
+            framerate = 20
 
-        if framerate:
-            obj.framerate = framerate
+        obj = cls(
+            path=Path(path),
+            framerate=framerate,
+        )
 
-        limit_frames = obj.parse_limit_frames(limit_frames)
+        # assign n_frames, framesets, events, timing_errors, phases
+        obj.read(first_frame, n_frames)
 
-        skip_frames = 0
-        if limit_frames:
-            skip_frames = limit_frames.start
-
-        obj.read(limit_frames=limit_frames)
-        obj.time = np.arange(len(obj) + skip_frames) / obj.framerate
-        obj.time = obj.time[skip_frames:]
+        obj.time = np.arange(len(obj) + first_frame) / obj.framerate
+        obj.time = obj.time[first_frame:]
 
         return obj
 
-    def read(self, limit_frames: slice = None, framerate: int = 20) -> None:
+    def read(
+        self,
+        first_frame: int,
+        n_frames: int,
+    ) -> None:
         FRAME_SIZE_BYTES = 4358
 
         file_size = self.path.stat().st_size
         if file_size % FRAME_SIZE_BYTES:
-            raise ValueError(
-                f"File size {file_size} not divisible by {FRAME_SIZE_BYTES}"
+            raise IOError(
+                f"""File size {file_size} not divisible by {FRAME_SIZE_BYTES}.\n
+                Make sure this is a valid and uncorrupted Draeger file."""
             )
-
-        max_n_frames = file_size // FRAME_SIZE_BYTES
-
-        if limit_frames:
-            if limit_frames.step not in (1, None):
-                raise NotImplementedError("Can't skip frames")
-
-            if limit_frames.stop and limit_frames.stop < max_n_frames:
-                stop = limit_frames.stop
-            else:
-                stop = max_n_frames
-
-            start = limit_frames.start or 0
-            self.n_frames = stop - start
+        total_frames = file_size // FRAME_SIZE_BYTES
+        if n_frames is not None:
+            self.n_frames = min(total_frames - first_frame, n_frames)
         else:
-            self.n_frames = max_n_frames
+            self.n_frames = total_frames - first_frame
 
         pixel_values = np.empty((self.n_frames, 32, 32))
 
         with open(self.path, "br") as fh:
-            if limit_frames:
-                fh.seek(limit_frames.start * FRAME_SIZE_BYTES)
+            fh.seek(first_frame * FRAME_SIZE_BYTES)
 
             reader = Reader(fh)
             for index in range(self.n_frames):
                 self.read_frame(reader, index, pixel_values)
 
-        params = {"framerate": framerate}
+        params = {"framerate": self.framerate}
         self.framesets["raw"] = Frameset(
             name="raw",
             description="raw impedance data",
@@ -386,7 +358,6 @@ class DraegerSequence(Sequence):
 
 @dataclass(eq=False)
 class TimpelSequence(Sequence):
-    framerate: int = 50
     vendor: Vendor = Vendor.TIMPEL
 
     @classmethod
@@ -395,42 +366,42 @@ class TimpelSequence(Sequence):
         path: Path | str,
         vendor: Vendor = Vendor.TIMPEL,
         framerate: int = None,
-        limit_frames: slice | Tuple[int, int] = None,
+        first_frame: int = 0,
+        n_frames: int | None = None,
     ) -> "TimpelSequence":
         if vendor != Vendor.TIMPEL:
             raise ValueError(f"Vendor can't be different from '{Vendor.TIMPEL}'")
 
-        obj = cls(path=Path(path))
+        COLUMN_WIDTH = 1030
 
-        if framerate:
-            obj.framerate = framerate
+        if not framerate:
+            framerate = 50
 
-        limit_frames = obj.parse_limit_frames(limit_frames)
-
-        skiprows, max_rows = 0, None
-        if limit_frames:
-            skiprows = limit_frames.start
-            if limit_frames.stop:
-                max_rows = limit_frames.stop - limit_frames.start
-
-        data = np.loadtxt(
-            path, dtype=float, delimiter=",", skiprows=skiprows, max_rows=max_rows
+        obj = cls(
+            path=Path(path),
+            framerate=framerate,
         )
 
-        obj.n_frames = data.shape[0]
-        if max_rows and max_rows != obj.n_frames:
-            raise ValueError(
-                "Fewer rows were loaded than indicated with `limit_frames`"
+        data = np.loadtxt(
+            path,
+            dtype=float,
+            delimiter=",",
+            skiprows=first_frame,
+            max_rows=n_frames,
+        )
+        if data.shape[1] != COLUMN_WIDTH:
+            raise IOError(
+                f"""Input does not have a width of {COLUMN_WIDTH} columns.\n
+                Make sure this is a valid and uncorrupted Timpel file."""
             )
+
+        obj.n_frames = data.shape[0]
 
         # Below method seems convoluted: it's easier to create an array with n_frames and add a
         # time_offset. However, this results in floating points errors, creating issues with
         # comparing times later on.
-        obj.time = np.arange(obj.n_frames + skiprows) / obj.framerate
-        obj.time = obj.time[skiprows:]
-
-        if data.shape[1] != 1030:
-            raise ValueError("CSV file does not contain 1030 columns")
+        obj.time = np.arange(obj.n_frames + first_frame) / obj.framerate
+        obj.time = obj.time[first_frame:]
 
         pixel_data = data[:, :1024]
         pixel_data = np.reshape(pixel_data, newshape=(-1, 32, 32), order="C")

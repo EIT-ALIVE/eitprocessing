@@ -80,21 +80,10 @@ def test_slicing():
     assert full_data[100 : len(full_data)] == full_data[100:]
 
 
-def test_limit_frames_tuple_v_slice():
-    limit_tuple1 = TimpelSequence.from_path(sample_data1, limit_frames=(0, 100))
-    limit_tuple2 = TimpelSequence.from_path(sample_data1, limit_frames=(None, 100))
-    limit_slice1 = TimpelSequence.from_path(sample_data1, limit_frames=slice(0, 100))
-    limit_slice2 = TimpelSequence.from_path(sample_data1, limit_frames=slice(None, 100))
-
-    assert limit_tuple1 == limit_tuple2
-    assert limit_slice1 == limit_slice2
-    assert limit_tuple1 == limit_slice1
-
-
 def test_limit_frames_merged_equals_full_data():
     full_data = TimpelSequence.from_path(sample_data1)
-    limit_first_part = TimpelSequence.from_path(sample_data1, limit_frames=(None, 100))
-    limit_second_part = TimpelSequence.from_path(sample_data1, limit_frames=(100, None))
+    limit_first_part = TimpelSequence.from_path(sample_data1, n_frames=100)
+    limit_second_part = TimpelSequence.from_path(sample_data1, first_frame=100)
 
     assert limit_first_part == full_data[:100]
     assert limit_second_part == full_data[100:]
