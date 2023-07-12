@@ -1,7 +1,6 @@
 """Tests for the eitprocessing.my_module module.
 """
 import os
-import pytest
 from eitprocessing.binreader.sequence import Sequence
 
 
@@ -33,7 +32,7 @@ def test_merge():
     reading1 = Sequence.from_path(sample_data1, vendor="draeger")
     reading2 = Sequence.from_path(sample_data2, vendor="draeger")
     merged = Sequence.merge(reading1, reading2)
-    assert merged.n_frames == (reading1.n_frames + reading2.n_frames)
+    assert merged.nframes == (reading1.nframes + reading2.nframes)
 
 
 def test_from_path_1():

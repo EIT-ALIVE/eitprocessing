@@ -8,15 +8,14 @@ as they are read.
 
 import copy
 import functools
-import itertools
 from dataclasses import dataclass
 from dataclasses import field
 from enum import auto
 from pathlib import Path
 from typing import Dict
 from typing import List
-from typing import Tuple
 import numpy as np
+from numpy.typing import NDArray
 from strenum import LowercaseStrEnum
 from .event import Event
 from .frameset import Frameset
@@ -53,7 +52,7 @@ class Sequence:
 
     path: Path | str | List[Path | str] = None
     time: np.ndarray = None
-    n_frames: int = None
+    nframes: int = None
     framerate: int = None
     framesets: Dict[str, Frameset] = field(default_factory=dict)
     events: List[Event] = field(default_factory=list, repr=False)
@@ -63,23 +62,15 @@ class Sequence:
 
 
     def __post_init__(self):
-        if isinstance(self.vendor, str):
-            self.vendor = self.vendor.lower()
-
-        if self.vendor == Vendor.DRAEGER:
-            self.__class__ = DraegerSequence
-        elif self.vendor == Vendor.TIMPEL:
-            self.__class__ = TimpelSequence
-        elif self.vendor is not None:
-            raise NotImplementedError(f'vendor {self.vendor} is not implemented')
+        self._set_vendor_class()
 
 
     def __len__(self) -> int:
-        return self.n_frames
+        return self.nframes
 
 
     def __eq__(self, other) -> bool:
-        for attr in ["n_frames", "framerate", "framesets", "vendor"]:
+        for attr in ["nframes", "framerate", "framesets", "vendor"]:
             if getattr(self, attr) != getattr(other, attr):
                 return False
 
@@ -91,6 +82,19 @@ class Sequence:
                 return False
 
         return True
+
+
+    def _set_vendor_class(self):
+        if isinstance(self.vendor, str):
+            self.vendor = Vendor(self.vendor.lower())
+
+        if self.vendor == Vendor.DRAEGER:
+            self.__class__ = DraegerSequence
+        elif self.vendor == Vendor.TIMPEL:
+            self.__class__ = TimpelSequence
+        elif self.vendor is not None:
+            raise NotImplementedError(f'vendor {self.vendor} is not implemented')
+
 
     @staticmethod
     def check_equivalence(a: "Sequence", b: "Sequence"):
@@ -111,8 +115,8 @@ class Sequence:
             pass
 
         path = [a.path, b.path]
-        n_frames = len(a) + len(b)
-        time = np.arange(n_frames) / a.framerate + a.time[0]
+        nframes = len(a) + len(b)
+        time = np.arange(nframes) / a.framerate + a.time[0]
         framesets = {
             name: Frameset.merge(a.framesets[name], b.framesets[name])
             for name in a.framesets
@@ -122,14 +126,14 @@ class Sequence:
             a_items = getattr(a, attr)
             b_items = getattr(b, attr)
             for item in b_items:
-                item.index += a.n_frames
+                item.index += a.nframes
                 item.time = time[item.index]
             return a_items + b_items
 
         return cls(
             path=path,
             time=time,
-            n_frames=n_frames,
+            nframes=nframes,
             framerate=a.framerate,
             framesets=framesets,
             events=merge_attribute("events"),
@@ -148,13 +152,13 @@ class Sequence:
         return functools.reduce(cls.merge, sequences)
 
     @classmethod
-    def from_path(
+    def from_path( #pylint: disable=too-many-arguments
         cls,
         path: Path | str,
         vendor: Vendor,
         framerate: int = None,
         first_frame: int = 0,
-        n_frames: int | None = None,
+        nframes: int | None = None,
     ) -> "Sequence":
         """Load sequence from path
 
@@ -171,25 +175,35 @@ class Sequence:
             Sequence: a sequence containing the loaded data
         """
 
-        path = Path(path)
+        obj = cls(
+            path=Path(path),
+            nframes=nframes,
+            vendor=vendor
+        )
+        obj._set_vendor_class()
+        if framerate:
+            obj.framerate = framerate
+        elif obj.vendor == Vendor.DRAEGER:
+            obj.framerate = 20
+        elif obj.vendor == Vendor.TIMPEL:
+            obj.framerate = 50
 
-        if vendor == Vendor.DRAEGER:
-            return DraegerSequence.from_path(
-                path,
-                framerate=framerate,
-                first_frame=first_frame,
-                n_frames=n_frames,
-            )
+        # function from child class, which will load and assign
+        # nframes, framesets, events, timing_errors, phases
+        obj._load_data(first_frame)
 
-        if vendor == Vendor.TIMPEL:
-            return TimpelSequence.from_path(
-                path,
-                framerate=framerate,
-                first_frame=first_frame,
-                n_frames=n_frames,
-            )
+        # Below method seems convoluted: it's easier to create an array with nframes and add a
+        # time_offset. However, this results in floating points errors, creating issues with
+        # comparing times later on.
+        obj.time = np.arange(obj.nframes + first_frame) / obj.framerate
+        obj.time = obj.time[first_frame:]
 
-        raise NotImplementedError(f"cannot load data from vendor {vendor}")
+        return obj
+
+
+    def _load_data(self, first_frame: int | None):
+        raise NotImplementedError(
+            f"Data loading for {self.vendor} is not implemented")
 
 
     def select_by_indices(self, indices) -> "Sequence":
@@ -199,7 +213,7 @@ class Sequence:
             k: v.select_by_indices(indices) for k, v in self.framesets.items()
         }
         obj.time = self.time[indices]
-        obj.n_frames = len(obj.time)
+        obj.nframes = len(obj.time)
 
         if isinstance(indices, slice):
             if indices.start is None:
@@ -252,60 +266,28 @@ class Sequence:
 class DraegerSequence(Sequence):
     vendor: Vendor = Vendor.DRAEGER
 
-    @classmethod
-    def from_path(
-        cls,
-        path: Path | str,
-        framerate: int = None,
-        first_frame: int = 0,
-        n_frames: int | None = None,
-        vendor: Vendor = Vendor.DRAEGER,
-    ) -> "DraegerSequence":
-        if vendor != Vendor.DRAEGER:
-            raise ValueError(f"Vendor can't be different from '{Vendor.DRAEGER}'")
-
-        if not framerate:
-            framerate = 20
-
-        obj = cls(
-            path=Path(path),
-            framerate=framerate,
-        )
-
-        # assign n_frames, framesets, events, timing_errors, phases
-        obj.read(first_frame, n_frames)
-
-        obj.time = np.arange(len(obj) + first_frame) / obj.framerate
-        obj.time = obj.time[first_frame:]
-
-        return obj
-
-    def read(
-        self,
-        first_frame: int,
-        n_frames: int,
-    ) -> None:
+    def _load_data(self, first_frame: int | None):
         FRAME_SIZE_BYTES = 4358
 
         file_size = self.path.stat().st_size
         if file_size % FRAME_SIZE_BYTES:
             raise IOError(
                 f"""File size {file_size} not divisible by {FRAME_SIZE_BYTES}.\n
-                Make sure this is a valid and uncorrupted Draeger file."""
+                Make sure this is a valid and uncorrupted Draeger data file."""
             )
         total_frames = file_size // FRAME_SIZE_BYTES
-        if n_frames is not None:
-            self.n_frames = min(total_frames - first_frame, n_frames)
+        if self.nframes is not None:
+            self.nframes = min(total_frames - first_frame, self.nframes)
         else:
-            self.n_frames = total_frames - first_frame
+            self.nframes = total_frames - first_frame
 
-        pixel_values = np.empty((self.n_frames, 32, 32))
+        pixel_values = np.empty((self.nframes, 32, 32))
 
         with open(self.path, "br") as fh:
             fh.seek(first_frame * FRAME_SIZE_BYTES)
 
             reader = Reader(fh)
-            for index in range(self.n_frames):
+            for index in range(self.nframes):
                 self.read_frame(reader, index, pixel_values)
 
         params = {"framerate": self.framerate}
@@ -316,15 +298,16 @@ class DraegerSequence(Sequence):
             pixel_values=pixel_values,
         )
 
-    def read_frame(self, reader, index, pixel_values) -> None:
-        def reshape_frame(frame):
-            return np.reshape(frame, (32, 32), "C")
-
+    def read_frame(
+        self, reader: Reader,
+        index: int,
+        pixel_values: NDArray,
+    ) -> None:
         timestamp = reader.float64()
         time = timestamp * 24 * 60 * 60
 
         _ = reader.float32()
-        pixel_values[index, :, :] = reshape_frame(reader.float32(length=1024))
+        pixel_values[index, :, :] = self.reshape_frame(reader.float32(length=1024))
         min_max_flag = reader.int32()
         event_marker = reader.int32()
         event_text = reader.string(length=30)
@@ -355,53 +338,31 @@ class DraegerSequence(Sequence):
         elif min_max_flag == -1:
             self.phases.append(MinValue(index, time))
 
+    @staticmethod
+    def reshape_frame(frame):
+        return np.reshape(frame, (32, 32), "C")
+
 
 @dataclass(eq=False)
 class TimpelSequence(Sequence):
     vendor: Vendor = Vendor.TIMPEL
 
-    @classmethod
-    def from_path(
-        cls,
-        path: Path | str,
-        vendor: Vendor = Vendor.TIMPEL,
-        framerate: int = None,
-        first_frame: int = 0,
-        n_frames: int | None = None,
-    ) -> "TimpelSequence":
-        if vendor != Vendor.TIMPEL:
-            raise ValueError(f"Vendor can't be different from '{Vendor.TIMPEL}'")
-
+    def _load_data(self, first_frame: int | None):
         COLUMN_WIDTH = 1030
 
-        if not framerate:
-            framerate = 50
-
-        obj = cls(
-            path=Path(path),
-            framerate=framerate,
-        )
-
         data = np.loadtxt(
-            path,
+            self.path,
             dtype=float,
             delimiter=",",
             skiprows=first_frame,
-            max_rows=n_frames,
+            max_rows=self.nframes,
         )
         if data.shape[1] != COLUMN_WIDTH:
             raise IOError(
                 f"""Input does not have a width of {COLUMN_WIDTH} columns.\n
-                Make sure this is a valid and uncorrupted Timpel file."""
+                Make sure this is a valid and uncorrupted Timpel data file."""
             )
-
-        obj.n_frames = data.shape[0]
-
-        # Below method seems convoluted: it's easier to create an array with n_frames and add a
-        # time_offset. However, this results in floating points errors, creating issues with
-        # comparing times later on.
-        obj.time = np.arange(obj.n_frames + first_frame) / obj.framerate
-        obj.time = obj.time[first_frame:]
+        self.nframes = data.shape[0]
 
         pixel_data = data[:, :1024]
         pixel_data = np.reshape(pixel_data, newshape=(-1, 32, 32), order="C")
@@ -414,24 +375,29 @@ class TimpelSequence(Sequence):
             "volume": data[:, 1026],
         }
 
+        # TODO: avoid repeating this in current method and Sequence.from_path
+        # The problem is that time cannot be defined before frames are loaded,
+        # but is needed for Timpel data to assign phases
+        self.time = np.arange(self.nframes + first_frame) / self.framerate
+        self.time = self.time[first_frame:]
+
+
         # extract breath start, breath end and QRS marks
         for index in np.flatnonzero(data[:, 1027] == 1):
-            obj.phases.append(MinValue(index, obj.time[index]))
+            self.phases.append(MinValue(index, self.time[index]))
 
         for index in np.flatnonzero(data[:, 1028] == 1):
-            obj.phases.append(MaxValue(index, obj.time[index]))
+            self.phases.append(MaxValue(index, self.time[index]))
 
         for index in np.flatnonzero(data[:, 1029] == 1):
-            obj.phases.append(QRSMark(index, obj.time[index]))
+            self.phases.append(QRSMark(index, self.time[index]))
 
-        obj.phases.sort(key=lambda x: x.index)
+        self.phases.sort(key=lambda x: x.index)
 
-        obj.framesets["raw"] = Frameset(
+        self.framesets["raw"] = Frameset(
             name="raw",
             description="raw timpel data",
-            params={"framerate": obj.framerate},
+            params={"framerate": self.framerate},
             pixel_values=pixel_data,
             waveform_data=waveform_data,
         )
-
-        return obj

@@ -1,6 +1,5 @@
 import copy
 import os
-import pytest
 from eitprocessing.binreader.sequence import Sequence
 from eitprocessing.binreader.sequence import TimpelSequence
 from eitprocessing.binreader.sequence import Vendor
@@ -16,27 +15,22 @@ print(__file__)
 sample_data1 = os.path.join(data_directory, "test_data", "testdata_timpel.txt")
 
 
-def test_read():
-    assert TimpelSequence.from_path(sample_data1)
+def test_from_path():
+    using_vendor = Sequence.from_path(sample_data1, vendor=Vendor.TIMPEL)
+    using_str = Sequence.from_path(sample_data1, vendor="timpel")
 
-
-def test_direct_vs_indirect_reading():
-    direct = TimpelSequence.from_path(sample_data1)
-    indirect = Sequence.from_path(sample_data1, vendor=Vendor.TIMPEL)
-    indirect_str = Sequence.from_path(sample_data1, vendor="timpel")
-
-    assert direct == indirect
-    assert isinstance(direct, type(indirect))
-    assert indirect == indirect_str
+    assert using_vendor == using_str
+    assert isinstance(using_str, TimpelSequence)
+    assert isinstance(using_vendor, TimpelSequence)
 
 
 def test_equals():
-    full_data = TimpelSequence.from_path(sample_data1)
+    full_data = Sequence.from_path(sample_data1, vendor="timpel")
 
     full_data_copy = TimpelSequence()
     full_data_copy.path = copy.deepcopy(full_data.path)
     full_data_copy.time = copy.deepcopy(full_data.time)
-    full_data_copy.n_frames = copy.deepcopy(full_data.n_frames)
+    full_data_copy.nframes = copy.deepcopy(full_data.nframes)
     full_data_copy.framerate = copy.deepcopy(full_data.framerate)
     full_data_copy.framesets = copy.deepcopy(full_data.framesets)
     full_data_copy.events = copy.deepcopy(full_data.events)
@@ -66,14 +60,14 @@ def test_equals():
 
 
 def test_copy():
-    full_data = TimpelSequence.from_path(sample_data1)
-
+    full_data = Sequence.from_path(sample_data1, vendor="timpel")
     full_data_copy = full_data.deepcopy()
+
     assert full_data == full_data_copy
 
 
 def test_slicing():
-    full_data = TimpelSequence.from_path(sample_data1)
+    full_data = Sequence.from_path(sample_data1, vendor="timpel")
 
     assert full_data[:100] == full_data[:100]  # tests whether slicing alters full_data
     assert full_data[0:100] == full_data[:100]
@@ -81,15 +75,10 @@ def test_slicing():
 
 
 def test_limit_frames_merged_equals_full_data():
-    full_data = TimpelSequence.from_path(sample_data1)
-    limit_first_part = TimpelSequence.from_path(sample_data1, n_frames=100)
-    limit_second_part = TimpelSequence.from_path(sample_data1, first_frame=100)
+    full_data = Sequence.from_path(sample_data1, vendor="timpel")
+    limit_first_part = Sequence.from_path(sample_data1, nframes=100, vendor="timpel")
+    limit_second_part = Sequence.from_path(sample_data1, first_frame=100, vendor="timpel")
 
     assert limit_first_part == full_data[:100]
     assert limit_second_part == full_data[100:]
     assert Sequence.merge(limit_first_part, limit_second_part) == full_data
-
-
-def test_nondefault_vendor():
-    with pytest.raises(ValueError):
-        TimpelSequence.from_path(sample_data1, vendor="draeger")
