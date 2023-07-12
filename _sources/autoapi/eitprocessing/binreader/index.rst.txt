@@ -251,6 +251,9 @@ Classes
 
       
 
+   .. py:method:: __post_init__()
+
+
    .. py:method:: __len__() -> int
 
 
@@ -259,7 +262,11 @@ Classes
       Return self==value.
 
 
-   .. py:method:: merge(a, b) -> Sequence
+   .. py:method:: check_equivalence(a: Sequence, b: Sequence)
+      :staticmethod:
+
+
+   .. py:method:: merge(a: Sequence, b: Sequence) -> Sequence
       :classmethod:
 
 
