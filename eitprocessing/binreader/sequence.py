@@ -143,37 +143,51 @@ class Sequence:
         )
 
     @classmethod
-    def from_paths(
-        cls, paths: List[Path], vendor: Vendor, framerate: int = None
+    def from_path(
+        cls,
+        path: Path | str | List[Path | str],
+        *args, **kwargs,
     ) -> "Sequence":
-        sequences = (
-            cls.from_path(path, framerate=framerate, vendor=vendor) for path in paths
-        )
+        """Load sequence from path(s)
+
+        Args:
+            path (Path | str | List[Path | str]): path(s) to data file
+            vendor (Vendor | str): vendor indicating the device used
+            framerate (int, optional): framerate at which the data was recorded.
+                Default for Draeger: 20
+                Default for Timpel: 50
+            first_frame (int, optional): select the starting frame.
+                Defaults to 0.
+            n_frames (int, optional): select the maximum number of frames to load.
+                The actual number of frames can be lower than this is the total
+                file size would be exceeded.
+
+        Raises:
+            NotImplementedError: is raised when there is no loading method for
+            the given vendor.
+
+        Returns:
+            Sequence: a sequence containing the loaded data from all files in path
+        """
+
+        if not isinstance(path, list):
+            path = [path]
+
+        sequences = []
+        for single_path in path:
+            Path(single_path).resolve(strict=True)
+            sequences.append(cls._load_file(single_path, *args, **kwargs))
         return functools.reduce(cls.merge, sequences)
 
     @classmethod
-    def from_path( #pylint: disable=too-many-arguments
+    def _load_file( #pylint: disable=too-many-arguments
         cls,
-        path: Path | str,
-        vendor: Vendor,
+        path,
+        vendor: Vendor | str,
         framerate: int = None,
         first_frame: int = 0,
         nframes: int | None = None,
     ) -> "Sequence":
-        """Load sequence from path
-
-        Args:
-            path (Path | str): path to data file
-            vendor (Vendor): vendor indicating the device used
-            framerate (int, optional): framerate at which the data was recorded. Defaults to None.
-            limit_frames (slice | Tuple[int, int], optional): limit the range of frames to be loaded. Defaults to None.
-
-        Raises:
-            NotImplementedError: is raised when there is no loading method for the given vendor.
-
-        Returns:
-            Sequence: a sequence containing the loaded data
-        """
 
         obj = cls(
             path=Path(path),

@@ -43,3 +43,10 @@ def test_from_path_1():
 def test_from_path_2():
     reading = Sequence.from_path(sample_data2, vendor="draeger")
     assert len(reading.time) == 12000
+
+def test_multiple_paths():
+    reading = Sequence.from_path(
+        path=[sample_data2, sample_data2],
+        vendor='draeger')
+    assert reading.framerate == 20
+    assert len(reading.time) == 12000*2
