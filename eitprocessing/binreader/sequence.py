@@ -329,7 +329,7 @@ class DraegerSequence(Sequence):
         index: int,
         pixel_values: NDArray,
     ) -> None:
-        total_time = reader.float64() * 24 * 60 * 60
+        current_time = reader.float64() * 24 * 60 * 60
 
         _ = reader.float32()
         pixel_values[index, :, :] = self.reshape_frame(reader.float32(length=1024))
@@ -353,15 +353,15 @@ class DraegerSequence(Sequence):
         if event_marker and (
             previous_event is None or event_marker > previous_event.marker
         ):
-            self.events.append(Event(index, event_marker, event_text))
+            self.events.append(Event(index, current_time, event_marker, event_text))
 
         if timing_error:
-            self.timing_errors.append(TimingError(index, total_time, timing_error))
+            self.timing_errors.append(TimingError(index, current_time, timing_error))
 
         if min_max_flag == 1:
-            self.phases.append(MaxValue(index, total_time))
+            self.phases.append(MaxValue(index, current_time))
         elif min_max_flag == -1:
-            self.phases.append(MinValue(index, total_time))
+            self.phases.append(MinValue(index, current_time))
 
 
     @staticmethod
