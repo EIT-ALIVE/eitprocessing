@@ -189,9 +189,9 @@ def test_load_partial( #noqa
     # this might have something to do with how the reader is set up
     # which is still a bit of a black box to me
     draeger_first_part = Sequence.from_path(draeger_file1, vendor="draeger", nframes=100)
-    draeger_second_part = Sequence.from_path(draeger_file2, vendor="draeger", first_frame=100)
+    draeger_second_part = Sequence.from_path(draeger_file1, vendor="draeger", first_frame=100)
 
     # assert draeger_first_part == draeger_data1[:100]
     # assert draeger_second_part == draeger_data1[100:]
     # assert Sequence.merge(draeger_first_part, draeger_second_part) == draeger_data1
-    # assert Sequence.merge(draeger_second_part, draeger_first_part) != draeger_data1  #TODO: fix draeger equality
+    # assert Sequence.merge(draeger_second_part, draeger_first_part) != draeger_data1
