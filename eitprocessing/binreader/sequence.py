@@ -51,6 +51,7 @@ class Sequence:
     """
 
     path: Path | str | List[Path | str] = None
+    vendor: Vendor = None
     time: np.ndarray = None
     nframes: int = None
     framerate: int = None
@@ -58,7 +59,6 @@ class Sequence:
     events: List[Event] = field(default_factory=list, repr=False)
     timing_errors: List[TimingError] = field(default_factory=list, repr=False)
     phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
-    vendor: Vendor = None
 
 
     def __post_init__(self):
@@ -390,7 +390,7 @@ class TimpelSequence(Sequence):
                 f"""File {self.path} could not be read as Timpel data.\n
                 Make sure this is a valid and uncorrupted Timpel data file.\n
                 Original error message: {e}"""
-            )
+            ) from e
 
         if data.shape[1] != COLUMN_WIDTH:
             raise OSError(

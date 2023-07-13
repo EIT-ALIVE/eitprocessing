@@ -6,13 +6,12 @@ This file contains methods related to when electrical impedance tomographs are r
 """
 
 from dataclasses import dataclass
-from dataclasses import field
 
 
 @dataclass
 class PhaseIndicator:
     index: int
-    time: float = field(repr=False)
+    time: float
 
     def __eq__(self, other):
         if self.index != other.index:
