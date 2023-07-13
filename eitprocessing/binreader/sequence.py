@@ -98,21 +98,23 @@ class Sequence:
 
     @staticmethod
     def check_equivalence(a: "Sequence", b: "Sequence"):
-        if a.vendor != b.vendor:
-            raise ValueError("Vendors aren't equal")
+        if (a_ := a.vendor) != (b_ := b.vendor):
+            raise TypeError(f"Vendors are not equal: {a_}, {b_}")
         if (a_ := a.framerate) != (b_ := b.framerate):
             raise ValueError(f"Framerates are not equal: {a_}, {b_}")
         if (a_ := a.framesets.keys()) != (b_ := b.framesets.keys()):
             raise AttributeError(
-                f"Sequences don't contain the same framesets: {a_}, {b_}"
+                f"Sequences do not contain the same framesets: {a_}, {b_}"
             )
         return True
 
 
     @classmethod
     def merge(cls, a: "Sequence", b: "Sequence") -> "Sequence":
-        if Sequence.check_equivalence(a, b):
-            pass
+        try:
+            Sequence.check_equivalence(a, b)
+        except Exception as e:
+            raise type(e)(f"Could not merge. {e}")
 
         path = [a.path, b.path]
         nframes = len(a) + len(b)
@@ -175,7 +177,7 @@ class Sequence:
 
         sequences = []
         for single_path in path:
-            Path(single_path).resolve(strict=True)
+            Path(single_path).resolve(strict=True)  # checks that file exists
             sequences.append(cls._load_file(single_path, *args, **kwargs))
         return functools.reduce(cls.merge, sequences)
 
@@ -191,8 +193,8 @@ class Sequence:
 
         obj = cls(
             path=Path(path),
+            vendor=vendor,
             nframes=nframes,
-            vendor=vendor
         )
         obj._set_vendor_class()
         if framerate:
@@ -219,7 +221,6 @@ class Sequence:
         Args:
             first_frame (int): first frame of sequence
         """
-
         self.time = np.arange(self.nframes + first_frame) / self.framerate
         self.time = self.time[first_frame:]
 
@@ -294,7 +295,7 @@ class DraegerSequence(Sequence):
 
         file_size = self.path.stat().st_size
         if file_size % FRAME_SIZE_BYTES:
-            raise IOError(
+            raise OSError(
                 f"""File size {file_size} not divisible by {FRAME_SIZE_BYTES}.\n
                 Make sure this is a valid and uncorrupted Draeger data file."""
             )
@@ -376,15 +377,23 @@ class TimpelSequence(Sequence):
     def _load_data(self, first_frame: int | None):
         COLUMN_WIDTH = 1030
 
-        data = np.loadtxt(
+        try:
+            data = np.loadtxt(
             self.path,
             dtype=float,
             delimiter=",",
             skiprows=first_frame,
             max_rows=self.nframes,
         )
+        except UnicodeDecodeError as e:
+            raise OSError(
+                f"""File {self.path} could not be read as Timpel data.\n
+                Make sure this is a valid and uncorrupted Timpel data file.\n
+                Original error message: {e}"""
+            )
+
         if data.shape[1] != COLUMN_WIDTH:
-            raise IOError(
+            raise OSError(
                 f"""Input does not have a width of {COLUMN_WIDTH} columns.\n
                 Make sure this is a valid and uncorrupted Timpel data file."""
             )
