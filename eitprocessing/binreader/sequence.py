@@ -206,13 +206,22 @@ class Sequence:
         # nframes, framesets, events, timing_errors, phases
         obj._load_data(first_frame)
 
-        # Below method seems convoluted: it's easier to create an array with nframes and add a
-        # time_offset. However, this results in floating points errors, creating issues with
-        # comparing times later on.
-        obj.time = np.arange(obj.nframes + first_frame) / obj.framerate
-        obj.time = obj.time[first_frame:]
-
         return obj
+
+
+    def _create_timestamps(self, first_frame: int):
+        """Populate the time attribute of Sequence instance.
+
+        The implemented method seems convoluted: it's easier to create an array
+        with nframes and add a time_offset. However, this results in floating
+        point errors, creating issues with comparing times later on.
+
+        Args:
+            first_frame (int): first frame of sequence
+        """
+
+        self.time = np.arange(self.nframes + first_frame) / self.framerate
+        self.time = self.time[first_frame:]
 
 
     def _load_data(self, first_frame: int | None):
@@ -302,7 +311,7 @@ class DraegerSequence(Sequence):
 
             reader = Reader(fh)
             for index in range(self.nframes):
-                self.read_frame(reader, index, pixel_values)
+                self._read_frame(reader, index, pixel_values)
 
         params = {"framerate": self.framerate}
         self.framesets["raw"] = Frameset(
@@ -312,13 +321,15 @@ class DraegerSequence(Sequence):
             pixel_values=pixel_values,
         )
 
-    def read_frame(
+        self._create_timestamps(first_frame)
+
+
+    def _read_frame(
         self, reader: Reader,
         index: int,
         pixel_values: NDArray,
     ) -> None:
-        timestamp = reader.float64()
-        time = timestamp * 24 * 60 * 60
+        total_time = reader.float64() * 24 * 60 * 60
 
         _ = reader.float32()
         pixel_values[index, :, :] = self.reshape_frame(reader.float32(length=1024))
@@ -345,12 +356,13 @@ class DraegerSequence(Sequence):
             self.events.append(Event(index, event_marker, event_text))
 
         if timing_error:
-            self.timing_errors.append(TimingError(index, time, timing_error))
+            self.timing_errors.append(TimingError(index, total_time, timing_error))
 
         if min_max_flag == 1:
-            self.phases.append(MaxValue(index, time))
+            self.phases.append(MaxValue(index, total_time))
         elif min_max_flag == -1:
-            self.phases.append(MinValue(index, time))
+            self.phases.append(MinValue(index, total_time))
+
 
     @staticmethod
     def reshape_frame(frame):
@@ -389,13 +401,7 @@ class TimpelSequence(Sequence):
             "volume": data[:, 1026],
         }
 
-        # TODO: avoid repeating this in current method and Sequence.from_path
-        # The problem is that time cannot be defined before frames are loaded,
-        # but is needed for Timpel data to assign phases
-        self.time = np.arange(self.nframes + first_frame) / self.framerate
-        self.time = self.time[first_frame:]
-
-
+        self._create_timestamps(first_frame)
         # extract breath start, breath end and QRS marks
         for index in np.flatnonzero(data[:, 1027] == 1):
             self.phases.append(MinValue(index, self.time[index]))
