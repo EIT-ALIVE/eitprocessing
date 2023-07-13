@@ -221,9 +221,9 @@ class Sequence:
         Args:
             first_frame (int): first frame of sequence
         """
-        self.time = np.arange(self.nframes + first_frame) / self.framerate
-        self.time = self.time[first_frame:]
-
+        timestamps = np.arange(self.nframes + first_frame) / self.framerate
+        timestamps = timestamps[first_frame:]
+        return timestamps
 
     def _load_data(self, first_frame: int | None):
         raise NotImplementedError(
@@ -304,6 +304,7 @@ class DraegerSequence(Sequence):
             self.nframes = min(total_frames - first_frame, self.nframes)
         else:
             self.nframes = total_frames - first_frame
+        self.time = self._create_timestamps(first_frame)
 
         pixel_values = np.empty((self.nframes, 32, 32))
 
@@ -321,8 +322,6 @@ class DraegerSequence(Sequence):
             params=params,
             pixel_values=pixel_values,
         )
-
-        self._create_timestamps(first_frame)
 
 
     def _read_frame(
@@ -398,6 +397,7 @@ class TimpelSequence(Sequence):
                 Make sure this is a valid and uncorrupted Timpel data file."""
             )
         self.nframes = data.shape[0]
+        self.time = self._create_timestamps(first_frame)
 
         pixel_data = data[:, :1024]
         pixel_data = np.reshape(pixel_data, newshape=(-1, 32, 32), order="C")
@@ -410,7 +410,6 @@ class TimpelSequence(Sequence):
             "volume": data[:, 1026],
         }
 
-        self._create_timestamps(first_frame)
         # extract breath start, breath end and QRS marks
         for index in np.flatnonzero(data[:, 1027] == 1):
             self.phases.append(MinValue(index, self.time[index]))
