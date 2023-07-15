@@ -12,6 +12,6 @@ from dataclasses import dataclass
 @dataclass
 class Event:
     index: int
-    start_time: float
+    time: float
     marker: int
     text: str

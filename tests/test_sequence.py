@@ -105,15 +105,16 @@ def test_merge(
     ):
 
     merged_draeger = Sequence.merge(draeger_data1, draeger_data2)
-    assert merged_draeger.nframes == (draeger_data2.nframes + draeger_data1.nframes)
+    assert len(merged_draeger) == len(draeger_data2) +len(draeger_data1)
     assert merged_draeger == draeger_data_both
+
+    draeger_load_double = Sequence.from_path([draeger_file1, draeger_file1], 'draeger')
+    draeger_merge_double = Sequence.merge(draeger_data1, draeger_data1)
+    assert draeger_load_double == draeger_merge_double
 
     merged_timpel = Sequence.merge(timpel_data, timpel_data)
     assert len(merged_timpel) == 2*len(timpel_data)
-    # assert timpel_data_double == merged_timpel
-    # # TODO: figure out why assertion above fails
-    # it has something to do with wrong phases being assigned when 2 files
-    # are loaded
+    assert timpel_data_double == merged_timpel
 
 
 def test_copy(
@@ -171,12 +172,17 @@ def test_slicing(
     draeger_data1: DraegerSequence,
     timpel_data: TimpelSequence,
     ):
+    cutoff = 100
+
     data: Sequence
     for data in [draeger_data1, timpel_data]:
         print(data.vendor)
-        assert data[:100] == data[:100]  # tests whether slicing alters full_data
-        assert data[0:100] == data[:100]
-        assert data[100 : len(data)] == data[100:]
+        assert data[:cutoff] == data[:cutoff]  # tests whether slicing alters full_data
+        assert data[0:cutoff] == data[:cutoff]
+        assert data[cutoff : len(data)] == data[cutoff:]
+
+        assert Sequence.merge(data[:cutoff], data[cutoff:]) == data
+        assert len(data[:cutoff]) == cutoff
 
 
 def test_load_partial( #noqa
@@ -184,12 +190,14 @@ def test_load_partial( #noqa
     timpel_data: TimpelSequence,
     ):
 
-    # Timpel
-    timpel_first_part = Sequence.from_path(timpel_file, vendor="timpel", nframes=100)
-    timpel_second_part = Sequence.from_path(timpel_file, vendor="timpel", first_frame=100)
+    cutoff = 100
 
-    assert timpel_first_part == timpel_data[:100]
-    assert timpel_second_part == timpel_data[100:]
+    # Timpel
+    timpel_first_part = Sequence.from_path(timpel_file, "timpel", nframes=cutoff)
+    timpel_second_part = Sequence.from_path(timpel_file, "timpel", first_frame=cutoff)
+
+    assert timpel_first_part == timpel_data[:cutoff]
+    assert timpel_second_part == timpel_data[cutoff:]
     assert Sequence.merge(timpel_first_part, timpel_second_part) == timpel_data
     assert Sequence.merge(timpel_second_part, timpel_first_part) != timpel_data
 
@@ -198,10 +206,10 @@ def test_load_partial( #noqa
     # as losing events information.
     # This is likely due to the Sequence.select_by_indices method or one of its
     # submethods
-    draeger_first_part = Sequence.from_path(draeger_file1, vendor="draeger", nframes=100)
-    draeger_second_part = Sequence.from_path(draeger_file1, vendor="draeger", first_frame=100)
+    draeger_first_part = Sequence.from_path(draeger_file1, "draeger", nframes=cutoff)
+    draeger_second_part = Sequence.from_path(draeger_file1, "draeger", first_frame=cutoff)
 
-    # assert draeger_first_part == draeger_data1[:100]
-    # assert draeger_second_part == draeger_data1[100:]
-    # assert Sequence.merge(draeger_first_part, draeger_second_part) == draeger_data1
-    # assert Sequence.merge(draeger_second_part, draeger_first_part) != draeger_data1
+    assert draeger_first_part == draeger_data1[:cutoff]
+    # assert draeger_second_part == draeger_data1[cutoff:]
+    assert Sequence.merge(draeger_first_part, draeger_second_part) == draeger_data1
+    assert Sequence.merge(draeger_second_part, draeger_first_part) != draeger_data1

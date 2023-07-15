@@ -126,7 +126,7 @@ class Sequence:
 
         def merge_attribute(attr: str) -> list:
             a_items = getattr(a, attr)
-            b_items = getattr(b, attr)
+            b_items = getattr(b.deepcopy(), attr)  # deepcopy avoids overwriting
             for item in b_items:
                 item.index += a.nframes
                 item.time = time[item.index]
@@ -134,6 +134,7 @@ class Sequence:
 
         return cls(
             path=path,
+            vendor=a.vendor,
             time=time,
             nframes=nframes,
             framerate=a.framerate,
@@ -141,7 +142,6 @@ class Sequence:
             events=merge_attribute("events"),
             timing_errors=merge_attribute("timing_errors"),
             phases=merge_attribute("phases"),
-            vendor=a.vendor,
         )
 
     @classmethod
@@ -231,45 +231,39 @@ class Sequence:
 
 
     def select_by_indices(self, indices) -> "Sequence":
+        if not isinstance(indices, slice):
+            raise NotImplementedError(
+                """Slicing only implemented using a slice object"""
+            )
+        if indices.step not in (None, 1):
+            raise NotImplementedError(
+                """Skipping intermediate frames while slicing is not
+                currently implemented."""
+            )
+        if indices.start is None:
+            indices = slice(0, indices.stop, indices.step)
+        if indices.stop is None:
+            indices = slice(indices.start, self.nframes, indices.step)
+
         obj = self.deepcopy()
+        obj.time = self.time[indices]
+        obj.nframes = len(obj.time)
 
         obj.framesets = {
             k: v.select_by_indices(indices) for k, v in self.framesets.items()
         }
-        obj.time = self.time[indices]
-        obj.nframes = len(obj.time)
 
-        if isinstance(indices, slice):
-            if indices.start is None:
-                indices = slice(0, indices.stop, indices.step)
-            first = indices.start
-        else:
-            first = indices[0]
-
-        def filter_by_index(list_):
-            def helper(item):
-                if isinstance(indices, slice):
-                    if indices.step not in (None, 1):
-                        raise NotImplementedError(
-                            "Can't skip intermediate frames while slicing"
-                        )
-                    return item.index >= indices.start and (
-                        indices.stop is None or item.index < indices.stop
-                    )
-                return item.index in indices
-
-            new_list = list(filter(helper, list_))
-            for item in new_list:
-                item.index = item.index - first
-                item.time = obj.time[item.index]
-
-            return new_list
-
-        obj.events = filter_by_index(obj.events)
-        obj.timing_errors = filter_by_index(obj.timing_errors)
-        obj.phases = filter_by_index(obj.phases)
+        r = range(indices.start, indices.stop)
+        for attr in ['events', 'timing_errors', 'phases']:
+            setattr(
+                obj, attr, [x for x in getattr(obj, attr)
+                    if x.index in r]
+            )
+            for x in getattr(obj, attr):
+                x.index -= indices.start
 
         return obj
+
 
     def select_by_time(self, start=None, end=None, end_inclusive=False) -> "Sequence":
         if not any((start, end)):
