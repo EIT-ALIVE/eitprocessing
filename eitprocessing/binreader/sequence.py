@@ -118,7 +118,7 @@ class Sequence:
 
         path = [a.path, b.path]
         nframes = len(a) + len(b)
-        time = np.arange(nframes) / a.framerate + a.time[0]
+        time = np.concatenate((a.time, b.time))
         framesets = {
             name: Frameset.merge(a.framesets[name], b.framesets[name])
             for name in a.framesets
@@ -184,12 +184,22 @@ class Sequence:
     @classmethod
     def _load_file( #pylint: disable=too-many-arguments
         cls,
-        path,
+        path: Path | str,
         vendor: Vendor | str,
         framerate: int = None,
         first_frame: int = 0,
         nframes: int | None = None,
     ) -> "Sequence":
+
+        if first_frame is None:
+            first_frame = 0
+        if int(first_frame) != first_frame:
+            raise TypeError(f'''`first_frame` must be an int, but was given as
+                            {first_frame} (type: {type(first_frame)})''')
+        if not first_frame >= 0:
+            raise ValueError(f'''`first_frame` can not be negative, but was
+                            given as {first_frame}''')
+        first_frame = int(first_frame)
 
         obj = cls(
             path=Path(path),
@@ -210,20 +220,6 @@ class Sequence:
 
         return obj
 
-
-    def _create_timestamps(self, first_frame: int):
-        """Populate the time attribute of Sequence instance.
-
-        The implemented method seems convoluted: it's easier to create an array
-        with nframes and add a time_offset. However, this results in floating
-        point errors, creating issues with comparing times later on.
-
-        Args:
-            first_frame (int): first frame of sequence
-        """
-        timestamps = np.arange(self.nframes + first_frame) / self.framerate
-        timestamps = timestamps[first_frame:]
-        return timestamps
 
     def _load_data(self, first_frame: int | None):
         raise NotImplementedError(
@@ -284,7 +280,7 @@ class Sequence:
 class DraegerSequence(Sequence):
     vendor: Vendor = Vendor.DRAEGER
 
-    def _load_data(self, first_frame: int | None):
+    def _load_data(self, first_frame: int):
         FRAME_SIZE_BYTES = 4358
 
         file_size = self.path.stat().st_size
@@ -298,16 +294,17 @@ class DraegerSequence(Sequence):
             self.nframes = min(total_frames - first_frame, self.nframes)
         else:
             self.nframes = total_frames - first_frame
-        self.time = self._create_timestamps(first_frame)
 
+        self.time = np.empty(self.nframes)
         pixel_values = np.empty((self.nframes, 32, 32))
 
         with open(self.path, "br") as fh:
             fh.seek(first_frame * FRAME_SIZE_BYTES)
-
             reader = Reader(fh)
+
+            previous_marker = None
             for index in range(self.nframes):
-                self._read_frame(reader, index, pixel_values)
+                previous_marker = self._read_frame(reader, index, pixel_values, previous_marker)
 
         params = {"framerate": self.framerate}
         self.framesets["raw"] = Frameset(
@@ -322,8 +319,9 @@ class DraegerSequence(Sequence):
         self, reader: Reader,
         index: int,
         pixel_values: NDArray,
+        previous_marker: int | None,
     ) -> None:
-        current_time = reader.float64() * 24 * 60 * 60
+        current_time = round(reader.float64() * 24 * 60 * 60, 3)
 
         _ = reader.float32()
         pixel_values[index, :, :] = self.reshape_frame(reader.float32(length=1024))
@@ -339,24 +337,18 @@ class DraegerSequence(Sequence):
 
         # The event marker stays the same until the next event occurs. Therefore, check whether the
         # event marker has changed with respect to the most recent event. If so, create a new event.
-        if self.events:
-            previous_event = self.events[-1]
-        else:
-            previous_event = None
-
-        if event_marker and (
-            previous_event is None or event_marker > previous_event.marker
-        ):
+        if (previous_marker is not None) and (event_marker > previous_marker):
             self.events.append(Event(index, current_time, event_marker, event_text))
 
         if timing_error:
             self.timing_errors.append(TimingError(index, current_time, timing_error))
-
         if min_max_flag == 1:
             self.phases.append(MaxValue(index, current_time))
         elif min_max_flag == -1:
             self.phases.append(MinValue(index, current_time))
+        self.time[index] = current_time
 
+        return event_marker
 
     @staticmethod
     def reshape_frame(frame):
@@ -391,7 +383,15 @@ class TimpelSequence(Sequence):
                 Make sure this is a valid and uncorrupted Timpel data file."""
             )
         self.nframes = data.shape[0]
-        self.time = self._create_timestamps(first_frame)
+
+        # TODO: check whether below issue was only a Drager problem or also
+        # applicable to Timpel.
+        # The implemented method seems convoluted: it's easier to create an array
+        # with nframes and add a time_offset. However, this results in floating
+        # point errors, creating issues with comparing times later on.
+        self.time = np.arange(self.nframes + first_frame) / self.framerate
+        self.time = self.time[first_frame:]
+
 
         pixel_data = data[:, :1024]
         pixel_data = np.reshape(pixel_data, newshape=(-1, 32, 32), order="C")

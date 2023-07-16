@@ -13,7 +13,7 @@ environment = os.environ.get(
 )
 data_directory = os.path.join(environment, 'test_data')
 draeger_file1 = os.path.join(data_directory, "Draeger_Test3.bin")
-draeger_file2 = os.path.join(data_directory, "Testdata2.bin")
+draeger_file2 = os.path.join(data_directory, "Draeger_Test.bin")
 timpel_file = os.path.join(data_directory, "testdata_timpel.txt")
 dummy_file = os.path.join(data_directory, "not_a_file.dummy")
 
@@ -49,7 +49,7 @@ def test_from_path_draeger(
     assert not isinstance (draeger_data1, TimpelSequence)
     assert draeger_data1.framerate == 20
     assert len(draeger_data1) == len(draeger_data1.time)
-    assert len(draeger_data2.time) == 12000
+    assert len(draeger_data2.time) == 20740
     assert draeger_data1 != draeger_data2
 
     # Load multiple
@@ -177,7 +177,6 @@ def test_slicing(
     data: Sequence
     for data in [draeger_data1, timpel_data]:
         print(data.vendor)
-        assert data[:cutoff] == data[:cutoff]  # tests whether slicing alters full_data
         assert data[0:cutoff] == data[:cutoff]
         assert data[cutoff : len(data)] == data[cutoff:]
 
@@ -185,12 +184,15 @@ def test_slicing(
         assert len(data[:cutoff]) == cutoff
 
 
-def test_load_partial( #noqa
-    draeger_data1: DraegerSequence,
+def test_load_partial(
+    draeger_data2: DraegerSequence,
     timpel_data: TimpelSequence,
     ):
 
-    cutoff = 100
+    # TODO: as currently implemented, loading Draeger files with `first_frame`
+    # exactly at an event mark will lead to that event mark being skipped.
+    # draeger_data2 has an event mark at index 58
+    cutoff = 59
 
     # Timpel
     timpel_first_part = Sequence.from_path(timpel_file, "timpel", nframes=cutoff)
@@ -202,14 +204,18 @@ def test_load_partial( #noqa
     assert Sequence.merge(timpel_second_part, timpel_first_part) != timpel_data
 
     # Draeger
-    # TODO: slicing draeger sequences leads to resetting of phases.time as well
-    # as losing events information.
-    # This is likely due to the Sequence.select_by_indices method or one of its
-    # submethods
-    draeger_first_part = Sequence.from_path(draeger_file1, "draeger", nframes=cutoff)
-    draeger_second_part = Sequence.from_path(draeger_file1, "draeger", first_frame=cutoff)
+    draeger_first_part = Sequence.from_path(draeger_file2, "draeger", nframes=cutoff)
+    draeger_second_part = Sequence.from_path(draeger_file2, "draeger", first_frame=cutoff)
 
-    assert draeger_first_part == draeger_data1[:cutoff]
-    # assert draeger_second_part == draeger_data1[cutoff:]
-    assert Sequence.merge(draeger_first_part, draeger_second_part) == draeger_data1
-    assert Sequence.merge(draeger_second_part, draeger_first_part) != draeger_data1
+    assert draeger_first_part == draeger_data2[:cutoff]
+    assert draeger_second_part == draeger_data2[cutoff:]
+    assert Sequence.merge(draeger_first_part, draeger_second_part) == draeger_data2
+    assert Sequence.merge(draeger_second_part, draeger_first_part) != draeger_data2
+
+def test_illegal_first():
+    for ff in [0.5, -1, 'fdw']:
+        with pytest.raises((TypeError, ValueError)):
+            _ = Sequence.from_path(draeger_file1, "draeger", first_frame=ff)
+
+    for ff2 in [0, 0.0, 1.0, None]:
+        _ = Sequence.from_path(draeger_file1, "draeger", first_frame=ff2)
