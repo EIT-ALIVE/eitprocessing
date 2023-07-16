@@ -213,6 +213,11 @@ class Sequence:
             obj.framerate = 20
         elif obj.vendor == Vendor.TIMPEL:
             obj.framerate = 50
+        else:
+            raise NotImplementedError(
+                f'''No default `framerate` for {obj.vendor} data is implemented.
+                \n`framerate` must be specified when calling `_load_file` for
+                this vendor.''')
 
         # function from child class, which will load and assign
         # nframes, framesets, events, timing_errors, phases
