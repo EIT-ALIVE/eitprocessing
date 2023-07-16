@@ -189,10 +189,15 @@ def test_load_partial(
     timpel_data: TimpelSequence,
     ):
 
-    # TODO: as currently implemented, loading Draeger files with `first_frame`
-    # exactly at an event mark will lead to that event mark being skipped.
-    # draeger_data2 has an event mark at index 58
-    cutoff = 59
+    cutoff = 58
+    # Keep cutoff at 58 for draeger_data2 as there is an event mark at this
+    # timepoint. Starting the load specifically at the timepoint of an event
+    # marker was tricky to implement, so keeping this cutoff will ensure that
+    # code keeps working for this fringe situation.
+
+    # TODO: test what happens if a file has an actual event marker on the very
+    # first frame. I suspect this will not be loaded, but I don't have a test
+    # file for this situation.
 
     # Timpel
     timpel_first_part = Sequence.from_path(timpel_file, "timpel", nframes=cutoff)

@@ -283,6 +283,12 @@ class DraegerSequence(Sequence):
     def _load_data(self, first_frame: int):
         FRAME_SIZE_BYTES = 4358
 
+        # Need to load 1 frame before first to check if there is an event
+        # marker. Data for initial frame will not be added to self.
+        first_load = 0
+        if first_frame > 0:
+            first_load = first_frame - 1
+
         file_size = self.path.stat().st_size
         if file_size % FRAME_SIZE_BYTES:
             raise OSError(
@@ -291,20 +297,28 @@ class DraegerSequence(Sequence):
             )
         total_frames = file_size // FRAME_SIZE_BYTES
         if self.nframes is not None:
-            self.nframes = min(total_frames - first_frame, self.nframes)
+            self.nframes = min(total_frames - first_load, self.nframes)
         else:
-            self.nframes = total_frames - first_frame
+            self.nframes = total_frames - first_load
 
-        self.time = np.empty(self.nframes)
-        pixel_values = np.empty((self.nframes, 32, 32))
+        self.time = np.zeros(self.nframes)
+        pixel_values = np.zeros((self.nframes, 32, 32))
 
         with open(self.path, "br") as fh:
-            fh.seek(first_frame * FRAME_SIZE_BYTES)
+            fh.seek(first_load * FRAME_SIZE_BYTES)
             reader = Reader(fh)
 
             previous_marker = None
             for index in range(self.nframes):
-                previous_marker = self._read_frame(reader, index, pixel_values, previous_marker)
+                use_index = index
+                if first_frame > 0:
+                    use_index = index-1
+                previous_marker = self._read_frame(reader, use_index, pixel_values, previous_marker)
+
+        if first_frame > 0:
+            self.nframes -= 1
+            self.time = self.time[:-1]
+            pixel_values = pixel_values[:-1,:,:]
 
         params = {"framerate": self.framerate}
         self.framesets["raw"] = Frameset(
@@ -335,18 +349,18 @@ class DraegerSequence(Sequence):
             length=52
         )
 
-        # The event marker stays the same until the next event occurs. Therefore, check whether the
-        # event marker has changed with respect to the most recent event. If so, create a new event.
-        if (previous_marker is not None) and (event_marker > previous_marker):
-            self.events.append(Event(index, current_time, event_marker, event_text))
-
-        if timing_error:
-            self.timing_errors.append(TimingError(index, current_time, timing_error))
-        if min_max_flag == 1:
-            self.phases.append(MaxValue(index, current_time))
-        elif min_max_flag == -1:
-            self.phases.append(MinValue(index, current_time))
-        self.time[index] = current_time
+        if index >= 0:
+            # The event marker stays the same until the next event occurs. Therefore, check whether the
+            # event marker has changed with respect to the most recent event. If so, create a new event.
+            if (previous_marker is not None) and (event_marker > previous_marker):
+                self.events.append(Event(index, current_time, event_marker, event_text))
+            if timing_error:
+                self.timing_errors.append(TimingError(index, current_time, timing_error))
+            if min_max_flag == 1:
+                self.phases.append(MaxValue(index, current_time))
+            elif min_max_flag == -1:
+                self.phases.append(MinValue(index, current_time))
+            self.time[index] = current_time
 
         return event_marker
 
@@ -359,7 +373,7 @@ class DraegerSequence(Sequence):
 class TimpelSequence(Sequence):
     vendor: Vendor = Vendor.TIMPEL
 
-    def _load_data(self, first_frame: int | None):
+    def _load_data(self, first_frame: int):
         COLUMN_WIDTH = 1030
 
         try:
