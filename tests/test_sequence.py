@@ -172,6 +172,7 @@ def test_slicing(
     draeger_data1: DraegerSequence,
     timpel_data: TimpelSequence,
     ):
+
     cutoff = 100
 
     data: Sequence
@@ -182,6 +183,9 @@ def test_slicing(
 
         assert Sequence.merge(data[:cutoff], data[cutoff:]) == data
         assert len(data[:cutoff]) == cutoff
+
+        assert len(data) == len(data[cutoff:]) + len(data[-cutoff:])
+        assert len(data) == len(data[:cutoff]) + len(data[:-cutoff])
 
 
 def test_load_partial(
