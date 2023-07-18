@@ -8,6 +8,7 @@ as they are read.
 
 import copy
 import functools
+import bisect
 from dataclasses import dataclass
 from dataclasses import field
 from enum import auto
@@ -266,14 +267,29 @@ class Sequence:
         return obj
 
 
-    def select_by_time(self, start=None, end=None, end_inclusive=False) -> "Sequence":
+    def select_by_time(
+        self,
+        start: float | int | None = None,
+        end: float | int | None = None,
+        start_inclusive: bool = True,
+        end_inclusive: bool = False,
+    ) -> "Sequence":
         if not any((start, end)):
             raise ValueError("Pass either start or end")
-        start_index = np.nonzero(self.time >= start)[0][0]
-        if end_inclusive:
-            end_index = np.nonzero(self.time <= end)[0][-1]
+
+        if start is None:
+            start_index = 0
+        elif start_inclusive:
+            start_index = bisect.bisect_left(self.time, start)
         else:
-            end_index = np.nonzero(self.time < end)[0][-1]
+            start_index = bisect.bisect_right(self.time, start)
+
+        if end is None:
+            end_index = len(self)
+        elif end_inclusive:
+            end_index = bisect.bisect_right(self.time, end) - 1
+        else:
+            end_index = bisect.bisect_left(self.time, end) - 1
 
         return self.select_by_indices(slice(start_index, end_index))
 

@@ -224,3 +224,82 @@ def test_illegal_first():
 
     for ff2 in [0, 0.0, 1.0, None]:
         _ = Sequence.from_path(draeger_file1, "draeger", first_frame=ff2)
+
+
+def test_select_by_time(
+    draeger_data2: DraegerSequence,
+):
+    # TODO: this function is kinda ugly. Would be nice to make it more modular,
+    # but I am struggling to get it done logically.
+    data = draeger_data2
+    t22 = 55825.268
+    t52 = 55826.768
+    ms = 0.001
+
+    # test illegal
+    with pytest.raises(ValueError):
+        _ = data.select_by_time()
+    with pytest.raises(ValueError):
+        _ = data.select_by_time(None, None)
+    with pytest.raises(ValueError):
+        _ = data.select_by_time(None)
+    with pytest.raises(ValueError):
+        _ = data.select_by_time(end = None)
+
+    # test start only
+    start_slices = [
+        # (time, expectation if inclusive=True, expectation if inclusive=False)
+        (t22, 22, 23),
+        (t22 - ms, 22, 22),
+        (t22 + ms, 23, 23),
+    ]
+    for start_slicing in start_slices:
+        sliced = data.select_by_time(
+            start = start_slicing[0], start_inclusive=True)
+        assert len(sliced) == len(data) - start_slicing[1]
+        sliced = data.select_by_time(start = start_slicing[0], start_inclusive=False)
+        assert len(sliced) == len(data) - start_slicing[2]
+
+    # test end only
+    end_slices = [
+        # (time, expectation if inclusive=True, expectation if inclusive=False)
+        (t52, 52, 51),
+        (t52 - ms, 51, 51),
+        (t52 + ms, 52, 52),
+    ]
+    for end_slicing in end_slices:
+        sliced = data.select_by_time(end = end_slicing[0], end_inclusive=True)
+        assert len(sliced) == end_slicing[1]
+        sliced = data.select_by_time(end = end_slicing[0], end_inclusive=False)
+        assert len(sliced) == end_slicing[2]
+
+    # test start and end
+    for start_slicing in start_slices:
+        for end_slicing in end_slices:
+            # True/True
+            sliced = data.select_by_time(start = start_slicing[0],
+                                        end = end_slicing[0],
+                                        start_inclusive=True,
+                                        end_inclusive=True)
+            assert len(sliced) == end_slicing[1]-start_slicing[1]
+
+            # False/True
+            sliced = data.select_by_time(start = start_slicing[0],
+                                        end = end_slicing[0],
+                                        start_inclusive=False,
+                                        end_inclusive=True)
+            assert len(sliced) == end_slicing[1]-start_slicing[2]
+
+            # True/False
+            sliced = data.select_by_time(start = start_slicing[0],
+                                        end = end_slicing[0],
+                                        start_inclusive=True,
+                                        end_inclusive=False)
+            assert len(sliced) == end_slicing[2]-start_slicing[1]
+
+            # False/False
+            sliced = data.select_by_time(start = start_slicing[0],
+                                        end = end_slicing[0],
+                                        start_inclusive=False,
+                                        end_inclusive=False)
+            assert len(sliced) == end_slicing[2]-start_slicing[2]
