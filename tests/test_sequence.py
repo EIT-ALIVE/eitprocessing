@@ -260,13 +260,13 @@ def test_select_by_time(
     ms = 0.001
 
     # test illegal
-    with pytest.raises(ValueError):
+    with pytest.warns(UserWarning):
         _ = data.select_by_time()
-    with pytest.raises(ValueError):
+    with pytest.warns(UserWarning):
         _ = data.select_by_time(None, None)
-    with pytest.raises(ValueError):
+    with pytest.warns(UserWarning):
         _ = data.select_by_time(None)
-    with pytest.raises(ValueError):
+    with pytest.warns(UserWarning):
         _ = data.select_by_time(end = None)
 
     # test start only

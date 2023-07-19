@@ -9,6 +9,7 @@ as they are read.
 import copy
 import functools
 import bisect
+import warnings
 from dataclasses import dataclass
 from dataclasses import field
 from enum import auto
@@ -328,13 +329,20 @@ class Sequence:
                 `end` is present in `Sequence.time`.
                 Defaults to False.
 
+        Raises:
+            ValueError: if the Sequence.time is not sorted
 
         Returns:
             Sequence: a slice of `self` based on time information given.
         """
 
         if not any((start, end)):
-            raise ValueError("Pass either start or end")
+            warnings.warn("No starting or end timepoint was selected.")
+            return self
+        if not np.all(np.sort(self.time) == self.time):
+            raise ValueError(
+                f"""Time stamps for {self} are not sorted and therefor data
+                cannot be selected by time.""")
 
         if start is None:
             start_index = 0
