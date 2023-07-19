@@ -271,8 +271,7 @@ class Sequence:
             f"Data loading for {self.vendor} is not implemented")
 
 
-    def select_by_indices(self, indices) -> "Sequence":
-        """This is the __getitem__ method."""
+    def __getitem__(self, indices):
         if not isinstance(indices, slice):
             raise NotImplementedError(
                 """Slicing only implemented using a slice object"""
@@ -292,7 +291,7 @@ class Sequence:
         obj.nframes = len(obj.time)
 
         obj.framesets = {
-            k: v.select_by_indices(indices) for k, v in self.framesets.items()
+            k: v[indices] for k, v in self.framesets.items()
         }
 
         r = range(indices.start, indices.stop)
@@ -351,9 +350,8 @@ class Sequence:
         else:
             end_index = bisect.bisect_left(self.time, end) - 1
 
-        return self.select_by_indices(slice(start_index, end_index))
+        return self[start_index : end_index]
 
-    __getitem__ = select_by_indices  # TODO: why not immediately define it??
     deepcopy = copy.deepcopy
 
 
