@@ -221,7 +221,7 @@ class Sequence:
                 this vendor.''')
 
         # function from child class, which will load and assign
-        # nframes, framesets, events, timing_errors, phases
+        # time, nframes, framesets, events, timing_errors, phases
         obj._load_data(first_frame)
 
         return obj
@@ -305,7 +305,7 @@ class DraegerSequence(Sequence):
         FRAME_SIZE_BYTES = 4358
 
         # Need to load 1 frame before first to check if there is an event
-        # marker. Data for initial frame will not be added to self.
+        # marker. Data for the pre-first frame will not be added to self.
         first_load = 0
         if first_frame > 0:
             first_load = first_frame - 1
