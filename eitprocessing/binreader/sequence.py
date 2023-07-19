@@ -139,8 +139,7 @@ class Sequence:
 
 
     def __add__(self, other):
-        # TODO NOW: make this function work as intended.
-        self.merge(self, other)
+        return self.merge(self, other)
 
 
     @classmethod

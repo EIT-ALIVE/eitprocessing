@@ -104,25 +104,23 @@ def test_merge(
     timpel_data_double: TimpelSequence,
     ):
 
-    # TODO: NOW: fix add method not equal to merged. Unclear why.
-
     merged_draeger = Sequence.merge(draeger_data1, draeger_data2)
     assert len(merged_draeger) == len(draeger_data2) + len(draeger_data1)
     assert merged_draeger == draeger_data_both
-    # added_draeger = draeger_data1 + draeger_data2
-    # assert added_draeger == merged_draeger
+    added_draeger = draeger_data1 + draeger_data2
+    assert added_draeger == merged_draeger
 
     draeger_load_double = Sequence.from_path([draeger_file1, draeger_file1], 'draeger')
     draeger_merge_double = Sequence.merge(draeger_data1, draeger_data1)
     assert draeger_load_double == draeger_merge_double
-    # added_draeger_double = draeger_data1 + draeger_data1
-    # assert added_draeger_double == draeger_merge_double
+    added_draeger_double = draeger_data1 + draeger_data1
+    assert added_draeger_double == draeger_merge_double
 
     merged_timpel = Sequence.merge(timpel_data, timpel_data)
     assert len(merged_timpel) == 2*len(timpel_data)
     assert timpel_data_double == merged_timpel
-    # added_timpel = timpel_data + timpel_data
-    # assert added_timpel == merged_timpel
+    added_timpel = timpel_data + timpel_data
+    assert added_timpel == merged_timpel
 
     with pytest.raises(TypeError):
         _ = Sequence.merge(timpel_data, draeger_data1)
