@@ -96,8 +96,11 @@ class Sequence:
                 return False
             if not np.all(np.equal(self_attr, other_attr)):
                 return False
-
-        return True
+        try:
+            self.check_equivalence(self, other)
+            return True
+        except (TypeError, ValueError, AttributeError):
+            return False
 
 
     def _set_vendor_class(self):
@@ -304,6 +307,26 @@ class Sequence:
         start_inclusive: bool = True,
         end_inclusive: bool = False,
     ) -> "Sequence":
+        """Select subset of sequence by the `Sequence.time` information (i.e.
+        based on the time stamp).
+
+        Args:
+            start (float | int | None, optional): starting time point.
+                Defaults to None.
+            end (float | int | None, optional): ending time point.
+                Defaults to None.
+            start_inclusive (bool, optional): include starting timepoint if
+                `start` is present in `Sequence.time`.
+                Defaults to True.
+            end_inclusive (bool, optional): include ending timepoint if
+                `end` is present in `Sequence.time`.
+                Defaults to False.
+
+
+        Returns:
+            Sequence: a slice of `self` based on time information given.
+        """
+
         if not any((start, end)):
             raise ValueError("Pass either start or end")
 
