@@ -204,7 +204,7 @@ def test_load_partial(
     # file for this situation.
 
     # Timpel
-    timpel_first_part = Sequence.from_path(timpel_file, "timpel", nframes=cutoff)
+    timpel_first_part = Sequence.from_path(timpel_file, "timpel", max_frames=cutoff)
     timpel_second_part = Sequence.from_path(timpel_file, "timpel", first_frame=cutoff)
 
     assert timpel_first_part == timpel_data[:cutoff]
@@ -213,7 +213,7 @@ def test_load_partial(
     assert Sequence.merge(timpel_second_part, timpel_first_part) != timpel_data
 
     # Draeger
-    draeger_first_part = Sequence.from_path(draeger_file2, "draeger", nframes=cutoff)
+    draeger_first_part = Sequence.from_path(draeger_file2, "draeger", max_frames=cutoff)
     draeger_second_part = Sequence.from_path(draeger_file2, "draeger", first_frame=cutoff)
 
     assert draeger_first_part == draeger_data2[:cutoff]

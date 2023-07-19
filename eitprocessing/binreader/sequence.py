@@ -49,11 +49,27 @@ class Sequence:
 
     EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
 
+    Args:
+        path (Path | str | List[Path | str]): path(s) to data file.
+        vendor (Vendor | str): vendor indicating the device used.
+        time (NDArray[float]): list of time label for each data point (can be
+            true time or relative time)
+        max_frames (int): number of frames in sequence
+        framerate (int, optional): framerate at which the data was recorded.
+            Defaults to 20 if vendor == DRAEGER
+            Defaults to 50 if vendor == TIMPEL
+        framesets (Dict[str, Frameset]): dictionary of framesets
+        events (List[Event]): list of Event objects in data
+        timing_errors (List[TimingError]): list of TimingError objects in data
+        phases (List[PhaseIndicator]): list of PhaseIndicator objects in data
+
+    Returns:
+        Sequence: a sequence containing the l
     """
 
     path: Path | str | List[Path | str] = None
     vendor: Vendor = None
-    time: np.ndarray = None
+    time: NDArray = None
     nframes: int = None
     framerate: int = None
     framesets: Dict[str, Frameset] = field(default_factory=dict)
@@ -74,7 +90,6 @@ class Sequence:
         for attr in ["nframes", "framerate", "framesets", "vendor"]:
             if getattr(self, attr) != getattr(other, attr):
                 return False
-
         for attr in ["time", "phases", "events", "timing_errors"]:
             self_attr, other_attr = getattr(self, attr), getattr(other, attr)
             if len(self_attr) != len(other_attr):
@@ -86,6 +101,13 @@ class Sequence:
 
 
     def _set_vendor_class(self):
+        """Re-assign Sequence class to child class for selected Vendor.
+
+        Raises:
+            NotImplementedError: if the child class for the selected vendor
+                has not yet been implemented.
+        """
+
         if isinstance(self.vendor, str):
             self.vendor = Vendor(self.vendor.lower())
 
@@ -99,6 +121,8 @@ class Sequence:
 
     @staticmethod
     def check_equivalence(a: "Sequence", b: "Sequence"):
+        """Checks whether content of two Sequence objects is equivalent."""
+
         if (a_ := a.vendor) != (b_ := b.vendor):
             raise TypeError(f"Vendors are not equal: {a_}, {b_}")
         if (a_ := a.framerate) != (b_ := b.framerate):
@@ -112,10 +136,11 @@ class Sequence:
 
     @classmethod
     def merge(cls, a: "Sequence", b: "Sequence") -> "Sequence":
+        """Merge two Sequence objects together."""
         try:
             Sequence.check_equivalence(a, b)
         except Exception as e:
-            raise type(e)(f"Could not merge. {e}")
+            raise type(e)(f"Sequences could not be merged: {e}") from e
 
         path = [a.path, b.path]
         nframes = len(a) + len(b)
@@ -159,11 +184,12 @@ class Sequence:
             framerate (int, optional): framerate at which the data was recorded.
                 Default for Draeger: 20
                 Default for Timpel: 50
-            first_frame (int, optional): select the starting frame.
+            first_frame (int, optional): index of first time point of sequence
+                (i.e. NOT the timestamp).
                 Defaults to 0.
-            n_frames (int, optional): select the maximum number of frames to load.
-                The actual number of frames can be lower than this is the total
-                file size would be exceeded.
+            max_frames (int, optional): maximum number of frames to load.
+                The actual number of frames can be lower than this if this
+                would surpass the final frame.
 
         Raises:
             NotImplementedError: is raised when there is no loading method for
@@ -189,8 +215,10 @@ class Sequence:
         vendor: Vendor | str,
         framerate: int = None,
         first_frame: int = 0,
-        nframes: int | None = None,
+        max_frames: int | None = None,
     ) -> "Sequence":
+        """Method used by `from_path` that initiates the object and calls
+        child method for loading the data."""
 
         if first_frame is None:
             first_frame = 0
@@ -205,7 +233,7 @@ class Sequence:
         obj = cls(
             path=Path(path),
             vendor=vendor,
-            nframes=nframes,
+            nframes=max_frames,
         )
         obj._set_vendor_class()
         if framerate:
@@ -228,11 +256,13 @@ class Sequence:
 
 
     def _load_data(self, first_frame: int | None):
+        """Needs to be implemented in child class."""
         raise NotImplementedError(
             f"Data loading for {self.vendor} is not implemented")
 
 
     def select_by_indices(self, indices) -> "Sequence":
+        """This is the __getitem__ method."""
         if not isinstance(indices, slice):
             raise NotImplementedError(
                 """Slicing only implemented using a slice object"""
@@ -299,9 +329,11 @@ class Sequence:
 
 @dataclass(eq=False)
 class DraegerSequence(Sequence):
+    """Sequence object for DRAEGER data."""
     vendor: Vendor = Vendor.DRAEGER
 
     def _load_data(self, first_frame: int):
+        """Load data for DRAEGER files."""
         FRAME_SIZE_BYTES = 4358
 
         # Need to load 1 frame before first to check if there is an event
@@ -356,6 +388,7 @@ class DraegerSequence(Sequence):
         pixel_values: NDArray,
         previous_marker: int | None,
     ) -> None:
+        """Read frame by frame data from DRAEGER files."""
         current_time = round(reader.float64() * 24 * 60 * 60, 3)
 
         _ = reader.float32()
@@ -387,14 +420,17 @@ class DraegerSequence(Sequence):
 
     @staticmethod
     def reshape_frame(frame):
+        """Convert linear array into 2D (32x32) image-like array."""
         return np.reshape(frame, (32, 32), "C")
 
 
 @dataclass(eq=False)
 class TimpelSequence(Sequence):
+    """Sequence object for TIMPEL data."""
     vendor: Vendor = Vendor.TIMPEL
 
     def _load_data(self, first_frame: int):
+        """Load data for TIMPEL files."""
         COLUMN_WIDTH = 1030
 
         try:
@@ -412,6 +448,7 @@ class TimpelSequence(Sequence):
                 Original error message: {e}"""
             ) from e
 
+        data: NDArray
         if data.shape[1] != COLUMN_WIDTH:
             raise OSError(
                 f"""Input does not have a width of {COLUMN_WIDTH} columns.\n
