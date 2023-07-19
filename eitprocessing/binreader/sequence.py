@@ -137,6 +137,11 @@ class Sequence:
         return True
 
 
+    def __add__(self, other):
+        # TODO NOW: make this function work as intended.
+        self.merge(self, other)
+
+
     @classmethod
     def merge(cls, a: "Sequence", b: "Sequence") -> "Sequence":
         """Merge two Sequence objects together."""
@@ -175,6 +180,8 @@ class Sequence:
 
     @classmethod
     def from_path(
+        # TODO: NOW: make this work so that *args, **kwargs can be passed, but
+        # they still show up when tab-autocompleting this method.
         cls,
         path: Path | str | List[Path | str],
         *args, **kwargs,
@@ -346,7 +353,7 @@ class Sequence:
 
         return self.select_by_indices(slice(start_index, end_index))
 
-    __getitem__ = select_by_indices
+    __getitem__ = select_by_indices  # TODO: why not immediately define it??
     deepcopy = copy.deepcopy
 
 
@@ -479,7 +486,7 @@ class TimpelSequence(Sequence):
             )
         self.nframes = data.shape[0]
 
-        # TODO: check whether below issue was only a Drager problem or also
+        # TODO: QUESTION: check whether below issue was only a Drager problem or also
         # applicable to Timpel.
         # The implemented method seems convoluted: it's easier to create an array
         # with nframes and add a time_offset. However, this results in floating
