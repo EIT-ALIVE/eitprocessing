@@ -46,13 +46,13 @@
 
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
 
 
 <span class="nd">@dataclass</span>
 <div class="viewcode-block" id="Event"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/event/index.html#eitprocessing.binreader.event.Event">[docs]</a><span class="k">class</span> <span class="nc">Event</span><span class="p">:</span>
 <div class="viewcode-block" id="Event.index"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/event/index.html#eitprocessing.binreader.event.Event.index">[docs]</a>    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span></div>
-<div class="viewcode-block" id="Event.time"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/event/index.html#eitprocessing.binreader.event.Event.time">[docs]</a>    <span class="n">time</span><span class="p">:</span> <span class="nb">float</span></div>
-<div class="viewcode-block" id="Event.marker"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/event/index.html#eitprocessing.binreader.event.Event.marker">[docs]</a>    <span class="n">marker</span><span class="p">:</span> <span class="nb">int</span></div>
+<div class="viewcode-block" id="Event.marker"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/event/index.html#eitprocessing.binreader.event.Event.marker">[docs]</a>    <span class="n">marker</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 <div class="viewcode-block" id="Event.text"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/event/index.html#eitprocessing.binreader.event.Event.text">[docs]</a>    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span></div></div>
 </pre></div>
 
