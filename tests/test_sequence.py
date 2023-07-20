@@ -30,7 +30,7 @@ def draeger_data2():
 def draeger_data_both():
     return Sequence.from_path([draeger_file1, draeger_file2], vendor="draeger")
 
-@pytest.fixture() #TODO: report bug on pytest -> this fails if scope='module'
+@pytest.fixture(scope='module')
 def timpel_data():
     return Sequence.from_path(timpel_file, vendor="timpel")
 
