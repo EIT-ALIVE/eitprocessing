@@ -179,12 +179,13 @@ class Sequence:
         )
 
     @classmethod
-    def from_path(
-        # TODO: NOW: make this work so that *args, **kwargs can be passed, but
-        # they still show up when tab-autocompleting this method.
+    def from_path(  #pylint: disable=too-many-arguments, unused-argument
         cls,
         path: Path | str | List[Path | str],
-        *args, **kwargs,
+        vendor: Vendor | str,
+        framerate: int = None,
+        first_frame: int = 0,
+        max_frames: int | None = None,
     ) -> "Sequence":
         """Load sequence from path(s)
 
@@ -209,13 +210,15 @@ class Sequence:
             Sequence: a sequence containing the loaded data from all files in path
         """
 
+        params = list(locals().values())[1:]  # list input parameters
+        sequences = []
+
         if not isinstance(path, list):
             path = [path]
-
-        sequences = []
         for single_path in path:
             Path(single_path).resolve(strict=True)  # checks that file exists
-            sequences.append(cls._load_file(single_path, *args, **kwargs))
+            params[0] = single_path
+            sequences.append(cls._load_file(*params))
         return functools.reduce(cls.merge, sequences)
 
     @classmethod
@@ -228,7 +231,9 @@ class Sequence:
         max_frames: int | None = None,
     ) -> "Sequence":
         """Method used by `from_path` that initiates the object and calls
-        child method for loading the data."""
+        child method for loading the data.
+
+        See `from_path` method for arguments."""
 
         if first_frame is None:
             first_frame = 0
