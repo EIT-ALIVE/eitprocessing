@@ -13,7 +13,7 @@ class PhaseIndicator:
     index: int
     time: float
 
-    # TODO: QUESTION: how does this differ the default __eq__ function for a dataclass?
+    # TODO (#78): QUESTION: how does this differ the default __eq__ function for a dataclass?
     def __eq__(self, other:'PhaseIndicator') -> bool:
         if self.index != other.index:
             return False

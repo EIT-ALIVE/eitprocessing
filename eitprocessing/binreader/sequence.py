@@ -438,7 +438,7 @@ class DraegerSequence(Sequence):
         event_text = reader.string(length=30)
         timing_error = reader.int32()
 
-        # TODO: parse medibus data into waveform data
+        # TODO (#79): parse medibus data into waveform data
         medibus_data = reader.float32(  # noqa; variable will be used in future version
             length=52
         )
@@ -496,7 +496,7 @@ class TimpelSequence(Sequence):
             )
         self.nframes = data.shape[0]
 
-        # TODO: QUESTION: check whether below issue was only a Drager problem or also
+        # TODO (#80): QUESTION: check whether below issue was only a Drager problem or also
         # applicable to Timpel.
         # The implemented method seems convoluted: it's easier to create an array
         # with nframes and add a time_offset. However, this results in floating

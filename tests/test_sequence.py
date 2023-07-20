@@ -128,7 +128,7 @@ def test_merge(
         draeger_data1.framerate = 50
         _ = Sequence.merge(draeger_data1, draeger_data2)
     with pytest.raises(ValueError):
-        # TODO: update this to AttributeError, once equivalence check for
+        # TODO (#77): update this to AttributeError, once equivalence check for
         # framesets is implemented.
         draeger_data1.vendor = Vendor.TIMPEL
         _ = Sequence.merge(draeger_data1, timpel_data)
@@ -216,7 +216,7 @@ def test_load_partial(
     # marker was tricky to implement, so keeping this cutoff will ensure that
     # code keeps working for this fringe situation.
 
-    # TODO: test what happens if a file has an actual event marker on the very
+    # TODO (#81): test what happens if a file has an actual event marker on the very
     # first frame. I suspect this will not be loaded, but I don't have a test
     # file for this situation.
 
@@ -250,7 +250,7 @@ def test_illegal_first():
 def test_select_by_time(
     draeger_data2: DraegerSequence,
 ):
-    # TODO: this function is kinda ugly. Would be nice to refactor it
+    # TODO (#82): this function is kinda ugly. Would be nice to refactor it
     # but I am struggling to think of a logical way to loop through.
     data = draeger_data2
     t22 = 55825.268
