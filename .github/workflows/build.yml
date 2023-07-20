@@ -18,13 +18,13 @@ jobs:
 
   build:
     if: github.event.pull_request.draft == false
-    name: Build for (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest']
         python-version: ['3.10']
+    name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - name: Connect to Container Registry
@@ -33,7 +33,7 @@ jobs:
           registry: ghcr.io
           username: drcandacemakedamoore
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run Tests in Container 
+      - name: Run Tests in Container
         run: >
           docker run
           --rm
@@ -42,8 +42,8 @@ jobs:
           ghcr.io/eit-alive/eittestdata:latest
           sh -c 'set -xe ;
             cd /ci ;
-            python -m pip install ".[dev,publishing]" ; 
-            pytest -v ; 
+            python -m pip install ".[dev,publishing]" ;
+            pytest -v ;
             python setup.py sdist bdist_wheel'
 
   lint:
@@ -96,10 +96,10 @@ jobs:
           -e COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }}
           -e COVERALLS_FLAG_NAME=python-${{ matrix.version }}
           ghcr.io/eit-alive/eittestdata:latest
-          sh -c 'set -xe ; 
-            cd /ci ; 
-            python -m pip install --upgrade pip setuptools ; 
-            python -m pip install ".[dev,publishing]" ; 
-            pytest --cov --cov-append --cov-report xml --cov-report term --cov-report html ; 
-            coveralls --service=github ; 
+          sh -c 'set -xe ;
+            cd /ci ;
+            python -m pip install --upgrade pip setuptools ;
+            python -m pip install ".[dev,publishing]" ;
+            pytest --cov --cov-append --cov-report xml --cov-report term --cov-report html ;
+            coveralls --service=github ;
             python setup.py sdist bdist_wheel'
