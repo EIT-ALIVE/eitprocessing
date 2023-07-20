@@ -11,10 +11,10 @@ environment = os.environ.get(
     "EIT_PROCESSING_TEST_DATA",
     os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
 )
-data_directory = os.path.join(environment, 'test_data')
+data_directory = os.path.join(environment, 'tests', 'test_data')
 draeger_file1 = os.path.join(data_directory, "Draeger_Test3.bin")
 draeger_file2 = os.path.join(data_directory, "Draeger_Test.bin")
-timpel_file = os.path.join(data_directory, "testdata_timpel.txt")
+timpel_file = os.path.join(data_directory, "Timpel_Test.txt")
 dummy_file = os.path.join(data_directory, "not_a_file.dummy")
 
 
