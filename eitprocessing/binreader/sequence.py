@@ -6,9 +6,9 @@ This file contains methods related to parts of electrical impedance tomographs
 as they are read.
 """
 
+import bisect
 import copy
 import functools
-import bisect
 import warnings
 from dataclasses import dataclass
 from dataclasses import field

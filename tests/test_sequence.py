@@ -3,9 +3,11 @@
 import copy
 import os
 import pytest  # noqa
+from eitprocessing.binreader.sequence import DraegerSequence
 from eitprocessing.binreader.sequence import Sequence
-from eitprocessing.binreader.sequence import TimpelSequence, DraegerSequence
+from eitprocessing.binreader.sequence import TimpelSequence
 from eitprocessing.binreader.sequence import Vendor
+
 
 environment = os.environ.get(
     "EIT_PROCESSING_TEST_DATA",
