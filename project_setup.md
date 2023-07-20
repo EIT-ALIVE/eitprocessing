@@ -61,7 +61,7 @@ help you decide which tool to use for packaging.
 
 ## Continuous code quality
 
-We check code quality by hand, and continously upgrade as time allows. 
+We check code quality by hand, and continously upgrade as time allows.
 
 ## Package version number
 
