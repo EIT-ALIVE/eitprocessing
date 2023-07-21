@@ -98,7 +98,7 @@ def test_illegal_from_path():
         _= Sequence.from_path(timpel_file, vendor="sentec")
 
 
-def test_merge(
+def test_merge(  # pylint: disable=too-many-locals
     draeger_data1: DraegerSequence,
     draeger_data2: DraegerSequence,
     draeger_data_both: DraegerSequence,
@@ -117,6 +117,19 @@ def test_merge(
     assert draeger_load_double == draeger_merge_double
     added_draeger_double = draeger_data1 + draeger_data1
     assert added_draeger_double == draeger_merge_double
+
+    draeger_merged_twice = Sequence.merge(draeger_merge_double, draeger_merge_double)
+    draeger_load_four_times = Sequence.from_path([draeger_file1]*4, 'draeger')
+    assert isinstance(draeger_merged_twice.path, list) and len(draeger_merged_twice.path) == 4
+    assert draeger_merged_twice == draeger_load_four_times
+
+    draeger_merge_thrice = Sequence.merge(draeger_merge_double, draeger_data1)
+    draeger_load_thrice = Sequence.from_path([draeger_file1]*3, 'draeger')
+    assert isinstance(draeger_merge_thrice.path, list) and len(draeger_merge_thrice.path) == 3
+    assert draeger_merge_thrice == draeger_load_thrice
+    added_draeger_triple = draeger_data1 + draeger_data1 + draeger_data1
+    assert draeger_merge_thrice == added_draeger_triple
+
 
     merged_timpel = Sequence.merge(timpel_data, timpel_data)
     assert len(merged_timpel) == 2*len(timpel_data)

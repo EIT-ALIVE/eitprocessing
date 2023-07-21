@@ -150,7 +150,9 @@ class Sequence:
         except Exception as e:
             raise type(e)(f"Sequences could not be merged: {e}") from e
 
-        path = [a.path, b.path]
+        a_path = a.path if isinstance(a.path, list) else [a.path]
+        b_path = b.path if isinstance(b.path, list) else [b.path]
+        path = a_path + b_path
         nframes = len(a) + len(b)
         time = np.concatenate((a.time, b.time))
         framesets = {
