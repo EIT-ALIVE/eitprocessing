@@ -9,7 +9,7 @@ Welcome to eitprocessing's documentation!
 =========================================
 
 Here is some general information about the eitprocessing package. We are working on
-documentation, stay tuned.
+documentation, stay tuned. 
 
 
 The API Documentation / Guide
