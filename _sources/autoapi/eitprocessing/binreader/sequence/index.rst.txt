@@ -177,7 +177,7 @@ Classes
       Merge two Sequence objects together.
 
 
-   .. py:method:: from_path(path: pathlib.Path | str | List[pathlib.Path | str], vendor: Vendor | str, framerate: int = None, first_frame: int = 0, max_frames: int | None = None) -> Sequence
+   .. py:method:: from_path(path: pathlib.Path | str | List[pathlib.Path] | List[str], vendor: Vendor | str, framerate: int = None, first_frame: int = 0, max_frames: int | None = None) -> Sequence
       :classmethod:
 
       Load sequence from path(s)
