@@ -51,7 +51,7 @@ Continuous Integration
 ^^^^^^^^^^^^^^^^^^^^^^
 
 This project has CI setup that uses GitHub Actions
-platform.  
+platform.
 
 
 

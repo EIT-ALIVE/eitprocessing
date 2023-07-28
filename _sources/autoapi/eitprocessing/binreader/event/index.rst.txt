@@ -33,11 +33,6 @@ Classes
 
       
 
-   .. py:attribute:: time
-      :type: float
-
-      
-
    .. py:attribute:: marker
       :type: int
 

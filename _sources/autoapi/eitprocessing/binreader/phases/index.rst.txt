@@ -41,7 +41,7 @@ Classes
 
       
 
-   .. py:method:: __eq__(other: PhaseIndicator) -> bool
+   .. py:method:: __eq__(other)
 
       Return self==value.
 

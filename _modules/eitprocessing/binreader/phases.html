@@ -45,15 +45,15 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
 
 
 <span class="nd">@dataclass</span>
 <div class="viewcode-block" id="PhaseIndicator"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator">[docs]</a><span class="k">class</span> <span class="nc">PhaseIndicator</span><span class="p">:</span>
 <div class="viewcode-block" id="PhaseIndicator.index"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.index">[docs]</a>    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span></div>
-<div class="viewcode-block" id="PhaseIndicator.time"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.time">[docs]</a>    <span class="n">time</span><span class="p">:</span> <span class="nb">float</span></div>
+<div class="viewcode-block" id="PhaseIndicator.time"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.time">[docs]</a>    <span class="n">time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-    <span class="c1"># TODO (#78): QUESTION: how does this differ the default __eq__ function for a dataclass?</span>
-<div class="viewcode-block" id="PhaseIndicator.__eq__"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span><span class="s1">&#39;PhaseIndicator&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="PhaseIndicator.__eq__"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">:</span>
