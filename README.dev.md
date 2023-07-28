@@ -8,7 +8,7 @@ If you're looking for user documentation, go [here](README.md).
 Make sure you have developer options installed as described in the [README](README.md)
 (otherwise run: `pip install -e .[dev]` on the repository folder in your environment)
 
-For testing all you need to do is run: 
+For testing all you need to do is run:
 ```shell
 pytest
 ```
@@ -29,7 +29,7 @@ coverage report
 ## Running linters locally
 
 For linting we will use [prospector](https://pypi.org/project/prospector/).
-To sort imports we will use [isort](https://pycqa.github.io/isort/). Note that if you use VS Code, 
+To sort imports we will use [isort](https://pycqa.github.io/isort/). Note that if you use VS Code,
 sorting is automated upon file saving.
 
 ```shell

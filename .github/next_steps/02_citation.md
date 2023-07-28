@@ -36,7 +36,7 @@ To help you keep the citation metadata up to date and synchronized, the [`cffcon
 
 1. Whether `.zenodo.json` is valid JSON.
 
-    _Currently unimplemented, but you can check for yourself on [https://jsonlint.com/](https://jsonlint.com/)._ 
+    _Currently unimplemented, but you can check for yourself on [https://jsonlint.com/](https://jsonlint.com/)._
 
 1. Whether `CITATION.cff` and `.zenodo.json` contain equivalent data.
 

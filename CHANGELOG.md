@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Added functionality from eitbinary package. License, code of conduct, readme included. Linting infrastructure through prospector (see .prospector.yml). 
+Added functionality from eitbinary package. License, code of conduct, readme included. Linting infrastructure through prospector (see .prospector.yml).
 
 ## [0.0.1] - 2023-04-28
 
