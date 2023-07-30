@@ -139,50 +139,27 @@ Classes
 
    Bases: :py:obj:`Sequence`
 
-   Sequence of timepoints containing EIT and/or waveform data
-
-   A Sequence is meant as a representation of a continuous set of data, either EIT frames,
-   waveform data, or both. A Sequence could consist of an entire measurement, a section of a
-   measurement, a single breath or even a portion of a breath.
-
-   EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
-
-
-   .. py:attribute:: framerate
-      :type: int
-      :value: 20
-
-      
+   Sequence object for DRAEGER data.
 
    .. py:attribute:: vendor
       :type: Vendor
 
       
 
-   .. py:method:: from_path(path: pathlib.Path | str, vendor: Vendor = Vendor.DRAEGER, framerate: int = None, limit_frames: slice | Tuple[int, int] = None) -> DraegerSequence
-      :classmethod:
+   .. py:method:: _load_data(first_frame: int)
 
-      Load sequence from path
-
-      :param path: path to data file
-      :type path: Path | str
-      :param vendor: vendor indicating the device used
-      :type vendor: Vendor
-      :param framerate: framerate at which the data was recorded. Defaults to None.
-      :type framerate: int, optional
-      :param limit_frames: limit the range of frames to be loaded. Defaults to None.
-      :type limit_frames: slice | Tuple[int, int], optional
-
-      :raises NotImplementedError: is raised when there is no loading method for the given vendor.
-
-      :returns: a sequence containing the loaded data
-      :rtype: Sequence
+      Load data for DRAEGER files.
 
 
-   .. py:method:: read(limit_frames: slice = None, framerate: int = 20) -> None
+   .. py:method:: _read_frame(reader: eitprocessing.binreader.reader.Reader, index: int, pixel_values: numpy.typing.NDArray, previous_marker: int | None) -> None
+
+      Read frame by frame data from DRAEGER files.
 
 
-   .. py:method:: read_frame(reader, index, pixel_values) -> None
+   .. py:method:: reshape_frame(frame)
+      :staticmethod:
+
+      Convert linear array into 2D (32x32) image-like array.
 
 
 
@@ -197,18 +174,47 @@ Classes
 
    EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
 
+   :param path: path(s) to data file.
+   :type path: Path | str | List[Path | str]
+   :param vendor: vendor indicating the device used.
+   :type vendor: Vendor | str
+   :param time: list of time label for each data point (can be
+                true time or relative time)
+   :type time: NDArray[float]
+   :param max_frames: number of frames in sequence
+   :type max_frames: int
+   :param framerate: framerate at which the data was recorded.
+                     Defaults to 20 if vendor == DRAEGER
+                     Defaults to 50 if vendor == TIMPEL
+   :type framerate: int, optional
+   :param framesets: dictionary of framesets
+   :type framesets: Dict[str, Frameset]
+   :param events: list of Event objects in data
+   :type events: List[Event]
+   :param timing_errors: list of TimingError objects in data
+   :type timing_errors: List[TimingError]
+   :param phases: list of PhaseIndicator objects in data
+   :type phases: List[PhaseIndicator]
+
+   :returns: a sequence containing the l
+   :rtype: Sequence
 
    .. py:attribute:: path
       :type: pathlib.Path | str | List[pathlib.Path | str]
 
       
 
-   .. py:attribute:: time
-      :type: numpy.ndarray
+   .. py:attribute:: vendor
+      :type: Vendor
 
       
 
-   .. py:attribute:: n_frames
+   .. py:attribute:: time
+      :type: numpy.typing.NDArray
+
+      
+
+   .. py:attribute:: nframes
       :type: int
 
       
@@ -238,18 +244,12 @@ Classes
 
       
 
-   .. py:attribute:: vendor
-      :type: Vendor
-
-      
-
-   .. py:attribute:: __getitem__
-
-      
-
    .. py:attribute:: deepcopy
 
       
+
+   .. py:method:: __post_init__()
+
 
    .. py:method:: __len__() -> int
 
@@ -259,42 +259,100 @@ Classes
       Return self==value.
 
 
-   .. py:method:: merge(a, b) -> Sequence
+   .. py:method:: _set_vendor_class()
+
+      Re-assign Sequence class to child class for selected Vendor.
+
+      :raises NotImplementedError: if the child class for the selected vendor
+          has not yet been implemented.
+
+
+   .. py:method:: check_equivalence(a: Sequence, b: Sequence)
+      :staticmethod:
+
+      Checks whether content of two Sequence objects is equivalent.
+
+
+   .. py:method:: __add__(other)
+
+
+   .. py:method:: merge(a: Sequence, b: Sequence) -> Sequence
       :classmethod:
 
+      Merge two Sequence objects together.
 
-   .. py:method:: from_paths(paths: List[pathlib.Path], vendor: Vendor, framerate: int = None) -> Sequence
+
+   .. py:method:: from_path(path: pathlib.Path | str | List[pathlib.Path] | List[str], vendor: Vendor | str, framerate: int = None, first_frame: int = 0, max_frames: int | None = None) -> Sequence
       :classmethod:
 
+      Load sequence from path(s)
 
-   .. py:method:: from_path(path: pathlib.Path | str, vendor: Vendor, framerate: int = None, limit_frames: slice | Tuple[int, int] = None) -> Sequence
-      :classmethod:
-
-      Load sequence from path
-
-      :param path: path to data file
-      :type path: Path | str
+      :param path: path(s) to data file
+      :type path: Path | str | List[Path | str]
       :param vendor: vendor indicating the device used
-      :type vendor: Vendor
-      :param framerate: framerate at which the data was recorded. Defaults to None.
+      :type vendor: Vendor | str
+      :param framerate: framerate at which the data was recorded.
+                        Default for Draeger: 20
+                        Default for Timpel: 50
       :type framerate: int, optional
-      :param limit_frames: limit the range of frames to be loaded. Defaults to None.
-      :type limit_frames: slice | Tuple[int, int], optional
+      :param first_frame: index of first time point of sequence
+                          (i.e. NOT the timestamp).
+                          Defaults to 0.
+      :type first_frame: int, optional
+      :param max_frames: maximum number of frames to load.
+                         The actual number of frames can be lower than this if this
+                         would surpass the final frame.
+      :type max_frames: int, optional
 
-      :raises NotImplementedError: is raised when there is no loading method for the given vendor.
+      :raises NotImplementedError: is raised when there is no loading method for
+      :raises the given vendor.:
 
-      :returns: a sequence containing the loaded data
+      :returns: a sequence containing the loaded data from all files in path
       :rtype: Sequence
 
 
-   .. py:method:: parse_limit_frames(limit_frames: tuple | slice) -> slice
-      :staticmethod:
+   .. py:method:: _load_file(path: pathlib.Path | str, vendor: Vendor | str, framerate: int = None, first_frame: int = 0, max_frames: int | None = None) -> Sequence
+      :classmethod:
+
+      Method used by `from_path` that initiates the object and calls
+      child method for loading the data.
+
+      See `from_path` method for arguments.
 
 
-   .. py:method:: select_by_indices(indices) -> Sequence
+   .. py:method:: _load_data(first_frame: int | None)
+      :abstractmethod:
+
+      Needs to be implemented in child class.
 
 
-   .. py:method:: select_by_time(start=None, end=None, end_inclusive=False) -> Sequence
+   .. py:method:: __getitem__(indices)
+
+
+   .. py:method:: select_by_time(start: float | int | None = None, end: float | int | None = None, start_inclusive: bool = True, end_inclusive: bool = False) -> Sequence
+
+      Select subset of sequence by the `Sequence.time` information (i.e.
+      based on the time stamp).
+
+      :param start: starting time point.
+                    Defaults to None.
+      :type start: float | int | None, optional
+      :param end: ending time point.
+                  Defaults to None.
+      :type end: float | int | None, optional
+      :param start_inclusive: include starting timepoint if
+                              `start` is present in `Sequence.time`.
+                              Defaults to True.
+      :type start_inclusive: bool, optional
+      :param end_inclusive: include ending timepoint if
+                            `end` is present in `Sequence.time`.
+                            Defaults to False.
+      :type end_inclusive: bool, optional
+
+      :raises ValueError: if the Sequence.time is not sorted
+
+      :returns: a slice of `self` based on time information given.
+      :rtype: Sequence
 
 
 
@@ -303,44 +361,16 @@ Classes
 
    Bases: :py:obj:`Sequence`
 
-   Sequence of timepoints containing EIT and/or waveform data
-
-   A Sequence is meant as a representation of a continuous set of data, either EIT frames,
-   waveform data, or both. A Sequence could consist of an entire measurement, a section of a
-   measurement, a single breath or even a portion of a breath.
-
-   EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
-
-
-   .. py:attribute:: framerate
-      :type: int
-      :value: 50
-
-      
+   Sequence object for TIMPEL data.
 
    .. py:attribute:: vendor
       :type: Vendor
 
       
 
-   .. py:method:: from_path(path: pathlib.Path | str, vendor: Vendor = Vendor.TIMPEL, framerate: int = None, limit_frames: slice | Tuple[int, int] = None) -> TimpelSequence
-      :classmethod:
+   .. py:method:: _load_data(first_frame: int)
 
-      Load sequence from path
-
-      :param path: path to data file
-      :type path: Path | str
-      :param vendor: vendor indicating the device used
-      :type vendor: Vendor
-      :param framerate: framerate at which the data was recorded. Defaults to None.
-      :type framerate: int, optional
-      :param limit_frames: limit the range of frames to be loaded. Defaults to None.
-      :type limit_frames: slice | Tuple[int, int], optional
-
-      :raises NotImplementedError: is raised when there is no loading method for the given vendor.
-
-      :returns: a sequence containing the loaded data
-      :rtype: Sequence
+      Load data for TIMPEL files.
 
 
 
