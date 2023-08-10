@@ -497,18 +497,30 @@ class TimpelSequence(Sequence):
             )
         except UnicodeDecodeError as e:
             raise OSError(
-                f"""File {self.path} could not be read as Timpel data.\n
-                Make sure this is a valid and uncorrupted Timpel data file.\n
-                Original error message: {e}"""
+                f"File {self.path} could not be read as Timpel data.\n"
+                "Make sure this is a valid and uncorrupted Timpel data file.\n"
+                f"Original error message: {e}"
             ) from e
 
         data: NDArray
         if data.shape[1] != COLUMN_WIDTH:
             raise OSError(
-                f"""Input does not have a width of {COLUMN_WIDTH} columns.\n
-                Make sure this is a valid and uncorrupted Timpel data file."""
+                f"Input does not have a width of {COLUMN_WIDTH} columns.\n"
+                "Make sure this is a valid and uncorrupted Timpel data file."
             )
-        self.nframes = data.shape[0]
+        if data.shape[0] == 0:
+            raise ValueError(
+                f"Invalid input: `first_frame` {first_frame} is larger than the "
+                f"total number of frames in the file."
+            )
+        if data.shape[0] != self.nframes:
+            warnings.warn(
+                f'The number of frames requested ({self.nframes}) is larger'
+                f'than the available number ({data.shape[0]}) of frames after '
+                f'the first frame selected ({first_frame}).\n'
+                f'{data.shape[0]} frames have been loaded.'
+            )
+            self.nframes = data.shape[0]
 
         # TODO (#80): QUESTION: check whether below issue was only a Drager problem or also
         # applicable to Timpel.
