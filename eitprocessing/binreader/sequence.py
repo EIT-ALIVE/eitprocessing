@@ -371,44 +371,58 @@ class DraegerSequence(Sequence):
         """Load data for DRAEGER files."""
         FRAME_SIZE_BYTES = 4358
 
-        # Need to load 1 frame before first to check if there is an event
-        # marker. Data for the pre-first frame will not be added to self.
-        first_load = 0
-        if first_frame > 0:
-            first_load = first_frame - 1
-
         file_size = self.path.stat().st_size
         if file_size % FRAME_SIZE_BYTES:
             raise OSError(
-                f"""File size {file_size} of file {str(self.path)} not divisible by {FRAME_SIZE_BYTES}.\n
-                Make sure this is a valid and uncorrupted Draeger data file."""
+                f"File size {file_size} of file {str(self.path)} not divisible by {FRAME_SIZE_BYTES}.\n"
+                f"Make sure this is a valid and uncorrupted Draeger data file."
             )
         total_frames = file_size // FRAME_SIZE_BYTES
-        if self.nframes is not None:
-            self.nframes = min(total_frames - first_load, self.nframes)
-        else:
-            self.nframes = total_frames - first_load
 
-        self.time = np.zeros(self.nframes)
-        pixel_values = np.zeros((self.nframes, 32, 32))
+        if first_frame > total_frames:
+            raise ValueError(
+                f"Invalid input: `first_frame` {first_frame} is larger than the "
+                f"total number of frames in the file {total_frames}."
+            )
+
+        # We need to load 1 frame before first actual frame to check if there
+        # is an event marker. Data for the pre-first (dummy) frame will be
+        # removed from self at the end of this function.
+        first_load = max(0, first_frame - 1)
+        loaded_frames = min(total_frames - first_load, self.nframes
+                            or total_frames - first_load)
+
+        self.time = np.zeros(loaded_frames)
+        pixel_values = np.zeros((loaded_frames, 32, 32))
 
         with open(self.path, "br") as fh:
             fh.seek(first_load * FRAME_SIZE_BYTES)
             reader = Reader(fh)
 
             previous_marker = None
-            for index in range(self.nframes):
-                use_index = index
-                if first_frame > 0:
-                    use_index = index - 1
+            for index in range(loaded_frames):
                 previous_marker = self._read_frame(
-                    reader, use_index, pixel_values, previous_marker
+                    reader,
+                    index - (first_frame > 0),  # only adjusts for firstframe > 0
+                    pixel_values,
+                    previous_marker
                 )
 
         if first_frame > 0:
-            self.nframes -= 1
+            # remove data for dummy frame if first frame in file was not loaded
+            loaded_frames -= 1
             self.time = self.time[:-1]
             pixel_values = pixel_values[:-1, :, :]
+
+        if self.nframes != loaded_frames:
+            if self.nframes:
+                warnings.warn(
+                    f'The number of frames requested ({self.nframes}) is larger'
+                    f'than the available number ({loaded_frames}) of frames after '
+                    f'the first frame selected ({first_frame}, total frames: '
+                    f'{total_frames}).\n {loaded_frames} frames have been loaded.'
+                )
+            self.nframes = loaded_frames
 
         params = {"framerate": self.framerate}
         self.framesets["raw"] = Frameset(
