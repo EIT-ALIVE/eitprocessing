@@ -7,11 +7,11 @@ This file contains methods to deal with events when electrical impedance tomogra
 
 
 from dataclasses import dataclass
-from dataclasses import field
 
 
 @dataclass
 class Event:
     index: int
-    marker: int = field(repr=False)
+    time: float
+    marker: int
     text: str

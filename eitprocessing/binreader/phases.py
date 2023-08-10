@@ -6,15 +6,15 @@ This file contains methods related to when electrical impedance tomographs are r
 """
 
 from dataclasses import dataclass
-from dataclasses import field
 
 
 @dataclass
 class PhaseIndicator:
     index: int
-    time: float = field(repr=False)
+    time: float
 
-    def __eq__(self, other):
+    # TODO (#78): QUESTION: how does this differ the default __eq__ function for a dataclass?
+    def __eq__(self, other:'PhaseIndicator') -> bool:
         if self.index != other.index:
             return False
         if self.time != other.time:

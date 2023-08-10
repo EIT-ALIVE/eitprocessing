@@ -2,21 +2,22 @@
 Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
 Licensed under the Apache License, version 2.0. See LICENSE for details.
 
-This file contains methods related to parts of electrical impedance tomographs 
+This file contains methods related to parts of electrical impedance tomographs
 as they are read.
 """
 
+import bisect
 import copy
 import functools
-import itertools
+import warnings
 from dataclasses import dataclass
 from dataclasses import field
 from enum import auto
 from pathlib import Path
 from typing import Dict
 from typing import List
-from typing import Tuple
 import numpy as np
+from numpy.typing import NDArray
 from strenum import LowercaseStrEnum
 from .event import Event
 from .frameset import Frameset
@@ -49,26 +50,49 @@ class Sequence:
 
     EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
 
+    Args:
+        path (Path | str | List[Path | str]): path(s) to data file.
+        vendor (Vendor | str): vendor indicating the device used.
+        time (NDArray[float]): list of time label for each data point (can be
+            true time or relative time)
+        max_frames (int): number of frames in sequence
+        framerate (int, optional): framerate at which the data was recorded.
+            Defaults to 20 if vendor == DRAEGER
+            Defaults to 50 if vendor == TIMPEL
+        framesets (Dict[str, Frameset]): dictionary of framesets
+        events (List[Event]): list of Event objects in data
+        timing_errors (List[TimingError]): list of TimingError objects in data
+        phases (List[PhaseIndicator]): list of PhaseIndicator objects in data
+
+    Returns:
+        Sequence: a sequence containing the l
     """
 
     path: Path | str | List[Path | str] = None
-    time: np.ndarray = None
-    n_frames: int = None
+    vendor: Vendor = None
+    time: NDArray = None
+    nframes: int = None
     framerate: int = None
     framesets: Dict[str, Frameset] = field(default_factory=dict)
     events: List[Event] = field(default_factory=list, repr=False)
     timing_errors: List[TimingError] = field(default_factory=list, repr=False)
     phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
-    vendor: Vendor = None
+
+    def __post_init__(self):
+        self._set_vendor_class()
 
     def __len__(self) -> int:
-        return self.n_frames
+        return self.nframes
 
     def __eq__(self, other) -> bool:
-        for attr in ["n_frames", "framerate", "framesets", "vendor"]:
+        try:
+            self.check_equivalence(self, other)
+        except (TypeError, ValueError, AttributeError):
+            return False
+
+        for attr in ["nframes", "framerate", "framesets", "vendor"]:
             if getattr(self, attr) != getattr(other, attr):
                 return False
-
         for attr in ["time", "phases", "events", "timing_errors"]:
             self_attr, other_attr = getattr(self, attr), getattr(other, attr)
             if len(self_attr) != len(other_attr):
@@ -78,251 +102,327 @@ class Sequence:
 
         return True
 
-    @classmethod
-    def merge(cls, a, b) -> "Sequence":
-        path = list(itertools.chain([a.path, b.path]))
+    def _set_vendor_class(self):
+        """Re-assign Sequence class to child class for selected Vendor.
 
-        if a.vendor != b.vendor:
-            raise ValueError("Vendors aren't equal")
+        Raises:
+            NotImplementedError: if the child class for the selected vendor
+                has not yet been implemented.
+        """
 
+        if isinstance(self.vendor, str):
+            self.vendor = Vendor(self.vendor.lower())
+
+        if self.vendor == Vendor.DRAEGER:
+            self.__class__ = DraegerSequence
+        elif self.vendor == Vendor.TIMPEL:
+            self.__class__ = TimpelSequence
+        elif self.vendor is not None:
+            raise NotImplementedError(f"vendor {self.vendor} is not implemented")
+
+    @staticmethod
+    def check_equivalence(a: "Sequence", b: "Sequence"):
+        """Checks whether content of two Sequence objects is equivalent."""
+
+        if (a_ := a.vendor) != (b_ := b.vendor):
+            raise TypeError(f"Vendors are not equal: {a_}, {b_}")
         if (a_ := a.framerate) != (b_ := b.framerate):
             raise ValueError(f"Framerates are not equal: {a_}, {b_}")
-
-        # Create time axis
-        n_frames = len(a) + len(b)
-        time = np.arange(n_frames) / a.framerate + a.time[0]
-
-        # Merge framesets
         if (a_ := a.framesets.keys()) != (b_ := b.framesets.keys()):
             raise AttributeError(
-                f"Sequences don't contain the same framesets: {a_}, {b_}"
+                f"Sequences do not contain the same framesets: {a_}, {b_}"
             )
+        return True
+
+    def __add__(self, other):
+        return self.merge(self, other)
+
+    @classmethod
+    def merge(cls, a: "Sequence", b: "Sequence") -> "Sequence":
+        """Merge two Sequence objects together."""
+        try:
+            Sequence.check_equivalence(a, b)
+        except Exception as e:
+            raise type(e)(f"Sequences could not be merged: {e}") from e
+
+        a_path = a.path if isinstance(a.path, list) else [a.path]
+        b_path = b.path if isinstance(b.path, list) else [b.path]
+        path = a_path + b_path
+        nframes = len(a) + len(b)
+        time = np.concatenate((a.time, b.time))
         framesets = {
             name: Frameset.merge(a.framesets[name], b.framesets[name])
-            for name in a.framesets.keys()
+            for name in a.framesets
         }
 
-        def merge_list_attribute(attr: str) -> list:
+        def merge_attribute(attr: str) -> list:
             a_items = getattr(a, attr)
-            b_items = copy.deepcopy(
-                getattr(b, attr)
-            )  # make a copy to prevent overwriting b
+            b_items = getattr(b.deepcopy(), attr)  # deepcopy avoids overwriting
             for item in b_items:
-                item.index += a.n_frames
+                item.index += a.nframes
                 item.time = time[item.index]
             return a_items + b_items
 
         return cls(
             path=path,
+            vendor=a.vendor,
             time=time,
-            n_frames=n_frames,
+            nframes=nframes,
             framerate=a.framerate,
             framesets=framesets,
-            events=merge_list_attribute("events"),
-            timing_errors=merge_list_attribute("timing_errors"),
-            phases=merge_list_attribute("phases"),
-            vendor=a.vendor,
+            events=merge_attribute("events"),
+            timing_errors=merge_attribute("timing_errors"),
+            phases=merge_attribute("phases"),
         )
 
     @classmethod
-    def from_paths(
-        cls, paths: List[Path], vendor: Vendor, framerate: int = None
+    def from_path(  # pylint: disable=too-many-arguments, unused-argument
+        cls,
+        path: Path | str | List[Path | str],
+        vendor: Vendor | str,
+        framerate: int = None,
+        first_frame: int = 0,
+        max_frames: int | None = None,
     ) -> "Sequence":
-        sequences = (
-            cls.from_path(path, framerate=framerate, vendor=vendor) for path in paths
-        )
+        """Load sequence from path(s)
+
+        Args:
+            path (Path | str | List[Path | str]): path(s) to data file
+            vendor (Vendor | str): vendor indicating the device used
+            framerate (int, optional): framerate at which the data was recorded.
+                Default for Draeger: 20
+                Default for Timpel: 50
+            first_frame (int, optional): index of first time point of sequence
+                (i.e. NOT the timestamp).
+                Defaults to 0.
+            max_frames (int, optional): maximum number of frames to load.
+                The actual number of frames can be lower than this if this
+                would surpass the final frame.
+
+        Raises:
+            NotImplementedError: is raised when there is no loading method for
+            the given vendor.
+
+        Returns:
+            Sequence: a sequence containing the loaded data from all files in path
+        """
+
+        params = list(locals().values())[1:]  # list input parameters
+        sequences = []
+
+        if not isinstance(path, list):
+            path = [path]
+        for single_path in path:
+            Path(single_path).resolve(strict=True)  # checks that file exists
+            params[0] = single_path
+            sequences.append(cls._load_file(*params))
         return functools.reduce(cls.merge, sequences)
 
     @classmethod
-    def from_path(
+    def _load_file(  # pylint: disable=too-many-arguments
         cls,
         path: Path | str,
-        vendor: Vendor,
+        vendor: Vendor | str,
         framerate: int = None,
-        limit_frames: slice | Tuple[int, int] = None,
+        first_frame: int = 0,
+        max_frames: int | None = None,
     ) -> "Sequence":
-        """Load sequence from path
+        """Method used by `from_path` that initiates the object and calls
+        child method for loading the data.
 
-        Args:
-            path (Path | str): path to data file
-            vendor (Vendor): vendor indicating the device used
-            framerate (int, optional): framerate at which the data was recorded. Defaults to None.
-            limit_frames (slice | Tuple[int, int], optional): limit the range of frames to be loaded. Defaults to None.
+        See `from_path` method for arguments."""
 
-        Raises:
-            NotImplementedError: is raised when there is no loading method for the given vendor.
-
-        Returns:
-            Sequence: a sequence containing the loaded data
-        """
-
-        path = Path(path)
-
-        if vendor == Vendor.DRAEGER:
-            return DraegerSequence.from_path(
-                path, framerate=framerate, limit_frames=limit_frames
-            )
-
-        if vendor == Vendor.TIMPEL:
-            return TimpelSequence.from_path(
-                path, framerate=framerate, limit_frames=limit_frames
-            )
-
-        raise NotImplementedError(f"cannot load data from vendor {vendor}")
-
-    @staticmethod
-    def parse_limit_frames(limit_frames: tuple | slice) -> slice:
-        if not limit_frames:
-            return None
-
-        if isinstance(limit_frames, tuple):
-            if len(limit_frames) != 2:
-                raise ValueError(
-                    "`limit_frames` should be a tuple (start, stop) or a slice."
-                )
-            limit_frames = slice(*limit_frames)
-
-        if limit_frames and not isinstance(limit_frames, slice):
+        if first_frame is None:
+            first_frame = 0
+        if int(first_frame) != first_frame:
             raise TypeError(
-                f"`limit_frames` should be a slice or tuple (to be converted to a slice), not {type(limit_frames)!r}"
+                f"`first_frame` must be an int, but was given as"
+                f" {first_frame} (type: {type(first_frame)})"
+            )
+        if not first_frame >= 0:
+            raise ValueError(
+                f"`first_frame` can not be negative, but was given as {first_frame}"
+            )
+        first_frame = int(first_frame)
+
+        obj = cls(
+            path=Path(path),
+            vendor=vendor,
+            nframes=max_frames,
+        )
+        obj._set_vendor_class()
+        if framerate:
+            obj.framerate = framerate
+        elif obj.vendor == Vendor.DRAEGER:
+            obj.framerate = 20
+        elif obj.vendor == Vendor.TIMPEL:
+            obj.framerate = 50
+        else:
+            raise NotImplementedError(
+                f"No default `framerate` for {obj.vendor} data is implemented."
+                "\n`framerate` must be specified when calling `_load_file` for"
+                "this vendor."
             )
 
-        if limit_frames.step != 1 and limit_frames.step is not None:
-            raise NotImplementedError("Can't skip frames when loading data.")
-
-        if limit_frames.start is None and limit_frames.stop is None:
-            return None
-
-        if limit_frames.start is None:
-            limit_frames = slice(0, limit_frames.stop)
-
-        return limit_frames
-
-    def select_by_indices(self, indices) -> "Sequence":
-        obj = self.deepcopy()
-
-        obj.framesets = {
-            k: v.select_by_indices(indices) for k, v in self.framesets.items()
-        }
-        obj.time = self.time[indices]
-        obj.n_frames = len(obj.time)
-
-        if isinstance(indices, slice):
-            if indices.start is None:
-                indices = slice(0, indices.stop, indices.step)
-            first = indices.start
-        else:
-            first = indices[0]
-
-        def filter_by_index(list_):
-            def helper(item):
-                if isinstance(indices, slice):
-                    if indices.step not in (None, 1):
-                        raise NotImplementedError(
-                            "Can't skip intermediate frames while slicing"
-                        )
-                    return item.index >= indices.start and (
-                        indices.stop is None or item.index < indices.stop
-                    )
-                return item.index in indices
-
-            new_list = list(filter(helper, list_))
-            for item in new_list:
-                item.index = item.index - first
-                item.time = obj.time[item.index]
-
-            return new_list
-
-        obj.events = filter_by_index(obj.events)
-        obj.timing_errors = filter_by_index(obj.timing_errors)
-        obj.phases = filter_by_index(obj.phases)
+        # function from child class, which will load and assign
+        # time, nframes, framesets, events, timing_errors, phases
+        obj._load_data(first_frame)
 
         return obj
 
-    def select_by_time(self, start=None, end=None, end_inclusive=False) -> "Sequence":
+    def _load_data(self, first_frame: int | None):
+        """Needs to be implemented in child class."""
+        raise NotImplementedError(f"Data loading for {self.vendor} is not implemented")
+
+    def __getitem__(self, indices):
+        if not isinstance(indices, slice):
+            raise NotImplementedError(
+                "Slicing only implemented using a slice object"
+            )
+        if indices.step not in (None, 1):
+            raise NotImplementedError(
+                "Skipping intermediate frames while slicing is not implemented."
+            )
+        if indices.start is None:
+            indices = slice(0, indices.stop, indices.step)
+        if indices.stop is None:
+            indices = slice(indices.start, self.nframes, indices.step)
+
+        obj = self.deepcopy()
+        obj.time = self.time[indices]
+        obj.nframes = len(obj.time)
+
+        obj.framesets = {k: v[indices] for k, v in self.framesets.items()}
+
+        r = range(indices.start, indices.stop)
+        for attr in ["events", "timing_errors", "phases"]:
+            setattr(obj, attr, [x for x in getattr(obj, attr) if x.index in r])
+            for x in getattr(obj, attr):
+                x.index -= indices.start
+
+        return obj
+
+    def select_by_time(
+        self,
+        start: float | int | None = None,
+        end: float | int | None = None,
+        start_inclusive: bool = True,
+        end_inclusive: bool = False,
+    ) -> "Sequence":
+        """Select subset of sequence by the `Sequence.time` information (i.e.
+        based on the time stamp).
+
+        Args:
+            start (float | int | None, optional): starting time point.
+                Defaults to None.
+            end (float | int | None, optional): ending time point.
+                Defaults to None.
+            start_inclusive (bool, optional): include starting timepoint if
+                `start` is present in `Sequence.time`.
+                Defaults to True.
+            end_inclusive (bool, optional): include ending timepoint if
+                `end` is present in `Sequence.time`.
+                Defaults to False.
+
+        Raises:
+            ValueError: if the Sequence.time is not sorted
+
+        Returns:
+            Sequence: a slice of `self` based on time information given.
+        """
+
         if not any((start, end)):
-            raise ValueError("Pass either start or end")
-        start_index = np.nonzero(self.time >= start)[0][0]
-        if end_inclusive:
-            end_index = np.nonzero(self.time <= end)[0][-1]
+            warnings.warn("No starting or end timepoint was selected.")
+            return self
+        if not np.all(np.sort(self.time) == self.time):
+            raise ValueError(
+                f"Time stamps for {self} are not sorted and therefor data"
+                "cannot be selected by time."
+            )
+
+        if start is None:
+            start_index = 0
+        elif start_inclusive:
+            start_index = bisect.bisect_left(self.time, start)
         else:
-            end_index = np.nonzero(self.time < end)[0][-1]
+            start_index = bisect.bisect_right(self.time, start)
 
-        return self.select_by_indices(slice(start_index, end_index))
+        if end is None:
+            end_index = len(self)
+        elif end_inclusive:
+            end_index = bisect.bisect_right(self.time, end) - 1
+        else:
+            end_index = bisect.bisect_left(self.time, end) - 1
 
-    __getitem__ = select_by_indices
+        return self[start_index:end_index]
+
     deepcopy = copy.deepcopy
 
 
 @dataclass(eq=False)
 class DraegerSequence(Sequence):
-    framerate: int = 20
+    """Sequence object for DRAEGER data."""
+
     vendor: Vendor = Vendor.DRAEGER
 
-    @classmethod
-    def from_path(
-        cls,
-        path: Path | str,
-        vendor: Vendor = Vendor.DRAEGER,
-        framerate: int = None,
-        limit_frames: slice | Tuple[int, int] = None,
-    ) -> "DraegerSequence":
-        if vendor != Vendor.DRAEGER:
-            raise ValueError(f"Vendor can't be different from '{Vendor.DRAEGER}'")
-
-        obj = cls(path=Path(path))
-
-        if framerate:
-            obj.framerate = framerate
-
-        limit_frames = obj.parse_limit_frames(limit_frames)
-
-        skip_frames = 0
-        if limit_frames:
-            skip_frames = limit_frames.start
-
-        obj.read(limit_frames=limit_frames)
-        obj.time = np.arange(len(obj) + skip_frames) / obj.framerate
-        obj.time = obj.time[skip_frames:]
-
-        return obj
-
-    def read(self, limit_frames: slice = None, framerate: int = 20) -> None:
+    def _load_data(self, first_frame: int):
+        """Load data for DRAEGER files."""
         FRAME_SIZE_BYTES = 4358
 
         file_size = self.path.stat().st_size
         if file_size % FRAME_SIZE_BYTES:
+            raise OSError(
+                f"File size {file_size} of file {str(self.path)} not divisible by {FRAME_SIZE_BYTES}.\n"
+                f"Make sure this is a valid and uncorrupted Draeger data file."
+            )
+        total_frames = file_size // FRAME_SIZE_BYTES
+
+        if first_frame > total_frames:
             raise ValueError(
-                f"File size {file_size} not divisible by {FRAME_SIZE_BYTES}"
+                f"Invalid input: `first_frame` {first_frame} is larger than the "
+                f"total number of frames in the file {total_frames}."
             )
 
-        max_n_frames = file_size // FRAME_SIZE_BYTES
+        # We need to load 1 frame before first actual frame to check if there
+        # is an event marker. Data for the pre-first (dummy) frame will be
+        # removed from self at the end of this function.
+        first_load = max(0, first_frame - 1)
+        loaded_frames = min(total_frames - first_load, self.nframes
+                            or total_frames - first_load)
 
-        if limit_frames:
-            if limit_frames.step not in (1, None):
-                raise NotImplementedError("Can't skip frames")
-
-            if limit_frames.stop and limit_frames.stop < max_n_frames:
-                stop = limit_frames.stop
-            else:
-                stop = max_n_frames
-
-            start = limit_frames.start or 0
-            self.n_frames = stop - start
-        else:
-            self.n_frames = max_n_frames
-
-        pixel_values = np.empty((self.n_frames, 32, 32))
+        self.time = np.zeros(loaded_frames)
+        pixel_values = np.zeros((loaded_frames, 32, 32))
 
         with open(self.path, "br") as fh:
-            if limit_frames:
-                fh.seek(limit_frames.start * FRAME_SIZE_BYTES)
-
+            fh.seek(first_load * FRAME_SIZE_BYTES)
             reader = Reader(fh)
-            for index in range(self.n_frames):
-                self.read_frame(reader, index, pixel_values)
 
-        params = {"framerate": framerate}
+            previous_marker = None
+            for index in range(loaded_frames):
+                previous_marker = self._read_frame(
+                    reader,
+                    index - (first_frame > 0),  # only adjusts for firstframe > 0
+                    pixel_values,
+                    previous_marker
+                )
+
+        if first_frame > 0:
+            # remove data for dummy frame if first frame in file was not loaded
+            loaded_frames -= 1
+            self.time = self.time[:-1]
+            pixel_values = pixel_values[:-1, :, :]
+
+        if self.nframes != loaded_frames:
+            if self.nframes:
+                warnings.warn(
+                    f'The number of frames requested ({self.nframes}) is larger'
+                    f'than the available number ({loaded_frames}) of frames after '
+                    f'the first frame selected ({first_frame}, total frames: '
+                    f'{total_frames}).\n {loaded_frames} frames have been loaded.'
+                )
+            self.nframes = loaded_frames
+
+        params = {"framerate": self.framerate}
         self.framesets["raw"] = Frameset(
             name="raw",
             description="raw impedance data",
@@ -330,93 +430,103 @@ class DraegerSequence(Sequence):
             pixel_values=pixel_values,
         )
 
-    def read_frame(self, reader, index, pixel_values) -> None:
-        def reshape_frame(frame):
-            return np.reshape(frame, (32, 32), "C")
-
-        timestamp = reader.float64()
-        time = timestamp * 24 * 60 * 60
+    def _read_frame(
+        self,
+        reader: Reader,
+        index: int,
+        pixel_values: NDArray,
+        previous_marker: int | None,
+    ) -> None:
+        """Read frame by frame data from DRAEGER files."""
+        current_time = round(reader.float64() * 24 * 60 * 60, 3)
 
         _ = reader.float32()
-        pixel_values[index, :, :] = reshape_frame(reader.float32(length=1024))
+        pixel_values[index, :, :] = self.reshape_frame(reader.float32(length=1024))
         min_max_flag = reader.int32()
         event_marker = reader.int32()
         event_text = reader.string(length=30)
         timing_error = reader.int32()
 
-        # TODO: parse medibus data into waveform data
+        # TODO (#79): parse medibus data into waveform data
         medibus_data = reader.float32(  # noqa; variable will be used in future version
             length=52
-        )  
+        )
 
-        # The event marker stays the same until the next event occurs. Therefore, check whether the
-        # event marker has changed with respect to the most recent event. If so, create a new event.
-        if self.events:
-            previous_event = self.events[-1]
-        else:
-            previous_event = None
+        if index >= 0:
+            # The event marker stays the same until the next event occurs. Therefore, check whether the
+            # event marker has changed with respect to the most recent event. If so, create a new event.
+            if (previous_marker is not None) and (event_marker > previous_marker):
+                self.events.append(Event(index, current_time, event_marker, event_text))
+            if timing_error:
+                self.timing_errors.append(
+                    TimingError(index, current_time, timing_error)
+                )
+            if min_max_flag == 1:
+                self.phases.append(MaxValue(index, current_time))
+            elif min_max_flag == -1:
+                self.phases.append(MinValue(index, current_time))
+            self.time[index] = current_time
 
-        if event_marker and (
-            previous_event is None or event_marker > previous_event.marker
-        ):
-            self.events.append(Event(index, event_marker, event_text))
+        return event_marker
 
-        if timing_error:
-            self.timing_errors.append(TimingError(index, time, timing_error))
-
-        if min_max_flag == 1:
-            self.phases.append(MaxValue(index, time))
-        elif min_max_flag == -1:
-            self.phases.append(MinValue(index, time))
+    @staticmethod
+    def reshape_frame(frame):
+        """Convert linear array into 2D (32x32) image-like array."""
+        return np.reshape(frame, (32, 32), "C")
 
 
 @dataclass(eq=False)
 class TimpelSequence(Sequence):
-    framerate: int = 50
+    """Sequence object for TIMPEL data."""
+
     vendor: Vendor = Vendor.TIMPEL
 
-    @classmethod
-    def from_path(
-        cls,
-        path: Path | str,
-        vendor: Vendor = Vendor.TIMPEL,
-        framerate: int = None,
-        limit_frames: slice | Tuple[int, int] = None,
-    ) -> "TimpelSequence":
-        if vendor != Vendor.TIMPEL:
-            raise ValueError(f"Vendor can't be different from '{Vendor.TIMPEL}'")
+    def _load_data(self, first_frame: int):
+        """Load data for TIMPEL files."""
+        COLUMN_WIDTH = 1030
 
-        obj = cls(path=Path(path))
-
-        if framerate:
-            obj.framerate = framerate
-
-        limit_frames = obj.parse_limit_frames(limit_frames)
-
-        skiprows, max_rows = 0, None
-        if limit_frames:
-            skiprows = limit_frames.start
-            if limit_frames.stop:
-                max_rows = limit_frames.stop - limit_frames.start
-
-        data = np.loadtxt(
-            path, dtype=float, delimiter=",", skiprows=skiprows, max_rows=max_rows
-        )
-
-        obj.n_frames = data.shape[0]
-        if max_rows and max_rows != obj.n_frames:
-            raise ValueError(
-                "Fewer rows were loaded than indicated with `limit_frames`"
+        try:
+            data = np.loadtxt(
+                self.path,
+                dtype=float,
+                delimiter=",",
+                skiprows=first_frame,
+                max_rows=self.nframes,
             )
+        except UnicodeDecodeError as e:
+            raise OSError(
+                f"File {self.path} could not be read as Timpel data.\n"
+                "Make sure this is a valid and uncorrupted Timpel data file.\n"
+                f"Original error message: {e}"
+            ) from e
 
-        # Below method seems convoluted: it's easier to create an array with n_frames and add a
-        # time_offset. However, this results in floating points errors, creating issues with
-        # comparing times later on.
-        obj.time = np.arange(obj.n_frames + skiprows) / obj.framerate
-        obj.time = obj.time[skiprows:]
+        data: NDArray
+        if data.shape[1] != COLUMN_WIDTH:
+            raise OSError(
+                f"Input does not have a width of {COLUMN_WIDTH} columns.\n"
+                "Make sure this is a valid and uncorrupted Timpel data file."
+            )
+        if data.shape[0] == 0:
+            raise ValueError(
+                f"Invalid input: `first_frame` {first_frame} is larger than the "
+                f"total number of frames in the file."
+            )
+        if data.shape[0] != self.nframes:
+            warnings.warn(
+                f'The number of frames requested ({self.nframes}) is larger'
+                f'than the available number ({data.shape[0]}) of frames after '
+                f'the first frame selected ({first_frame}).\n'
+                f'{data.shape[0]} frames have been loaded.'
+            )
+            self.nframes = data.shape[0]
 
-        if data.shape[1] != 1030:
-            raise ValueError("CSV file does not contain 1030 columns")
+        # TODO (#80): QUESTION: check whether below issue was only a Drager problem or also
+        # applicable to Timpel.
+        # The implemented method seems convoluted: it's easier to create an array
+        # with nframes and add a time_offset. However, this results in floating
+        # point errors, creating issues with comparing times later on.
+        self.time = np.arange(self.nframes + first_frame) / self.framerate
+        self.time = self.time[first_frame:]
 
         pixel_data = data[:, :1024]
         pixel_data = np.reshape(pixel_data, newshape=(-1, 32, 32), order="C")
@@ -431,22 +541,20 @@ class TimpelSequence(Sequence):
 
         # extract breath start, breath end and QRS marks
         for index in np.flatnonzero(data[:, 1027] == 1):
-            obj.phases.append(MinValue(index, obj.time[index]))
+            self.phases.append(MinValue(index, self.time[index]))
 
         for index in np.flatnonzero(data[:, 1028] == 1):
-            obj.phases.append(MaxValue(index, obj.time[index]))
+            self.phases.append(MaxValue(index, self.time[index]))
 
         for index in np.flatnonzero(data[:, 1029] == 1):
-            obj.phases.append(QRSMark(index, obj.time[index]))
+            self.phases.append(QRSMark(index, self.time[index]))
 
-        obj.phases.sort(key=lambda x: x.index)
+        self.phases.sort(key=lambda x: x.index)
 
-        obj.framesets["raw"] = Frameset(
+        self.framesets["raw"] = Frameset(
             name="raw",
             description="raw timpel data",
-            params={"framerate": obj.framerate},
+            params={"framerate": self.framerate},
             pixel_values=pixel_data,
             waveform_data=waveform_data,
         )
-
-        return obj
