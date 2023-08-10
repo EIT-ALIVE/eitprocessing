@@ -236,13 +236,12 @@ class Sequence:
             first_frame = 0
         if int(first_frame) != first_frame:
             raise TypeError(
-                f"""`first_frame` must be an int, but was given as
-                            {first_frame} (type: {type(first_frame)})"""
+                f"`first_frame` must be an int, but was given as"
+                f" {first_frame} (type: {type(first_frame)})"
             )
         if not first_frame >= 0:
             raise ValueError(
-                f"""`first_frame` can not be negative, but was
-                            given as {first_frame}"""
+                f"`first_frame` can not be negative, but was given as {first_frame}"
             )
         first_frame = int(first_frame)
 
@@ -260,9 +259,9 @@ class Sequence:
             obj.framerate = 50
         else:
             raise NotImplementedError(
-                f"""No default `framerate` for {obj.vendor} data is implemented.
-                \n`framerate` must be specified when calling `_load_file` for
-                this vendor."""
+                f"No default `framerate` for {obj.vendor} data is implemented."
+                "\n`framerate` must be specified when calling `_load_file` for"
+                "this vendor."
             )
 
         # function from child class, which will load and assign
@@ -278,12 +277,11 @@ class Sequence:
     def __getitem__(self, indices):
         if not isinstance(indices, slice):
             raise NotImplementedError(
-                """Slicing only implemented using a slice object"""
+                "Slicing only implemented using a slice object"
             )
         if indices.step not in (None, 1):
             raise NotImplementedError(
-                """Skipping intermediate frames while slicing is not
-                currently implemented."""
+                "Skipping intermediate frames while slicing is not implemented."
             )
         if indices.start is None:
             indices = slice(0, indices.stop, indices.step)
@@ -338,8 +336,8 @@ class Sequence:
             return self
         if not np.all(np.sort(self.time) == self.time):
             raise ValueError(
-                f"""Time stamps for {self} are not sorted and therefor data
-                cannot be selected by time."""
+                f"Time stamps for {self} are not sorted and therefor data"
+                "cannot be selected by time."
             )
 
         if start is None:
