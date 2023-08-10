@@ -387,7 +387,7 @@ class DraegerSequence(Sequence):
         file_size = self.path.stat().st_size
         if file_size % FRAME_SIZE_BYTES:
             raise OSError(
-                f"""File size {file_size} not divisible by {FRAME_SIZE_BYTES}.\n
+                f"""File size {file_size} of file {str(self.path)} not divisible by {FRAME_SIZE_BYTES}.\n
                 Make sure this is a valid and uncorrupted Draeger data file."""
             )
         total_frames = file_size // FRAME_SIZE_BYTES
