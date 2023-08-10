@@ -85,6 +85,11 @@ class Sequence:
         return self.nframes
 
     def __eq__(self, other) -> bool:
+        try:
+            self.check_equivalence(self, other)
+        except (TypeError, ValueError, AttributeError):
+            return False
+
         for attr in ["nframes", "framerate", "framesets", "vendor"]:
             if getattr(self, attr) != getattr(other, attr):
                 return False
@@ -94,11 +99,8 @@ class Sequence:
                 return False
             if not np.all(np.equal(self_attr, other_attr)):
                 return False
-        try:
-            self.check_equivalence(self, other)
-            return True
-        except (TypeError, ValueError, AttributeError):
-            return False
+
+        return True
 
     def _set_vendor_class(self):
         """Re-assign Sequence class to child class for selected Vendor.
