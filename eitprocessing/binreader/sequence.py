@@ -78,14 +78,11 @@ class Sequence:
     timing_errors: List[TimingError] = field(default_factory=list, repr=False)
     phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
 
-
     def __post_init__(self):
         self._set_vendor_class()
 
-
     def __len__(self) -> int:
         return self.nframes
-
 
     def __eq__(self, other) -> bool:
         for attr in ["nframes", "framerate", "framesets", "vendor"]:
@@ -103,7 +100,6 @@ class Sequence:
         except (TypeError, ValueError, AttributeError):
             return False
 
-
     def _set_vendor_class(self):
         """Re-assign Sequence class to child class for selected Vendor.
 
@@ -120,8 +116,7 @@ class Sequence:
         elif self.vendor == Vendor.TIMPEL:
             self.__class__ = TimpelSequence
         elif self.vendor is not None:
-            raise NotImplementedError(f'vendor {self.vendor} is not implemented')
-
+            raise NotImplementedError(f"vendor {self.vendor} is not implemented")
 
     @staticmethod
     def check_equivalence(a: "Sequence", b: "Sequence"):
@@ -137,10 +132,8 @@ class Sequence:
             )
         return True
 
-
     def __add__(self, other):
         return self.merge(self, other)
-
 
     @classmethod
     def merge(cls, a: "Sequence", b: "Sequence") -> "Sequence":
@@ -181,7 +174,7 @@ class Sequence:
         )
 
     @classmethod
-    def from_path(  #pylint: disable=too-many-arguments, unused-argument
+    def from_path(  # pylint: disable=too-many-arguments, unused-argument
         cls,
         path: Path | str | List[Path | str],
         vendor: Vendor | str,
@@ -224,7 +217,7 @@ class Sequence:
         return functools.reduce(cls.merge, sequences)
 
     @classmethod
-    def _load_file( #pylint: disable=too-many-arguments
+    def _load_file(  # pylint: disable=too-many-arguments
         cls,
         path: Path | str,
         vendor: Vendor | str,
@@ -240,11 +233,15 @@ class Sequence:
         if first_frame is None:
             first_frame = 0
         if int(first_frame) != first_frame:
-            raise TypeError(f'''`first_frame` must be an int, but was given as
-                            {first_frame} (type: {type(first_frame)})''')
+            raise TypeError(
+                f"""`first_frame` must be an int, but was given as
+                            {first_frame} (type: {type(first_frame)})"""
+            )
         if not first_frame >= 0:
-            raise ValueError(f'''`first_frame` can not be negative, but was
-                            given as {first_frame}''')
+            raise ValueError(
+                f"""`first_frame` can not be negative, but was
+                            given as {first_frame}"""
+            )
         first_frame = int(first_frame)
 
         obj = cls(
@@ -261,9 +258,10 @@ class Sequence:
             obj.framerate = 50
         else:
             raise NotImplementedError(
-                f'''No default `framerate` for {obj.vendor} data is implemented.
+                f"""No default `framerate` for {obj.vendor} data is implemented.
                 \n`framerate` must be specified when calling `_load_file` for
-                this vendor.''')
+                this vendor."""
+            )
 
         # function from child class, which will load and assign
         # time, nframes, framesets, events, timing_errors, phases
@@ -271,12 +269,9 @@ class Sequence:
 
         return obj
 
-
     def _load_data(self, first_frame: int | None):
         """Needs to be implemented in child class."""
-        raise NotImplementedError(
-            f"Data loading for {self.vendor} is not implemented")
-
+        raise NotImplementedError(f"Data loading for {self.vendor} is not implemented")
 
     def __getitem__(self, indices):
         if not isinstance(indices, slice):
@@ -297,21 +292,15 @@ class Sequence:
         obj.time = self.time[indices]
         obj.nframes = len(obj.time)
 
-        obj.framesets = {
-            k: v[indices] for k, v in self.framesets.items()
-        }
+        obj.framesets = {k: v[indices] for k, v in self.framesets.items()}
 
         r = range(indices.start, indices.stop)
-        for attr in ['events', 'timing_errors', 'phases']:
-            setattr(
-                obj, attr, [x for x in getattr(obj, attr)
-                    if x.index in r]
-            )
+        for attr in ["events", "timing_errors", "phases"]:
+            setattr(obj, attr, [x for x in getattr(obj, attr) if x.index in r])
             for x in getattr(obj, attr):
                 x.index -= indices.start
 
         return obj
-
 
     def select_by_time(
         self,
@@ -348,7 +337,8 @@ class Sequence:
         if not np.all(np.sort(self.time) == self.time):
             raise ValueError(
                 f"""Time stamps for {self} are not sorted and therefor data
-                cannot be selected by time.""")
+                cannot be selected by time."""
+            )
 
         if start is None:
             start_index = 0
@@ -364,7 +354,7 @@ class Sequence:
         else:
             end_index = bisect.bisect_left(self.time, end) - 1
 
-        return self[start_index : end_index]
+        return self[start_index:end_index]
 
     deepcopy = copy.deepcopy
 
@@ -372,6 +362,7 @@ class Sequence:
 @dataclass(eq=False)
 class DraegerSequence(Sequence):
     """Sequence object for DRAEGER data."""
+
     vendor: Vendor = Vendor.DRAEGER
 
     def _load_data(self, first_frame: int):
@@ -407,13 +398,15 @@ class DraegerSequence(Sequence):
             for index in range(self.nframes):
                 use_index = index
                 if first_frame > 0:
-                    use_index = index-1
-                previous_marker = self._read_frame(reader, use_index, pixel_values, previous_marker)
+                    use_index = index - 1
+                previous_marker = self._read_frame(
+                    reader, use_index, pixel_values, previous_marker
+                )
 
         if first_frame > 0:
             self.nframes -= 1
             self.time = self.time[:-1]
-            pixel_values = pixel_values[:-1,:,:]
+            pixel_values = pixel_values[:-1, :, :]
 
         params = {"framerate": self.framerate}
         self.framesets["raw"] = Frameset(
@@ -423,9 +416,9 @@ class DraegerSequence(Sequence):
             pixel_values=pixel_values,
         )
 
-
     def _read_frame(
-        self, reader: Reader,
+        self,
+        reader: Reader,
         index: int,
         pixel_values: NDArray,
         previous_marker: int | None,
@@ -451,7 +444,9 @@ class DraegerSequence(Sequence):
             if (previous_marker is not None) and (event_marker > previous_marker):
                 self.events.append(Event(index, current_time, event_marker, event_text))
             if timing_error:
-                self.timing_errors.append(TimingError(index, current_time, timing_error))
+                self.timing_errors.append(
+                    TimingError(index, current_time, timing_error)
+                )
             if min_max_flag == 1:
                 self.phases.append(MaxValue(index, current_time))
             elif min_max_flag == -1:
@@ -469,6 +464,7 @@ class DraegerSequence(Sequence):
 @dataclass(eq=False)
 class TimpelSequence(Sequence):
     """Sequence object for TIMPEL data."""
+
     vendor: Vendor = Vendor.TIMPEL
 
     def _load_data(self, first_frame: int):
@@ -477,12 +473,12 @@ class TimpelSequence(Sequence):
 
         try:
             data = np.loadtxt(
-            self.path,
-            dtype=float,
-            delimiter=",",
-            skiprows=first_frame,
-            max_rows=self.nframes,
-        )
+                self.path,
+                dtype=float,
+                delimiter=",",
+                skiprows=first_frame,
+                max_rows=self.nframes,
+            )
         except UnicodeDecodeError as e:
             raise OSError(
                 f"""File {self.path} could not be read as Timpel data.\n
@@ -505,7 +501,6 @@ class TimpelSequence(Sequence):
         # point errors, creating issues with comparing times later on.
         self.time = np.arange(self.nframes + first_frame) / self.framerate
         self.time = self.time[first_frame:]
-
 
         pixel_data = data[:, :1024]
         pixel_data = np.reshape(pixel_data, newshape=(-1, 32, 32), order="C")
