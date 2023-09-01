@@ -1,17 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>eitprocessing.binreader.frameset &#8212; eitprocessing 0.0.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css?v=601dbdee" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head><body>
@@ -59,17 +58,39 @@
 
 
 <span class="nd">@dataclass</span>
-<div class="viewcode-block" id="Frameset"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset">[docs]</a><span class="k">class</span> <span class="nc">Frameset</span><span class="p">:</span>
-<div class="viewcode-block" id="Frameset.name"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.name">[docs]</a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
-<div class="viewcode-block" id="Frameset.description"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.description">[docs]</a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span></div>
-<div class="viewcode-block" id="Frameset.params"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.params">[docs]</a>    <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
-<div class="viewcode-block" id="Frameset.pixel_values"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.pixel_values">[docs]</a>    <span class="n">pixel_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
-<div class="viewcode-block" id="Frameset.waveform_data"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.waveform_data">[docs]</a>    <span class="n">waveform_data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Frameset">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset">[docs]</a>
+<span class="k">class</span> <span class="nc">Frameset</span><span class="p">:</span>
+<div class="viewcode-block" id="Frameset.name">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.name">[docs]</a>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
 
-<div class="viewcode-block" id="Frameset.__len__"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Frameset.description">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.description">[docs]</a>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span></div>
+
+<div class="viewcode-block" id="Frameset.params">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.params">[docs]</a>
+    <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Frameset.pixel_values">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.pixel_values">[docs]</a>
+    <span class="n">pixel_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Frameset.waveform_data">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.waveform_data">[docs]</a>
+    <span class="n">waveform_data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Frameset.__len__">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.__len__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Frameset.__eq__"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Frameset.__eq__">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.__eq__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
@@ -99,36 +120,60 @@
 
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="Frameset.select_by_indices"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.select_by_indices">[docs]</a>    <span class="k">def</span> <span class="nf">select_by_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Frameset.select_by_indices">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.select_by_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_by_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">()</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">pixel_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_values</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">waveform_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">waveform_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
-<div class="viewcode-block" id="Frameset.__getitem__"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.__getitem__">[docs]</a>    <span class="fm">__getitem__</span> <span class="o">=</span> <span class="n">select_by_indices</span></div>
+
+<div class="viewcode-block" id="Frameset.__getitem__">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.__getitem__">[docs]</a>
+    <span class="fm">__getitem__</span> <span class="o">=</span> <span class="n">select_by_indices</span></div>
+
 
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Frameset.global_baseline"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.global_baseline">[docs]</a>    <span class="k">def</span> <span class="nf">global_baseline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Frameset.global_baseline">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.global_baseline">[docs]</a>
+    <span class="k">def</span> <span class="nf">global_baseline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_values</span><span class="p">)</span></div>
 
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Frameset.pixel_values_global_offset"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.pixel_values_global_offset">[docs]</a>    <span class="k">def</span> <span class="nf">pixel_values_global_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Frameset.pixel_values_global_offset">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.pixel_values_global_offset">[docs]</a>
+    <span class="k">def</span> <span class="nf">pixel_values_global_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_values</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_baseline</span></div>
 
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Frameset.pixel_baseline"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.pixel_baseline">[docs]</a>    <span class="k">def</span> <span class="nf">pixel_baseline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Frameset.pixel_baseline">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.pixel_baseline">[docs]</a>
+    <span class="k">def</span> <span class="nf">pixel_baseline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Frameset.pixel_values_individual_offset"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.pixel_values_individual_offset">[docs]</a>    <span class="k">def</span> <span class="nf">pixel_values_individual_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Frameset.pixel_values_individual_offset">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.pixel_values_individual_offset">[docs]</a>
+    <span class="k">def</span> <span class="nf">pixel_values_individual_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_values</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Frameset.global_impedance"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.global_impedance">[docs]</a>    <span class="k">def</span> <span class="nf">global_impedance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Frameset.global_impedance">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.global_impedance">[docs]</a>
+    <span class="k">def</span> <span class="nf">global_impedance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="Frameset.plot_waveforms"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.plot_waveforms">[docs]</a>    <span class="k">def</span> <span class="nf">plot_waveforms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveforms</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Frameset.plot_waveforms">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.plot_waveforms">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_waveforms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveforms</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">waveforms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">waveforms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">waveform_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
@@ -142,7 +187,10 @@
             <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">waveform_data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Frameset.animate"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.animate">[docs]</a>    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Frameset.animate">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.animate">[docs]</a>
+    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plasma&quot;</span><span class="p">,</span>
         <span class="n">show_progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
@@ -207,8 +255,11 @@
 
         <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
+
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Frameset.merge"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.merge">[docs]</a>    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<div class="viewcode-block" id="Frameset.merge">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/index.html#eitprocessing.binreader.frameset.Frameset.merge">[docs]</a>
+    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">a_</span> <span class="o">:=</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">b_</span> <span class="o">:=</span> <span class="n">b</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Frameset names don&#39;t match: </span><span class="si">{</span><span class="n">a_</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">b_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -253,7 +304,12 @@
             <span class="n">waveform_data</span><span class="o">=</span><span class="n">waveform_data</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Frameset.deepcopy"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.deepcopy">[docs]</a>    <span class="n">deepcopy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span></div></div>
+
+<div class="viewcode-block" id="Frameset.deepcopy">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/frameset/index.html#eitprocessing.binreader.frameset.Frameset.deepcopy">[docs]</a>
+    <span class="n">deepcopy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -292,8 +348,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

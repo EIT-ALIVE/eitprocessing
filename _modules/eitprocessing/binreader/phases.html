@@ -1,17 +1,16 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>eitprocessing.binreader.phases &#8212; eitprocessing 0.0.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css?v=601dbdee" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head><body>
@@ -48,34 +47,55 @@
 
 
 <span class="nd">@dataclass</span>
-<div class="viewcode-block" id="PhaseIndicator"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator">[docs]</a><span class="k">class</span> <span class="nc">PhaseIndicator</span><span class="p">:</span>
-<div class="viewcode-block" id="PhaseIndicator.index"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.index">[docs]</a>    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span></div>
-<div class="viewcode-block" id="PhaseIndicator.time"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.time">[docs]</a>    <span class="n">time</span><span class="p">:</span> <span class="nb">float</span></div>
+<div class="viewcode-block" id="PhaseIndicator">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator">[docs]</a>
+<span class="k">class</span> <span class="nc">PhaseIndicator</span><span class="p">:</span>
+<div class="viewcode-block" id="PhaseIndicator.index">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.index">[docs]</a>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span></div>
+
+<div class="viewcode-block" id="PhaseIndicator.time">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.time">[docs]</a>
+    <span class="n">time</span><span class="p">:</span> <span class="nb">float</span></div>
+
 
     <span class="c1"># TODO (#78): QUESTION: how does this differ the default __eq__ function for a dataclass?</span>
-<div class="viewcode-block" id="PhaseIndicator.__eq__"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span><span class="s1">&#39;PhaseIndicator&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="PhaseIndicator.__eq__">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.PhaseIndicator.__eq__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span><span class="s1">&#39;PhaseIndicator&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span></div></div>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
 
-
-<span class="nd">@dataclass</span>
-<div class="viewcode-block" id="MinValue"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.MinValue">[docs]</a><span class="k">class</span> <span class="nc">MinValue</span><span class="p">(</span><span class="n">PhaseIndicator</span><span class="p">):</span>
-    <span class="k">pass</span></div>
 
 
 <span class="nd">@dataclass</span>
-<div class="viewcode-block" id="MaxValue"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.MaxValue">[docs]</a><span class="k">class</span> <span class="nc">MaxValue</span><span class="p">(</span><span class="n">PhaseIndicator</span><span class="p">):</span>
+<div class="viewcode-block" id="MinValue">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.MinValue">[docs]</a>
+<span class="k">class</span> <span class="nc">MinValue</span><span class="p">(</span><span class="n">PhaseIndicator</span><span class="p">):</span>
     <span class="k">pass</span></div>
+
 
 
 <span class="nd">@dataclass</span>
-<div class="viewcode-block" id="QRSMark"><a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.QRSMark">[docs]</a><span class="k">class</span> <span class="nc">QRSMark</span><span class="p">(</span><span class="n">PhaseIndicator</span><span class="p">):</span>
+<div class="viewcode-block" id="MaxValue">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.MaxValue">[docs]</a>
+<span class="k">class</span> <span class="nc">MaxValue</span><span class="p">(</span><span class="n">PhaseIndicator</span><span class="p">):</span>
     <span class="k">pass</span></div>
+
+
+
+<span class="nd">@dataclass</span>
+<div class="viewcode-block" id="QRSMark">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/phases/index.html#eitprocessing.binreader.QRSMark">[docs]</a>
+<span class="k">class</span> <span class="nc">QRSMark</span><span class="p">(</span><span class="n">PhaseIndicator</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -114,8 +134,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

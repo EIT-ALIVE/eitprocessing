@@ -1,0 +1,120 @@
+:py:mod:`eitprocessing.filters.butterworth_filters`
+===================================================
+
+.. py:module:: eitprocessing.filters.butterworth_filters
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.filters.butterworth_filters.ButterworthFilter
+   eitprocessing.filters.butterworth_filters.SpecifiedButterworthFilter
+   eitprocessing.filters.butterworth_filters.LowPassFilter
+   eitprocessing.filters.butterworth_filters.HighPassFilter
+   eitprocessing.filters.butterworth_filters.BandStopFilter
+   eitprocessing.filters.butterworth_filters.BandPassFilter
+
+
+
+
+.. py:class:: ButterworthFilter(filter_type: str, cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False)
+
+
+   Bases: :py:obj:`eitprocessing.filters.TimeDomainFilter`
+
+   Butterworth Filter
+
+   .. py:method:: apply_filter(input_data)
+
+
+
+.. py:class:: SpecifiedButterworthFilter(*args, **kwargs)
+
+
+   Bases: :py:obj:`ButterworthFilter`
+
+   Butterworth Filter
+
+   .. py:attribute:: available_in_GUI
+      :value: False
+
+      
+
+
+.. py:class:: LowPassFilter(*args, **kwargs)
+
+
+   Bases: :py:obj:`SpecifiedButterworthFilter`
+
+   Butterworth Filter
+
+   .. py:attribute:: available_in_GUI
+      :value: True
+
+      
+
+   .. py:attribute:: filter_type
+      :value: 'lowpass'
+
+      
+
+
+.. py:class:: HighPassFilter(*args, **kwargs)
+
+
+   Bases: :py:obj:`SpecifiedButterworthFilter`
+
+   Butterworth Filter
+
+   .. py:attribute:: available_in_GUI
+      :value: True
+
+      
+
+   .. py:attribute:: filter_type
+      :value: 'highpass'
+
+      
+
+
+.. py:class:: BandStopFilter(*args, **kwargs)
+
+
+   Bases: :py:obj:`SpecifiedButterworthFilter`
+
+   Butterworth Filter
+
+   .. py:attribute:: available_in_GUI
+      :value: True
+
+      
+
+   .. py:attribute:: filter_type
+      :value: 'bandstop'
+
+      
+
+
+.. py:class:: BandPassFilter(*args, **kwargs)
+
+
+   Bases: :py:obj:`SpecifiedButterworthFilter`
+
+   Butterworth Filter
+
+   .. py:attribute:: available_in_GUI
+      :value: True
+
+      
+
+   .. py:attribute:: filter_type
+      :value: 'bandpass'
+
+      
+
+
