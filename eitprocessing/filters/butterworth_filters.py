@@ -25,6 +25,11 @@ class ButterworthFilter(TimeDomainFilter):
         self.sample_frequency = sample_frequency
         self.filter_type = filter_type
 
+    def __eq__(self, other):
+        if not isinstance(other, ButterworthFilter):
+            return False
+        return self.__dict__ == other.__dict__
+
     def apply_filter(self, input_data):
         b, a = signal.butter(
             N=self.order,
