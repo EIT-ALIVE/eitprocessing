@@ -72,6 +72,13 @@ def test_butterworth_cutoff_frequency():
 
     with pytest.raises(TypeError):
         ButterworthFilter(**kwargs, cutoff_frequency=[20, 30])
+
+    with pytest.raises(ValueError):
+        ButterworthFilter(**kwargs, cutoff_frequency=(1, ))
+
+    with pytest.raises(ValueError):
+        ButterworthFilter(**kwargs, cutoff_frequency=(1, 2, 3))
+
     try:
         ButterworthFilter(**kwargs, cutoff_frequency=(20, 30))
     except (ValueError, TypeError):
