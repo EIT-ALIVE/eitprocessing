@@ -76,4 +76,7 @@ class GridSelection(ROISelection):
     def _find_grid_split_pixels(self, data):
         pass
 
-        
+    def matrix_layout(self):
+        """Returns an array showing the layout of the matrices returned by `find_grid`."""
+        n_groups = self.v_split * self.h_split
+        return np.reshape(np.arange(n_groups), (self.v_split, self.h_split))
