@@ -30,14 +30,7 @@ class ButterworthFilter(TimeDomainFilter):
 
         elif filter_type in ("bandpass", "bandstop"):
             if not isinstance(cutoff_frequency, tuple):
-                if isinstance(cutoff_frequency, str):
-                    raise TypeError("`cutoff_frequency` should be a tuple")
-                try:
-                    cutoff_frequency = tuple(cutoff_frequency)
-                except TypeError as e:
-                    raise TypeError(
-                        "`cutoff_frequency` should be (castable to) a tuple"
-                    ) from e
+                raise TypeError("`cutoff_frequency` should be a tuple")
 
             if len(cutoff_frequency) != 2:
                 raise ValueError("`cutoff_frequency` should have length 2")
