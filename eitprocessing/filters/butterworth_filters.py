@@ -40,30 +40,30 @@ class ButterworthFilter(TimeDomainFilter):
 
 
 class SpecifiedButterworthFilter(ButterworthFilter):
-    available_in_GUI = False
+    available_in_gui = False
 
     def __init__(self, *args, **kwargs):
         if "filter_type" in kwargs and kwargs["filter_type"] != self.filter_type:
-            raise AttributeError(f"`filter_type` should not be supplied.")
+            raise AttributeError("`filter_type` should not be supplied.")
 
         ButterworthFilter.__init__(self, *args, filter_type=self.filter_type, **kwargs)
 
 
 class LowPassFilter(SpecifiedButterworthFilter):
-    available_in_GUI = True
+    available_in_gui = True
     filter_type = "lowpass"
 
 
 class HighPassFilter(SpecifiedButterworthFilter):
-    available_in_GUI = True
+    available_in_gui = True
     filter_type = "highpass"
 
 
 class BandStopFilter(SpecifiedButterworthFilter):
-    available_in_GUI = True
+    available_in_gui = True
     filter_type = "bandstop"
 
 
 class BandPassFilter(SpecifiedButterworthFilter):
-    available_in_GUI = True
+    available_in_gui = True
     filter_type = "bandpass"
