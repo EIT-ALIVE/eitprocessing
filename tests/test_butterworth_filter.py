@@ -104,6 +104,11 @@ def test_butterworth_sample_frequency():
 
 def test_create_specified_filter():
     kwargs = INIT_KWARGS.copy()
+    lp_filter = LowPassFilter(**kwargs)
+    
+    with pytest.raises(AttributeError):
+        hp_filter = HighPassFilter(**kwargs)
+
     del kwargs["filter_type"]
 
     lp_filter = LowPassFilter(**kwargs)
