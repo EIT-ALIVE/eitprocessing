@@ -43,14 +43,14 @@ class ButterworthFilter(TimeDomainFilter):
         self.cutoff_frequency = cutoff_frequency
 
         if order < MIN_ORDER or (order > MAX_ORDER and override_order is False):
-            raise AttributeError(
+            raise ValueError(
                 f"Order should be between {MIN_ORDER} and {MAX_ORDER}. "
                 + "To use higher values, set `override_order` to `True`."
             )
         self.order = order
 
         if not isinstance(sample_frequency, (int, float)):
-            raise TypeError('`sample_frequency` should be a positive number')
+            raise TypeError('`sample_frequency` should be a number')
         if sample_frequency <= 0:
             raise ValueError('`sample_frequency` should be positive')
         self.sample_frequency = sample_frequency

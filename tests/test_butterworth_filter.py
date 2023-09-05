@@ -35,7 +35,7 @@ def test_butterworth_range():
     kwargs = INIT_KWARGS.copy()
     del kwargs["order"]
 
-    with pytest.raises(AttributeError):
+    with pytest.raises(ValueError):
         ButterworthFilter(**kwargs, order=11)
 
     # Tests whether an explicit out-of-range order does not raise AttributeError
