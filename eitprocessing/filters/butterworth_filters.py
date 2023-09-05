@@ -114,11 +114,33 @@ class SpecifiedButterworthFilter(ButterworthFilter):
 
     available_in_gui = False
 
-    def __init__(self, *args, **kwargs):
-        if "filter_type" in kwargs and kwargs["filter_type"] != self.filter_type:
-            raise AttributeError("`filter_type` should not be supplied.")
+    def __init__(
+        self,
+        cutoff_frequency: float | tuple[float, float],
+        order: int,
+        sample_frequency: float,
+        override_order: bool = False,
+        **kwargs,
+    ):
+        if "filter_type" in kwargs:
+            filter_type = kwargs.pop("filter_type")
+            if filter_type != self.filter_type:
+                raise AttributeError("`filter_type` should not be supplied.")
 
-        ButterworthFilter.__init__(self, *args, filter_type=self.filter_type, **kwargs)
+        if len(kwargs):
+            raise AttributeError(
+                f"got an unexpect keyword argument: {', '.join(kwargs.keys())}"
+            )
+
+        ButterworthFilter.__init__(
+            self,
+            filter_type=self.filter_type,
+            cutoff_frequency=cutoff_frequency,
+            order=order,
+            sample_frequency=sample_frequency,
+            override_order=override_order,
+            **kwargs,
+        )
 
 
 class LowPassFilter(SpecifiedButterworthFilter):
