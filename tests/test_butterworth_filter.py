@@ -1,5 +1,7 @@
 """Tests for the Butterworth time domain filter"""
+import numpy as np
 import pytest
+from scipy import signal
 from eitprocessing.filters.butterworth_filters import BandPassFilter
 from eitprocessing.filters.butterworth_filters import BandStopFilter
 from eitprocessing.filters.butterworth_filters import ButterworthFilter
@@ -74,7 +76,7 @@ def test_butterworth_cutoff_frequency():
         ButterworthFilter(**kwargs, cutoff_frequency=[20, 30])
 
     with pytest.raises(ValueError):
-        ButterworthFilter(**kwargs, cutoff_frequency=(1, ))
+        ButterworthFilter(**kwargs, cutoff_frequency=(1,))
 
     with pytest.raises(ValueError):
         ButterworthFilter(**kwargs, cutoff_frequency=(1, 2, 3))
@@ -83,7 +85,6 @@ def test_butterworth_cutoff_frequency():
         ButterworthFilter(**kwargs, cutoff_frequency=(20, 30))
     except (ValueError, TypeError):
         pytest.fail("Unexpected error")
-
 
 
 def test_butterworth_sample_frequency():
@@ -105,7 +106,7 @@ def test_butterworth_sample_frequency():
 def test_create_specified_filter():
     kwargs = INIT_KWARGS.copy()
     lp_filter = LowPassFilter(**kwargs)
-    
+
     with pytest.raises(AttributeError):
         hp_filter = HighPassFilter(**kwargs)
 
@@ -159,3 +160,38 @@ def test_specified_butterworth_equivalence():
     assert filter1 != filter8
     assert filter2 != filter8
     assert filter7 == filter8
+
+
+def test_butterworth_functionality():
+    sample_frequency = 50
+    freq_low = 1
+    freq_medium = 4
+    freq_high = 10
+    amplitude_medium = 0.5
+    amplitude_high = 0.1
+
+    order = 4
+
+    t = np.arange(0, 100, 1 / sample_frequency)
+    low_part = np.sin(2 * np.pi * t * freq_low)
+    medium_part = np.sin(2 * np.pi * t * freq_medium)
+    high_part = np.sin(2 * np.pi * t * freq_high)
+    signal_ = low_part + amplitude_medium * medium_part + amplitude_high * high_part
+
+    def compare_filters(cutoff, filter_type, class_):
+        filter1 = ButterworthFilter(filter_type, cutoff, order, sample_frequency)
+        filter2 = class_(cutoff, order, sample_frequency)
+        result1 = filter1.apply_filter(signal_)
+        result2 = filter2.apply_filter(signal_)
+        assert np.array_equal(result1, result2)
+
+        b, a = signal.butter(order, cutoff, filter_type, fs=sample_frequency)
+        sp_result = signal.filtfilt(b, a, signal_)
+        assert np.array_equal(result1, sp_result)
+
+    lowpass_cutoff = (freq_low + freq_medium) / 2
+    highpass_cutoff = (freq_medium + freq_high) / 2
+    compare_filters(lowpass_cutoff, "lowpass", LowPassFilter)
+    compare_filters(highpass_cutoff, "highpass", HighPassFilter)
+    compare_filters((lowpass_cutoff, highpass_cutoff), "bandpass", BandPassFilter)
+    compare_filters((lowpass_cutoff, highpass_cutoff), "bandstop", BandStopFilter)
