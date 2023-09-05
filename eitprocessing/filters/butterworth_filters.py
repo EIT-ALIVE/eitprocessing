@@ -1,3 +1,6 @@
+from typing import Literal
+import numpy as np
+import numpy.typing as npt
 from scipy import signal
 from . import TimeDomainFilter
 
@@ -12,7 +15,7 @@ class ButterworthFilter(TimeDomainFilter):
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        filter_type: str,
+        filter_type: Literal["lowpass", "highpass", "bandpass", "bandstop"],
         cutoff_frequency: float | tuple[float, float],
         order: int,
         sample_frequency: float,
@@ -55,13 +58,12 @@ class ButterworthFilter(TimeDomainFilter):
             raise ValueError('`sample_frequency` should be positive')
         self.sample_frequency = sample_frequency
 
-
-    def __eq__(self, other):
+    def __eq__(self, other: "ButterworthFilter"):
         if not isinstance(other, ButterworthFilter):
             return False
         return self.__dict__ == other.__dict__
 
-    def apply_filter(self, input_data):
+    def apply_filter(self, input_data: npt.ArrayLike) -> np.ndarray:
         b, a = signal.butter(
             N=self.order,
             Wn=self.cutoff_frequency,
