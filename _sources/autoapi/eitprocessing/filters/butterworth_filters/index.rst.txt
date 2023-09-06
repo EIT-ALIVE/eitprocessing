@@ -22,38 +22,98 @@ Classes
 
 
 
-.. py:class:: ButterworthFilter(filter_type: str, cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False)
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.filters.butterworth_filters.MIN_ORDER
+   eitprocessing.filters.butterworth_filters.MAX_ORDER
+   eitprocessing.filters.butterworth_filters.FILTER_TYPES
+
+
+.. py:data:: MIN_ORDER
+   :value: 1
+
+   
+
+.. py:data:: MAX_ORDER
+   :value: 10
+
+   
+
+.. py:data:: FILTER_TYPES
+   :value: ['lowpass', 'highpass', 'bandpass', 'bandstop']
+
+   
+
+.. py:class:: ButterworthFilter(filter_type: Literal[lowpass, highpass, bandpass, bandstop], cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False)
 
 
    Bases: :py:obj:`eitprocessing.filters.TimeDomainFilter`
 
-   Butterworth Filter
+   Butterworth filter for filtering in the time domain.
 
-   .. py:method:: apply_filter(input_data)
+   Generates a low-pass, high-pass, band-pass or band-stop digital Butterworth filter of order
+   `order`.
+
+   ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions.
+
+   :param filter_type: The type of filter to create.
+   :param cutoff_frequency: Single frequency (lowpass or highpass filter) or tuple containing two
+                            frequencies (bandpass and bandstop filters).
+   :param order: Filter order.
+   :param sample_frequency: Sample frequency of the data to be filtered.
+   :param override_order: Whether to raise an exception if the order is larger than the maximum of
+                          10. Defaults to False.
+
+   .. rubric:: Examples
+
+   >>> t = np.arange(0, 100, 0.1)
+   >>> signal = np.sin(t) + 0.1 * np.sin(10 * t)
+   >>> lowpass_filter = ButterworthFilter('lowpass', 45, 4, 250)
+   >>> filtered_signal = lowpass_filter.apply_filter(signal)
+
+   .. py:method:: __eq__(other: ButterworthFilter)
+
+      Return True if other is a ``ButterworthFilter``, and attributes match.
+
+
+   .. py:method:: apply_filter(input_data: numpy.typing.ArrayLike) -> numpy.ndarray
+
+      Apply the filter to the input data.
+
+      :param input_data: Data to be filtered. If the input data has more than one axis,
+                         the filter is applied to the last axis.
+
+      :returns: The filtered output with the same shape as the input data.
 
 
 
-.. py:class:: SpecifiedButterworthFilter(*args, **kwargs)
+.. py:class:: SpecifiedButterworthFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False, **kwargs)
 
 
    Bases: :py:obj:`ButterworthFilter`
 
-   Butterworth Filter
+   Superclass of specified convenience classes based on ``ButterworthFilter``.
 
-   .. py:attribute:: available_in_GUI
+   .. py:attribute:: available_in_gui
       :value: False
 
       
 
 
-.. py:class:: LowPassFilter(*args, **kwargs)
+.. py:class:: LowPassFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False, **kwargs)
 
 
    Bases: :py:obj:`SpecifiedButterworthFilter`
 
-   Butterworth Filter
+   Low-pass Butterworth filter for filtering in the time domain.
 
-   .. py:attribute:: available_in_GUI
+   ``LowPassFilter`` is a convenience class similar to ``ButterworthFilter``, where the
+   `filter_type` is set to "lowpass".
+
+   .. py:attribute:: available_in_gui
       :value: True
 
       
@@ -64,14 +124,17 @@ Classes
       
 
 
-.. py:class:: HighPassFilter(*args, **kwargs)
+.. py:class:: HighPassFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False, **kwargs)
 
 
    Bases: :py:obj:`SpecifiedButterworthFilter`
 
-   Butterworth Filter
+   High-pass Butterworth filter for filtering in the time domain.
 
-   .. py:attribute:: available_in_GUI
+   ``HighPassFilter`` is a convenience class similar to ``ButterworthFilter``, where the
+   `filter_type` is set to "highpass".
+
+   .. py:attribute:: available_in_gui
       :value: True
 
       
@@ -82,14 +145,17 @@ Classes
       
 
 
-.. py:class:: BandStopFilter(*args, **kwargs)
+.. py:class:: BandStopFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False, **kwargs)
 
 
    Bases: :py:obj:`SpecifiedButterworthFilter`
 
-   Butterworth Filter
+   Band-stop Butterworth filter for filtering in the time domain.
 
-   .. py:attribute:: available_in_GUI
+   ``BandStopFilter`` is a convenience class similar to ``ButterworthFilter``, where the
+   `filter_type` is set to "bandstop".
+
+   .. py:attribute:: available_in_gui
       :value: True
 
       
@@ -100,14 +166,17 @@ Classes
       
 
 
-.. py:class:: BandPassFilter(*args, **kwargs)
+.. py:class:: BandPassFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False, **kwargs)
 
 
    Bases: :py:obj:`SpecifiedButterworthFilter`
 
-   Butterworth Filter
+   Band-pass Butterworth filter for filtering in the time domain.
 
-   .. py:attribute:: available_in_GUI
+   ``BandPassFilter`` is a convenience class similar to ``ButterworthFilter``, where the
+   `filter_type` is set to "bandpass".
+
+   .. py:attribute:: available_in_gui
       :value: True
 
       

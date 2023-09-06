@@ -29,7 +29,7 @@ Classes
 .. py:class:: TimeDomainFilter
 
 
-   .. py:attribute:: available_in_GUI
+   .. py:attribute:: available_in_gui
       :value: True
 
       
