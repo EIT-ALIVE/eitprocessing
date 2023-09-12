@@ -24,7 +24,7 @@ class ButterworthFilter(TimeDomainFilter):
             frequencies (bandpass and bandstop filters).
         order: Filter order.
         sample_frequency: Sample frequency of the data to be filtered.
-        override_order: Whether to raise an exception if the order is larger than the maximum of
+        ignore_max_order: Whether to raise an exception if the order is larger than the maximum of
             10. Defaults to False.
 
     Examples:
@@ -70,7 +70,7 @@ class ButterworthFilter(TimeDomainFilter):
         if order < MIN_ORDER or (order > MAX_ORDER and ignore_max_order is False):
             raise ValueError(
                 f"Order should be between {MIN_ORDER} and {MAX_ORDER}. "
-                "To use higher values, set `override_order` to `True`."
+                "To use higher values, set `ignore_max_order` to `True`."
             )
         self.order = order
 
@@ -119,7 +119,7 @@ class SpecifiedButterworthFilter(ButterworthFilter):
         cutoff_frequency: float | tuple[float, float],
         order: int,
         sample_frequency: float,
-        override_order: bool = False,
+        ignore_max_order: bool = False,
         **kwargs,
     ):
         if "filter_type" in kwargs:
@@ -138,7 +138,7 @@ class SpecifiedButterworthFilter(ButterworthFilter):
             cutoff_frequency=cutoff_frequency,
             order=order,
             sample_frequency=sample_frequency,
-            ignore_max_order=override_order,
+            ignore_max_order=ignore_max_order,
             **kwargs,
         )
 
