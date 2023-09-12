@@ -40,7 +40,7 @@ class ButterworthFilter(TimeDomainFilter):
         cutoff_frequency: float | tuple[float, float],
         order: int,
         sample_frequency: float,
-        override_order: bool = False,
+        ignore_max_order: bool = False,
     ):
         if filter_type not in FILTER_TYPES:
             raise ValueError(
@@ -67,7 +67,7 @@ class ButterworthFilter(TimeDomainFilter):
 
         self.cutoff_frequency = cutoff_frequency
 
-        if order < MIN_ORDER or (order > MAX_ORDER and override_order is False):
+        if order < MIN_ORDER or (order > MAX_ORDER and ignore_max_order is False):
             raise ValueError(
                 f"Order should be between {MIN_ORDER} and {MAX_ORDER}. "
                 "To use higher values, set `override_order` to `True`."
@@ -138,7 +138,7 @@ class SpecifiedButterworthFilter(ButterworthFilter):
             cutoff_frequency=cutoff_frequency,
             order=order,
             sample_frequency=sample_frequency,
-            override_order=override_order,
+            ignore_max_order=override_order,
             **kwargs,
         )
 
