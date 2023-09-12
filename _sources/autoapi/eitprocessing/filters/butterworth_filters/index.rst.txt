@@ -64,8 +64,8 @@ Attributes
                             frequencies (bandpass and bandstop filters).
    :param order: Filter order.
    :param sample_frequency: Sample frequency of the data to be filtered.
-   :param override_order: Whether to raise an exception if the order is larger than the maximum of
-                          10. Defaults to False.
+   :param ignore_max_order: Whether to raise an exception if the order is larger than the maximum of
+                            10. Defaults to False.
 
    .. rubric:: Examples
 
@@ -90,7 +90,7 @@ Attributes
 
 
 
-.. py:class:: SpecifiedButterworthFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False, **kwargs)
+.. py:class:: SpecifiedButterworthFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, ignore_max_order: bool = False, **kwargs)
 
 
    Bases: :py:obj:`ButterworthFilter`
@@ -103,7 +103,7 @@ Attributes
       
 
 
-.. py:class:: LowPassFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False, **kwargs)
+.. py:class:: LowPassFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, ignore_max_order: bool = False, **kwargs)
 
 
    Bases: :py:obj:`SpecifiedButterworthFilter`
@@ -124,7 +124,7 @@ Attributes
       
 
 
-.. py:class:: HighPassFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False, **kwargs)
+.. py:class:: HighPassFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, ignore_max_order: bool = False, **kwargs)
 
 
    Bases: :py:obj:`SpecifiedButterworthFilter`
@@ -145,7 +145,7 @@ Attributes
       
 
 
-.. py:class:: BandStopFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False, **kwargs)
+.. py:class:: BandStopFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, ignore_max_order: bool = False, **kwargs)
 
 
    Bases: :py:obj:`SpecifiedButterworthFilter`
@@ -166,7 +166,7 @@ Attributes
       
 
 
-.. py:class:: BandPassFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, override_order: bool = False, **kwargs)
+.. py:class:: BandPassFilter(cutoff_frequency: float | tuple[float, float], order: int, sample_frequency: float, ignore_max_order: bool = False, **kwargs)
 
 
    Bases: :py:obj:`SpecifiedButterworthFilter`
