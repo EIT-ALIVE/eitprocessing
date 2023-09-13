@@ -14,8 +14,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from enum import auto
 from pathlib import Path
-from typing import Dict
-from typing import List
 import numpy as np
 from numpy.typing import NDArray
 from strenum import LowercaseStrEnum
@@ -51,7 +49,7 @@ class Sequence:
     EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
 
     Args:
-        path (Path | str | List[Path | str]): path(s) to data file.
+        path (Path | str | list[Path | str]): path(s) to data file.
         vendor (Vendor | str): vendor indicating the device used.
         time (NDArray[float]): list of time label for each data point (can be
             true time or relative time)
@@ -59,24 +57,24 @@ class Sequence:
         framerate (int, optional): framerate at which the data was recorded.
             Defaults to 20 if vendor == DRAEGER
             Defaults to 50 if vendor == TIMPEL
-        framesets (Dict[str, Frameset]): dictionary of framesets
-        events (List[Event]): list of Event objects in data
-        timing_errors (List[TimingError]): list of TimingError objects in data
-        phases (List[PhaseIndicator]): list of PhaseIndicator objects in data
+        framesets (dict[str, Frameset]): dictionary of framesets
+        events (list[Event]): list of Event objects in data
+        timing_errors (list[TimingError]): list of TimingError objects in data
+        phases (list[PhaseIndicator]): list of PhaseIndicator objects in data
 
     Returns:
         Sequence: a sequence containing the l
     """
 
-    path: Path | str | List[Path | str] = None
+    path: Path | str | list[Path | str] = None
     vendor: Vendor = None
     time: NDArray = None
     nframes: int = None
     framerate: int = None
-    framesets: Dict[str, Frameset] = field(default_factory=dict)
-    events: List[Event] = field(default_factory=list, repr=False)
-    timing_errors: List[TimingError] = field(default_factory=list, repr=False)
-    phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
+    framesets: dict[str, Frameset] = field(default_factory=dict)
+    events: list[Event] = field(default_factory=list, repr=False)
+    timing_errors: list[TimingError] = field(default_factory=list, repr=False)
+    phases: list[PhaseIndicator] = field(default_factory=list, repr=False)
 
     def __post_init__(self):
         self._set_vendor_class()
@@ -178,7 +176,7 @@ class Sequence:
     @classmethod
     def from_path(  # pylint: disable=too-many-arguments, unused-argument
         cls,
-        path: Path | str | List[Path | str],
+        path: Path | str | list[Path | str],
         vendor: Vendor | str,
         framerate: int = None,
         first_frame: int = 0,
@@ -187,7 +185,7 @@ class Sequence:
         """Load sequence from path(s)
 
         Args:
-            path (Path | str | List[Path | str]): path(s) to data file
+            path (Path | str | list[Path | str]): path(s) to data file
             vendor (Vendor | str): vendor indicating the device used
             framerate (int, optional): framerate at which the data was recorded.
                 Default for Draeger: 20
