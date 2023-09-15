@@ -144,8 +144,14 @@ class Sequence:
         return self.merge(self, other)
 
     @classmethod
-    def merge(cls, a: Sequence, b: Sequence) -> Sequence:
-        """Merge two Sequence objects together."""
+    def merge(
+        cls,
+        a: Sequence,
+        b: Sequence,
+        label: str = None,
+    ) -> Sequence:
+        """Create a merge of two Sequence objects."""
+
         try:
             Sequence.check_equivalence(a, b)
         except Exception as e:
@@ -169,9 +175,12 @@ class Sequence:
                 item.time = time[item.index]
             return a_items + b_items
 
+        label = f'Merge of ({a.label}) and <{b.label}>' if label is None else label
+
         return cls(
             path=path,
             vendor=a.vendor,
+            label=label,
             time=time,
             nframes=nframes,
             framerate=a.framerate,

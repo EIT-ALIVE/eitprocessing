@@ -372,4 +372,20 @@ def test_label(
     assert timpel_1.label != timpel_copy_relabel.label, 'combo of label and relabel not working as intended'
 
 
+def test_relabeling(
+    timpel_data: TimpelSequence,
+    draeger_data2: DraegerSequence,
+
+):
+    test_label = 'test label'
+
+    #merging
+    merged_timpel = Sequence.merge(timpel_data, timpel_data)
+    assert merged_timpel.label != timpel_data.label, 'merging does not assign new label by default'
+    assert merged_timpel.label == f'Merge of ({timpel_data.label}) and <{timpel_data.label}>', 'merging generates unexpected default label'
+    added_timpel = timpel_data + timpel_data
+    assert added_timpel.label == f'Merge of ({timpel_data.label}) and <{timpel_data.label}>', 'adding generates unexpected default label'
+    merged_timpel_2 = Sequence.merge(timpel_data, timpel_data, label = test_label)
+    assert merged_timpel_2.label == test_label, 'incorrect label assigned when merging data with new label'
+
 
