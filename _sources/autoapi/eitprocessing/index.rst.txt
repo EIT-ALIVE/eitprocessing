@@ -16,7 +16,6 @@ Subpackages
    :maxdepth: 3
 
    binreader/index.rst
-   filters/index.rst
 
 
 Package Contents

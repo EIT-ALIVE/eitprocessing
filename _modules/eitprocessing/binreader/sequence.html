@@ -547,7 +547,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">!=</span> <span class="n">loaded_frames</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;The number of frames requested (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="si">}</span><span class="s1">) is larger&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;The number of frames requested (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="si">}</span><span class="s1">) is larger &#39;</span>
                     <span class="sa">f</span><span class="s1">&#39;than the available number (</span><span class="si">{</span><span class="n">loaded_frames</span><span class="si">}</span><span class="s1">) of frames after &#39;</span>
                     <span class="sa">f</span><span class="s1">&#39;the first frame selected (</span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s1">, total frames: &#39;</span>
                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">total_frames</span><span class="si">}</span><span class="s1">).</span><span class="se">\n</span><span class="s1"> </span><span class="si">{</span><span class="n">loaded_frames</span><span class="si">}</span><span class="s1"> frames have been loaded.&#39;</span>
@@ -659,12 +659,13 @@
                 <span class="sa">f</span><span class="s2">&quot;total number of frames in the file.&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;The number of frames requested (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="si">}</span><span class="s1">) is larger&#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;than the available number (</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">) of frames after &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;the first frame selected (</span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s1">).</span><span class="se">\n</span><span class="s1">&#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> frames have been loaded.&#39;</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;The number of frames requested (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="si">}</span><span class="s1">) is larger &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;than the available number (</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">) of frames after &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;the first frame selected (</span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s1">).</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> frames have been loaded.&#39;</span>
+                <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># TODO (#80): QUESTION: check whether below issue was only a Drager problem or also</span>
