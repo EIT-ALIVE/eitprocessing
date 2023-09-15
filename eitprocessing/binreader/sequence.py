@@ -53,6 +53,8 @@ class Sequence:
     Args:
         path (Path | str | List[Path | str]): path(s) to data file.
         vendor (Vendor | str): vendor indicating the device used.
+        label (str): description of object for human interpretation.
+            Defaults to "Sequence_<unique_id>".
         time (NDArray[float]): list of time label for each data point (can be
             true time or relative time)
         max_frames (int): number of frames in sequence
@@ -70,6 +72,7 @@ class Sequence:
 
     path: Path | str | List[Path | str] = None
     vendor: Vendor = None
+    label: str = None
     time: NDArray = None
     nframes: int = None
     framerate: int = None
@@ -79,6 +82,9 @@ class Sequence:
     phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
 
     def __post_init__(self):
+        if self.label is None:
+            self.label = f'Sequence_{id(self)}'
+
         self._set_vendor_class()
 
     def __len__(self) -> int:
@@ -179,7 +185,8 @@ class Sequence:
     def from_path(  # pylint: disable=too-many-arguments, unused-argument
         cls,
         path: Path | str | List[Path | str],
-        vendor: Vendor | str,
+        vendor: Vendor | str = None,
+        label: str = None,
         framerate: int = None,
         first_frame: int = 0,
         max_frames: int | None = None,
@@ -187,8 +194,10 @@ class Sequence:
         """Load sequence from path(s)
 
         Args:
-            path (Path | str | List[Path | str]): path(s) to data file
-            vendor (Vendor | str): vendor indicating the device used
+            path (Path | str | List[Path | str]): path(s) to data file.
+            vendor (Vendor | str): vendor indicating the device used.
+            label (str): description of object for human interpretation.
+                Defaults to "Sequence_<unique_id>".
             framerate (int, optional): framerate at which the data was recorded.
                 Default for Draeger: 20
                 Default for Timpel: 50
@@ -223,6 +232,7 @@ class Sequence:
         cls,
         path: Path | str,
         vendor: Vendor | str,
+        label: str = None,
         framerate: int = None,
         first_frame: int = 0,
         max_frames: int | None = None,
@@ -249,6 +259,7 @@ class Sequence:
             path=Path(path),
             vendor=vendor,
             nframes=max_frames,
+            label=label,
         )
         obj._set_vendor_class()
         if framerate:
@@ -357,7 +368,31 @@ class Sequence:
 
         return self[start_index:end_index]
 
-    deepcopy = copy.deepcopy
+
+    def deepcopy(
+        self,
+        label: str = None,
+        relabel: bool = True,
+    ) -> Sequence:
+        """Create a deep copy of `Sequence` object.
+
+        Args:
+            label (str): Create a new `label` for the copy.
+                Defaults to None, which will trigger behavior described for relabel (below)
+            relabel (bool): If `True` (default), the label of self is re-used for the copy,
+                otherwise the following label is assigned f"Deepcopy of {self.label}".
+                Note that this setting is ignored if a label is given.
+
+        Returns:
+            Sequence: a deep copy of self
+        """
+
+        obj = copy.deepcopy(self)
+        if label:
+            obj.label = label
+        elif relabel:
+            obj.label = f'Deepcopy of {self.label}'
+        return obj
 
 
 @dataclass(eq=False)

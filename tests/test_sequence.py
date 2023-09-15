@@ -253,6 +253,7 @@ def test_load_partial(
     assert Sequence.merge(draeger_first_part, draeger_second_part) == draeger_data2
     assert Sequence.merge(draeger_second_part, draeger_first_part) != draeger_data2
 
+
 def test_illegal_first():
     for ff in [0.5, -1, 'fdw']:
         with pytest.raises((TypeError, ValueError)):
@@ -339,3 +340,36 @@ def test_select_by_time(
                                         start_inclusive=False,
                                         end_inclusive=False)
             assert len(sliced) == end_slicing[2]-start_slicing[2]
+
+
+def test_label(
+    draeger_data1: DraegerSequence,
+    draeger_data2: DraegerSequence,
+):
+
+    assert isinstance(draeger_data1.label, str), 'default label is not a string'
+    assert draeger_data1.label == f'Sequence_{id(draeger_data1)}', 'unexpected default label'
+
+    assert draeger_data1.label != draeger_data2.label, 'different data has identical label'
+
+    timpel_1 = Sequence.from_path(timpel_file, vendor = 'timpel')
+    timpel_2 = Sequence.from_path(timpel_file, vendor = 'timpel')
+    assert timpel_1.label != timpel_2.label, 'reloaded data has identical label'
+
+    test_label = 'test_label'
+    timpel_3 = Sequence.from_path(timpel_file, vendor = 'timpel', label = test_label)
+    timpel_4 = Sequence.from_path(timpel_file, vendor = 'timpel', label = test_label)
+    assert timpel_3.label == test_label, 'label attribute does not match given label'
+    assert timpel_3.label == timpel_4.label, 're-used test label not recognized as identical'
+
+    timpel_copy = timpel_1.deepcopy()
+    assert timpel_1.label != timpel_copy.label, 'deepcopied data has identical label'
+    timpel_copy_relabel = timpel_1.deepcopy(label = test_label)
+    assert timpel_1.label != timpel_copy_relabel.label, 'deepcopied data with new label has identical label'
+    timpel_copy_relabel = timpel_1.deepcopy(relabel = False)
+    assert timpel_1.label == timpel_copy_relabel.label, 'deepcopied data did not keep old label'
+    timpel_copy_relabel = timpel_1.deepcopy(label = test_label, relabel = False)
+    assert timpel_1.label != timpel_copy_relabel.label, 'combo of label and relabel not working as intended'
+
+
+
