@@ -294,7 +294,7 @@ class Sequence:
         """Needs to be implemented in child class."""
         raise NotImplementedError(f"Data loading for {self.vendor} is not implemented")
 
-    def __getitem__(self, indices):
+    def select_by_index(self, indices: slice, label: str | None = None):
         if not isinstance(indices, slice):
             raise NotImplementedError(
                 "Slicing only implemented using a slice object"
@@ -308,27 +308,32 @@ class Sequence:
         if indices.stop is None:
             indices = slice(indices.start, self.nframes, indices.step)
 
-        obj = self.deepcopy()
+        obj = self.deepcopy()  #TODO: consider to make this more efficient for large data
         obj.time = self.time[indices]
         obj.nframes = len(obj.time)
-
         obj.framesets = {k: v[indices] for k, v in self.framesets.items()}
+        obj.label = f'Slice ({indices.start}-{indices.stop}) of <{self.label}>' if label is None else label
 
-        r = range(indices.start, indices.stop)
+        range_ = range(indices.start, indices.stop)
         for attr in ["events", "timing_errors", "phases"]:
-            setattr(obj, attr, [x for x in getattr(obj, attr) if x.index in r])
+            setattr(obj, attr, [x for x in getattr(obj, attr) if x.index in range_])
             for x in getattr(obj, attr):
                 x.index -= indices.start
 
         return obj
 
 
-    def select_by_time(
+    def __getitem__(self, indices: slice):
+        return self.select_by_index(indices)
+
+
+    def select_by_time(  #pylint: disable=too-many-arguments
         self,
         start: float | int | None = None,
         end: float | int | None = None,
         start_inclusive: bool = True,
         end_inclusive: bool = False,
+        label: str = None,
     ) -> Sequence:
         """Select subset of sequence by the `Sequence.time` information (i.e.
         based on the time stamp).
@@ -375,7 +380,7 @@ class Sequence:
         else:
             end_index = bisect.bisect_left(self.time, end) - 1
 
-        return self[start_index:end_index]
+        return self.select_by_index(slice(start_index,end_index), label = label)
 
 
     def deepcopy(

@@ -388,4 +388,19 @@ def test_relabeling(
     merged_timpel_2 = Sequence.merge(timpel_data, timpel_data, label = test_label)
     assert merged_timpel_2.label == test_label, 'incorrect label assigned when merging data with new label'
 
+    # slicing
+    indices = slice(0,10)
+    sliced_timpel = timpel_data[indices]
+    assert sliced_timpel.label != timpel_data.label, 'slicing does not assign new label by default'
+    assert sliced_timpel.label == f'Slice ({indices.start}-{indices.stop}) of <{timpel_data.label}>', 'slicing generates unexpected default label'
+    sliced_timpel_2 = timpel_data.select_by_index(indices=indices, label=test_label)
+    assert sliced_timpel_2.label == test_label, 'incorrect label assigned when slicing data with new label'
 
+    # select_by_time
+    t22 = 55825.268
+    t52 = 55826.768
+    time_sliced = draeger_data2.select_by_time(t22, t52+0.001)
+    assert time_sliced.label != draeger_data2.label, 'time slicing does not assign new label by default'
+    assert time_sliced.label == f'Slice (22-52) of <{draeger_data2.label}>', 'slicing generates unexpected default label'
+    time_sliced_2 = draeger_data2.select_by_time(t22, t52, label=test_label)
+    assert time_sliced_2.label == test_label, 'incorrect label assigned when time slicing data with new label'
