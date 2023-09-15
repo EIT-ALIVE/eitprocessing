@@ -5,7 +5,7 @@ Licensed under the Apache License, version 2.0. See LICENSE for details.
 This file contains methods related to parts of electrical impedance tomographs
 as they are read.
 """
-
+from __future__ import annotations
 import bisect
 import copy
 import functools
@@ -121,7 +121,7 @@ class Sequence:
             raise NotImplementedError(f"vendor {self.vendor} is not implemented")
 
     @staticmethod
-    def check_equivalence(a: "Sequence", b: "Sequence"):
+    def check_equivalence(a: Sequence, b: Sequence):
         """Checks whether content of two Sequence objects is equivalent."""
 
         if (a_ := a.vendor) != (b_ := b.vendor):
@@ -134,11 +134,11 @@ class Sequence:
             )
         return True
 
-    def __add__(self, other):
+    def __add__(self, other: Sequence) -> Sequence:
         return self.merge(self, other)
 
     @classmethod
-    def merge(cls, a: "Sequence", b: "Sequence") -> "Sequence":
+    def merge(cls, a: Sequence, b: Sequence) -> Sequence:
         """Merge two Sequence objects together."""
         try:
             Sequence.check_equivalence(a, b)
@@ -183,7 +183,7 @@ class Sequence:
         framerate: int = None,
         first_frame: int = 0,
         max_frames: int | None = None,
-    ) -> "Sequence":
+    ) -> Sequence:
         """Load sequence from path(s)
 
         Args:
@@ -226,7 +226,7 @@ class Sequence:
         framerate: int = None,
         first_frame: int = 0,
         max_frames: int | None = None,
-    ) -> "Sequence":
+    ) -> Sequence:
         """Method used by `from_path` that initiates the object and calls
         child method for loading the data.
 
@@ -302,13 +302,14 @@ class Sequence:
 
         return obj
 
+
     def select_by_time(
         self,
         start: float | int | None = None,
         end: float | int | None = None,
         start_inclusive: bool = True,
         end_inclusive: bool = False,
-    ) -> "Sequence":
+    ) -> Sequence:
         """Select subset of sequence by the `Sequence.time` information (i.e.
         based on the time stamp).
 
