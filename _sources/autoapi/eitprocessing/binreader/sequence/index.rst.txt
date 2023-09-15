@@ -160,8 +160,6 @@ Classes
 
       :raises NotImplementedError: if the child class for the selected vendor
           has not yet been implemented.
-      :raises TypeError: if the `vendor` argument does not correspond to the expected
-          vendor for `type(self)`.
 
 
    .. py:method:: check_equivalence(a: Sequence, b: Sequence)

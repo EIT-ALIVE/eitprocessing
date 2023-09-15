@@ -204,21 +204,11 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            NotImplementedError: if the child class for the selected vendor</span>
 <span class="sd">                has not yet been implemented.</span>
-<span class="sd">            TypeError: if the `vendor` argument does not correspond to the expected</span>
-<span class="sd">                vendor for `type(self)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vendor</span> <span class="o">=</span> <span class="n">Vendor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Sequence</span>
-            <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">vendor</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">vendor</span>
-            <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;`vendor` for </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s1"> cannot be set as </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
-
-        <span class="c1"># Note that this way of re-assigning classes is considered to be a bad practice</span>
-        <span class="c1"># (https://tinyurl.com/2x2cea6h), but the objections raised don&#39;t seem to be prohibtive.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vendor</span> <span class="o">==</span> <span class="n">Vendor</span><span class="o">.</span><span class="n">DRAEGER</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="n">DraegerSequence</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">vendor</span> <span class="o">==</span> <span class="n">Vendor</span><span class="o">.</span><span class="n">TIMPEL</span><span class="p">:</span>
