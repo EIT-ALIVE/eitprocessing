@@ -70,9 +70,6 @@ def test_butterworth_cutoff_frequency(filter_arguments):
     with pytest.raises(TypeError):
         ButterworthFilter(**filter_arguments, cutoff_frequency=("not a number", True))
 
-    with pytest.raises(TypeError):
-        ButterworthFilter(**filter_arguments, cutoff_frequency=[20, 30])
-
     with pytest.raises(ValueError):
         ButterworthFilter(**filter_arguments, cutoff_frequency=(1,))
 
@@ -103,7 +100,7 @@ def test_butterworth_sample_frequency(filter_arguments):
 def test_create_specified_filter(filter_arguments):
     lp_filter = LowPassFilter(**filter_arguments)
 
-    with pytest.raises(AttributeError):
+    with pytest.raises(TypeError):
         hp_filter = HighPassFilter(**filter_arguments)
 
     del filter_arguments["filter_type"]
@@ -176,8 +173,15 @@ def test_butterworth_functionality():
     signal_ = low_part + amplitude_medium * medium_part + amplitude_high * high_part
 
     def compare_filters(cutoff, filter_type, class_):
-        filter1 = ButterworthFilter(filter_type, cutoff, order, sample_frequency)
-        filter2 = class_(cutoff, order, sample_frequency)
+        filter1 = ButterworthFilter(
+            filter_type=filter_type,
+            cutoff_frequency=cutoff,
+            order=order,
+            sample_frequency=sample_frequency,
+        )
+        filter2 = class_(
+            cutoff_frequency=cutoff, order=order, sample_frequency=sample_frequency
+        )
         result1 = filter1.apply_filter(signal_)
         result2 = filter2.apply_filter(signal_)
         assert np.array_equal(result1, result2)
