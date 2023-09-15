@@ -35,14 +35,14 @@ def test_create_butterworth_filter(filter_arguments):
 
 def test_butterworth_range(filter_arguments):
     # Tests whether an out-of-range order raises AttributeError
-    del filter_arguments["order"]
+    filter_arguments["order"] = 11
 
     with pytest.raises(ValueError):
-        ButterworthFilter(**filter_arguments, order=11)
+        ButterworthFilter(**filter_arguments)
 
     # Tests whether an explicit out-of-range order does not raise AttributeError
     try:
-        filter_ = ButterworthFilter(**filter_arguments, order=11, ignore_max_order=True)
+        filter_ = ButterworthFilter(**filter_arguments, ignore_max_order=True)
     except AttributeError:
         pytest.fail("Unexpected AttributeError")
     assert filter_.order == 11
