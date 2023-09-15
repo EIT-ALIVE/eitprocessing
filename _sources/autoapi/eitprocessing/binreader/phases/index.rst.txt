@@ -41,11 +41,6 @@ Classes
 
       
 
-   .. py:method:: __eq__(other: PhaseIndicator) -> bool
-
-      Return self==value.
-
-
 
 .. py:class:: MinValue
 
