@@ -108,11 +108,21 @@ class Sequence:
         Raises:
             NotImplementedError: if the child class for the selected vendor
                 has not yet been implemented.
+            TypeError: if the `vendor` argument does not correspond to the expected
+                vendor for `type(self)`.
         """
 
         if isinstance(self.vendor, str):
             self.vendor = Vendor(self.vendor.lower())
 
+        if (isinstance(self, Sequence)
+            and self.__class__ is not Sequence
+            and not self.__class__.vendor == self.vendor
+            ):
+            raise TypeError(f'`vendor` for {type(self)} cannot be set as {self.vendor}.')
+
+        # Note that this way of re-assigning classes is considered to be a bad practice
+        # (https://tinyurl.com/2x2cea6h), but the objections raised don't seem to be prohibtive.
         if self.vendor == Vendor.DRAEGER:
             self.__class__ = DraegerSequence
         elif self.vendor == Vendor.TIMPEL:
