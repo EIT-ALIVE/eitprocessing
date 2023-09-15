@@ -43,7 +43,7 @@
 <span class="sd">This file contains methods related to parts of electrical impedance tomographs</span>
 <span class="sd">as they are read.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 <span class="kn">import</span> <span class="nn">bisect</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">functools</span>
@@ -134,6 +134,10 @@
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.vendor">[docs]</a>
     <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">=</span> <span class="kc">None</span></div>
 
+<div class="viewcode-block" id="Sequence.label">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.label">[docs]</a>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 <div class="viewcode-block" id="Sequence.time">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.time">[docs]</a>
     <span class="n">time</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="kc">None</span></div>
@@ -166,6 +170,9 @@
 <div class="viewcode-block" id="Sequence.__post_init__">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.__post_init__">[docs]</a>
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Sequence_</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_vendor_class</span><span class="p">()</span></div>
 
 
@@ -220,7 +227,7 @@
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="Sequence.check_equivalence">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.check_equivalence">[docs]</a>
-    <span class="k">def</span> <span class="nf">check_equivalence</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_equivalence</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks whether content of two Sequence objects is equivalent.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">a_</span> <span class="o">:=</span> <span class="n">a</span><span class="o">.</span><span class="n">vendor</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">b_</span> <span class="o">:=</span> <span class="n">b</span><span class="o">.</span><span class="n">vendor</span><span class="p">):</span>
@@ -236,15 +243,21 @@
 
 <div class="viewcode-block" id="Sequence.__add__">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.__add__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span></div>
 
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Sequence.merge">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.merge">[docs]</a>
-    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Merge two Sequence objects together.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">a</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
+        <span class="n">b</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a merge of two Sequence objects.&quot;&quot;&quot;</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="n">Sequence</span><span class="o">.</span><span class="n">check_equivalence</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -268,9 +281,12 @@
                 <span class="n">item</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">a_items</span> <span class="o">+</span> <span class="n">b_items</span>
 
+        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Merge of (</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">) and &lt;</span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">&gt;&#39;</span> <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">label</span>
+
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
             <span class="n">vendor</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
             <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
             <span class="n">nframes</span><span class="o">=</span><span class="n">nframes</span><span class="p">,</span>
             <span class="n">framerate</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">framerate</span><span class="p">,</span>
@@ -287,11 +303,12 @@
     <span class="k">def</span> <span class="nf">from_path</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments, unused-argument</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">],</span>
-        <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load sequence from path(s)</span>
 
 <span class="sd">        Args:</span>
@@ -334,10 +351,11 @@
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Method used by `from_path` that initiates the object and calls</span>
 <span class="sd">        child method for loading the data.</span>
 
@@ -360,6 +378,7 @@
             <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
             <span class="n">vendor</span><span class="o">=</span><span class="n">vendor</span><span class="p">,</span>
             <span class="n">nframes</span><span class="o">=</span><span class="n">max_frames</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">_set_vendor_class</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">framerate</span><span class="p">:</span>
@@ -389,9 +408,9 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data loading for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="si">}</span><span class="s2"> is not implemented&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Sequence.__getitem__">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.__getitem__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+<div class="viewcode-block" id="Sequence.select_by_index">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.select_by_index">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_by_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="nb">slice</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;Slicing only implemented using a slice object&quot;</span>
@@ -405,30 +424,39 @@
         <span class="k">if</span> <span class="n">indices</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">indices</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">,</span> <span class="n">indices</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
 
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">()</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">()</span>  <span class="c1">#TODO: consider to make this more efficient for large data</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">nframes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
-
         <span class="n">obj</span><span class="o">.</span><span class="n">framesets</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">framesets</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Slice (</span><span class="si">{</span><span class="n">indices</span><span class="o">.</span><span class="n">start</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">indices</span><span class="o">.</span><span class="n">stop</span><span class="si">}</span><span class="s1">) of &lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">&gt;&#39;</span> <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">label</span>
 
-        <span class="n">r</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">indices</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">indices</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
+        <span class="n">range_</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">indices</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">indices</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="s2">&quot;timing_errors&quot;</span><span class="p">,</span> <span class="s2">&quot;phases&quot;</span><span class="p">]:</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span> <span class="ow">in</span> <span class="n">r</span><span class="p">])</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span> <span class="ow">in</span> <span class="n">range_</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
                 <span class="n">x</span><span class="o">.</span><span class="n">index</span> <span class="o">-=</span> <span class="n">indices</span><span class="o">.</span><span class="n">start</span>
 
         <span class="k">return</span> <span class="n">obj</span></div>
 
 
+
+<div class="viewcode-block" id="Sequence.__getitem__">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.__getitem__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="nb">slice</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_by_index</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="Sequence.select_by_time">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.select_by_time">[docs]</a>
-    <span class="k">def</span> <span class="nf">select_by_time</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">select_by_time</span><span class="p">(</span>  <span class="c1">#pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">start_inclusive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">end_inclusive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">:</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Select subset of sequence by the `Sequence.time` information (i.e.</span>
 <span class="sd">        based on the time stamp).</span>
 
@@ -474,12 +502,36 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">end_index</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_by_index</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">start_index</span><span class="p">,</span><span class="n">end_index</span><span class="p">),</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="Sequence.deepcopy">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.deepcopy">[docs]</a>
-    <span class="n">deepcopy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span></div>
+    <span class="k">def</span> <span class="nf">deepcopy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">relabel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a deep copy of `Sequence` object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            label (str): Create a new `label` for the copy.</span>
+<span class="sd">                Defaults to None, which will trigger behavior described for relabel (below)</span>
+<span class="sd">            relabel (bool): If `True` (default), the label of self is re-used for the copy,</span>
+<span class="sd">                otherwise the following label is assigned f&quot;Deepcopy of {self.label}&quot;.</span>
+<span class="sd">                Note that this setting is ignored if a label is given.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Sequence: a deep copy of self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="k">elif</span> <span class="n">relabel</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Deepcopy of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
 </div>
 
 

@@ -104,6 +104,11 @@ Classes
 
       
 
+   .. py:attribute:: label
+      :type: str | None
+
+      
+
    .. py:attribute:: time
       :type: numpy.typing.NDArray
 
@@ -139,10 +144,6 @@ Classes
 
       
 
-   .. py:attribute:: deepcopy
-
-      
-
    .. py:method:: __post_init__()
 
 
@@ -168,16 +169,16 @@ Classes
       Checks whether content of two Sequence objects is equivalent.
 
 
-   .. py:method:: __add__(other)
+   .. py:method:: __add__(other: Sequence) -> Sequence
 
 
-   .. py:method:: merge(a: Sequence, b: Sequence) -> Sequence
+   .. py:method:: merge(a: Sequence, b: Sequence, label: str = None) -> Sequence
       :classmethod:
 
-      Merge two Sequence objects together.
+      Create a merge of two Sequence objects.
 
 
-   .. py:method:: from_path(path: pathlib.Path | str | List[pathlib.Path | str], vendor: Vendor | str, framerate: int = None, first_frame: int = 0, max_frames: int | None = None) -> Sequence
+   .. py:method:: from_path(path: pathlib.Path | str | List[pathlib.Path | str], vendor: Vendor | str = None, label: str = None, framerate: int = None, first_frame: int = 0, max_frames: int | None = None) -> Sequence
       :classmethod:
 
       Load sequence from path(s)
@@ -206,7 +207,7 @@ Classes
       :rtype: Sequence
 
 
-   .. py:method:: _load_file(path: pathlib.Path | str, vendor: Vendor | str, framerate: int = None, first_frame: int = 0, max_frames: int | None = None) -> Sequence
+   .. py:method:: _load_file(path: pathlib.Path | str, vendor: Vendor | str, label: str = None, framerate: int = None, first_frame: int = 0, max_frames: int | None = None) -> Sequence
       :classmethod:
 
       Method used by `from_path` that initiates the object and calls
@@ -221,10 +222,13 @@ Classes
       Needs to be implemented in child class.
 
 
-   .. py:method:: __getitem__(indices)
+   .. py:method:: select_by_index(indices: slice, label: str | None = None)
 
 
-   .. py:method:: select_by_time(start: float | int | None = None, end: float | int | None = None, start_inclusive: bool = True, end_inclusive: bool = False) -> Sequence
+   .. py:method:: __getitem__(indices: slice)
+
+
+   .. py:method:: select_by_time(start: float | int | None = None, end: float | int | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str = None) -> Sequence
 
       Select subset of sequence by the `Sequence.time` information (i.e.
       based on the time stamp).
@@ -247,6 +251,22 @@ Classes
       :raises ValueError: if the Sequence.time is not sorted
 
       :returns: a slice of `self` based on time information given.
+      :rtype: Sequence
+
+
+   .. py:method:: deepcopy(label: str = None, relabel: bool = True) -> Sequence
+
+      Create a deep copy of `Sequence` object.
+
+      :param label: Create a new `label` for the copy.
+                    Defaults to None, which will trigger behavior described for relabel (below)
+      :type label: str
+      :param relabel: If `True` (default), the label of self is re-used for the copy,
+                      otherwise the following label is assigned f"Deepcopy of {self.label}".
+                      Note that this setting is ignored if a label is given.
+      :type relabel: bool
+
+      :returns: a deep copy of self
       :rtype: Sequence
 
 
