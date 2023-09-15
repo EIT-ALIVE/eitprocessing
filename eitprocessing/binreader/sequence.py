@@ -415,7 +415,7 @@ class DraegerSequence(Sequence):
         if self.nframes != loaded_frames:
             if self.nframes:
                 warnings.warn(
-                    f'The number of frames requested ({self.nframes}) is larger'
+                    f'The number of frames requested ({self.nframes}) is larger '
                     f'than the available number ({loaded_frames}) of frames after '
                     f'the first frame selected ({first_frame}, total frames: '
                     f'{total_frames}).\n {loaded_frames} frames have been loaded.'
@@ -512,12 +512,13 @@ class TimpelSequence(Sequence):
                 f"total number of frames in the file."
             )
         if data.shape[0] != self.nframes:
-            warnings.warn(
-                f'The number of frames requested ({self.nframes}) is larger'
-                f'than the available number ({data.shape[0]}) of frames after '
-                f'the first frame selected ({first_frame}).\n'
-                f'{data.shape[0]} frames have been loaded.'
-            )
+            if self.nframes:
+                warnings.warn(
+                    f'The number of frames requested ({self.nframes}) is larger '
+                    f'than the available number ({data.shape[0]}) of frames after '
+                    f'the first frame selected ({first_frame}).\n'
+                    f'{data.shape[0]} frames have been loaded.'
+                )
             self.nframes = data.shape[0]
 
         # TODO (#80): QUESTION: check whether below issue was only a Drager problem or also
