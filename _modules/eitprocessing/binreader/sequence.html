@@ -111,6 +111,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">        path (Path | str | List[Path | str]): path(s) to data file.</span>
 <span class="sd">        vendor (Vendor | str): vendor indicating the device used.</span>
+<span class="sd">        label (str): description of object for human interpretation.</span>
+<span class="sd">            Defaults to &quot;Sequence_&lt;unique_id&gt;&quot;.</span>
 <span class="sd">        time (NDArray[float]): list of time label for each data point (can be</span>
 <span class="sd">            true time or relative time)</span>
 <span class="sd">        max_frames (int): number of frames in sequence</span>
@@ -136,7 +138,7 @@
 
 <div class="viewcode-block" id="Sequence.label">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.label">[docs]</a>
-    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Sequence.time">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.time">[docs]</a>
@@ -312,8 +314,10 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load sequence from path(s)</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            path (Path | str | List[Path | str]): path(s) to data file</span>
-<span class="sd">            vendor (Vendor | str): vendor indicating the device used</span>
+<span class="sd">            path (Path | str | List[Path | str]): path(s) to data file.</span>
+<span class="sd">            vendor (Vendor | str): vendor indicating the device used.</span>
+<span class="sd">            label (str): description of object for human interpretation.</span>
+<span class="sd">                Defaults to &quot;Sequence_&lt;unique_id&gt;&quot;.</span>
 <span class="sd">            framerate (int, optional): framerate at which the data was recorded.</span>
 <span class="sd">                Default for Draeger: 20</span>
 <span class="sd">                Default for Timpel: 50</span>

@@ -117,6 +117,8 @@ measurement, a single breath or even a portion of a breath.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<em>Path</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>List</em><em>[</em><em>Path</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – path(s) to data file.</p></li>
 <li><p><strong>vendor</strong> (<a class="reference internal" href="#eitprocessing.binreader.sequence.Vendor" title="eitprocessing.binreader.sequence.Vendor"><em>Vendor</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – vendor indicating the device used.</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – description of object for human interpretation.
+Defaults to “Sequence_&lt;unique_id&gt;”.</p></li>
 <li><p><strong>time</strong> (<em>NDArray</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>]</em>) – list of time label for each data point (can be
 true time or relative time)</p></li>
 <li><p><strong>max_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – number of frames in sequence</p></li>
@@ -148,7 +150,7 @@ Defaults to 50 if vendor == TIMPEL</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.binreader.sequence.Sequence.label">
-<span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/sequence.html#Sequence.label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.sequence.Sequence.label" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/sequence.html#Sequence.label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.sequence.Sequence.label" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -238,8 +240,10 @@ has not yet been implemented.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<em>Path</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>List</em><em>[</em><em>Path</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – path(s) to data file</p></li>
-<li><p><strong>vendor</strong> (<a class="reference internal" href="#eitprocessing.binreader.sequence.Vendor" title="eitprocessing.binreader.sequence.Vendor"><em>Vendor</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – vendor indicating the device used</p></li>
+<li><p><strong>path</strong> (<em>Path</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><em>List</em><em>[</em><em>Path</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – path(s) to data file.</p></li>
+<li><p><strong>vendor</strong> (<a class="reference internal" href="#eitprocessing.binreader.sequence.Vendor" title="eitprocessing.binreader.sequence.Vendor"><em>Vendor</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – vendor indicating the device used.</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – description of object for human interpretation.
+Defaults to “Sequence_&lt;unique_id&gt;”.</p></li>
 <li><p><strong>framerate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – framerate at which the data was recorded.
 Default for Draeger: 20
 Default for Timpel: 50</p></li>

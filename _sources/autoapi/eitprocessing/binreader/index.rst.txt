@@ -178,6 +178,9 @@ Classes
    :type path: Path | str | List[Path | str]
    :param vendor: vendor indicating the device used.
    :type vendor: Vendor | str
+   :param label: description of object for human interpretation.
+                 Defaults to "Sequence_<unique_id>".
+   :type label: str
    :param time: list of time label for each data point (can be
                 true time or relative time)
    :type time: NDArray[float]
@@ -210,7 +213,7 @@ Classes
       
 
    .. py:attribute:: label
-      :type: str | None
+      :type: str
 
       
 
@@ -288,10 +291,13 @@ Classes
 
       Load sequence from path(s)
 
-      :param path: path(s) to data file
+      :param path: path(s) to data file.
       :type path: Path | str | List[Path | str]
-      :param vendor: vendor indicating the device used
+      :param vendor: vendor indicating the device used.
       :type vendor: Vendor | str
+      :param label: description of object for human interpretation.
+                    Defaults to "Sequence_<unique_id>".
+      :type label: str
       :param framerate: framerate at which the data was recorded.
                         Default for Draeger: 20
                         Default for Timpel: 50
