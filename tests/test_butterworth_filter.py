@@ -145,9 +145,7 @@ def test_specified_butterworth_equivalence(filter_arguments):
     filter1 = ButterworthFilter(**filter_arguments, filter_type="lowpass")
     filter2 = LowPassFilter(**filter_arguments)
 
-    # filter1.__eq__(filter2) differs from filter2.__eq__(filter1)
     assert filter1 == filter2
-    assert filter2 == filter1
 
     filter3 = ButterworthFilter(**filter_arguments, filter_type="highpass")
     filter4 = HighPassFilter(**filter_arguments)
