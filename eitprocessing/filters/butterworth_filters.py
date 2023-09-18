@@ -124,12 +124,14 @@ class ButterworthFilter(TimeDomainFilter):
         if self.sample_frequency <= 0:
             raise ValueError("`sample_frequency` should be positive")
 
-    def apply_filter(self, input_data: npt.ArrayLike) -> np.ndarray:
+    def apply_filter(self, input_data: npt.ArrayLike, axis: int = -1) -> np.ndarray:
         """Apply the filter to the input data.
 
         Args:
-            input_data: Data to be filtered. If the input data has more than one axis,
+            input_data: data to be filtered. If the input data has more than one axis,
                 the filter is applied to the last axis.
+            axis: axis the filter should be applied to. This defaults to the last axis, assuming
+                this to be the time axis of the input data.
 
         Returns:
             The filtered output with the same shape as the input data.
@@ -143,7 +145,7 @@ class ButterworthFilter(TimeDomainFilter):
             output="ba",
         )
 
-        filtered_data = signal.filtfilt(b, a, input_data, axis=-1)
+        filtered_data = signal.filtfilt(b, a, input_data, axis=axis)
         return filtered_data
 
 
