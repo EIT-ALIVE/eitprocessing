@@ -1,4 +1,6 @@
 """Tests for the Butterworth time domain filter"""
+from typing import Literal
+from typing import TypeAlias
 import numpy as np
 import pytest
 from scipy import signal
@@ -7,6 +9,11 @@ from eitprocessing.filters.butterworth_filters import BandStopFilter
 from eitprocessing.filters.butterworth_filters import ButterworthFilter
 from eitprocessing.filters.butterworth_filters import HighPassFilter
 from eitprocessing.filters.butterworth_filters import LowPassFilter
+
+
+SpecifiedFilter: TypeAlias = type[
+    LowPassFilter | HighPassFilter | BandPassFilter | BandStopFilter
+]
 
 
 @pytest.fixture
@@ -172,7 +179,27 @@ def test_butterworth_functionality():
     high_part = np.sin(2 * np.pi * t * freq_high)
     signal_ = low_part + amplitude_medium * medium_part + amplitude_high * high_part
 
-    def compare_filters(cutoff, filter_type, class_):
+    def compare_filters(
+        cutoff: float | tuple[float, float],
+        filter_type: Literal["lowpass", "highpass", "bandpass", "bandstop"],
+        class_: SpecifiedFilter,
+    ):
+        """Compare filters created using ButterworthFilter to filters created using the
+        corresponding subclass
+
+        This function creates two filter instances, one using the ButterworthFilter, and one using
+        either of the four subclasses. It then compares whether those filters are equal, and have
+        equal results.
+
+        The function then filters the data `signal_` using the created ButterworthFilter, and
+        compares the result to the same data filtered using `scipy`.
+
+        Parameters:
+            cutoff: the cutoff frequency to use
+            filter_type: the filter type to use
+            class_: the class corresponding to the filter_type
+
+        """
         filter1 = ButterworthFilter(
             filter_type=filter_type,
             cutoff_frequency=cutoff,
