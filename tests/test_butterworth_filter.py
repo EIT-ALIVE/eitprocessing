@@ -61,27 +61,35 @@ def test_butterworth_filter_type(filter_arguments):
         ButterworthFilter(**filter_arguments)
 
 
-def test_butterworth_cutoff_frequency(filter_arguments):
+def test_butterworth_cutoff_frequency_scalar(filter_arguments):
     del filter_arguments["cutoff_frequency"]
 
-    with pytest.raises(TypeError):
-        ButterworthFilter(**filter_arguments, cutoff_frequency="not a number")
+    invalid_bandpass_cutoffs = [("not a number", TypeError), ((10, 20), TypeError)]
+    for invalid, error_type in invalid_bandpass_cutoffs:
+        with pytest.raises(error_type):
+            ButterworthFilter(**filter_arguments, cutoff_frequency=invalid)
 
+    try:
+        ButterworthFilter(**filter_arguments, cutoff_frequency=20)
+    except (ValueError, TypeError):
+        pytest.fail("Unexpected error")
+
+
+def test_butterworth_cutoff_frequency_sequence(filter_arguments):
+    del filter_arguments["cutoff_frequency"]
     filter_arguments["filter_type"] = "bandpass"
-    with pytest.raises(TypeError):
-        ButterworthFilter(**filter_arguments, cutoff_frequency="not a number")
 
-    with pytest.raises(TypeError):
-        ButterworthFilter(**filter_arguments, cutoff_frequency=10)
-
-    with pytest.raises(TypeError):
-        ButterworthFilter(**filter_arguments, cutoff_frequency=("not a number", True))
-
-    with pytest.raises(ValueError):
-        ButterworthFilter(**filter_arguments, cutoff_frequency=(1,))
-
-    with pytest.raises(ValueError):
-        ButterworthFilter(**filter_arguments, cutoff_frequency=(1, 2, 3))
+    invalid_bandpass_cutoffs = [
+        ("not a number", TypeError),
+        (10, TypeError),
+        (("not a number", True), TypeError),
+        ((1, "not a number"), TypeError),
+        ((1,), ValueError),
+        ((1, 2, 3), ValueError),
+    ]
+    for invalid, error_type in invalid_bandpass_cutoffs:
+        with pytest.raises(error_type):
+            ButterworthFilter(**filter_arguments, cutoff_frequency=invalid)
 
     try:
         ButterworthFilter(**filter_arguments, cutoff_frequency=(20, 30))
