@@ -111,7 +111,12 @@ filtering.</p></li>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lowpass_filter</span> <span class="o">=</span> <span class="n">ButterworthFilter</span><span class="p">(</span><span class="s1">&#39;lowpass&#39;</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lowpass_filter</span> <span class="o">=</span> <span class="n">ButterworthFilter</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">filter_type</span><span class="o">=</span><span class="s1">&#39;lowpass&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">cutoff_frequenct</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">sample_frequency</span><span class="o">=</span><span class="mi">250</span>
+<span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">filtered_signal</span> <span class="o">=</span> <span class="n">lowpass_filter</span><span class="o">.</span><span class="n">apply_filter</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
 </pre></div>
 </div>

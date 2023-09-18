@@ -75,7 +75,12 @@
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; t = np.arange(0, 100, 0.1)</span>
 <span class="sd">        &gt;&gt;&gt; signal = np.sin(t) + 0.1 * np.sin(10 * t)</span>
-<span class="sd">        &gt;&gt;&gt; lowpass_filter = ButterworthFilter(&#39;lowpass&#39;, 45, 4, 250)</span>
+<span class="sd">        &gt;&gt;&gt; lowpass_filter = ButterworthFilter(</span>
+<span class="sd">        ...     filter_type=&#39;lowpass&#39;, </span>
+<span class="sd">        ...     cutoff_frequenct=45, </span>
+<span class="sd">        ...     order=4, </span>
+<span class="sd">        ...     sample_frequency=250</span>
+<span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; filtered_signal = lowpass_filter.apply_filter(signal)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
