@@ -41,13 +41,18 @@ Attributes
    Generates a low-pass, high-pass, band-pass or band-stop digital Butterworth filter of order
    `order`.
 
-   ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions.
+   ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions:
+   - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html
+   - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html
 
-   :param filter_type: The type of filter to create.
-   :param cutoff_frequency: Single frequency (lowpass or highpass filter) or tuple containing two
-                            frequencies (bandpass and bandstop filters).
-   :param order: Filter order.
-   :param sample_frequency: Sample frequency of the data to be filtered.
+   :param filter_type: The type of filter to create: a low pass, high pass, band pass or band stop
+                       filter.
+   :param cutoff_frequency: Cutoff frequency or frequencies (in Hz). For low pass or high pass
+                            filters, `cutoff_frequency` is a scalar. For band pass or band stop filters,
+                            `cutoff_frequency` is a sequence containing two frequencies.
+   :param order: Order of the filter. High-order filters can result in instable or incorrect
+                 filtering.
+   :param sample_frequency: The sample frequency of the data to be filtered (in Hz).
    :param ignore_max_order: Whether to raise an exception if the order is larger than the maximum of
                             10. Defaults to False.
 
@@ -115,10 +120,10 @@ Attributes
 
       Apply the filter to the input data.
 
-      :param input_data: data to be filtered. If the input data has more than one axis,
+      :param input_data: Data to be filtered. If the input data has more than one axis,
                          the filter is applied to the last axis.
-      :param axis: axis the filter should be applied to. This defaults to the last axis, assuming
-                   this to be the time axis of the input data.
+      :param axis: Data axis the filter should be applied to. This defaults to the last axis,
+                   assuming this to be the time axis of the input data.
 
       :returns: The filtered output with the same shape as the input data.
 

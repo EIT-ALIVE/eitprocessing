@@ -56,14 +56,19 @@
 <span class="sd">    Generates a low-pass, high-pass, band-pass or band-stop digital Butterworth filter of order</span>
 <span class="sd">    `order`.</span>
 
-<span class="sd">    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions.</span>
+<span class="sd">    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions: </span>
+<span class="sd">    - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html</span>
+<span class="sd">    - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filter_type: The type of filter to create.</span>
-<span class="sd">        cutoff_frequency: Single frequency (lowpass or highpass filter) or tuple containing two</span>
-<span class="sd">            frequencies (bandpass and bandstop filters).</span>
-<span class="sd">        order: Filter order.</span>
-<span class="sd">        sample_frequency: Sample frequency of the data to be filtered.</span>
+<span class="sd">        filter_type: The type of filter to create: a low pass, high pass, band pass or band stop</span>
+<span class="sd">            filter.</span>
+<span class="sd">        cutoff_frequency: Cutoff frequency or frequencies (in Hz). For low pass or high pass</span>
+<span class="sd">            filters, `cutoff_frequency` is a scalar. For band pass or band stop filters,</span>
+<span class="sd">            `cutoff_frequency` is a sequence containing two frequencies.</span>
+<span class="sd">        order: Order of the filter. High-order filters can result in instable or incorrect</span>
+<span class="sd">            filtering.</span>
+<span class="sd">        sample_frequency: The sample frequency of the data to be filtered (in Hz). </span>
 <span class="sd">        ignore_max_order: Whether to raise an exception if the order is larger than the maximum of</span>
 <span class="sd">            10. Defaults to False.</span>
 
@@ -198,24 +203,24 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the filter to the input data.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            input_data: data to be filtered. If the input data has more than one axis,</span>
+<span class="sd">            input_data: Data to be filtered. If the input data has more than one axis,</span>
 <span class="sd">                the filter is applied to the last axis.</span>
-<span class="sd">            axis: axis the filter should be applied to. This defaults to the last axis, assuming</span>
-<span class="sd">                this to be the time axis of the input data.</span>
+<span class="sd">            axis: Data axis the filter should be applied to. This defaults to the last axis,</span>
+<span class="sd">                assuming this to be the time axis of the input data.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            The filtered output with the same shape as the input data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span>
+        <span class="n">sos</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span>
             <span class="n">N</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span>
             <span class="n">Wn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span>
             <span class="n">btype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span><span class="p">,</span>
             <span class="n">fs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">,</span>
             <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">output</span><span class="o">=</span><span class="s2">&quot;ba&quot;</span><span class="p">,</span>
+            <span class="n">output</span><span class="o">=</span><span class="s2">&quot;sos&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="n">filtered_data</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+        <span class="n">filtered_data</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">sos</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">filtered_data</span></div>
 </div>
 
