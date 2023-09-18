@@ -160,6 +160,7 @@ def test_specified_butterworth_equivalence(filter_arguments):
     filter6 = BandPassFilter(**filter_arguments)
     assert filter1 != filter6
     assert filter2 != filter6
+    assert filter3 != filter6    
     assert filter5 == filter6
 
     filter7 = ButterworthFilter(**filter_arguments, filter_type="bandstop")
