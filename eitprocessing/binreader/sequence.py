@@ -117,7 +117,7 @@ class Sequence:
 
         if (isinstance(self, Sequence)
             and self.__class__ is not Sequence
-            and not self.__class__.vendor == self.vendor
+            and self.__class__.vendor != self.vendor
             ):
             raise TypeError(f'`vendor` for {type(self)} cannot be set as {self.vendor}.')
 
