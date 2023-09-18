@@ -98,6 +98,18 @@ def test_illegal_from_path():
         _= Sequence.from_path(timpel_file, vendor="sentec")
 
 
+def test_illegal_vendor():
+    _= DraegerSequence(vendor='draeger')
+    with pytest.raises(TypeError):
+        _= DraegerSequence(vendor='timpel')
+        _= DraegerSequence(vendor='sentec')
+
+    _= TimpelSequence(vendor='timpel')
+    with pytest.raises(TypeError):
+        _= TimpelSequence(vendor='draeger')
+        _= TimpelSequence(vendor='sentec')
+
+
 def test_merge(  # pylint: disable=too-many-locals
     draeger_data1: DraegerSequence,
     draeger_data2: DraegerSequence,
