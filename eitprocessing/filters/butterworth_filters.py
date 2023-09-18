@@ -133,24 +133,24 @@ class ButterworthFilter(TimeDomainFilter):
         """Apply the filter to the input data.
 
         Args:
-            input_data: data to be filtered. If the input data has more than one axis,
+            input_data: Data to be filtered. If the input data has more than one axis,
                 the filter is applied to the last axis.
-            axis: axis the filter should be applied to. This defaults to the last axis, assuming
-                this to be the time axis of the input data.
+            axis: Data axis the filter should be applied to. This defaults to the last axis,
+                assuming this to be the time axis of the input data.
 
         Returns:
             The filtered output with the same shape as the input data.
         """
-        b, a = signal.butter(
+        sos = signal.butter(
             N=self.order,
             Wn=self.cutoff_frequency,
             btype=self.filter_type,
             fs=self.sample_frequency,
             analog=False,
-            output="ba",
+            output="sos",
         )
 
-        filtered_data = signal.filtfilt(b, a, input_data, axis=axis)
+        filtered_data = signal.sosfiltfilt(sos, input_data, axis=axis)
         return filtered_data
 
 
