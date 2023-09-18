@@ -171,6 +171,16 @@ def test_specified_butterworth_equivalence(filter_arguments):
 
 
 def test_butterworth_functionality():
+    """Tests the functionality of the Butterworth filters.
+    
+    This function tests whether a filter created by initializing a ButterworthFilter does the same
+    thing as a filter initialized from one of the subclasses LowPassFilter, HighPassFilter,
+    BandStopFilter and BandPassFilter. It tests the attributes set in the filter instance. It also
+    tests whether the output of the `apply_filter()` method is the same regardless of how it was
+    initialized, and is equal to using the normal scipy functions without the ButterworthFilter
+    wrapper.
+    """
+
     sample_frequency = 50
     freq_low = 1
     freq_medium = 4
