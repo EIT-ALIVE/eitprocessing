@@ -158,7 +158,7 @@ def test_specified_butterworth_equivalence(filter_arguments):
     filter6 = BandPassFilter(**filter_arguments)
     assert filter1 != filter6
     assert filter2 != filter6
-    assert filter3 != filter6    
+    assert filter3 != filter6
     assert filter5 == filter6
 
     filter7 = ButterworthFilter(**filter_arguments, filter_type="bandstop")
@@ -172,7 +172,7 @@ def test_specified_butterworth_equivalence(filter_arguments):
 
 def test_butterworth_functionality():
     """Tests the functionality of the Butterworth filters.
-    
+
     This function tests whether a filter created by initializing a ButterworthFilter does the same
     thing as a filter initialized from one of the subclasses LowPassFilter, HighPassFilter,
     BandStopFilter and BandPassFilter. It tests the attributes set in the filter instance. It also
@@ -196,12 +196,17 @@ def test_butterworth_functionality():
     low_part = np.sin(2 * np.pi * t * freq_low)
     medium_part = np.sin(2 * np.pi * t * freq_medium)
     high_part = np.sin(2 * np.pi * t * freq_high)
-    signal_ = low_part + amplitude_medium * medium_part + amplitude_high * high_part
+    signal1 = low_part + amplitude_medium * medium_part + amplitude_high * high_part
+
+    # create a matrix containing signal1 multiplied by a scalar in each row
+    signal2 = np.array([[10], [20], [30], [40], [50]]) @ np.expand_dims(signal1.T, 0)
 
     def compare_filters(
         cutoff: float | tuple[float, float],
         filter_type: Literal["lowpass", "highpass", "bandpass", "bandstop"],
         class_: SpecifiedFilter,
+        data: np.ndarray,
+        axis: int,
     ):
         """Compare filters created using ButterworthFilter to filters created using the
         corresponding subclass
@@ -228,17 +233,30 @@ def test_butterworth_functionality():
         filter2 = class_(
             cutoff_frequency=cutoff, order=order, sample_frequency=sample_frequency
         )
-        result1 = filter1.apply_filter(signal_)
-        result2 = filter2.apply_filter(signal_)
+        result1 = filter1.apply_filter(data, axis=axis)
+        result2 = filter2.apply_filter(data, axis=axis)
         assert np.array_equal(result1, result2)
 
         sos = signal.butter(
             order, cutoff, filter_type, fs=sample_frequency, output="sos"
         )
-        scipy_result = signal.sosfiltfilt(sos, signal_)
+        scipy_result = signal.sosfiltfilt(sos, data, axis=axis)
+        assert result1.shape == scipy_result.shape
         assert np.array_equal(result1, scipy_result)
 
-    compare_filters(lowpass_cutoff, "lowpass", LowPassFilter)
-    compare_filters(highpass_cutoff, "highpass", HighPassFilter)
-    compare_filters((lowpass_cutoff, highpass_cutoff), "bandpass", BandPassFilter)
-    compare_filters((lowpass_cutoff, highpass_cutoff), "bandstop", BandStopFilter)
+    signals = (
+        (signal1, 0),
+        (np.expand_dims(signal1, 0), 1),
+        (np.expand_dims(signal1, -1), 0),
+        (signal2, 1),
+        (signal2.T, 0),
+    )
+    for signal_, axis in signals:
+        compare_filters(lowpass_cutoff, "lowpass", LowPassFilter, signal_, axis)
+        compare_filters(highpass_cutoff, "highpass", HighPassFilter, signal_, axis)
+        compare_filters(
+            (lowpass_cutoff, highpass_cutoff), "bandpass", BandPassFilter, signal_, axis
+        )
+        compare_filters(
+            (lowpass_cutoff, highpass_cutoff), "bandstop", BandStopFilter, signal_, axis
+        )
