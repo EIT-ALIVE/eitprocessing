@@ -15,7 +15,7 @@ class ButterworthFilter(TimeDomainFilter):
     Generates a low-pass, high-pass, band-pass or band-stop digital Butterworth filter of order
     `order`.
 
-    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions: 
+    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions:
     - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html
     - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html
 
@@ -27,7 +27,7 @@ class ButterworthFilter(TimeDomainFilter):
             `cutoff_frequency` is a sequence containing two frequencies.
         order: Order of the filter. High-order filters can result in instable or incorrect
             filtering.
-        sample_frequency: The sample frequency of the data to be filtered (in Hz). 
+        sample_frequency: The sample frequency of the data to be filtered (in Hz).
         ignore_max_order: Whether to raise an exception if the order is larger than the maximum of
             10. Defaults to False.
 
@@ -35,9 +35,9 @@ class ButterworthFilter(TimeDomainFilter):
         >>> t = np.arange(0, 100, 0.1)
         >>> signal = np.sin(t) + 0.1 * np.sin(10 * t)
         >>> lowpass_filter = ButterworthFilter(
-        ...     filter_type='lowpass', 
-        ...     cutoff_frequenct=45, 
-        ...     order=4, 
+        ...     filter_type='lowpass',
+        ...     cutoff_frequenct=45,
+        ...     order=4,
         ...     sample_frequency=250
         ... )
         >>> filtered_signal = lowpass_filter.apply_filter(signal)
@@ -63,6 +63,9 @@ class ButterworthFilter(TimeDomainFilter):
             raise TypeError(
                 f"conflicting type info; `filter_type={self.filter_type}` does not match {self.__class__}."
             )
+        
+        # Note that this way of re-assigning classes is considered to be a bad practice
+        # (https://tinyurl.com/2x2cea6h), but the objections raised don't seem to be prohibtive.
         cls = FILTER_TYPES[self.filter_type]
         self.__class__ = cls
 
