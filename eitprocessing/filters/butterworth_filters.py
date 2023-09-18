@@ -15,14 +15,19 @@ class ButterworthFilter(TimeDomainFilter):
     Generates a low-pass, high-pass, band-pass or band-stop digital Butterworth filter of order
     `order`.
 
-    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions.
+    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions: 
+    - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html
+    - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html
 
     Args:
-        filter_type: The type of filter to create.
-        cutoff_frequency: Single frequency (lowpass or highpass filter) or tuple containing two
-            frequencies (bandpass and bandstop filters).
-        order: Filter order.
-        sample_frequency: Sample frequency of the data to be filtered.
+        filter_type: The type of filter to create: a low pass, high pass, band pass or band stop
+            filter.
+        cutoff_frequency: Cutoff frequency or frequencies (in Hz). For low pass or high pass
+            filters, `cutoff_frequency` is a scalar. For band pass or band stop filters,
+            `cutoff_frequency` is a sequence containing two frequencies.
+        order: Order of the filter. High-order filters can result in instable or incorrect
+            filtering.
+        sample_frequency: The sample frequency of the data to be filtered (in Hz). 
         ignore_max_order: Whether to raise an exception if the order is larger than the maximum of
             10. Defaults to False.
 
