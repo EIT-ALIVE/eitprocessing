@@ -213,7 +213,9 @@ def test_butterworth_functionality():
         result2 = filter2.apply_filter(signal_)
         assert np.array_equal(result1, result2)
 
-        sos = signal.butter(order, cutoff, filter_type, fs=sample_frequency, output='sos')
+        sos = signal.butter(
+            order, cutoff, filter_type, fs=sample_frequency, output="sos"
+        )
         sp_result = signal.sosfiltfilt(sos, signal_)
         assert np.array_equal(result1, sp_result)
 
