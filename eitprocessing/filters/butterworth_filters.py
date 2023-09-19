@@ -103,7 +103,7 @@ class ButterworthFilter(TimeDomainFilter):
         else:  # implies self.filter_type in ("bandpass", "bandstop"):
             if not isinstance(self.cutoff_frequency, tuple):
                 if isinstance(self.cutoff_frequency, Sequence) and not isinstance(
-                    self.cutoff_frequency, str
+                    self.cutoff_frequency, (str, bytes), 
                 ):
                     try:
                         self.cutoff_frequency = tuple(self.cutoff_frequency)

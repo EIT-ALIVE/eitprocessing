@@ -86,6 +86,8 @@ def test_butterworth_cutoff_frequency_sequence(filter_arguments):
         ((1, "not a number"), TypeError),
         ((1,), ValueError),
         ((1, 2, 3), ValueError),
+        ({10, 20}, TypeError),
+        (b'56', TypeError)
     ]
     for invalid, error_type in invalid_bandpass_cutoffs:
         with pytest.raises(error_type):
@@ -93,6 +95,7 @@ def test_butterworth_cutoff_frequency_sequence(filter_arguments):
 
     try:
         ButterworthFilter(**filter_arguments, cutoff_frequency=(20, 30))
+        ButterworthFilter(**filter_arguments, cutoff_frequency=[20, 30])
     except (ValueError, TypeError):
         pytest.fail("Unexpected error")
 
