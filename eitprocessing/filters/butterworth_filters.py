@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from dataclasses import InitVar
 from dataclasses import dataclass
 from typing import Literal
@@ -44,7 +43,7 @@ class ButterworthFilter(TimeDomainFilter):
     """
 
     filter_type: Literal["lowpass", "highpass", "bandpass", "bandstop"]
-    cutoff_frequency: float | Sequence[float]
+    cutoff_frequency: float | tuple[float]
     order: int
     sample_frequency: float
     ignore_max_order: InitVar[bool] = False
@@ -91,21 +90,12 @@ class ButterworthFilter(TimeDomainFilter):
                 raise TypeError("`cutoff_frequency` should be an integer or float")
 
         elif self.filter_type in ("bandpass", "bandstop"):
-            if not isinstance(self.cutoff_frequency, tuple):
-                if isinstance(self.cutoff_frequency, Sequence) and not isinstance(
-                    self.cutoff_frequency,
-                    (str, bytes),
-                ):
-                    try:
-                        self.cutoff_frequency = tuple(self.cutoff_frequency)
-                    except Exception as e:
-                        raise TypeError(
-                            f"can't convert sequence {self.cutoff_frequency} to tuple"
-                        ) from e
-                else:
-                    raise TypeError(
-                        "`cutoff_frequency` should be a sequence of 2 numbers"
-                    )
+            if isinstance(self.cutoff_frequency, list):
+                self.cutoff_frequency = tuple(self.cutoff_frequency)
+            elif not isinstance(self.cutoff_frequency, tuple):
+                raise TypeError(
+                    "`cutoff_frequency` should be a tuple containing 2 numbers"
+                )
 
             if len(self.cutoff_frequency) != 2:
                 raise ValueError("`cutoff_frequency` should have length 2")
@@ -113,7 +103,9 @@ class ButterworthFilter(TimeDomainFilter):
             if not all(
                 isinstance(value, (int, float)) for value in self.cutoff_frequency
             ):
-                raise TypeError("`cutoff_frequency` be a sequence of two numbers")
+                raise TypeError(
+                    "`cutoff_frequency` should be a tuple containing 2 numbers"
+                )
         else:
             raise ValueError(
                 "The filter type should be one of "
