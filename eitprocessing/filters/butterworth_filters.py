@@ -12,11 +12,16 @@ class ButterworthFilter(TimeDomainFilter):
     """Butterworth filter for filtering in the time domain.
 
     Generates a low-pass, high-pass, band-pass or band-stop digital Butterworth filter of order
-    `order`.
+    `order`. Filters are created using cascaded second-order sections representation, providing
+    better stability compared to the traditionally used transfer function (numerator/denominator or
+    b/a representation). 
 
-    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions:
-    - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html
-    - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html
+    The `apply_filter()` method applies the filter to the provided data using forward-backward
+    filtering. This minimizes the phase shift, and effectively doubles the order of the filter.
+
+    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions: 
+        - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html 
+        - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html
 
     Args:
         filter_type: The type of filter to create: a low pass, high pass, band pass or band stop
@@ -24,8 +29,9 @@ class ButterworthFilter(TimeDomainFilter):
         cutoff_frequency: Cutoff frequency or frequencies (in Hz). For low pass or high pass
             filters, `cutoff_frequency` is a scalar. For band pass or band stop filters,
             `cutoff_frequency` is a sequence containing two frequencies.
-        order: Order of the filter. High-order filters can result in instable or incorrect
-            filtering.
+        order: Order of the filter. The effective order size is twice the given order, due to
+            forward-backward filtering. Higher order improves the effectiveness of a filter, but
+            can result in unstable or incorrect filtering. 
         sample_frequency: The sample frequency of the data to be filtered (in Hz).
         ignore_max_order: Whether to raise an exception if the order is larger than the maximum of
             10. Defaults to False.
