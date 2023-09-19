@@ -87,29 +87,37 @@ class ButterworthFilter(TimeDomainFilter):
 
         if self.filter_type in ("lowpass", "highpass"):
             if not isinstance(self.cutoff_frequency, (int, float)):
-                raise TypeError("`cutoff_frequency` should be an integer or float")
+                raise TypeError(
+                    "Invalid `cutoff_frequency`. "
+                    f"Must be an integer or float, not {type(self.cutoff_frequency)}."
+                )
 
         elif self.filter_type in ("bandpass", "bandstop"):
             if isinstance(self.cutoff_frequency, list):
                 self.cutoff_frequency = tuple(self.cutoff_frequency)
             elif not isinstance(self.cutoff_frequency, tuple):
                 raise TypeError(
-                    "`cutoff_frequency` should be a tuple containing 2 numbers"
+                    "Invalid `cutoff_frequency`. "
+                    f"Must be a tuple, not {type(self.cutoff_frequency)}."
                 )
 
             if len(self.cutoff_frequency) != 2:
-                raise ValueError("`cutoff_frequency` should have length 2")
+                raise ValueError(
+                    f"Invalid `cutoff_frequency` ({self.cutoff_frequency}). "
+                    "Must have length 2."
+                )
 
             if not all(
                 isinstance(value, (int, float)) for value in self.cutoff_frequency
             ):
                 raise TypeError(
-                    "`cutoff_frequency` should be a tuple containing 2 numbers"
+                    f"Invalid `cutoff_frequency` ({self.cutoff_frequency}). "
+                    "Must be a tuple containing two numbers."
                 )
         else:
             raise ValueError(
-                "The filter type should be one of "
-                f"{', '.join(FILTER_TYPES.keys())}, not '{self.filter_type}'."
+                f"Invalid `filter_type` ({self.filter_type}). "
+                f"Must be one of {', '.join(FILTER_TYPES.keys())}."
             )
 
         if self.order < MIN_ORDER or (
@@ -121,9 +129,13 @@ class ButterworthFilter(TimeDomainFilter):
             )
 
         if not isinstance(self.sample_frequency, (int, float)):
-            raise TypeError("`sample_frequency` should be a number")
+            raise TypeError(
+                f"Invalid `sample_frequency` ({self.sample_frequency}). Must be a number."
+            )
         if self.sample_frequency <= 0:
-            raise ValueError("`sample_frequency` should be positive")
+            raise ValueError(
+                f"Invalid `sample_frequency` ({self.sample_frequency}). Must be positive"
+            )
 
     def apply_filter(self, input_data: npt.ArrayLike, axis: int = -1) -> np.ndarray:
         """Apply the filter to the input data.
