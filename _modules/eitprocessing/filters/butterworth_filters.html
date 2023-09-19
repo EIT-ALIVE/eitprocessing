@@ -170,7 +170,7 @@
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># implies self.filter_type in (&quot;bandpass&quot;, &quot;bandstop&quot;):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span> <span class="nb">str</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">),</span> 
                 <span class="p">):</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">)</span>
