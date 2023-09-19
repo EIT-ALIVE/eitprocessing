@@ -44,7 +44,49 @@
             
   <section id="developer-s-guide">
 <h1>Developer’s Guide<a class="headerlink" href="#developer-s-guide" title="Link to this heading">¶</a></h1>
-<p>Please refer to <a class="reference external" href="https://github.com/EIT-ALIVE/eitprocessing/blob/main/README.dev.md">https://github.com/EIT-ALIVE/eitprocessing/blob/main/README.dev.md</a></p>
+<section id="sending-your-work">
+<h2>Sending Your Work<a class="headerlink" href="#sending-your-work" title="Link to this heading">¶</a></h2>
+<p>We accept pull requests made through GitHub. As is usual,
+we request that the changes be rebased
+on the branch they are to be integrated into.  We also request that
+you pre-lint and test anything you send.</p>
+<p>We’ll try our best to attribute
+your work to you, however, you need to release your work under
+compatible license for us to be able to use it.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>We don’t use <cite>git-merge</cite> command, and if your submission has merge
+commits, we’ll have to remove them.  This means that in such case
+commit hashes will be different from those in your original
+submission.</p>
+</div>
+</section>
+<section id="setting-up-development-environment">
+<h2>Setting Up Development Environment<a class="headerlink" href="#setting-up-development-environment" title="Link to this heading">¶</a></h2>
+<section id="the-way-we-do-it">
+<h3>The Way We Do It<a class="headerlink" href="#the-way-we-do-it" title="Link to this heading">¶</a></h3>
+<p>This is a pip project.</p>
+</section>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h2>
+<p>You may follow the README.dev.md , and apply manual testing as logical.</p>
+<section id="style-guide-for-python-code">
+<h3>Style Guide for Python Code<a class="headerlink" href="#style-guide-for-python-code" title="Link to this heading">¶</a></h3>
+<p>We have linting! We use prospector.</p>
+</section>
+<section id="continuous-integration">
+<h3>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Link to this heading">¶</a></h3>
+<p>This project has CI setup that uses GitHub Actions
+platform.</p>
+</section>
+<section id="style">
+<h3>Style<a class="headerlink" href="#style" title="Link to this heading">¶</a></h3>
+<p>When it comes to style, beyond linting we are trying
+to conform, more or less, to the Google Python style
+<a class="reference external" href="https://google.github.io/styleguide/pyguide.html">https://google.github.io/styleguide/pyguide.html</a></p>
+</section>
+</section>
 </section>
 
 
@@ -54,6 +96,26 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Developer’s Guide</a><ul>
+<li><a class="reference internal" href="#sending-your-work">Sending Your Work</a></li>
+<li><a class="reference internal" href="#setting-up-development-environment">Setting Up Development Environment</a><ul>
+<li><a class="reference internal" href="#the-way-we-do-it">The Way We Do It</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing">Testing</a><ul>
+<li><a class="reference internal" href="#style-guide-for-python-code">Style Guide for Python Code</a></li>
+<li><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
+<li><a class="reference internal" href="#style">Style</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="index.html"
