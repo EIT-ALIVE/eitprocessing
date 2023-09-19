@@ -170,7 +170,7 @@ def test_specified_butterworth_equivalence(filter_arguments):
     assert filter7 == filter8
 
 
-def test_butterworth_functionality():
+def test_butterworth_functionality():  # pylint: disable=too-many-locals
     """Tests the functionality of the Butterworth filters.
 
     This function tests whether a filter created by initializing a ButterworthFilter does the same
