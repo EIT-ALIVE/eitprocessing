@@ -70,12 +70,12 @@ class Sequence:
         Sequence: a sequence containing the l
     """
 
-    path: Path | str | List[Path | str] = None
-    vendor: Vendor = None
-    label: str = None
-    time: NDArray = None
-    nframes: int = None
-    framerate: int = None
+    path: Path | str | List[Path | str] | None = None
+    vendor: Vendor | str | None = None
+    label: str | None = None
+    time: NDArray | None = None
+    nframes: int | None = None
+    framerate: int | None = None
     framesets: Dict[str, Frameset] = field(default_factory=dict)
     events: List[Event] = field(default_factory=list, repr=False)
     timing_errors: List[TimingError] = field(default_factory=list, repr=False)
@@ -148,7 +148,7 @@ class Sequence:
         cls,
         a: Sequence,
         b: Sequence,
-        label: str = None,
+        label: str | None  = None,
     ) -> Sequence:
         """Create a merge of two Sequence objects."""
 
@@ -194,9 +194,9 @@ class Sequence:
     def from_path(  # pylint: disable=too-many-arguments, unused-argument
         cls,
         path: Path | str | List[Path | str],
-        vendor: Vendor | str = None,
-        label: str = None,
-        framerate: int = None,
+        vendor: Vendor | str | None = None,
+        label: str | None = None,
+        framerate: int | None = None,
         first_frame: int = 0,
         max_frames: int | None = None,
     ) -> Sequence:
@@ -241,8 +241,8 @@ class Sequence:
         cls,
         path: Path | str,
         vendor: Vendor | str,
-        label: str = None,
-        framerate: int = None,
+        label: str | None = None,
+        framerate: int | None = None,
         first_frame: int = 0,
         max_frames: int | None = None,
     ) -> Sequence:
@@ -294,7 +294,11 @@ class Sequence:
         """Needs to be implemented in child class."""
         raise NotImplementedError(f"Data loading for {self.vendor} is not implemented")
 
-    def select_by_index(self, indices: slice, label: str | None = None):
+    def select_by_index(
+        self,
+        indices: slice,
+        label: str | None = None,
+    ):
         if not isinstance(indices, slice):
             raise NotImplementedError(
                 "Slicing only implemented using a slice object"
@@ -333,7 +337,7 @@ class Sequence:
         end: float | int | None = None,
         start_inclusive: bool = True,
         end_inclusive: bool = False,
-        label: str = None,
+        label: str | None = None,
     ) -> Sequence:
         """Select subset of sequence by the `Sequence.time` information (i.e.
         based on the time stamp).
@@ -382,11 +386,10 @@ class Sequence:
 
         return self.select_by_index(slice(start_index,end_index), label = label)
 
-
     def deepcopy(
         self,
-        label: str = None,
-        relabel: bool = True,
+        label: str | None = None,
+        relabel: bool | None = True,
     ) -> Sequence:
         """Create a deep copy of `Sequence` object.
 

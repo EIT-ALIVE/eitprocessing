@@ -389,7 +389,7 @@ def test_relabeling(
     assert merged_timpel_2.label == test_label, 'incorrect label assigned when merging data with new label'
 
     # slicing
-    indices = slice(0,10)
+    indices = slice(0, 10)
     sliced_timpel = timpel_data[indices]
     assert sliced_timpel.label != timpel_data.label, 'slicing does not assign new label by default'
     assert sliced_timpel.label == f'Slice ({indices.start}-{indices.stop}) of <{timpel_data.label}>', 'slicing generates unexpected default label'
