@@ -5,7 +5,7 @@ Licensed under the Apache License, version 2.0. See LICENSE for details.
 This file contains methods related to parts of electrical impedance tomographs
 as they are read.
 """
-
+from __future__ import annotations
 import bisect
 import copy
 import functools
@@ -53,6 +53,8 @@ class Sequence:
     Args:
         path (Path | str | List[Path | str]): path(s) to data file.
         vendor (Vendor | str): vendor indicating the device used.
+        label (str): description of object for human interpretation.
+            Defaults to "Sequence_<unique_id>".
         time (NDArray[float]): list of time label for each data point (can be
             true time or relative time)
         max_frames (int): number of frames in sequence
@@ -68,17 +70,21 @@ class Sequence:
         Sequence: a sequence containing the l
     """
 
-    path: Path | str | List[Path | str] = None
-    vendor: Vendor = None
-    time: NDArray = None
-    nframes: int = None
-    framerate: int = None
+    path: Path | str | List[Path | str] | None = None
+    vendor: Vendor | str | None = None
+    label: str | None = None
+    time: NDArray | None = None
+    nframes: int | None = None
+    framerate: int | None = None
     framesets: Dict[str, Frameset] = field(default_factory=dict)
     events: List[Event] = field(default_factory=list, repr=False)
     timing_errors: List[TimingError] = field(default_factory=list, repr=False)
     phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
 
     def __post_init__(self):
+        if self.label is None:
+            self.label = f'Sequence_{id(self)}'
+
         self._set_vendor_class()
 
     def __len__(self) -> int:
@@ -131,7 +137,7 @@ class Sequence:
             raise NotImplementedError(f"vendor {self.vendor} is not implemented")
 
     @staticmethod
-    def check_equivalence(a: "Sequence", b: "Sequence"):
+    def check_equivalence(a: Sequence, b: Sequence):
         """Checks whether content of two Sequence objects is equivalent."""
 
         if (a_ := a.vendor) != (b_ := b.vendor):
@@ -144,12 +150,18 @@ class Sequence:
             )
         return True
 
-    def __add__(self, other):
+    def __add__(self, other: Sequence) -> Sequence:
         return self.merge(self, other)
 
     @classmethod
-    def merge(cls, a: "Sequence", b: "Sequence") -> "Sequence":
-        """Merge two Sequence objects together."""
+    def merge(
+        cls,
+        a: Sequence,
+        b: Sequence,
+        label: str | None  = None,
+    ) -> Sequence:
+        """Create a merge of two Sequence objects."""
+
         try:
             Sequence.check_equivalence(a, b)
         except Exception as e:
@@ -173,9 +185,12 @@ class Sequence:
                 item.time = time[item.index]
             return a_items + b_items
 
+        label = f'Merge of <{a.label}> and <{b.label}>' if label is None else label
+
         return cls(
             path=path,
             vendor=a.vendor,
+            label=label,
             time=time,
             nframes=nframes,
             framerate=a.framerate,
@@ -189,16 +204,19 @@ class Sequence:
     def from_path(  # pylint: disable=too-many-arguments, unused-argument
         cls,
         path: Path | str | List[Path | str],
-        vendor: Vendor | str,
-        framerate: int = None,
+        vendor: Vendor | str | None = None,
+        label: str | None = None,
+        framerate: int | None = None,
         first_frame: int = 0,
         max_frames: int | None = None,
-    ) -> "Sequence":
+    ) -> Sequence:
         """Load sequence from path(s)
 
         Args:
-            path (Path | str | List[Path | str]): path(s) to data file
-            vendor (Vendor | str): vendor indicating the device used
+            path (Path | str | List[Path | str]): path(s) to data file.
+            vendor (Vendor | str): vendor indicating the device used.
+            label (str): description of object for human interpretation.
+                Defaults to "Sequence_<unique_id>".
             framerate (int, optional): framerate at which the data was recorded.
                 Default for Draeger: 20
                 Default for Timpel: 50
@@ -233,10 +251,11 @@ class Sequence:
         cls,
         path: Path | str,
         vendor: Vendor | str,
-        framerate: int = None,
+        label: str | None = None,
+        framerate: int | None = None,
         first_frame: int = 0,
         max_frames: int | None = None,
-    ) -> "Sequence":
+    ) -> Sequence:
         """Method used by `from_path` that initiates the object and calls
         child method for loading the data.
 
@@ -259,6 +278,7 @@ class Sequence:
             path=Path(path),
             vendor=vendor,
             nframes=max_frames,
+            label=label,
         )
         obj._set_vendor_class()
         if framerate:
@@ -284,7 +304,11 @@ class Sequence:
         """Needs to be implemented in child class."""
         raise NotImplementedError(f"Data loading for {self.vendor} is not implemented")
 
-    def __getitem__(self, indices):
+    def select_by_index(
+        self,
+        indices: slice,
+        label: str | None = None,
+    ):
         if not isinstance(indices, slice):
             raise NotImplementedError(
                 "Slicing only implemented using a slice object"
@@ -298,27 +322,33 @@ class Sequence:
         if indices.stop is None:
             indices = slice(indices.start, self.nframes, indices.step)
 
-        obj = self.deepcopy()
+        obj = self.deepcopy()  #TODO: consider to make this more efficient for large data
         obj.time = self.time[indices]
         obj.nframes = len(obj.time)
-
         obj.framesets = {k: v[indices] for k, v in self.framesets.items()}
+        obj.label = f'Slice ({indices.start}-{indices.stop}) of <{self.label}>' if label is None else label
 
-        r = range(indices.start, indices.stop)
+        range_ = range(indices.start, indices.stop)
         for attr in ["events", "timing_errors", "phases"]:
-            setattr(obj, attr, [x for x in getattr(obj, attr) if x.index in r])
+            setattr(obj, attr, [x for x in getattr(obj, attr) if x.index in range_])
             for x in getattr(obj, attr):
                 x.index -= indices.start
 
         return obj
 
-    def select_by_time(
+
+    def __getitem__(self, indices: slice):
+        return self.select_by_index(indices)
+
+
+    def select_by_time(  #pylint: disable=too-many-arguments
         self,
         start: float | int | None = None,
         end: float | int | None = None,
         start_inclusive: bool = True,
         end_inclusive: bool = False,
-    ) -> "Sequence":
+        label: str | None = None,
+    ) -> Sequence:
         """Select subset of sequence by the `Sequence.time` information (i.e.
         based on the time stamp).
 
@@ -364,9 +394,32 @@ class Sequence:
         else:
             end_index = bisect.bisect_left(self.time, end) - 1
 
-        return self[start_index:end_index]
+        return self.select_by_index(slice(start_index,end_index), label = label)
 
-    deepcopy = copy.deepcopy
+    def deepcopy(
+        self,
+        label: str | None = None,
+        relabel: bool | None = True,
+    ) -> Sequence:
+        """Create a deep copy of `Sequence` object.
+
+        Args:
+            label (str): Create a new `label` for the copy.
+                Defaults to None, which will trigger behavior described for relabel (below)
+            relabel (bool): If `True` (default), the label of self is re-used for the copy,
+                otherwise the following label is assigned f"Deepcopy of {self.label}".
+                Note that this setting is ignored if a label is given.
+
+        Returns:
+            Sequence: a deep copy of self
+        """
+
+        obj = copy.deepcopy(self)
+        if label:
+            obj.label = label
+        elif relabel:
+            obj.label = f'Copy of <{self.label}>'
+        return obj
 
 
 @dataclass(eq=False)
