@@ -21,6 +21,11 @@ to the [Zen of python](https://peps.python.org/pep-0020/).
 Note that all contrubtions to this project will be published under our [Apache 2.0 licence]
 (https://github.com/EIT-ALIVE/eitprocessing/blob/main/LICENSE).
 
+
+#### Docstrings
+We use the [google convention](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
+for writing docstrings.
+
 #### Branch naming convention
 Please try to adhere to the following branch naming convention:
 <github-issue-number>_<brief-description>_<username>.
