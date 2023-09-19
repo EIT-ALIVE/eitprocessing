@@ -54,7 +54,6 @@ class ButterworthFilter(TimeDomainFilter):
         self._set_filter_type_class()
 
     def _set_filter_type_class(self):
-        self._check_filter_type(self.filter_type)
         if (
             isinstance(self, ButterworthFilter)
             and self.__class__ != ButterworthFilter
@@ -63,19 +62,11 @@ class ButterworthFilter(TimeDomainFilter):
             raise TypeError(
                 f"conflicting type info; `filter_type={self.filter_type}` does not match {self.__class__}."
             )
-        
+
         # Note that this way of re-assigning classes is considered to be a bad practice
         # (https://tinyurl.com/2x2cea6h), but the objections raised don't seem to be prohibtive.
         cls = FILTER_TYPES[self.filter_type]
         self.__class__ = cls
-
-    @staticmethod
-    def _check_filter_type(filter_type):
-        if filter_type not in FILTER_TYPES:
-            raise ValueError(
-                "The filter type should be one of "
-                f"{', '.join(FILTER_TYPES.keys())}, not '{filter_type}'."
-            )
 
     def _check_init(self, ignore_max_order):
         """
@@ -94,16 +85,16 @@ class ButterworthFilter(TimeDomainFilter):
             TypeError: if the sample frequency is not numeric.
             ValueError: if the sample frequency is 0 or negative.
         """
-        self._check_filter_type(self.filter_type)
 
         if self.filter_type in ("lowpass", "highpass"):
             if not isinstance(self.cutoff_frequency, (int, float)):
                 raise TypeError("`cutoff_frequency` should be an integer or float")
 
-        else:  # implies self.filter_type in ("bandpass", "bandstop"):
+        elif self.filter_type in ("bandpass", "bandstop"):
             if not isinstance(self.cutoff_frequency, tuple):
                 if isinstance(self.cutoff_frequency, Sequence) and not isinstance(
-                    self.cutoff_frequency, (str, bytes), 
+                    self.cutoff_frequency,
+                    (str, bytes),
                 ):
                     try:
                         self.cutoff_frequency = tuple(self.cutoff_frequency)
@@ -123,6 +114,11 @@ class ButterworthFilter(TimeDomainFilter):
                 isinstance(value, (int, float)) for value in self.cutoff_frequency
             ):
                 raise TypeError("`cutoff_frequency` be a sequence of two numbers")
+        else:
+            raise ValueError(
+                "The filter type should be one of "
+                f"{', '.join(FILTER_TYPES.keys())}, not '{self.filter_type}'."
+            )
 
         if self.order < MIN_ORDER or (
             self.order > MAX_ORDER and ignore_max_order is False
