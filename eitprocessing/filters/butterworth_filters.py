@@ -30,7 +30,7 @@ class ButterworthFilter(TimeDomainFilter):
             filters, `cutoff_frequency` is a scalar. For band pass or band stop filters,
             `cutoff_frequency` is a sequence containing two frequencies.
         order: Order of the filter. The effective order size is twice the given order, due to
-            forward-backward filtering. Higher order improves the effectiveness of a filter, but
+            forward-backward filtering. Higher orders improve the effectiveness of a filter, but
             can result in unstable or incorrect filtering. 
         sample_frequency: The sample frequency of the data to be filtered (in Hz).
         ignore_max_order: Whether to raise an exception if the order is larger than the maximum of
