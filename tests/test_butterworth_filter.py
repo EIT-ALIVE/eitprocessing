@@ -40,6 +40,19 @@ def test_create_butterworth_filter(filter_arguments):
     check_filter_attributes(filter_, filter_arguments)
 
 
+def test_butterworth_order(filter_arguments):
+    del filter_arguments["order"]
+
+    with pytest.raises(TypeError):
+        ButterworthFilter(**filter_arguments, order="not a number")
+
+    with pytest.raises(ValueError):
+        ButterworthFilter(**filter_arguments, order=-5)
+
+    with pytest.raises(ValueError):
+        ButterworthFilter(**filter_arguments, order=0)
+
+
 def test_butterworth_range(filter_arguments):
     # Tests whether an out-of-range order raises AttributeError
     filter_arguments["order"] = 11
@@ -87,7 +100,7 @@ def test_butterworth_cutoff_frequency_sequence(filter_arguments):
         ((1,), ValueError),
         ((1, 2, 3), ValueError),
         ({10, 20}, TypeError),
-        (b'56', TypeError)
+        (b"56", TypeError),
     ]
     for invalid, error_type in invalid_bandpass_cutoffs:
         with pytest.raises(error_type):

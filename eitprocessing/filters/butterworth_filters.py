@@ -120,11 +120,12 @@ class ButterworthFilter(TimeDomainFilter):
                 f"Must be one of {', '.join(FILTER_TYPES.keys())}."
             )
 
-        if self.order < MIN_ORDER or (
-            self.order > MAX_ORDER and ignore_max_order is False
-        ):
+        if not isinstance(self.order, int):
+            raise TypeError(f"Invalid `order`. Must be an int, not {type(self.order)}.")
+
+        if self.order < 1 or (self.order > MAX_ORDER and ignore_max_order is False):
             raise ValueError(
-                f"Order should be between {MIN_ORDER} and {MAX_ORDER}. "
+                f"Invalid `order` ({self.order}). Must be between 1 and {MAX_ORDER}. "
                 "To use higher values, set `ignore_max_order` to `True`."
             )
 
@@ -210,7 +211,6 @@ class BandPassFilter(ButterworthFilter):
     filter_type: Literal["bandpass"] = "bandpass"
 
 
-MIN_ORDER = 1
 MAX_ORDER = 10
 FILTER_TYPES = {
     "lowpass": LowPassFilter,
