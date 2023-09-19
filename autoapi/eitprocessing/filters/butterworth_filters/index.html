@@ -85,10 +85,18 @@
 <dd><p>Bases: <a class="reference internal" href="../index.html#eitprocessing.filters.TimeDomainFilter" title="eitprocessing.filters.TimeDomainFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.filters.TimeDomainFilter</span></code></a></p>
 <p>Butterworth filter for filtering in the time domain.</p>
 <p>Generates a low-pass, high-pass, band-pass or band-stop digital Butterworth filter of order
-<cite>order</cite>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">ButterworthFilter</span></code> is a wrapper of the <cite>scipy.butter()</cite> and <cite>scipy.filtfilt()</cite> functions:
-- <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html">https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html</a>
-- <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html">https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html</a></p>
+<cite>order</cite>. Filters are created using cascaded second-order sections representation, providing
+better stability compared to the traditionally used transfer function (numerator/denominator or
+b/a representation).</p>
+<p>The <cite>apply_filter()</cite> method applies the filter to the provided data using forward-backward
+filtering. This minimizes the phase shift, and effectively doubles the order of the filter.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">ButterworthFilter</span></code> is a wrapper of the <cite>scipy.butter()</cite> and <cite>scipy.filtfilt()</cite> functions:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html">https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html</a></p></li>
+<li><p><a class="reference external" href="https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html">https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html</a></p></li>
+</ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -97,8 +105,9 @@ filter.</p></li>
 <li><p><strong>cutoff_frequency</strong> – Cutoff frequency or frequencies (in Hz). For low pass or high pass
 filters, <cite>cutoff_frequency</cite> is a scalar. For band pass or band stop filters,
 <cite>cutoff_frequency</cite> is a sequence containing two frequencies.</p></li>
-<li><p><strong>order</strong> – Order of the filter. High-order filters can result in instable or incorrect
-filtering.</p></li>
+<li><p><strong>order</strong> – Order of the filter. The effective order size is twice the given order, due to
+forward-backward filtering. Higher order improves the effectiveness of a filter, but
+can result in unstable or incorrect filtering.</p></li>
 <li><p><strong>sample_frequency</strong> – The sample frequency of the data to be filtered (in Hz).</p></li>
 <li><p><strong>ignore_max_order</strong> – Whether to raise an exception if the order is larger than the maximum of
 10. Defaults to False.</p></li>

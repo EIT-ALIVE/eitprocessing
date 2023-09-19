@@ -53,11 +53,16 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Butterworth filter for filtering in the time domain.</span>
 
 <span class="sd">    Generates a low-pass, high-pass, band-pass or band-stop digital Butterworth filter of order</span>
-<span class="sd">    `order`.</span>
+<span class="sd">    `order`. Filters are created using cascaded second-order sections representation, providing</span>
+<span class="sd">    better stability compared to the traditionally used transfer function (numerator/denominator or</span>
+<span class="sd">    b/a representation). </span>
 
-<span class="sd">    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions:</span>
-<span class="sd">    - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html</span>
-<span class="sd">    - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html</span>
+<span class="sd">    The `apply_filter()` method applies the filter to the provided data using forward-backward</span>
+<span class="sd">    filtering. This minimizes the phase shift, and effectively doubles the order of the filter.</span>
+
+<span class="sd">    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions: </span>
+<span class="sd">        - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html </span>
+<span class="sd">        - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        filter_type: The type of filter to create: a low pass, high pass, band pass or band stop</span>
@@ -65,8 +70,9 @@
 <span class="sd">        cutoff_frequency: Cutoff frequency or frequencies (in Hz). For low pass or high pass</span>
 <span class="sd">            filters, `cutoff_frequency` is a scalar. For band pass or band stop filters,</span>
 <span class="sd">            `cutoff_frequency` is a sequence containing two frequencies.</span>
-<span class="sd">        order: Order of the filter. High-order filters can result in instable or incorrect</span>
-<span class="sd">            filtering.</span>
+<span class="sd">        order: Order of the filter. The effective order size is twice the given order, due to</span>
+<span class="sd">            forward-backward filtering. Higher order improves the effectiveness of a filter, but</span>
+<span class="sd">            can result in unstable or incorrect filtering. </span>
 <span class="sd">        sample_frequency: The sample frequency of the data to be filtered (in Hz).</span>
 <span class="sd">        ignore_max_order: Whether to raise an exception if the order is larger than the maximum of</span>
 <span class="sd">            10. Defaults to False.</span>
