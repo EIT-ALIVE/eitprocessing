@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eitprocessing.filters.butterworth_filters &#8212; eitprocessing 0.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css?v=601dbdee" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../filters.html" accesskey="U">eitprocessing.filters</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.filters.butterworth_filters</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for eitprocessing.filters.butterworth_filters</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">InitVar</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">TimeDomainFilter</span>
+
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="ButterworthFilter">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter">[docs]</a>
+<span class="k">class</span> <span class="nc">ButterworthFilter</span><span class="p">(</span><span class="n">TimeDomainFilter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Butterworth filter for filtering in the time domain.</span>
+
+<span class="sd">    Generates a low-pass, high-pass, band-pass or band-stop digital Butterworth filter of order</span>
+<span class="sd">    `order`.</span>
+
+<span class="sd">    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions:</span>
+<span class="sd">    - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html</span>
+<span class="sd">    - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filter_type: The type of filter to create: a low pass, high pass, band pass or band stop</span>
+<span class="sd">            filter.</span>
+<span class="sd">        cutoff_frequency: Cutoff frequency or frequencies (in Hz). For low pass or high pass</span>
+<span class="sd">            filters, `cutoff_frequency` is a scalar. For band pass or band stop filters,</span>
+<span class="sd">            `cutoff_frequency` is a sequence containing two frequencies.</span>
+<span class="sd">        order: Order of the filter. High-order filters can result in instable or incorrect</span>
+<span class="sd">            filtering.</span>
+<span class="sd">        sample_frequency: The sample frequency of the data to be filtered (in Hz).</span>
+<span class="sd">        ignore_max_order: Whether to raise an exception if the order is larger than the maximum of</span>
+<span class="sd">            10. Defaults to False.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; t = np.arange(0, 100, 0.1)</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.sin(t) + 0.1 * np.sin(10 * t)</span>
+<span class="sd">        &gt;&gt;&gt; lowpass_filter = ButterworthFilter(</span>
+<span class="sd">        ...     filter_type=&#39;lowpass&#39;,</span>
+<span class="sd">        ...     cutoff_frequenct=45,</span>
+<span class="sd">        ...     order=4,</span>
+<span class="sd">        ...     sample_frequency=250</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; filtered_signal = lowpass_filter.apply_filter(signal)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ButterworthFilter.filter_type">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter.filter_type">[docs]</a>
+    <span class="n">filter_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;lowpass&quot;</span><span class="p">,</span> <span class="s2">&quot;highpass&quot;</span><span class="p">,</span> <span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="s2">&quot;bandstop&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ButterworthFilter.cutoff_frequency">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter.cutoff_frequency">[docs]</a>
+    <span class="n">cutoff_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ButterworthFilter.order">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter.order">[docs]</a>
+    <span class="n">order</span><span class="p">:</span> <span class="nb">int</span></div>
+
+<div class="viewcode-block" id="ButterworthFilter.sample_frequency">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter.sample_frequency">[docs]</a>
+    <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<div class="viewcode-block" id="ButterworthFilter.ignore_max_order">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter.ignore_max_order">[docs]</a>
+    <span class="n">ignore_max_order</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ButterworthFilter.__post_init__">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter.__post_init__">[docs]</a>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ignore_max_order</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_init</span><span class="p">(</span><span class="n">ignore_max_order</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_filter_type_class</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ButterworthFilter._set_filter_type_class">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter._set_filter_type_class">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_filter_type_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ButterworthFilter</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">!=</span> <span class="n">ButterworthFilter</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">filter_type</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;conflicting type info; `filter_type=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">` does not match </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Note that this way of re-assigning classes is considered to be a bad practice</span>
+        <span class="c1"># (https://tinyurl.com/2x2cea6h), but the objections raised don&#39;t seem to be prohibtive.</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="n">FILTER_TYPES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="bp">cls</span></div>
+
+
+<div class="viewcode-block" id="ButterworthFilter._check_init">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter._check_init">[docs]</a>
+    <span class="k">def</span> <span class="nf">_check_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ignore_max_order</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check the arguments of __init__ and raise exceptions when they don&#39;t meet requirements.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if the `filter_type` is unknown.</span>
+<span class="sd">            TypeError: if the cutoff frequency isn&#39;t numeric (low/high pass filters) or a tuple</span>
+<span class="sd">                (band pass/stop filters).</span>
+<span class="sd">            ValueError: if the number of provided cutoff frequencies is not 2 (band pass/stop</span>
+<span class="sd">                filters).</span>
+<span class="sd">            TypeError: if the tuple `cutoff_frequency` does not contains numeric values (band</span>
+<span class="sd">                pass/stop filters).</span>
+<span class="sd">            ValueError: if the order is lower than `MIN_ORDER` or higher than `MAX_ORDER`. Can be</span>
+<span class="sd">                prevented when the order is higher than `MAX_ORDER` with `ignore_max_order = True`.</span>
+<span class="sd">            TypeError: if the sample frequency is not numeric.</span>
+<span class="sd">            ValueError: if the sample frequency is 0 or negative.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;lowpass&quot;</span><span class="p">,</span> <span class="s2">&quot;highpass&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`cutoff_frequency` should be an integer or float&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="s2">&quot;bandstop&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span>
+                    <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">),</span>
+                <span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;can&#39;t convert sequence </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="si">}</span><span class="s2"> to tuple&quot;</span>
+                        <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s2">&quot;`cutoff_frequency` should be a sequence of 2 numbers&quot;</span>
+                    <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`cutoff_frequency` should have length 2&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`cutoff_frequency` be a sequence of two numbers&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The filter type should be one of &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FILTER_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">, not &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">&lt;</span> <span class="n">MIN_ORDER</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">&gt;</span> <span class="n">MAX_ORDER</span> <span class="ow">and</span> <span class="n">ignore_max_order</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Order should be between </span><span class="si">{</span><span class="n">MIN_ORDER</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">MAX_ORDER</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="s2">&quot;To use higher values, set `ignore_max_order` to `True`.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`sample_frequency` should be a number&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`sample_frequency` should be positive&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ButterworthFilter.apply_filter">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter.apply_filter">[docs]</a>
+    <span class="k">def</span> <span class="nf">apply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">ArrayLike</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the filter to the input data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_data: Data to be filtered. If the input data has more than one axis,</span>
+<span class="sd">                the filter is applied to the last axis.</span>
+<span class="sd">            axis: Data axis the filter should be applied to. This defaults to the last axis,</span>
+<span class="sd">                assuming this to be the time axis of the input data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The filtered output with the same shape as the input data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sos</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span>
+            <span class="n">N</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span>
+            <span class="n">Wn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span>
+            <span class="n">btype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span><span class="p">,</span>
+            <span class="n">fs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">,</span>
+            <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">output</span><span class="o">=</span><span class="s2">&quot;sos&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">filtered_data</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">sos</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">filtered_data</span></div>
+</div>
+
+
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="LowPassFilter">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.LowPassFilter">[docs]</a>
+<span class="k">class</span> <span class="nc">LowPassFilter</span><span class="p">(</span><span class="n">ButterworthFilter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Low-pass Butterworth filter for filtering in the time domain.</span>
+
+<span class="sd">    ``LowPassFilter`` is a convenience class similar to ``ButterworthFilter``, where the</span>
+<span class="sd">    `filter_type` is set to &quot;lowpass&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LowPassFilter.available_in_gui">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.LowPassFilter.available_in_gui">[docs]</a>
+    <span class="n">available_in_gui</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="LowPassFilter.filter_type">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.LowPassFilter.filter_type">[docs]</a>
+    <span class="n">filter_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;lowpass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;lowpass&quot;</span></div>
+</div>
+
+
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="HighPassFilter">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.HighPassFilter">[docs]</a>
+<span class="k">class</span> <span class="nc">HighPassFilter</span><span class="p">(</span><span class="n">ButterworthFilter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;High-pass Butterworth filter for filtering in the time domain.</span>
+
+<span class="sd">    ``HighPassFilter`` is a convenience class similar to ``ButterworthFilter``, where the</span>
+<span class="sd">    `filter_type` is set to &quot;highpass&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HighPassFilter.available_in_gui">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.HighPassFilter.available_in_gui">[docs]</a>
+    <span class="n">available_in_gui</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="HighPassFilter.filter_type">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.HighPassFilter.filter_type">[docs]</a>
+    <span class="n">filter_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;highpass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;highpass&quot;</span></div>
+</div>
+
+
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="BandStopFilter">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.BandStopFilter">[docs]</a>
+<span class="k">class</span> <span class="nc">BandStopFilter</span><span class="p">(</span><span class="n">ButterworthFilter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Band-stop Butterworth filter for filtering in the time domain.</span>
+
+<span class="sd">    ``BandStopFilter`` is a convenience class similar to ``ButterworthFilter``, where the</span>
+<span class="sd">    `filter_type` is set to &quot;bandstop&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BandStopFilter.available_in_gui">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.BandStopFilter.available_in_gui">[docs]</a>
+    <span class="n">available_in_gui</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BandStopFilter.filter_type">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.BandStopFilter.filter_type">[docs]</a>
+    <span class="n">filter_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;bandstop&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;bandstop&quot;</span></div>
+</div>
+
+
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="BandPassFilter">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.BandPassFilter">[docs]</a>
+<span class="k">class</span> <span class="nc">BandPassFilter</span><span class="p">(</span><span class="n">ButterworthFilter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Band-pass Butterworth filter for filtering in the time domain.</span>
+
+<span class="sd">    ``BandPassFilter`` is a convenience class similar to ``ButterworthFilter``, where the</span>
+<span class="sd">    `filter_type` is set to &quot;bandpass&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BandPassFilter.available_in_gui">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.BandPassFilter.available_in_gui">[docs]</a>
+    <span class="n">available_in_gui</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="BandPassFilter.filter_type">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.BandPassFilter.filter_type">[docs]</a>
+    <span class="n">filter_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;bandpass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;bandpass&quot;</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MIN_ORDER">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.MIN_ORDER">[docs]</a>
+<span class="n">MIN_ORDER</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="MAX_ORDER">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.MAX_ORDER">[docs]</a>
+<span class="n">MAX_ORDER</span> <span class="o">=</span> <span class="mi">10</span></div>
+
+<div class="viewcode-block" id="FILTER_TYPES">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.FILTER_TYPES">[docs]</a>
+<span class="n">FILTER_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;lowpass&quot;</span><span class="p">:</span> <span class="n">LowPassFilter</span><span class="p">,</span>
+    <span class="s2">&quot;highpass&quot;</span><span class="p">:</span> <span class="n">HighPassFilter</span><span class="p">,</span>
+    <span class="s2">&quot;bandpass&quot;</span><span class="p">:</span> <span class="n">BandPassFilter</span><span class="p">,</span>
+    <span class="s2">&quot;bandstop&quot;</span><span class="p">:</span> <span class="n">BandStopFilter</span><span class="p">,</span>
+<span class="p">}</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../filters.html" >eitprocessing.filters</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.filters.butterworth_filters</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>
