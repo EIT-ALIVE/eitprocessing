@@ -364,6 +364,7 @@ def test_label(
 
     timpel_copy = timpel_1.deepcopy()
     assert timpel_1.label != timpel_copy.label, 'deepcopied data has identical label'
+    assert timpel_copy.label == f'Copy of <{timpel_1.label}>', 'deepcopied data has unexpected label'
     timpel_copy_relabel = timpel_1.deepcopy(label = test_label)
     assert timpel_1.label != timpel_copy_relabel.label, 'deepcopied data with new label has identical label'
     timpel_copy_relabel = timpel_1.deepcopy(relabel = False)
@@ -382,9 +383,9 @@ def test_relabeling(
     #merging
     merged_timpel = Sequence.merge(timpel_data, timpel_data)
     assert merged_timpel.label != timpel_data.label, 'merging does not assign new label by default'
-    assert merged_timpel.label == f'Merge of ({timpel_data.label}) and <{timpel_data.label}>', 'merging generates unexpected default label'
+    assert merged_timpel.label == f'Merge of <{timpel_data.label}> and <{timpel_data.label}>', 'merging generates unexpected default label'
     added_timpel = timpel_data + timpel_data
-    assert added_timpel.label == f'Merge of ({timpel_data.label}) and <{timpel_data.label}>', 'adding generates unexpected default label'
+    assert added_timpel.label == f'Merge of <{timpel_data.label}> and <{timpel_data.label}>', 'adding generates unexpected default label'
     merged_timpel_2 = Sequence.merge(timpel_data, timpel_data, label = test_label)
     assert merged_timpel_2.label == test_label, 'incorrect label assigned when merging data with new label'
 

@@ -175,7 +175,7 @@ class Sequence:
                 item.time = time[item.index]
             return a_items + b_items
 
-        label = f'Merge of ({a.label}) and <{b.label}>' if label is None else label
+        label = f'Merge of <{a.label}> and <{b.label}>' if label is None else label
 
         return cls(
             path=path,
@@ -408,7 +408,7 @@ class Sequence:
         if label:
             obj.label = label
         elif relabel:
-            obj.label = f'Deepcopy of {self.label}'
+            obj.label = f'Copy of <{self.label}>'
         return obj
 
 
