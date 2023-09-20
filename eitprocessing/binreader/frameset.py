@@ -18,7 +18,7 @@ from tqdm import tqdm
 from tqdm.notebook import tqdm as notebook_tqdm
 
 
-@dataclass
+@dataclass(eq=False)
 class Frameset:
     """A Frameset is ....
         From Sequence:
@@ -51,10 +51,14 @@ class Frameset:
                 return False
 
         for attr in ["pixel_values"]:
+            # TODO: why loop over a single attribute (here and below)?
+            # Is it for future proofing
+
             # NaN values are not equal. Check whether values are equal or both NaN.
             s = getattr(self, attr)
             o = getattr(other, attr)
             if not np.all((s == o) | (np.isnan(s) & np.isnan(o))):
+                # TODO: check that this works if isnan in different positions
                 return False
 
         for attr in ["waveform_data"]:
@@ -76,6 +80,8 @@ class Frameset:
         return True
 
     def select_by_indices(self, indices):
+        # TODO: check https://stackoverflow.com/questions/47190218/proper-type-hint-for-getitem
+        # TODO: check how this is done in sequence.py and follow same logic? Maybe even make external function called by both?
         obj = self.deepcopy()
         obj.pixel_values = self.pixel_values[indices, :, :]
         for key, values in self.waveform_data.items():
@@ -83,6 +89,7 @@ class Frameset:
         return obj
 
     __getitem__ = select_by_indices
+    # TODO: consider directly defining getitem instead of taking extra step here
 
     @property
     def global_baseline(self):
@@ -105,6 +112,7 @@ class Frameset:
         return np.nansum(self.pixel_values, axis=(1, 2))
 
     def plot_waveforms(self, waveforms=None):
+        # TODO: document this function.
         if waveforms is None:
             waveforms = list(self.waveform_data.keys())
 
@@ -124,6 +132,8 @@ class Frameset:
         show_progress: bool | str = "notebook",
         waveforms: bool | list[str] = False,
     ):  # pylint: disable = too-many-locals
+        # TODO: document this function.
+        # TODO: what would a bool do in show_progress? Should it be a Literal?
         if waveforms is True:
             waveforms = list(self.waveform_data.keys())
 
@@ -185,6 +195,8 @@ class Frameset:
 
     @classmethod
     def merge(cls, a, b):
+        # TODO: see `merge` (and `__add__` functions in sequence)
+        # docstring?
         if (a_ := a.name) != (b_ := b.name):
             raise ValueError(f"Frameset names don't match: {a_}, {b_}")
 
