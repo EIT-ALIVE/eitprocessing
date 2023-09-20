@@ -79,7 +79,7 @@ class Sequence:
 
     def __post_init__(self):
         if self.label is None:
-            self.label = f'Sequence_{id(self)}'
+            self.label = f"Sequence_{id(self)}"
 
         self._set_vendor_class()
 
@@ -117,11 +117,14 @@ class Sequence:
         if isinstance(self.vendor, str):
             self.vendor = Vendor(self.vendor.lower())
 
-        if (isinstance(self, Sequence)
+        if (
+            isinstance(self, Sequence)
             and self.__class__ is not Sequence
             and self.__class__.vendor != self.vendor
-            ):
-            raise TypeError(f'`vendor` for {type(self)} cannot be set as {self.vendor}.')
+        ):
+            raise TypeError(
+                f"`vendor` for {type(self)} cannot be set as {self.vendor}."
+            )
 
         # Note that this way of re-assigning classes is considered to be a bad practice
         # (https://tinyurl.com/2x2cea6h), but the objections raised don't seem to be prohibtive.
@@ -154,7 +157,7 @@ class Sequence:
         cls,
         a: Sequence,
         b: Sequence,
-        label: str | None  = None,
+        label: str | None = None,
     ) -> Sequence:
         """Create a merge of two Sequence objects."""
 
@@ -181,7 +184,7 @@ class Sequence:
                 item.time = time[item.index]
             return a_items + b_items
 
-        label = f'Merge of <{a.label}> and <{b.label}>' if label is None else label
+        label = f"Merge of <{a.label}> and <{b.label}>" if label is None else label
 
         return cls(
             path=path,
@@ -306,9 +309,7 @@ class Sequence:
         label: str | None = None,
     ):
         if not isinstance(indices, slice):
-            raise NotImplementedError(
-                "Slicing only implemented using a slice object"
-            )
+            raise NotImplementedError("Slicing only implemented using a slice object")
         if indices.step not in (None, 1):
             raise NotImplementedError(
                 "Skipping intermediate frames while slicing is not implemented."
@@ -318,11 +319,15 @@ class Sequence:
         if indices.stop is None:
             indices = slice(indices.start, self.nframes, indices.step)
 
-        obj = self.deepcopy()  #TODO: consider to make this more efficient for large data
+        obj = self.deepcopy()
         obj.time = self.time[indices]
         obj.nframes = len(obj.time)
         obj.framesets = {k: v[indices] for k, v in self.framesets.items()}
-        obj.label = f'Slice ({indices.start}-{indices.stop}) of <{self.label}>' if label is None else label
+        obj.label = (
+            f"Slice ({indices.start}-{indices.stop}) of <{self.label}>"
+            if label is None
+            else label
+        )
 
         range_ = range(indices.start, indices.stop)
         for attr in ["events", "timing_errors", "phases"]:
@@ -332,12 +337,10 @@ class Sequence:
 
         return obj
 
-
     def __getitem__(self, indices: slice):
         return self.select_by_index(indices)
 
-
-    def select_by_time(  #pylint: disable=too-many-arguments
+    def select_by_time(  # pylint: disable=too-many-arguments
         self,
         start: float | int | None = None,
         end: float | int | None = None,
@@ -390,7 +393,7 @@ class Sequence:
         else:
             end_index = bisect.bisect_left(self.time, end) - 1
 
-        return self.select_by_index(slice(start_index,end_index), label = label)
+        return self.select_by_index(slice(start_index, end_index), label=label)
 
     def deepcopy(
         self,
@@ -414,7 +417,7 @@ class Sequence:
         if label:
             obj.label = label
         elif relabel:
-            obj.label = f'Copy of <{self.label}>'
+            obj.label = f"Copy of <{self.label}>"
         return obj
 
 
@@ -446,8 +449,9 @@ class DraegerSequence(Sequence):
         # is an event marker. Data for the pre-first (dummy) frame will be
         # removed from self at the end of this function.
         first_load = max(0, first_frame - 1)
-        loaded_frames = min(total_frames - first_load, self.nframes
-                            or total_frames - first_load)
+        loaded_frames = min(
+            total_frames - first_load, self.nframes or total_frames - first_load
+        )
 
         self.time = np.zeros(loaded_frames)
         pixel_values = np.zeros((loaded_frames, 32, 32))
@@ -462,7 +466,7 @@ class DraegerSequence(Sequence):
                     reader,
                     index - (first_frame > 0),  # only adjusts for firstframe > 0
                     pixel_values,
-                    previous_marker
+                    previous_marker,
                 )
 
         if first_frame > 0:
@@ -474,10 +478,10 @@ class DraegerSequence(Sequence):
         if self.nframes != loaded_frames:
             if self.nframes:
                 warnings.warn(
-                    f'The number of frames requested ({self.nframes}) is larger '
-                    f'than the available number ({loaded_frames}) of frames after '
-                    f'the first frame selected ({first_frame}, total frames: '
-                    f'{total_frames}).\n {loaded_frames} frames have been loaded.'
+                    f"The number of frames requested ({self.nframes}) is larger "
+                    f"than the available number ({loaded_frames}) of frames after "
+                    f"the first frame selected ({first_frame}, total frames: "
+                    f"{total_frames}).\n {loaded_frames} frames have been loaded."
                 )
             self.nframes = loaded_frames
 
@@ -575,10 +579,10 @@ class TimpelSequence(Sequence):
         if data.shape[0] != self.nframes:
             if self.nframes:
                 warnings.warn(
-                    f'The number of frames requested ({self.nframes}) is larger '
-                    f'than the available number ({data.shape[0]}) of frames after '
-                    f'the first frame selected ({first_frame}).\n'
-                    f'{data.shape[0]} frames have been loaded.'
+                    f"The number of frames requested ({self.nframes}) is larger "
+                    f"than the available number ({data.shape[0]}) of frames after "
+                    f"the first frame selected ({first_frame}).\n"
+                    f"{data.shape[0]} frames have been loaded."
                 )
             self.nframes = data.shape[0]
 
