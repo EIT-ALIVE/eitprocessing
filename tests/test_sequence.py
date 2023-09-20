@@ -13,42 +13,46 @@ environment = os.environ.get(
     "EIT_PROCESSING_TEST_DATA",
     os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
 )
-data_directory = os.path.join(environment, 'tests', 'test_data')
+data_directory = os.path.join(environment, "tests", "test_data")
 draeger_file1 = os.path.join(data_directory, "Draeger_Test3.bin")
 draeger_file2 = os.path.join(data_directory, "Draeger_Test.bin")
 timpel_file = os.path.join(data_directory, "Timpel_Test.txt")
 dummy_file = os.path.join(data_directory, "not_a_file.dummy")
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def draeger_data1():
     return Sequence.from_path(draeger_file1, vendor="draeger")
 
-@pytest.fixture(scope='module')
+
+@pytest.fixture(scope="module")
 def draeger_data2():
     return Sequence.from_path(draeger_file2, vendor="draeger")
 
-@pytest.fixture(scope='module')
+
+@pytest.fixture(scope="module")
 def draeger_data_both():
     return Sequence.from_path([draeger_file1, draeger_file2], vendor="draeger")
 
-@pytest.fixture(scope='module')
+
+@pytest.fixture(scope="module")
 def timpel_data():
     return Sequence.from_path(timpel_file, vendor="timpel")
 
+
 @pytest.fixture()
 def timpel_data_double():
-    return Sequence.from_path([timpel_file, timpel_file], vendor='timpel')
+    return Sequence.from_path([timpel_file, timpel_file], vendor="timpel")
 
 
 def test_from_path_draeger(
     draeger_data1: DraegerSequence,
     draeger_data2: DraegerSequence,
     draeger_data_both: DraegerSequence,
-    ):
+):
     assert isinstance(draeger_data1, DraegerSequence)
     assert isinstance(draeger_data1, Sequence)
-    assert not isinstance (draeger_data1, TimpelSequence)
+    assert not isinstance(draeger_data1, TimpelSequence)
     assert draeger_data1.framerate == 20
     assert len(draeger_data1) == len(draeger_data1.time)
     assert len(draeger_data2.time) == 20740
@@ -58,8 +62,8 @@ def test_from_path_draeger(
     assert len(draeger_data_both) == len(draeger_data1) + len(draeger_data2)
 
     draeger_inverted = Sequence.from_path(
-        path=[draeger_file2, draeger_file1],
-        vendor='draeger')
+        path=[draeger_file2, draeger_file1], vendor="draeger"
+    )
     assert len(draeger_data_both) == len(draeger_inverted)
     assert draeger_data_both != draeger_inverted
 
@@ -68,7 +72,7 @@ def test_from_path_timpel(
     draeger_data1: DraegerSequence,
     timpel_data: TimpelSequence,
     timpel_data_double: TimpelSequence,
-    ):
+):
     using_vendor = Sequence.from_path(timpel_file, vendor=Vendor.TIMPEL)
     assert timpel_data == using_vendor
     assert isinstance(timpel_data, TimpelSequence)
@@ -78,36 +82,36 @@ def test_from_path_timpel(
 
     # Load multiple
     assert isinstance(timpel_data_double, TimpelSequence)
-    assert len(timpel_data_double) == 2*len(timpel_data)
+    assert len(timpel_data_double) == 2 * len(timpel_data)
 
 
 def test_illegal_from_path():
     # non existing
-    for vendor in ['draeger', 'timpel']:
+    for vendor in ["draeger", "timpel"]:
         with pytest.raises(FileNotFoundError):
-            _= Sequence.from_path(dummy_file, vendor=vendor)
+            _ = Sequence.from_path(dummy_file, vendor=vendor)
 
     # incorrect vendor
     with pytest.raises(OSError):
-        _= Sequence.from_path(draeger_file1, vendor="timpel")
+        _ = Sequence.from_path(draeger_file1, vendor="timpel")
     with pytest.raises(OSError):
-        _= Sequence.from_path(timpel_file, vendor="draeger")
+        _ = Sequence.from_path(timpel_file, vendor="draeger")
 
     # not implemented
     with pytest.raises(NotImplementedError):
-        _= Sequence.from_path(timpel_file, vendor="sentec")
+        _ = Sequence.from_path(timpel_file, vendor="sentec")
 
 
 def test_illegal_vendor():
-    _= DraegerSequence(vendor='draeger')
+    _ = DraegerSequence(vendor="draeger")
     with pytest.raises(TypeError):
-        _= DraegerSequence(vendor='timpel')
-        _= DraegerSequence(vendor='sentec')
+        _ = DraegerSequence(vendor="timpel")
+        _ = DraegerSequence(vendor="sentec")
 
-    _= TimpelSequence(vendor='timpel')
+    _ = TimpelSequence(vendor="timpel")
     with pytest.raises(TypeError):
-        _= TimpelSequence(vendor='draeger')
-        _= TimpelSequence(vendor='sentec')
+        _ = TimpelSequence(vendor="draeger")
+        _ = TimpelSequence(vendor="sentec")
 
 
 def test_merge(  # pylint: disable=too-many-locals
@@ -116,35 +120,39 @@ def test_merge(  # pylint: disable=too-many-locals
     draeger_data_both: DraegerSequence,
     timpel_data: TimpelSequence,
     timpel_data_double: TimpelSequence,
-    ):
-
+):
     merged_draeger = Sequence.merge(draeger_data1, draeger_data2)
     assert len(merged_draeger) == len(draeger_data2) + len(draeger_data1)
     assert merged_draeger == draeger_data_both
     added_draeger = draeger_data1 + draeger_data2
     assert added_draeger == merged_draeger
 
-    draeger_load_double = Sequence.from_path([draeger_file1, draeger_file1], 'draeger')
+    draeger_load_double = Sequence.from_path([draeger_file1, draeger_file1], "draeger")
     draeger_merge_double = Sequence.merge(draeger_data1, draeger_data1)
     assert draeger_load_double == draeger_merge_double
     added_draeger_double = draeger_data1 + draeger_data1
     assert added_draeger_double == draeger_merge_double
 
     draeger_merged_twice = Sequence.merge(draeger_merge_double, draeger_merge_double)
-    draeger_load_four_times = Sequence.from_path([draeger_file1]*4, 'draeger')
-    assert isinstance(draeger_merged_twice.path, list) and len(draeger_merged_twice.path) == 4
+    draeger_load_four_times = Sequence.from_path([draeger_file1] * 4, "draeger")
+    assert (
+        isinstance(draeger_merged_twice.path, list)
+        and len(draeger_merged_twice.path) == 4
+    )
     assert draeger_merged_twice == draeger_load_four_times
 
     draeger_merge_thrice = Sequence.merge(draeger_merge_double, draeger_data1)
-    draeger_load_thrice = Sequence.from_path([draeger_file1]*3, 'draeger')
-    assert isinstance(draeger_merge_thrice.path, list) and len(draeger_merge_thrice.path) == 3
+    draeger_load_thrice = Sequence.from_path([draeger_file1] * 3, "draeger")
+    assert (
+        isinstance(draeger_merge_thrice.path, list)
+        and len(draeger_merge_thrice.path) == 3
+    )
     assert draeger_merge_thrice == draeger_load_thrice
     added_draeger_triple = draeger_data1 + draeger_data1 + draeger_data1
     assert draeger_merge_thrice == added_draeger_triple
 
-
     merged_timpel = Sequence.merge(timpel_data, timpel_data)
-    assert len(merged_timpel) == 2*len(timpel_data)
+    assert len(merged_timpel) == 2 * len(timpel_data)
     assert timpel_data_double == merged_timpel
     added_timpel = timpel_data + timpel_data
     assert added_timpel == merged_timpel
@@ -164,7 +172,7 @@ def test_merge(  # pylint: disable=too-many-locals
 def test_copy(
     draeger_data1: DraegerSequence,
     timpel_data: TimpelSequence,
-    ):
+):
     data: Sequence
     for data in [draeger_data1, timpel_data]:
         print(data.vendor)
@@ -175,7 +183,7 @@ def test_copy(
 def test_equals(
     draeger_data1: DraegerSequence,
     timpel_data: TimpelSequence,
-    ):
+):
     data: Sequence
     for data in [draeger_data1, timpel_data]:
         print(data.vendor)
@@ -215,8 +223,7 @@ def test_equals(
 def test_slicing(
     draeger_data1: DraegerSequence,
     timpel_data: TimpelSequence,
-    ):
-
+):
     cutoff = 100
 
     data: Sequence
@@ -235,8 +242,7 @@ def test_slicing(
 def test_load_partial(
     draeger_data2: DraegerSequence,
     timpel_data: TimpelSequence,
-    ):
-
+):
     cutoff = 58
     # Keep cutoff at 58 for draeger_data2 as there is an event mark at this
     # timepoint. Starting the load specifically at the timepoint of an event
@@ -258,7 +264,9 @@ def test_load_partial(
 
     # Draeger
     draeger_first_part = Sequence.from_path(draeger_file2, "draeger", max_frames=cutoff)
-    draeger_second_part = Sequence.from_path(draeger_file2, "draeger", first_frame=cutoff)
+    draeger_second_part = Sequence.from_path(
+        draeger_file2, "draeger", first_frame=cutoff
+    )
 
     assert draeger_first_part == draeger_data2[:cutoff]
     assert draeger_second_part == draeger_data2[cutoff:]
@@ -267,7 +275,7 @@ def test_load_partial(
 
 
 def test_illegal_first():
-    for ff in [0.5, -1, 'fdw']:
+    for ff in [0.5, -1, "fdw"]:
         with pytest.raises((TypeError, ValueError)):
             _ = Sequence.from_path(draeger_file1, "draeger", first_frame=ff)
 
@@ -293,7 +301,7 @@ def test_select_by_time(
     with pytest.warns(UserWarning):
         _ = data.select_by_time(None)
     with pytest.warns(UserWarning):
-        _ = data.select_by_time(end = None)
+        _ = data.select_by_time(end=None)
 
     # test start only
     start_slices = [
@@ -303,10 +311,9 @@ def test_select_by_time(
         (t22 + ms, 23, 23),
     ]
     for start_slicing in start_slices:
-        sliced = data.select_by_time(
-            start = start_slicing[0], start_inclusive=True)
+        sliced = data.select_by_time(start=start_slicing[0], start_inclusive=True)
         assert len(sliced) == len(data) - start_slicing[1]
-        sliced = data.select_by_time(start = start_slicing[0], start_inclusive=False)
+        sliced = data.select_by_time(start=start_slicing[0], start_inclusive=False)
         assert len(sliced) == len(data) - start_slicing[2]
 
     # test end only
@@ -317,103 +324,146 @@ def test_select_by_time(
         (t52 + ms, 52, 52),
     ]
     for end_slicing in end_slices:
-        sliced = data.select_by_time(end = end_slicing[0], end_inclusive=True)
+        sliced = data.select_by_time(end=end_slicing[0], end_inclusive=True)
         assert len(sliced) == end_slicing[1]
-        sliced = data.select_by_time(end = end_slicing[0], end_inclusive=False)
+        sliced = data.select_by_time(end=end_slicing[0], end_inclusive=False)
         assert len(sliced) == end_slicing[2]
 
     # test start and end
     for start_slicing in start_slices:
         for end_slicing in end_slices:
             # True/True
-            sliced = data.select_by_time(start = start_slicing[0],
-                                        end = end_slicing[0],
-                                        start_inclusive=True,
-                                        end_inclusive=True)
-            assert len(sliced) == end_slicing[1]-start_slicing[1]
+            sliced = data.select_by_time(
+                start=start_slicing[0],
+                end=end_slicing[0],
+                start_inclusive=True,
+                end_inclusive=True,
+            )
+            assert len(sliced) == end_slicing[1] - start_slicing[1]
 
             # False/True
-            sliced = data.select_by_time(start = start_slicing[0],
-                                        end = end_slicing[0],
-                                        start_inclusive=False,
-                                        end_inclusive=True)
-            assert len(sliced) == end_slicing[1]-start_slicing[2]
+            sliced = data.select_by_time(
+                start=start_slicing[0],
+                end=end_slicing[0],
+                start_inclusive=False,
+                end_inclusive=True,
+            )
+            assert len(sliced) == end_slicing[1] - start_slicing[2]
 
             # True/False
-            sliced = data.select_by_time(start = start_slicing[0],
-                                        end = end_slicing[0],
-                                        start_inclusive=True,
-                                        end_inclusive=False)
-            assert len(sliced) == end_slicing[2]-start_slicing[1]
+            sliced = data.select_by_time(
+                start=start_slicing[0],
+                end=end_slicing[0],
+                start_inclusive=True,
+                end_inclusive=False,
+            )
+            assert len(sliced) == end_slicing[2] - start_slicing[1]
 
             # False/False
-            sliced = data.select_by_time(start = start_slicing[0],
-                                        end = end_slicing[0],
-                                        start_inclusive=False,
-                                        end_inclusive=False)
-            assert len(sliced) == end_slicing[2]-start_slicing[2]
+            sliced = data.select_by_time(
+                start=start_slicing[0],
+                end=end_slicing[0],
+                start_inclusive=False,
+                end_inclusive=False,
+            )
+            assert len(sliced) == end_slicing[2] - start_slicing[2]
 
 
 def test_label(
     draeger_data1: DraegerSequence,
     draeger_data2: DraegerSequence,
 ):
+    assert isinstance(draeger_data1.label, str), "default label is not a string"
+    assert (
+        draeger_data1.label == f"Sequence_{id(draeger_data1)}"
+    ), "unexpected default label"
 
-    assert isinstance(draeger_data1.label, str), 'default label is not a string'
-    assert draeger_data1.label == f'Sequence_{id(draeger_data1)}', 'unexpected default label'
+    assert (
+        draeger_data1.label != draeger_data2.label
+    ), "different data has identical label"
 
-    assert draeger_data1.label != draeger_data2.label, 'different data has identical label'
+    timpel_1 = Sequence.from_path(timpel_file, vendor="timpel")
+    timpel_2 = Sequence.from_path(timpel_file, vendor="timpel")
+    assert timpel_1.label != timpel_2.label, "reloaded data has identical label"
 
-    timpel_1 = Sequence.from_path(timpel_file, vendor = 'timpel')
-    timpel_2 = Sequence.from_path(timpel_file, vendor = 'timpel')
-    assert timpel_1.label != timpel_2.label, 'reloaded data has identical label'
-
-    test_label = 'test_label'
-    timpel_3 = Sequence.from_path(timpel_file, vendor = 'timpel', label = test_label)
-    timpel_4 = Sequence.from_path(timpel_file, vendor = 'timpel', label = test_label)
-    assert timpel_3.label == test_label, 'label attribute does not match given label'
-    assert timpel_3.label == timpel_4.label, 're-used test label not recognized as identical'
+    test_label = "test_label"
+    timpel_3 = Sequence.from_path(timpel_file, vendor="timpel", label=test_label)
+    timpel_4 = Sequence.from_path(timpel_file, vendor="timpel", label=test_label)
+    assert timpel_3.label == test_label, "label attribute does not match given label"
+    assert (
+        timpel_3.label == timpel_4.label
+    ), "re-used test label not recognized as identical"
 
     timpel_copy = timpel_1.deepcopy()
-    assert timpel_1.label != timpel_copy.label, 'deepcopied data has identical label'
-    assert timpel_copy.label == f'Copy of <{timpel_1.label}>', 'deepcopied data has unexpected label'
-    timpel_copy_relabel = timpel_1.deepcopy(label = test_label)
-    assert timpel_1.label != timpel_copy_relabel.label, 'deepcopied data with new label has identical label'
-    timpel_copy_relabel = timpel_1.deepcopy(relabel = False)
-    assert timpel_1.label == timpel_copy_relabel.label, 'deepcopied data did not keep old label'
-    timpel_copy_relabel = timpel_1.deepcopy(label = test_label, relabel = False)
-    assert timpel_1.label != timpel_copy_relabel.label, 'combo of label and relabel not working as intended'
+    assert timpel_1.label != timpel_copy.label, "deepcopied data has identical label"
+    assert (
+        timpel_copy.label == f"Copy of <{timpel_1.label}>"
+    ), "deepcopied data has unexpected label"
+    timpel_copy_relabel = timpel_1.deepcopy(label=test_label)
+    assert (
+        timpel_1.label != timpel_copy_relabel.label
+    ), "deepcopied data with new label has identical label"
+    timpel_copy_relabel = timpel_1.deepcopy(relabel=False)
+    assert (
+        timpel_1.label == timpel_copy_relabel.label
+    ), "deepcopied data did not keep old label"
+    timpel_copy_relabel = timpel_1.deepcopy(label=test_label, relabel=False)
+    assert (
+        timpel_1.label != timpel_copy_relabel.label
+    ), "combo of label and relabel not working as intended"
 
 
 def test_relabeling(
     timpel_data: TimpelSequence,
     draeger_data2: DraegerSequence,
-
 ):
-    test_label = 'test label'
+    test_label = "test label"
 
-    #merging
+    # merging
     merged_timpel = Sequence.merge(timpel_data, timpel_data)
-    assert merged_timpel.label != timpel_data.label, 'merging does not assign new label by default'
-    assert merged_timpel.label == f'Merge of <{timpel_data.label}> and <{timpel_data.label}>', 'merging generates unexpected default label'
+    assert (
+        merged_timpel.label != timpel_data.label
+    ), "merging does not assign new label by default"
+    assert (
+        merged_timpel.label
+        == f"Merge of <{timpel_data.label}> and <{timpel_data.label}>"
+    ), "merging generates unexpected default label"
     added_timpel = timpel_data + timpel_data
-    assert added_timpel.label == f'Merge of <{timpel_data.label}> and <{timpel_data.label}>', 'adding generates unexpected default label'
-    merged_timpel_2 = Sequence.merge(timpel_data, timpel_data, label = test_label)
-    assert merged_timpel_2.label == test_label, 'incorrect label assigned when merging data with new label'
+    assert (
+        added_timpel.label
+        == f"Merge of <{timpel_data.label}> and <{timpel_data.label}>"
+    ), "adding generates unexpected default label"
+    merged_timpel_2 = Sequence.merge(timpel_data, timpel_data, label=test_label)
+    assert (
+        merged_timpel_2.label == test_label
+    ), "incorrect label assigned when merging data with new label"
 
     # slicing
     indices = slice(0, 10)
     sliced_timpel = timpel_data[indices]
-    assert sliced_timpel.label != timpel_data.label, 'slicing does not assign new label by default'
-    assert sliced_timpel.label == f'Slice ({indices.start}-{indices.stop}) of <{timpel_data.label}>', 'slicing generates unexpected default label'
+    assert (
+        sliced_timpel.label != timpel_data.label
+    ), "slicing does not assign new label by default"
+    assert (
+        sliced_timpel.label
+        == f"Slice ({indices.start}-{indices.stop}) of <{timpel_data.label}>"
+    ), "slicing generates unexpected default label"
     sliced_timpel_2 = timpel_data.select_by_index(indices=indices, label=test_label)
-    assert sliced_timpel_2.label == test_label, 'incorrect label assigned when slicing data with new label'
+    assert (
+        sliced_timpel_2.label == test_label
+    ), "incorrect label assigned when slicing data with new label"
 
     # select_by_time
     t22 = 55825.268
     t52 = 55826.768
-    time_sliced = draeger_data2.select_by_time(t22, t52+0.001)
-    assert time_sliced.label != draeger_data2.label, 'time slicing does not assign new label by default'
-    assert time_sliced.label == f'Slice (22-52) of <{draeger_data2.label}>', 'slicing generates unexpected default label'
+    time_sliced = draeger_data2.select_by_time(t22, t52 + 0.001)
+    assert (
+        time_sliced.label != draeger_data2.label
+    ), "time slicing does not assign new label by default"
+    assert (
+        time_sliced.label == f"Slice (22-52) of <{draeger_data2.label}>"
+    ), "slicing generates unexpected default label"
     time_sliced_2 = draeger_data2.select_by_time(t22, t52, label=test_label)
-    assert time_sliced_2.label == test_label, 'incorrect label assigned when time slicing data with new label'
+    assert (
+        time_sliced_2.label == test_label
+    ), "incorrect label assigned when time slicing data with new label"
