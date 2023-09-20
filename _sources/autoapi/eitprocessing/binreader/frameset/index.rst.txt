@@ -90,7 +90,7 @@ Classes
    .. py:method:: plot_waveforms(waveforms=None)
 
 
-   .. py:method:: animate(cmap: str = 'plasma', show_progress: bool | str = 'notebook', waveforms: bool | list[str] = False)
+   .. py:method:: animate(cmap: str = 'plasma', show_progress: bool | str = 'notebook', waveforms: bool | List[str] = False)
 
 
    .. py:method:: merge(a, b)
