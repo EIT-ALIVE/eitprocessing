@@ -2,31 +2,38 @@
 
 If you're looking for user documentation, go [here](README.md).
 
-
 ## Contributions
 
 We welcome all contributions to this open-source project, as long as they follow our
 [code of conduct](https://github.com/EIT-ALIVE/eitprocessing/blob/main/CODE_OF_CONDUCT.md).
 We appreciate it if you adhere to our naming and style conventions below.
 
-
 ### Conventions
 
 #### Readability vs complexity/correctness
+
 While we implement "best practices" as much as possible, it is important to state that sometimes
 readibility or simplicity is more important than absolute correctness.
 It is hard to define the precise balance we are looking for, so instead we will refer
 to the [Zen of python](https://peps.python.org/pep-0020/).
 
 Note that all contrubtions to this project will be published under our [Apache 2.0 licence]
-(https://github.com/EIT-ALIVE/eitprocessing/blob/main/LICENSE).
-
+(<https://github.com/EIT-ALIVE/eitprocessing/blob/main/LICENSE>).
 
 #### Docstrings
+
 We use the [google convention](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
 for writing docstrings.
 
+#### Code formatting
+
+We use the [Black formatter](https://pypi.org/project/black/) to format code. If you use Visual
+Studio Code, the [extension by
+Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter) is a good
+place to start. This extension is currently in preview, but seems to work more reliably than older implementations.
+
 #### Branch naming convention
+
 Please try to adhere to the following branch naming convention:
 <github-issue-number>_<brief-description>_<username>.
 E.g., `042_life_universe_everything_douglasadams`.
@@ -36,14 +43,15 @@ addressing, a hint of what the issue is, and who you are.
 Also, it simplifies tab autocompletion when switching to your branch.
 
 #### PR naming convention
+
 Please use an [angular convention type](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#type),
 followed by a semicolon and then a description when creating a PR.
 E.g., `feat: added module to calculate the answer to life, the universe, and everything`
 
-
 ### Creating a PR
 
 #### Code review and continuous integration
+
 All contributions to the project are subject to code review and require at least one
 approving review before they can be merged onto the main branch.
 
@@ -52,10 +60,10 @@ that all checks pass before requesting code review.
 
 Please create a "draft PR" until your work is ready for review, as this will avoid triggering
 the CI prematurely (which uses unnecessary computing power, see [here]
-(https://blog.esciencecenter.nl/reduce-reuse-recycle-save-the-planet-one-github-action-at-a-time-4ab602255c3f)).
+(<https://blog.esciencecenter.nl/reduce-reuse-recycle-save-the-planet-one-github-action-at-a-time-4ab602255c3f>)).
 
-You can run the [tests](#testing-locally) and [linter](#linting-locally) locally before activating the CI.
-
+You can run the [tests](#testing-locally) and [linter](#linting-locally) locally before activating
+the CI.
 
 #### Testing locally
 
@@ -63,6 +71,7 @@ Make sure you have developer options installed as described in the [README](READ
 (otherwise run: `pip install -e .[dev]` on the repository folder in your environment)
 
 For testing all you need to do is run:
+
 ```shell
 pytest
 ```
@@ -100,8 +109,8 @@ isort --check-only --diff eitprocessing
 isort eitprocessing
 ```
 
-
 # The following sections are untested
+
 ## Generating the API docs
 
 ```shell
