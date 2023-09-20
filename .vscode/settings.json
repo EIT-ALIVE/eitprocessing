@@ -2,9 +2,9 @@
     "[python]": {
         "editor.codeActionsOnSave": {
             "source.organizeImports": true
-        }
+        },
+        "editor.formatOnSave": true,
     },
-    // "python.linting.prospectorEnabled": true,
     "notebook.lineNumbers": "on",
     "python.testing.pytestArgs": [
         "tests"
