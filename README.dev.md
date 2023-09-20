@@ -6,7 +6,21 @@ If you're looking for user documentation, go [here](README.md).
 
 We welcome all contributions to this open-source project, as long as they follow our
 [code of conduct](https://github.com/EIT-ALIVE/eitprocessing/blob/main/CODE_OF_CONDUCT.md).
-We appreciate it if you adhere to our naming and style conventions below.
+We appreciate it if you adhere to our naming and style [conventions](#conventions) below.
+
+Please follow these steps:
+1. (**important**) announce your plan to the rest of the community *before you start working*. This announcement should be in the form of a (new) issue;
+1. (**important**) wait until some kind of consensus is reached about your idea being a good idea;
+1. if needed, fork the repository to your own Github profile and create your own feature branch off of the latest master commit. While working on your feature branch, make sure to stay up to date with the master branch by pulling in changes, possibly from the 'upstream' repository (follow the instructions [here](https://help.github.com/articles/configuring-a-remote-for-a-fork/) and [here](https://help.github.com/articles/syncing-a-fork/));
+1. make sure the existing tests still work by running ``pytest`` (see also [here](#testing-locally));
+1. add your own tests (if necessary);
+1. update or expand the documentation;
+1. update the `CHANGELOG.md` file with change;
+1. push your feature branch to (your fork of) the eitprocessing repository on GitHub;
+1. create the pull request, e.g. following the instructions [here](https://help.github.com/articles/creating-a-pull-request/).
+
+In case you feel like you've made a valuable contribution, but you don't know how to write or run tests for it, or how to generate the documentation: don't let this discourage you from making the pull request; we can help you! Just go ahead and submit the pull request, but keep in mind that you might be asked to append additional commits to your pull request.
+
 
 ### Conventions
 
@@ -46,7 +60,7 @@ Also, it simplifies tab autocompletion when switching to your branch.
 
 Please use an [angular convention type](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#type),
 followed by a semicolon and then a description when creating a PR.
-E.g., `feat: added module to calculate the answer to life, the universe, and everything`
+E.g., `feat: added module to calculate the answer to life, the universe, and everything`.
 
 ### Creating a PR
 
@@ -59,8 +73,7 @@ We have set up continuous integration for linting and testing, among other thing
 that all checks pass before requesting code review.
 
 Please create a "draft PR" until your work is ready for review, as this will avoid triggering
-the CI prematurely (which uses unnecessary computing power, see [here]
-(<https://blog.esciencecenter.nl/reduce-reuse-recycle-save-the-planet-one-github-action-at-a-time-4ab602255c3f>)).
+the CI prematurely (which uses unnecessary computing power, see [here](<https://blog.esciencecenter.nl/reduce-reuse-recycle-save-the-planet-one-github-action-at-a-time-4ab602255c3f>)).
 
 You can run the [tests](#testing-locally) and [linter](#linting-locally) locally before activating
 the CI.
