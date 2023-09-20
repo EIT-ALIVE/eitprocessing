@@ -1,6 +1,6 @@
 ## Badges
 
-(Customize these badges with your own links, and check https://shields.io/ or https://badgen.net/ to see which other badges are available.)
+(Customize these badges with your own links, and check <https://shields.io/> or <https://badgen.net/> to see which other badges are available.)
 
 | fair-software.eu recommendations | |
 | :-- | :--  |
@@ -25,6 +25,7 @@ The project setup is documented in [project_setup.md](project_setup.md). Feel fr
 ## Installation
 
 Install eitprocessing as follows:
+
 - Create fresh environment
   - Make sure you are in your base environment: `conda activate`
   - Create a new environment: `conda create -n <envname> python=3.10`
@@ -35,7 +36,6 @@ Install eitprocessing as follows:
     - For basic use: `pip install -e .`
     - For full developer options (testing, etc): `pip install -e .[dev]`
 
-
 ## Documentation
 
 We have custom documentation on a dedicated page [here](https://eit-alive.github.io/eitprocessing/)
@@ -43,7 +43,7 @@ We have custom documentation on a dedicated page [here](https://eit-alive.github
 ## Contributing
 
 If you want to contribute to the development of eitprocessing,
-have a look at the [contribution guidelines](CONTRIBUTING.md).
+have a look at the [contribution guidelines](CONTRIBUTING.md) and the [developer documentation](README.dev.md).
 
 ## Credits
 
