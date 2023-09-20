@@ -28,8 +28,7 @@ from .timing_error import TimingError
 
 
 class Vendor(LowercaseStrEnum):
-    """Enum indicating the vendor (manufacturer) of the EIT device with which the data was
-    gathered"""
+    """Enum indicating the vendor (manufacturer) of the EIT device with which the data was gathered."""
 
     DRAEGER = auto()
     TIMPEL = auto()
@@ -40,11 +39,13 @@ class Vendor(LowercaseStrEnum):
 
 @dataclass(eq=False)
 class Sequence:
-    """Sequence of timepoints containing EIT and/or waveform data
+    """Sequence of timepoints containing EIT and/or waveform data.
 
-    A Sequence is meant as a representation of a continuous set of data, either EIT frames,
-    waveform data, or both. A Sequence could consist of an entire measurement, a section of a
-    measurement, a single breath or even a portion of a breath.
+    A Sequence is a representation of a continuous set of data points, either EIT frames,
+    waveform data, or both. A Sequence can consist of an entire measurement, a section of a
+    measurement, a single breath, or even a portion of a breath.
+    A sequence can be split up into separate sections of a measurement or multiple (similar)
+    Sequence objects can be merged together to form a single Sequence.
 
     EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
 
@@ -63,9 +64,6 @@ class Sequence:
         events (list[Event]): list of Event objects in data
         timing_errors (list[TimingError]): list of TimingError objects in data
         phases (list[PhaseIndicator]): list of PhaseIndicator objects in data
-
-    Returns:
-        Sequence: a sequence containing the l
     """
 
     path: Path | str | list[Path | str] | None = None
@@ -499,6 +497,7 @@ class DraegerSequence(Sequence):
         previous_marker: int | None,
     ):
         """Read frame by frame data from DRAEGER files."""
+
         current_time = round(reader.float64() * 24 * 60 * 60, 3)
 
         _ = reader.float32()
@@ -544,6 +543,7 @@ class TimpelSequence(Sequence):
 
     def _load_data(self, first_frame: int):
         """Load data for TIMPEL files."""
+
         COLUMN_WIDTH = 1030
 
         try:
