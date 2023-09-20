@@ -20,6 +20,22 @@ from tqdm.notebook import tqdm as notebook_tqdm
 
 @dataclass
 class Frameset:
+    """A Frameset is ....
+        From Sequence:
+            EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
+        From notebook:
+            Data is contained within framesets.
+            A frameset contains data that has been processed or edited in some way.
+            By default, loaded data only contains raw impedance data, without any processing.
+            Impedance data is available as the `pixel_values` attribute, which is a `np.ndarray` with three dimensions: time, rows, columns.
+    Args:
+        name (str): ...
+        description (str): ...
+        params (dict): ...
+        pixel_values (np.ndarray): ...
+        waveform_data (dict): ...
+    """
+
     name: str
     description: str
     params: dict = field(default_factory=dict)
