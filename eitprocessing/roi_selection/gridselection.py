@@ -20,12 +20,12 @@ class GridSelection(ROISelection):
         n_columns = data.shape[1]
         if self.h_split > n_columns:
             raise ValueError(
-                "can't split a matrix into more horizontal regions than columns"
+                f"`h_split` ({self.h_split}) is larger than the number of columns ({n_columns})."
             )
 
         if self.v_split > n_rows:
             raise ValueError(
-                "can't split a matrix into more vertical regions than rows"
+                f"`v_split` ({self.v_split}) is larger than the number or rows ({n_rows})."
             )
 
         if self.split_pixels:
