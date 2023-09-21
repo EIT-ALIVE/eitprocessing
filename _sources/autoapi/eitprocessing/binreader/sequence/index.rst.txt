@@ -34,7 +34,8 @@ Classes
 
    Bases: :py:obj:`strenum.LowercaseStrEnum`
 
-   Enum indicating the vendor (manufacturer) of the EIT device with which the data was gathered.
+   Enum indicating the vendor (manufacturer) of the EIT device with which the data was
+   gathered
 
    .. py:attribute:: DRAEGER
 
@@ -60,18 +61,16 @@ Classes
 .. py:class:: Sequence
 
 
-   Sequence of timepoints containing EIT and/or waveform data.
+   Sequence of timepoints containing EIT and/or waveform data
 
-   A Sequence is a representation of a continuous set of data points, either EIT frames,
-   waveform data, or both. A Sequence can consist of an entire measurement, a section of a
-   measurement, a single breath, or even a portion of a breath.
-   A sequence can be split up into separate sections of a measurement or multiple (similar)
-   Sequence objects can be merged together to form a single Sequence.
+   A Sequence is meant as a representation of a continuous set of data, either EIT frames,
+   waveform data, or both. A Sequence could consist of an entire measurement, a section of a
+   measurement, a single breath or even a portion of a breath.
 
    EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
 
    :param path: path(s) to data file.
-   :type path: Path | str | list[Path | str]
+   :type path: Path | str | List[Path | str]
    :param vendor: vendor indicating the device used.
    :type vendor: Vendor | str
    :param label: description of object for human interpretation.
@@ -87,16 +86,19 @@ Classes
                      Defaults to 50 if vendor == TIMPEL
    :type framerate: int, optional
    :param framesets: dictionary of framesets
-   :type framesets: dict[str, Frameset]
+   :type framesets: Dict[str, Frameset]
    :param events: list of Event objects in data
-   :type events: list[Event]
+   :type events: List[Event]
    :param timing_errors: list of TimingError objects in data
-   :type timing_errors: list[TimingError]
+   :type timing_errors: List[TimingError]
    :param phases: list of PhaseIndicator objects in data
-   :type phases: list[PhaseIndicator]
+   :type phases: List[PhaseIndicator]
+
+   :returns: a sequence containing the l
+   :rtype: Sequence
 
    .. py:attribute:: path
-      :type: pathlib.Path | str | list[pathlib.Path | str] | None
+      :type: pathlib.Path | str | List[pathlib.Path | str] | None
 
       
 
@@ -126,22 +128,22 @@ Classes
       
 
    .. py:attribute:: framesets
-      :type: dict[str, eitprocessing.binreader.frameset.Frameset]
+      :type: Dict[str, eitprocessing.binreader.frameset.Frameset]
 
       
 
    .. py:attribute:: events
-      :type: list[eitprocessing.binreader.event.Event]
+      :type: List[eitprocessing.binreader.event.Event]
 
       
 
    .. py:attribute:: timing_errors
-      :type: list[eitprocessing.binreader.timing_error.TimingError]
+      :type: List[eitprocessing.binreader.timing_error.TimingError]
 
       
 
    .. py:attribute:: phases
-      :type: list[eitprocessing.binreader.phases.PhaseIndicator]
+      :type: List[eitprocessing.binreader.phases.PhaseIndicator]
 
       
 
@@ -181,13 +183,13 @@ Classes
       Create a merge of two Sequence objects.
 
 
-   .. py:method:: from_path(path: pathlib.Path | str | list[pathlib.Path | str], vendor: Vendor | str | None = None, label: str | None = None, framerate: int | None = None, first_frame: int = 0, max_frames: int | None = None) -> Sequence
+   .. py:method:: from_path(path: pathlib.Path | str | List[pathlib.Path | str], vendor: Vendor | str | None = None, label: str | None = None, framerate: int | None = None, first_frame: int = 0, max_frames: int | None = None) -> Sequence
       :classmethod:
 
       Load sequence from path(s)
 
       :param path: path(s) to data file.
-      :type path: Path | str | list[Path | str]
+      :type path: Path | str | List[Path | str]
       :param vendor: vendor indicating the device used.
       :type vendor: Vendor | str
       :param label: description of object for human interpretation.
@@ -294,7 +296,7 @@ Classes
       Load data for DRAEGER files.
 
 
-   .. py:method:: _read_frame(reader: eitprocessing.binreader.reader.Reader, index: int, pixel_values: numpy.typing.NDArray, previous_marker: int | None)
+   .. py:method:: _read_frame(reader: eitprocessing.binreader.reader.Reader, index: int, pixel_values: numpy.typing.NDArray, previous_marker: int | None) -> None
 
       Read frame by frame data from DRAEGER files.
 

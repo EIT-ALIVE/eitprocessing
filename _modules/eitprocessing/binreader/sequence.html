@@ -52,6 +52,8 @@
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">auto</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
 <span class="kn">from</span> <span class="nn">strenum</span> <span class="kn">import</span> <span class="n">LowercaseStrEnum</span>
@@ -68,7 +70,8 @@
 <div class="viewcode-block" id="Vendor">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Vendor">[docs]</a>
 <span class="k">class</span> <span class="nc">Vendor</span><span class="p">(</span><span class="n">LowercaseStrEnum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum indicating the vendor (manufacturer) of the EIT device with which the data was gathered.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum indicating the vendor (manufacturer) of the EIT device with which the data was</span>
+<span class="sd">    gathered&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Vendor.DRAEGER">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Vendor.DRAEGER">[docs]</a>
@@ -97,18 +100,16 @@
 <div class="viewcode-block" id="Sequence">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence">[docs]</a>
 <span class="k">class</span> <span class="nc">Sequence</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sequence of timepoints containing EIT and/or waveform data.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sequence of timepoints containing EIT and/or waveform data</span>
 
-<span class="sd">    A Sequence is a representation of a continuous set of data points, either EIT frames,</span>
-<span class="sd">    waveform data, or both. A Sequence can consist of an entire measurement, a section of a</span>
-<span class="sd">    measurement, a single breath, or even a portion of a breath.</span>
-<span class="sd">    A sequence can be split up into separate sections of a measurement or multiple (similar)</span>
-<span class="sd">    Sequence objects can be merged together to form a single Sequence.</span>
+<span class="sd">    A Sequence is meant as a representation of a continuous set of data, either EIT frames,</span>
+<span class="sd">    waveform data, or both. A Sequence could consist of an entire measurement, a section of a</span>
+<span class="sd">    measurement, a single breath or even a portion of a breath.</span>
 
 <span class="sd">    EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        path (Path | str | list[Path | str]): path(s) to data file.</span>
+<span class="sd">        path (Path | str | List[Path | str]): path(s) to data file.</span>
 <span class="sd">        vendor (Vendor | str): vendor indicating the device used.</span>
 <span class="sd">        label (str): description of object for human interpretation.</span>
 <span class="sd">            Defaults to &quot;Sequence_&lt;unique_id&gt;&quot;.</span>
@@ -118,15 +119,18 @@
 <span class="sd">        framerate (int, optional): framerate at which the data was recorded.</span>
 <span class="sd">            Defaults to 20 if vendor == DRAEGER</span>
 <span class="sd">            Defaults to 50 if vendor == TIMPEL</span>
-<span class="sd">        framesets (dict[str, Frameset]): dictionary of framesets</span>
-<span class="sd">        events (list[Event]): list of Event objects in data</span>
-<span class="sd">        timing_errors (list[TimingError]): list of TimingError objects in data</span>
-<span class="sd">        phases (list[PhaseIndicator]): list of PhaseIndicator objects in data</span>
+<span class="sd">        framesets (Dict[str, Frameset]): dictionary of framesets</span>
+<span class="sd">        events (List[Event]): list of Event objects in data</span>
+<span class="sd">        timing_errors (List[TimingError]): list of TimingError objects in data</span>
+<span class="sd">        phases (List[PhaseIndicator]): list of PhaseIndicator objects in data</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Sequence: a sequence containing the l</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Sequence.path">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.path">[docs]</a>
-    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Sequence.vendor">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.vendor">[docs]</a>
@@ -150,26 +154,26 @@
 
 <div class="viewcode-block" id="Sequence.framesets">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.framesets">[docs]</a>
-    <span class="n">framesets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Frameset</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+    <span class="n">framesets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Frameset</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Sequence.events">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.events">[docs]</a>
-    <span class="n">events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Event</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Event</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Sequence.timing_errors">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.timing_errors">[docs]</a>
-    <span class="n">timing_errors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TimingError</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">timing_errors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TimingError</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Sequence.phases">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.phases">[docs]</a>
-    <span class="n">phases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PhaseIndicator</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">phases</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PhaseIndicator</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Sequence.__post_init__">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.__post_init__">[docs]</a>
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Sequence_</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Sequence_</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_vendor_class</span><span class="p">()</span></div>
 
@@ -216,14 +220,11 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vendor</span> <span class="o">=</span> <span class="n">Vendor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
 
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span>
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Sequence</span>
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">vendor</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vendor</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`vendor` for </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> cannot be set as </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
+            <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;`vendor` for </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s1"> cannot be set as </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
         <span class="c1"># Note that this way of re-assigning classes is considered to be a bad practice</span>
         <span class="c1"># (https://tinyurl.com/2x2cea6h), but the objections raised don&#39;t seem to be prohibtive.</span>
@@ -265,7 +266,7 @@
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">a</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
         <span class="n">b</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
-        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a merge of two Sequence objects.&quot;&quot;&quot;</span>
 
@@ -292,7 +293,7 @@
                 <span class="n">item</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">a_items</span> <span class="o">+</span> <span class="n">b_items</span>
 
-        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Merge of &lt;</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&gt; and &lt;</span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&gt;&quot;</span> <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">label</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Merge of &lt;</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">&gt; and &lt;</span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">&gt;&#39;</span> <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">label</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
@@ -313,7 +314,7 @@
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.from_path">[docs]</a>
     <span class="k">def</span> <span class="nf">from_path</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments, unused-argument</span>
         <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -323,7 +324,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load sequence from path(s)</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            path (Path | str | list[Path | str]): path(s) to data file.</span>
+<span class="sd">            path (Path | str | List[Path | str]): path(s) to data file.</span>
 <span class="sd">            vendor (Vendor | str): vendor indicating the device used.</span>
 <span class="sd">            label (str): description of object for human interpretation.</span>
 <span class="sd">                Defaults to &quot;Sequence_&lt;unique_id&gt;&quot;.</span>
@@ -429,7 +430,9 @@
         <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Slicing only implemented using a slice object&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Slicing only implemented using a slice object&quot;</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">indices</span><span class="o">.</span><span class="n">step</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;Skipping intermediate frames while slicing is not implemented.&quot;</span>
@@ -439,15 +442,11 @@
         <span class="k">if</span> <span class="n">indices</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">indices</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">,</span> <span class="n">indices</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
 
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">()</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">()</span>  <span class="c1">#TODO: consider to make this more efficient for large data</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">nframes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">framesets</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">framesets</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">obj</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Slice (</span><span class="si">{</span><span class="n">indices</span><span class="o">.</span><span class="n">start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">indices</span><span class="o">.</span><span class="n">stop</span><span class="si">}</span><span class="s2">) of &lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
-            <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="k">else</span> <span class="n">label</span>
-        <span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Slice (</span><span class="si">{</span><span class="n">indices</span><span class="o">.</span><span class="n">start</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">indices</span><span class="o">.</span><span class="n">stop</span><span class="si">}</span><span class="s1">) of &lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">&gt;&#39;</span> <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">label</span>
 
         <span class="n">range_</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">indices</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">indices</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="s2">&quot;timing_errors&quot;</span><span class="p">,</span> <span class="s2">&quot;phases&quot;</span><span class="p">]:</span>
@@ -458,15 +457,17 @@
         <span class="k">return</span> <span class="n">obj</span></div>
 
 
+
 <div class="viewcode-block" id="Sequence.__getitem__">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.__getitem__">[docs]</a>
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="nb">slice</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_by_index</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span></div>
 
 
+
 <div class="viewcode-block" id="Sequence.select_by_time">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.Sequence.select_by_time">[docs]</a>
-    <span class="k">def</span> <span class="nf">select_by_time</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="k">def</span> <span class="nf">select_by_time</span><span class="p">(</span>  <span class="c1">#pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -519,7 +520,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">end_index</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_by_index</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">start_index</span><span class="p">,</span> <span class="n">end_index</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_by_index</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">start_index</span><span class="p">,</span><span class="n">end_index</span><span class="p">),</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Sequence.deepcopy">
@@ -546,7 +547,7 @@
         <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
         <span class="k">elif</span> <span class="n">relabel</span><span class="p">:</span>
-            <span class="n">obj</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Copy of &lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Copy of &lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">&gt;&#39;</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 </div>
 
@@ -587,9 +588,8 @@
         <span class="c1"># is an event marker. Data for the pre-first (dummy) frame will be</span>
         <span class="c1"># removed from self at the end of this function.</span>
         <span class="n">first_load</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">first_frame</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">loaded_frames</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-            <span class="n">total_frames</span> <span class="o">-</span> <span class="n">first_load</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="ow">or</span> <span class="n">total_frames</span> <span class="o">-</span> <span class="n">first_load</span>
-        <span class="p">)</span>
+        <span class="n">loaded_frames</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">total_frames</span> <span class="o">-</span> <span class="n">first_load</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span>
+                            <span class="ow">or</span> <span class="n">total_frames</span> <span class="o">-</span> <span class="n">first_load</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">loaded_frames</span><span class="p">)</span>
         <span class="n">pixel_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">loaded_frames</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
@@ -604,7 +604,7 @@
                     <span class="n">reader</span><span class="p">,</span>
                     <span class="n">index</span> <span class="o">-</span> <span class="p">(</span><span class="n">first_frame</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span>  <span class="c1"># only adjusts for firstframe &gt; 0</span>
                     <span class="n">pixel_values</span><span class="p">,</span>
-                    <span class="n">previous_marker</span><span class="p">,</span>
+                    <span class="n">previous_marker</span>
                 <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">first_frame</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -616,10 +616,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">!=</span> <span class="n">loaded_frames</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The number of frames requested (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="si">}</span><span class="s2">) is larger &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;than the available number (</span><span class="si">{</span><span class="n">loaded_frames</span><span class="si">}</span><span class="s2">) of frames after &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;the first frame selected (</span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s2">, total frames: &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">total_frames</span><span class="si">}</span><span class="s2">).</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">loaded_frames</span><span class="si">}</span><span class="s2"> frames have been loaded.&quot;</span>
+                    <span class="sa">f</span><span class="s1">&#39;The number of frames requested (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="si">}</span><span class="s1">) is larger &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;than the available number (</span><span class="si">{</span><span class="n">loaded_frames</span><span class="si">}</span><span class="s1">) of frames after &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;the first frame selected (</span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s1">, total frames: &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">total_frames</span><span class="si">}</span><span class="s1">).</span><span class="se">\n</span><span class="s1"> </span><span class="si">{</span><span class="n">loaded_frames</span><span class="si">}</span><span class="s1"> frames have been loaded.&#39;</span>
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">=</span> <span class="n">loaded_frames</span>
 
@@ -640,9 +640,8 @@
         <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">pixel_values</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
         <span class="n">previous_marker</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read frame by frame data from DRAEGER files.&quot;&quot;&quot;</span>
-
         <span class="n">current_time</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">float64</span><span class="p">()</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
         <span class="n">_</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">float32</span><span class="p">()</span>
@@ -700,7 +699,6 @@
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.TimpelSequence._load_data">[docs]</a>
     <span class="k">def</span> <span class="nf">_load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load data for TIMPEL files.&quot;&quot;&quot;</span>
-
         <span class="n">COLUMN_WIDTH</span> <span class="o">=</span> <span class="mi">1030</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -732,10 +730,10 @@
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The number of frames requested (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="si">}</span><span class="s2">) is larger &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;than the available number (</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) of frames after &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;the first frame selected (</span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s2">).</span><span class="se">\n</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> frames have been loaded.&quot;</span>
+                    <span class="sa">f</span><span class="s1">&#39;The number of frames requested (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="si">}</span><span class="s1">) is larger &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;than the available number (</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">) of frames after &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;the first frame selected (</span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s1">).</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> frames have been loaded.&#39;</span>
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
