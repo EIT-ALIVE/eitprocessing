@@ -1,6 +1,7 @@
 import numpy as np
 from . import ROISelection
 
+
 class FunctionalLungSpace(ROISelection):
     def __init__(
         self,
@@ -21,9 +22,7 @@ class FunctionalLungSpace(ROISelection):
         pixel_amplitude = max_pixel - min_pixel
         max_pixel_amplitude = np.max(pixel_amplitude)
 
-        output = pixel_amplitude > max_pixel_amplitude * self.threshold
+        output = pixel_amplitude > (max_pixel_amplitude * self.threshold)
         output = self.minimal_cluster(output)
 
         return output
-
-

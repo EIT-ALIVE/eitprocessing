@@ -40,26 +40,24 @@ class GridSelection(ROISelection):
 
         is_numeric = ~np.isnan(data)
 
-        def get_region_boundaries(axis):
-            n_regions = self.h_split if axis == 0 else self.v_split
-            num_numeric_cells_in_vector = is_numeric.sum(axis)
-            vectors_with_numbers = np.argwhere(num_numeric_cells_in_vector > 0)
-            first_vector_with_number = vectors_with_numbers.min()
-            last_vector_with_numer = vectors_with_numbers.max()
+        def get_region_boundaries(axis, n_regions):
+            vector_has_numeric_cells = is_numeric.sum(axis) > 0
+            numeric_vector_indices = np.argwhere(vector_has_numeric_cells)
+            first_numeric_vector = numeric_vector_indices.min()
+            last_vector_numeric = numeric_vector_indices.max()
 
-            n_vectors = last_vector_with_numer - first_vector_with_number + 1
-
+            n_vectors = last_vector_numeric - first_numeric_vector + 1
             n_vectors_per_region = n_vectors / n_regions
 
             region_boundaries = [
-                first_vector_with_number
-                + bisect.bisect_left(np.arange(n_vectors), c * n_vectors_per_region)
-                for c in range(0, n_regions)
-            ] + [last_vector_with_numer + 1]
+                first_numeric_vector
+                + bisect.bisect_left(np.arange(n_vectors) / n_vectors_per_region, c)
+                for c in range(n_regions + 1)
+            ]
             return region_boundaries
 
-        h_boundaries = get_region_boundaries(0)
-        v_boundaries = get_region_boundaries(1)
+        h_boundaries = get_region_boundaries(axis=0, n_regions=self.h_split)
+        v_boundaries = get_region_boundaries(axis=1, n_regions=self.v_split)
 
         matrices = []
         for v_start, v_end in itertools.pairwise(v_boundaries):
