@@ -11,6 +11,36 @@ class GridSelection(ROISelection):
     h_split: int
     split_pixels: bool = False
 
+    def __post_init__(self):
+        if not isinstance(self.v_split, int):
+            raise TypeError(
+                "Invalid type for `h_split`. "
+                f"Should be `int`, not {type(self.h_split)}."
+            )
+
+        if not isinstance(self.h_split, int):
+            raise TypeError(
+                "Invalid type for `h_split`. "
+                f"Should be `int`, not {type(self.h_split)}."
+            )
+
+        if self.v_split < 1:
+            raise InvalidVerticalDivision("`v_split` can't be smaller than 1.")
+
+        if self.h_split < 1:
+            raise InvalidHorizontalDivision("`h_split` can't be smaller than 1.")
+
+        if not isinstance(self.split_pixels, bool):
+            raise TypeError(
+                "Invalid type for `split_pixels`. "
+                f"Should be `bool`, not {type(self.split_pixels)}"
+            )
+
+        if self.split_pixels is True:
+            raise NotImplementedError(
+                "GrisSelection has no support for split pixels yet."
+            )
+
     def find_grid(self, data) -> list:
         n_rows = data.shape[0]
         n_columns = data.shape[1]
