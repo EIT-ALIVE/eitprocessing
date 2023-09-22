@@ -1,6 +1,8 @@
 import bisect
 import itertools
+import warnings
 from dataclasses import dataclass
+from typing import Literal
 import numpy as np
 from . import ROISelection
 
@@ -65,7 +67,11 @@ class GridSelection(ROISelection):
 
         is_numeric = ~np.isnan(data)
 
-        def get_region_boundaries(axis, n_regions):
+        def get_region_boundaries(
+            orientation: Literal["horizontal", "vertical"], n_regions: int
+        ):
+            horizontal = orientation == "horizontal"
+            axis = 0 if horizontal else 1
             vector_has_numeric_cells = is_numeric.sum(axis) > 0
             numeric_vector_indices = np.argwhere(vector_has_numeric_cells)
             first_numeric_vector = numeric_vector_indices.min()
@@ -74,6 +80,13 @@ class GridSelection(ROISelection):
             n_vectors = last_vector_numeric - first_numeric_vector + 1
             n_vectors_per_region = n_vectors / n_regions
 
+            if n_vectors_per_region % 1 > 0:
+                warnings.warn(
+                    f"The {orientation} groups will not have an equal number of {'columns' if horizontal else 'rows'}. "
+                    f"{n_vectors} is not equally divisible by {n_regions}.",
+                    RuntimeWarning,
+                )
+
             region_boundaries = [
                 first_numeric_vector
                 + bisect.bisect_left(np.arange(n_vectors) / n_vectors_per_region, c)
@@ -81,8 +94,8 @@ class GridSelection(ROISelection):
             ]
             return region_boundaries
 
-        h_boundaries = get_region_boundaries(axis=0, n_regions=self.h_split)
-        v_boundaries = get_region_boundaries(axis=1, n_regions=self.v_split)
+        h_boundaries = get_region_boundaries("horizontal", n_regions=self.h_split)
+        v_boundaries = get_region_boundaries("vertical", n_regions=self.v_split)
 
         matrices = []
         for v_start, v_end in itertools.pairwise(v_boundaries):
