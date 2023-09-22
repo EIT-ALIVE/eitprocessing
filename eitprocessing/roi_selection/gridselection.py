@@ -55,7 +55,6 @@ class GridSelection(ROISelection):
             )
 
         if self.split_pixels:
-            raise NotImplementedError()
             return self._find_grid_split_pixels(data)
 
         return self._find_grid_no_split_pixels(data)
@@ -98,7 +97,7 @@ class GridSelection(ROISelection):
         return matrices
 
     def _find_grid_split_pixels(self, data):
-        pass
+        raise NotImplementedError()
 
     def matrix_layout(self):
         """Returns an array showing the layout of the matrices returned by `find_grid`."""

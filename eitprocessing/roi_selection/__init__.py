@@ -4,4 +4,4 @@ class ROISelection:
         pixel_map,
     ):
         # TODO create minimal cluster size selector
-        pass
+        raise NotImplementedError()
