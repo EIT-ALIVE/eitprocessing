@@ -1,6 +1,10 @@
+import warnings
 import numpy as np
 import pytest
 from eitprocessing.roi_selection.gridselection import GridSelection
+from eitprocessing.roi_selection.gridselection import InvalidDivision
+from eitprocessing.roi_selection.gridselection import InvalidHorizontalDivision
+from eitprocessing.roi_selection.gridselection import InvalidVerticalDivision
 
 
 def matrices_from_string(string: str, boolean: bool = False) -> list[np.ndarray]:
@@ -59,6 +63,31 @@ def matrices_from_string(string: str, boolean: bool = False) -> list[np.ndarray]
         matrices.append(matrix)
 
     return matrices
+
+
+@pytest.mark.parametrize(
+    "v_split,h_split,split_pixels,exception_type",
+    [
+        (1, 1, False, None),
+        (1, 1, True, NotImplementedError),
+        (0, 1, False, InvalidVerticalDivision),
+        (-1, 1, False, InvalidVerticalDivision),
+        (1.1, 1, False, TypeError),
+        (1, 0, False, InvalidHorizontalDivision),
+        (1, -1, False, InvalidHorizontalDivision),
+        (1, 1.1, False, TypeError),
+        (2, 2, "not a boolean", TypeError),
+        (2, 2, 1, TypeError),
+        (2, 2, 0, TypeError),
+    ],
+)
+def test_initialisation(v_split, h_split, split_pixels, exception_type):
+    if exception_type is None:
+        GridSelection(v_split, h_split, split_pixels)
+
+    else:
+        with pytest.raises(exception_type):
+            GridSelection(v_split, h_split, split_pixels)
 
 
 @pytest.mark.parametrize(
@@ -138,3 +167,68 @@ def test_no_split_pixels_nans(data_string, split_vh, result_string):
     assert len(matrices) == h_split * v_split
     assert np.array_equal(num_appearances, (~np.isnan(data) * 1))
     assert np.array_equal(matrices, result)
+
+
+@pytest.mark.parametrize(
+    "data_string,split_vh,warning_type",
+    [
+        ("RR,RR", (2, 2), None),
+        ("RRR,RRR", (2, 2), RuntimeWarning),
+        ("RRR,RRR", (1, 3), None),
+        ("RRRR,RRRR", (1, 3), RuntimeWarning),
+        ("RR,RR,RR", (2, 1), RuntimeWarning),
+        ("RR,RR,RR", (3, 1), None),
+        ("NN,RR,RR", (3, 1), RuntimeWarning),
+        ("NN,RR,RR", (2, 1), None),
+    ],
+)
+def test_warnings(data_string, split_vh, warning_type):
+    data = matrices_from_string(data_string)[0]
+    gs = GridSelection(*split_vh)
+
+    if warning_type is None:
+        # catch all warnings and raises them
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            gs.find_grid(data)
+    else:
+        with pytest.warns(warning_type):
+            gs.find_grid(data)
+
+
+@pytest.mark.parametrize(
+    "data_string,split_vh,exception_type",
+    [
+        ("RR,RR", (2, 2), None),
+        ("RR,RR", (3, 1), InvalidVerticalDivision),
+        ("RR,RR", (1, 3), InvalidHorizontalDivision),
+        ("RR,RR", (3, 1), InvalidDivision),
+        ("RR,RR", (1, 3), InvalidDivision),
+    ],
+)
+def test_exceptions(data_string, split_vh, exception_type):
+    data = matrices_from_string(data_string)[0]
+    gs = GridSelection(*split_vh)
+
+    if exception_type is None:
+        gs.find_grid(data)
+
+    else:
+        with pytest.raises(exception_type):
+            gs.find_grid(data)
+
+
+def test_split_pixels():
+    with pytest.raises(NotImplementedError):
+        gs = GridSelection(1, 1, True)
+
+    gs = GridSelection(1, 1, False)
+    gs.split_pixels = True
+    data = np.ones((2, 2))
+    with pytest.raises(NotImplementedError):
+        gs.find_grid(data)
+
+
+def test_matrix_layout():
+    # TODO: write tests for matrix layout method
+    pass
