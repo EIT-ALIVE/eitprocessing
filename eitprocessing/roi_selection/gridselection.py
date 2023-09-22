@@ -44,8 +44,8 @@ class GridSelection(ROISelection):
             )
 
     def find_grid(self, data) -> list:
-        n_rows = data.shape[0]
-        n_columns = data.shape[1]
+        n_rows, n_columns = data.shape
+
         if self.h_split > n_columns:
             raise InvalidHorizontalDivision(
                 f"`h_split` ({self.h_split}) is larger than the number of columns ({n_columns})."
