@@ -229,6 +229,18 @@ def test_split_pixels():
         gs.find_grid(data)
 
 
-def test_matrix_layout():
-    # TODO: write tests for matrix layout method
-    pass
+@pytest.mark.parametrize(
+    "split_vh,result",
+    [
+        ((1, 1), [[0]]),
+        ((1, 2), [[0, 1]]),
+        ((2, 1), [[0], [1]]),
+        ((2, 2), [[0, 1], [2, 3]]),
+        ((3, 4), [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]]),
+    ],
+)
+def test_matrix_layout(split_vh, result):
+    gs = GridSelection(*split_vh)
+    layout = gs.matrix_layout()
+
+    assert np.array_equal(layout, np.array(result))
