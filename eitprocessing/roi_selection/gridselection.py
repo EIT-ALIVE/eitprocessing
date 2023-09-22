@@ -1,19 +1,15 @@
 import bisect
 import itertools
+from dataclasses import dataclass
 import numpy as np
 from . import ROISelection
 
 
+@dataclass
 class GridSelection(ROISelection):
-    def __init__(
-        self,
-        v_split: int,
-        h_split: int,
-        split_pixels: bool = False,
-    ):
-        self.h_split = h_split
-        self.v_split = v_split
-        self.split_pixels = split_pixels
+    v_split: int
+    h_split: int
+    split_pixels: bool = False
 
     def find_grid(self, data) -> list:
         n_rows = data.shape[0]
