@@ -15,12 +15,12 @@ class GridSelection(ROISelection):
         n_rows = data.shape[0]
         n_columns = data.shape[1]
         if self.h_split > n_columns:
-            raise ValueError(
+            raise InvalidHorizontalDivision(
                 f"`h_split` ({self.h_split}) is larger than the number of columns ({n_columns})."
             )
 
         if self.v_split > n_rows:
-            raise ValueError(
+            raise InvalidVerticalDivision(
                 f"`v_split` ({self.v_split}) is larger than the number or rows ({n_rows})."
             )
 
@@ -74,3 +74,15 @@ class GridSelection(ROISelection):
         """Returns an array showing the layout of the matrices returned by `find_grid`."""
         n_groups = self.v_split * self.h_split
         return np.reshape(np.arange(n_groups), (self.v_split, self.h_split))
+
+
+class InvalidDivision(Exception):
+    """Raised when the data can't be divided into regions."""
+
+
+class InvalidHorizontalDivision(InvalidDivision):
+    """Raised when the data can't be divided into horizontal regions."""
+
+
+class InvalidVerticalDivision(InvalidDivision):
+    """Raised when the data can't be divided into vertical regions."""
