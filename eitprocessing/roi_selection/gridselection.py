@@ -9,6 +9,39 @@ from . import ROISelection
 
 @dataclass
 class GridSelection(ROISelection):
+    """Create regions of interest by division into a grid.
+
+    GridSelection allows for the creation a list of matrices that can be used to divide a
+    two-dimensional array into several groups structured in a grid. An instance of GridSelection
+    contains information about how to subdivide an input matrix. Calling `find_grid(data)` results
+    in a list of matrices with the same dimension as `data`, each representing a single group. A
+    matrix contains the value False or 0 for pixels that do not belong to the group, and the value
+    True, 1 or any number between 0 and 1 for pixels that (partly) belong to the group.
+
+    Common grids are pre-defined:
+    - VentralAndDorsal: vertically divided into ventral and dorsal;
+    - RightAndLeft: horizontally divided into anatomical right and left; NB: anatomical right is
+    the left side of the matrix;
+    - FourLayers: vertically divided into ventral, mid-ventral, mid-dorsal and dorsal;
+    - Quadrants: vertically and horizontally divided into four quadrants.
+
+    Args:
+        v_split: The number of vertical groups. Must be 1 or larger.
+        h_split: The number of horizontal groups. Must be 1 or larger.
+        split_pixels: Allows rows and columns to be split over two groups. Currently not
+            implemented.
+
+    Example:
+    >>> gs = GridSelection(3, 1)
+    >>> matrices = gs.find_grid(included_pixels)
+    >>> sum_group1 = np.sum(matrices[0] * pixel_amplitude)
+    >>> print(gs.matrix_layout())
+    array([[0],
+           [1],
+           [2]])
+
+    """
+
     v_split: int
     h_split: int
     split_pixels: bool = False
