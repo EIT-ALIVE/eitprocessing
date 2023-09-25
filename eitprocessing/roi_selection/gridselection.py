@@ -128,3 +128,31 @@ class InvalidHorizontalDivision(InvalidDivision):
 
 class InvalidVerticalDivision(InvalidDivision):
     """Raised when the data can't be divided into vertical regions."""
+
+
+@dataclass
+class VentralAndDorsal(GridSelection):
+    v_split: Literal[2] = 2
+    h_split: Literal[0] = 0
+    split_pixels: bool = False
+
+
+@dataclass
+class RightAndLeft(GridSelection):
+    v_split: Literal[0] = 0
+    h_split: Literal[2] = 2
+    split_pixels: bool = False
+
+
+@dataclass
+class FourLayers(GridSelection):
+    v_split: Literal[4] = 4
+    h_split: Literal[0] = 0
+    split_pixels: bool = False
+
+
+@dataclass
+class Quadrants(GridSelection):
+    v_split: Literal[2] = 2
+    h_split: Literal[2] = 2
+    split_pixels: bool = False
