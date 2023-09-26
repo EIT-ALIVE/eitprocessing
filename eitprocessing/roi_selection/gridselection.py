@@ -72,13 +72,12 @@ class GridSelection(ROISelection):
                 f"Should be `bool`, not {type(self.split_pixels)}"
             )
 
-        if self.split_pixels is True:
-            raise NotImplementedError(
-                "GrisSelection has no support for split pixels yet."
-            )
-
     def find_grid(self, data) -> list:
         n_rows, n_columns = data.shape
+
+        if self.split_pixels:
+            # TODO: create warning if number of regions > number of columns/rows
+            return self._find_grid_split_pixels(data)
 
         if self.h_split > n_columns:
             raise InvalidHorizontalDivision(
@@ -89,9 +88,6 @@ class GridSelection(ROISelection):
             raise InvalidVerticalDivision(
                 f"`v_split` ({self.v_split}) is larger than the number or rows ({n_rows})."
             )
-
-        if self.split_pixels:
-            return self._find_grid_split_pixels(data)
 
         return self._find_grid_no_split_pixels(data)
 
@@ -144,7 +140,69 @@ class GridSelection(ROISelection):
         return matrices
 
     def _find_grid_split_pixels(self, data):
-        raise NotImplementedError()
+        def create_grouping_vector(matrix, axis, n_groups):
+            """Create a grouping vector to split vector into `n` groups."""
+
+            # create a vector that is nan if the entire column/row is nan, 1 otherwise
+            nan = np.all(np.isnan(matrix), axis=axis)
+            vector = np.ones(nan.shape)
+            vector[nan] = np.nan
+
+            # remove non-numeric (nan) elements at vector ends
+            # nan elements between numeric elements are kept
+            numeric_element_indices = np.argwhere(~np.isnan(vector))
+            first_num_element = numeric_element_indices.min()
+            last_num_element = numeric_element_indices.max()
+            n_elements = last_num_element - first_num_element + 1
+
+            group_size = n_elements / n_groups
+
+            # find the right boundaries (upper values) of each group
+            right_boundaries = (np.arange(n_groups) + 1) * group_size
+            right_boundaries = right_boundaries[:, None]  # converts it to a row vector
+
+            # each row in the base represents one group
+            base = np.tile(np.arange(n_elements), (n_groups, 1))
+
+            # if the element number is higher than the split, it does not belong in this group
+            element_contribution_to_group = right_boundaries - base
+            element_contribution_to_group[element_contribution_to_group < 0] = 0
+
+            # if the element to the right is a full group size, this element is ruled out
+            rule_out = element_contribution_to_group[:, 1:] >= group_size
+            element_contribution_to_group[:, :-1][rule_out] = 0
+
+            # elements have a maximum value of 1
+            element_contribution_to_group = np.fmin(element_contribution_to_group, 1)
+
+            # if this element is already represented in the previous group (row), subtract that
+            element_contribution_to_group[1:] -= element_contribution_to_group[:-1]
+            element_contribution_to_group[element_contribution_to_group < 0] = 0
+
+            # element_contribution_to_group only represents non-nan elements
+            # insert into final including non-nan elements
+            final = np.full((n_groups, len(vector)), np.nan)
+            final[
+                :, first_num_element : last_num_element + 1
+            ] = element_contribution_to_group
+            return final
+
+        horizontal_grouping_vectors = create_grouping_vector(data, 0, self.h_split)
+        vertical_grouping_vectors = create_grouping_vector(data, 1, self.v_split)
+
+        matrices = []
+
+        for vertical, horizontal in itertools.product(
+            vertical_grouping_vectors, horizontal_grouping_vectors
+        ):
+            matrix = np.ones(data.shape)
+            matrix[np.isnan(data)] = np.nan
+            matrix *= horizontal
+            matrix *= vertical[:, None]  # [:, None] converts to a column vector
+
+            matrices.append(matrix)
+
+        return matrices
 
     def matrix_layout(self):
         """Returns an array showing the layout of the matrices returned by `find_grid`."""
