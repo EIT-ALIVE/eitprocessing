@@ -9,7 +9,6 @@ import copy
 import warnings
 from dataclasses import dataclass
 from dataclasses import field
-from typing import List
 import numpy as np
 from IPython.display import HTML
 from IPython.display import display
@@ -107,7 +106,7 @@ class Frameset:
         self,
         cmap: str = "plasma",
         show_progress: bool | str = "notebook",
-        waveforms: bool | List[str] = False,
+        waveforms: bool | list[str] = False,
     ):  # pylint: disable = too-many-locals
         if waveforms is True:
             waveforms = list(self.waveform_data.keys())

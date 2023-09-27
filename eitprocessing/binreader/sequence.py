@@ -14,8 +14,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from enum import auto
 from pathlib import Path
-from typing import Dict
-from typing import List
 import numpy as np
 from numpy.typing import NDArray
 from strenum import LowercaseStrEnum
@@ -30,8 +28,7 @@ from .timing_error import TimingError
 
 
 class Vendor(LowercaseStrEnum):
-    """Enum indicating the vendor (manufacturer) of the EIT device with which the data was
-    gathered"""
+    """Enum indicating the vendor (manufacturer) of the EIT device with which the data was gathered."""
 
     DRAEGER = auto()
     TIMPEL = auto()
@@ -42,16 +39,18 @@ class Vendor(LowercaseStrEnum):
 
 @dataclass(eq=False)
 class Sequence:
-    """Sequence of timepoints containing EIT and/or waveform data
+    """Sequence of timepoints containing EIT and/or waveform data.
 
-    A Sequence is meant as a representation of a continuous set of data, either EIT frames,
-    waveform data, or both. A Sequence could consist of an entire measurement, a section of a
-    measurement, a single breath or even a portion of a breath.
+    A Sequence is a representation of a continuous set of data points, either EIT frames,
+    waveform data, or both. A Sequence can consist of an entire measurement, a section of a
+    measurement, a single breath, or even a portion of a breath.
+    A sequence can be split up into separate sections of a measurement or multiple (similar)
+    Sequence objects can be merged together to form a single Sequence.
 
     EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
 
     Args:
-        path (Path | str | List[Path | str]): path(s) to data file.
+        path (Path | str | list[Path | str]): path(s) to data file.
         vendor (Vendor | str): vendor indicating the device used.
         label (str): description of object for human interpretation.
             Defaults to "Sequence_<unique_id>".
@@ -61,29 +60,26 @@ class Sequence:
         framerate (int, optional): framerate at which the data was recorded.
             Defaults to 20 if vendor == DRAEGER
             Defaults to 50 if vendor == TIMPEL
-        framesets (Dict[str, Frameset]): dictionary of framesets
-        events (List[Event]): list of Event objects in data
-        timing_errors (List[TimingError]): list of TimingError objects in data
-        phases (List[PhaseIndicator]): list of PhaseIndicator objects in data
-
-    Returns:
-        Sequence: a sequence containing the l
+        framesets (dict[str, Frameset]): dictionary of framesets
+        events (list[Event]): list of Event objects in data
+        timing_errors (list[TimingError]): list of TimingError objects in data
+        phases (list[PhaseIndicator]): list of PhaseIndicator objects in data
     """
 
-    path: Path | str | List[Path | str] | None = None
+    path: Path | str | list[Path | str] | None = None
     vendor: Vendor | str | None = None
     label: str | None = None
     time: NDArray | None = None
     nframes: int | None = None
     framerate: int | None = None
-    framesets: Dict[str, Frameset] = field(default_factory=dict)
-    events: List[Event] = field(default_factory=list, repr=False)
-    timing_errors: List[TimingError] = field(default_factory=list, repr=False)
-    phases: List[PhaseIndicator] = field(default_factory=list, repr=False)
+    framesets: dict[str, Frameset] = field(default_factory=dict)
+    events: list[Event] = field(default_factory=list, repr=False)
+    timing_errors: list[TimingError] = field(default_factory=list, repr=False)
+    phases: list[PhaseIndicator] = field(default_factory=list, repr=False)
 
     def __post_init__(self):
         if self.label is None:
-            self.label = f'Sequence_{id(self)}'
+            self.label = f"Sequence_{id(self)}"
 
         self._set_vendor_class()
 
@@ -121,11 +117,14 @@ class Sequence:
         if isinstance(self.vendor, str):
             self.vendor = Vendor(self.vendor.lower())
 
-        if (isinstance(self, Sequence)
+        if (
+            isinstance(self, Sequence)
             and self.__class__ is not Sequence
             and self.__class__.vendor != self.vendor
-            ):
-            raise TypeError(f'`vendor` for {type(self)} cannot be set as {self.vendor}.')
+        ):
+            raise TypeError(
+                f"`vendor` for {type(self)} cannot be set as {self.vendor}."
+            )
 
         # Note that this way of re-assigning classes is considered to be a bad practice
         # (https://tinyurl.com/2x2cea6h), but the objections raised don't seem to be prohibtive.
@@ -158,7 +157,7 @@ class Sequence:
         cls,
         a: Sequence,
         b: Sequence,
-        label: str | None  = None,
+        label: str | None = None,
     ) -> Sequence:
         """Create a merge of two Sequence objects."""
 
@@ -185,7 +184,7 @@ class Sequence:
                 item.time = time[item.index]
             return a_items + b_items
 
-        label = f'Merge of <{a.label}> and <{b.label}>' if label is None else label
+        label = f"Merge of <{a.label}> and <{b.label}>" if label is None else label
 
         return cls(
             path=path,
@@ -203,7 +202,7 @@ class Sequence:
     @classmethod
     def from_path(  # pylint: disable=too-many-arguments, unused-argument
         cls,
-        path: Path | str | List[Path | str],
+        path: Path | str | list[Path | str],
         vendor: Vendor | str | None = None,
         label: str | None = None,
         framerate: int | None = None,
@@ -213,7 +212,7 @@ class Sequence:
         """Load sequence from path(s)
 
         Args:
-            path (Path | str | List[Path | str]): path(s) to data file.
+            path (Path | str | list[Path | str]): path(s) to data file.
             vendor (Vendor | str): vendor indicating the device used.
             label (str): description of object for human interpretation.
                 Defaults to "Sequence_<unique_id>".
@@ -310,9 +309,7 @@ class Sequence:
         label: str | None = None,
     ):
         if not isinstance(indices, slice):
-            raise NotImplementedError(
-                "Slicing only implemented using a slice object"
-            )
+            raise NotImplementedError("Slicing only implemented using a slice object")
         if indices.step not in (None, 1):
             raise NotImplementedError(
                 "Skipping intermediate frames while slicing is not implemented."
@@ -322,11 +319,15 @@ class Sequence:
         if indices.stop is None:
             indices = slice(indices.start, self.nframes, indices.step)
 
-        obj = self.deepcopy()  #TODO: consider to make this more efficient for large data
+        obj = self.deepcopy()
         obj.time = self.time[indices]
         obj.nframes = len(obj.time)
         obj.framesets = {k: v[indices] for k, v in self.framesets.items()}
-        obj.label = f'Slice ({indices.start}-{indices.stop}) of <{self.label}>' if label is None else label
+        obj.label = (
+            f"Slice ({indices.start}-{indices.stop}) of <{self.label}>"
+            if label is None
+            else label
+        )
 
         range_ = range(indices.start, indices.stop)
         for attr in ["events", "timing_errors", "phases"]:
@@ -336,12 +337,10 @@ class Sequence:
 
         return obj
 
-
     def __getitem__(self, indices: slice):
         return self.select_by_index(indices)
 
-
-    def select_by_time(  #pylint: disable=too-many-arguments
+    def select_by_time(  # pylint: disable=too-many-arguments
         self,
         start: float | int | None = None,
         end: float | int | None = None,
@@ -394,7 +393,7 @@ class Sequence:
         else:
             end_index = bisect.bisect_left(self.time, end) - 1
 
-        return self.select_by_index(slice(start_index,end_index), label = label)
+        return self.select_by_index(slice(start_index, end_index), label=label)
 
     def deepcopy(
         self,
@@ -418,7 +417,7 @@ class Sequence:
         if label:
             obj.label = label
         elif relabel:
-            obj.label = f'Copy of <{self.label}>'
+            obj.label = f"Copy of <{self.label}>"
         return obj
 
 
@@ -450,8 +449,9 @@ class DraegerSequence(Sequence):
         # is an event marker. Data for the pre-first (dummy) frame will be
         # removed from self at the end of this function.
         first_load = max(0, first_frame - 1)
-        loaded_frames = min(total_frames - first_load, self.nframes
-                            or total_frames - first_load)
+        loaded_frames = min(
+            total_frames - first_load, self.nframes or total_frames - first_load
+        )
 
         self.time = np.zeros(loaded_frames)
         pixel_values = np.zeros((loaded_frames, 32, 32))
@@ -466,7 +466,7 @@ class DraegerSequence(Sequence):
                     reader,
                     index - (first_frame > 0),  # only adjusts for firstframe > 0
                     pixel_values,
-                    previous_marker
+                    previous_marker,
                 )
 
         if first_frame > 0:
@@ -478,10 +478,10 @@ class DraegerSequence(Sequence):
         if self.nframes != loaded_frames:
             if self.nframes:
                 warnings.warn(
-                    f'The number of frames requested ({self.nframes}) is larger '
-                    f'than the available number ({loaded_frames}) of frames after '
-                    f'the first frame selected ({first_frame}, total frames: '
-                    f'{total_frames}).\n {loaded_frames} frames have been loaded.'
+                    f"The number of frames requested ({self.nframes}) is larger "
+                    f"than the available number ({loaded_frames}) of frames after "
+                    f"the first frame selected ({first_frame}, total frames: "
+                    f"{total_frames}).\n {loaded_frames} frames have been loaded."
                 )
             self.nframes = loaded_frames
 
@@ -499,8 +499,9 @@ class DraegerSequence(Sequence):
         index: int,
         pixel_values: NDArray,
         previous_marker: int | None,
-    ) -> None:
+    ):
         """Read frame by frame data from DRAEGER files."""
+
         current_time = round(reader.float64() * 24 * 60 * 60, 3)
 
         _ = reader.float32()
@@ -546,6 +547,7 @@ class TimpelSequence(Sequence):
 
     def _load_data(self, first_frame: int):
         """Load data for TIMPEL files."""
+
         COLUMN_WIDTH = 1030
 
         try:
@@ -577,10 +579,10 @@ class TimpelSequence(Sequence):
         if data.shape[0] != self.nframes:
             if self.nframes:
                 warnings.warn(
-                    f'The number of frames requested ({self.nframes}) is larger '
-                    f'than the available number ({data.shape[0]}) of frames after '
-                    f'the first frame selected ({first_frame}).\n'
-                    f'{data.shape[0]} frames have been loaded.'
+                    f"The number of frames requested ({self.nframes}) is larger "
+                    f"than the available number ({data.shape[0]}) of frames after "
+                    f"the first frame selected ({first_frame}).\n"
+                    f"{data.shape[0]} frames have been loaded."
                 )
             self.nframes = data.shape[0]
 
