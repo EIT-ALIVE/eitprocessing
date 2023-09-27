@@ -455,6 +455,9 @@ class DraegerSequence(Sequence):
 
         self.time = np.zeros(loaded_frames)
         pixel_values = np.zeros((loaded_frames, 32, 32))
+        waveform_data = {
+            key: np.full((loaded_frames,), np.nan) for key in medibus_field_names
+        }
 
         with open(self.path, "br") as fh:
             fh.seek(first_load * FRAME_SIZE_BYTES)
@@ -466,6 +469,7 @@ class DraegerSequence(Sequence):
                     reader,
                     index - (first_frame > 0),  # only adjusts for firstframe > 0
                     pixel_values,
+                    waveform_data,
                     previous_marker,
                 )
 
@@ -474,6 +478,7 @@ class DraegerSequence(Sequence):
             loaded_frames -= 1
             self.time = self.time[:-1]
             pixel_values = pixel_values[:-1, :, :]
+            waveform_data = {key: values[:-1] for key, values in waveform_data.items()}
 
         if self.nframes != loaded_frames:
             if self.nframes:
@@ -491,6 +496,7 @@ class DraegerSequence(Sequence):
             description="raw impedance data",
             params=params,
             pixel_values=pixel_values,
+            waveform_data=waveform_data,
         )
 
     def _read_frame(
@@ -498,6 +504,7 @@ class DraegerSequence(Sequence):
         reader: Reader,
         index: int,
         pixel_values: NDArray,
+        waveform_data: dict[str, NDArray],
         previous_marker: int | None,
     ):
         """Read frame by frame data from DRAEGER files."""
@@ -516,6 +523,8 @@ class DraegerSequence(Sequence):
             length=52
         )
 
+        self._parse_medibus_data(index, medibus_data, waveform_data)
+
         if index >= 0:
             # The event marker stays the same until the next event occurs. Therefore, check whether the
             # event marker has changed with respect to the most recent event. If so, create a new event.
@@ -532,6 +541,19 @@ class DraegerSequence(Sequence):
             self.time[index] = current_time
 
         return event_marker
+
+    def _parse_medibus_data(
+        self, index: int, data: list, waveform_data: dict[str, NDArray]
+    ):
+        for key, value in zip(medibus_field_names, data):
+            # some fields have a value of -1000 when not available; others a very large negative
+            # number which varies, but seems to always be lower than -3e37
+            if value == -1000:
+                continue
+            if value < -3e37:
+                continue
+
+            waveform_data[key][index] = value
 
     @staticmethod
     def reshape_frame(frame):
@@ -624,3 +646,59 @@ class TimpelSequence(Sequence):
             pixel_values=pixel_data,
             waveform_data=waveform_data,
         )
+
+
+medibus_field_names = [
+    "airway pressure [mbar]",
+    "flow [L/min]",
+    "volume [mL]",
+    "CO2 [%]",
+    "CO2 [kPa]",
+    "CO2 [mmHg]",
+    "dynamic compliance [mL/mbar]",
+    "resistance [mbar/L/s]",
+    "r² ???",
+    "spontaneous inspiratory time [s]",
+    "minimal pressure [mbar]",
+    "P0.1 [mbar]",
+    "mean pressure [mbar]",
+    "plateau pressure [mbar]",
+    "PEEP [mbar]",
+    "intrinsic PEEP [mbar]",
+    "mandatory respiratory rate [/min]",
+    "mandatory minute volume [L/min]",
+    "peak inspiratory pressure [mbar]",
+    "mandatory tidal volume [L]",
+    "spontaneous tidal volume [L]",
+    "trapped volume [mL]",
+    "mandatory expiratory tidal volume [mL]",
+    "spontaneous expiratory tidal volume [mL]",
+    "mandatory inspiratory tidal volume [mL]",
+    "tidal volume [mL]",
+    "spontaneous inspiratory tidal volume [mL]",
+    "negative inspiratory force [mbar]",
+    "leak minute volume [L/min]",
+    "leak percentage [%]",
+    "spontaneous respiratory rate [/min]",
+    "percentage of spontaneous minute volume [%]",
+    "spontaneous minute volume [L/min]",
+    "minute volume [L/min]",
+    "airway temperature [°C]",
+    "rapid shallow breating index [1/min/L]",
+    "respiratory rate [/min]",
+    "inspiratory:expiratory ratio",
+    "CO2 flow [mL/min]",
+    "dead space volume [mL]",
+    "percentage dead space of expiratory tidal volume [%]",
+    "end-tidal CO2 [%]",
+    "end-tidal CO2 [kPa]",
+    "end-tidal CO2 [mmHg]",
+    "fraction inspired O2 [%]",
+    "spontaneous inspiratory:expiratory ratio",
+    "elastance [mbar/L]",
+    "TC ??? [s]",
+    "ratio between upper 20% pressure range and total dynamic compliance",
+    "end-inspiratory pressure [mbar]",
+    "expiratory tidal volume [mL]",
+    "time at low pressure [s]",
+]
