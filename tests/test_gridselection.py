@@ -69,7 +69,6 @@ def matrices_from_string(string: str, boolean: bool = False) -> list[np.ndarray]
     "v_split,h_split,split_pixels,exception_type",
     [
         (1, 1, False, None),
-        (1, 1, True, NotImplementedError),
         (0, 1, False, InvalidVerticalDivision),
         (-1, 1, False, InvalidVerticalDivision),
         (1.1, 1, False, TypeError),
@@ -139,34 +138,36 @@ def test_no_split_pixels_no_nans(shape, split_vh, result_string):
         (
             "NNN,RRR,RRR,RRR,RRR",
             (2, 2),
-            "FFF,TTF,TTF,FFF,FFF;"
-            "FFF,FFT,FFT,FFF,FFF;"
-            "FFF,FFF,FFF,TTF,TTF;"
-            "FFF,FFF,FFF,FFT,FFT",
+            "NNN,TTF,TTF,FFF,FFF;"
+            "NNN,FFT,FFT,FFF,FFF;"
+            "NNN,FFF,FFF,TTF,TTF;"
+            "NNN,FFF,FFF,FFT,FFT",
         ),
         (
             "NNNNNN,NNNNNN,NRRRRR,RNRRRR,NNNNNN",
             (2, 2),
-            "FFFFFF,FFFFFF,FTTFFF,FFFFFF,FFFFFF;"
-            "FFFFFF,FFFFFF,FFFTTT,FFFFFF,FFFFFF;"
-            "FFFFFF,FFFFFF,FFFFFF,TFTFFF,FFFFFF;"
-            "FFFFFF,FFFFFF,FFFFFF,FFFTTT,FFFFFF",
+            "NNNNNN,NNNNNN,NTTFFF,FNFFFF,NNNNNN;"
+            "NNNNNN,NNNNNN,NFFTTT,FNFFFF,NNNNNN;"
+            "NNNNNN,NNNNNN,NFFFFF,TNTFFF,NNNNNN;"
+            "NNNNNN,NNNNNN,NFFFFF,FNFTTT,NNNNNN",
         ),
     ],
 )
 def test_no_split_pixels_nans(data_string, split_vh, result_string):
     data = matrices_from_string(data_string)[0]
-    result = matrices_from_string(result_string, boolean=True)
+    numeric_values = np.ones(data.shape)
+    numeric_values[np.isnan(data)] = np.nan
+    result = matrices_from_string(result_string, boolean=False)
 
     v_split, h_split = split_vh
-    gs = GridSelection(v_split, h_split)
+    gs = GridSelection(v_split, h_split, split_pixels=False)
 
     matrices = gs.find_grid(data)
     num_appearances = np.sum(np.stack(matrices, axis=-1), axis=-1)
 
     assert len(matrices) == h_split * v_split
-    assert np.array_equal(num_appearances, (~np.isnan(data) * 1))
-    assert np.array_equal(matrices, result)
+    assert np.array_equal(num_appearances, numeric_values, equal_nan=True)
+    assert np.array_equal(matrices, result, equal_nan=True)
 
 
 @pytest.mark.parametrize(
@@ -178,7 +179,6 @@ def test_no_split_pixels_nans(data_string, split_vh, result_string):
         ("RRRR,RRRR", (1, 3), RuntimeWarning),
         ("RR,RR,RR", (2, 1), RuntimeWarning),
         ("RR,RR,RR", (3, 1), None),
-        ("NN,RR,RR", (3, 1), RuntimeWarning),
         ("NN,RR,RR", (2, 1), None),
     ],
 )
@@ -216,17 +216,6 @@ def test_exceptions(data_string, split_vh, exception_type):
     else:
         with pytest.raises(exception_type):
             gs.find_grid(data)
-
-
-def test_split_pixels():
-    with pytest.raises(NotImplementedError):
-        gs = GridSelection(1, 1, True)
-
-    gs = GridSelection(1, 1, False)
-    gs.split_pixels = True
-    data = np.ones((2, 2))
-    with pytest.raises(NotImplementedError):
-        gs.find_grid(data)
 
 
 @pytest.mark.parametrize(
