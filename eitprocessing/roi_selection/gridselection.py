@@ -314,6 +314,7 @@ class VentralAndDorsal(GridSelection):
 
     v_split: Literal[2] = field(default=2, init=False)
     h_split: Literal[1] = field(default=1, init=False)
+    split_rows = True
 
 
 @dataclass
@@ -322,6 +323,7 @@ class RightAndLeft(GridSelection):
 
     v_split: Literal[1] = field(default=1, init=False)
     h_split: Literal[2] = field(default=2, init=False)
+    split_columns = False
 
 
 @dataclass
@@ -330,6 +332,7 @@ class FourLayers(GridSelection):
 
     v_split: Literal[4] = field(default=4, init=False)
     h_split: Literal[1] = field(default=1, init=False)
+    split_rows = True
 
 
 @dataclass
@@ -338,3 +341,5 @@ class Quadrants(GridSelection):
 
     v_split: Literal[2] = field(default=2, init=False)
     h_split: Literal[2] = field(default=2, init=False)
+    split_columns = False
+    split_rows = True
