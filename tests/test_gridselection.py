@@ -7,30 +7,25 @@ from eitprocessing.roi_selection.gridselection import InvalidHorizontalDivision
 from eitprocessing.roi_selection.gridselection import InvalidVerticalDivision
 
 
-def matrices_from_string(string: str, boolean: bool = False) -> list[np.ndarray]:
-    """Generates a list of matrices from a string containing a matrix representation.
+def matrices_from_string(string: str) -> list[np.ndarray]:
+    """Generates a list of matrices from a string containing a representation of matrices.
 
-    A matrix represtation contains one character per cell that describes the value of that cell.
+    A represtation of matrices contains one character per cell that describes the value of that cell.
     Rows are delimited by commas. Matrices are delimited by semi-colons.
 
-    The returned matrices by default have `np.floating` as dtype. When `boolean` is set to True, the
-    dtype is `bool`. That means that the actual values in the matrices depend on the value of `boolean`.
-
-    The following characters are transformed to these corresponding values in either `np.floating` or
-    `bool` mode:
-    - T -> 1. or True
-    - F -> 0. or False
-    - 1 -> 1. or True
-    - N -> np.nan or False
-    - R -> np.random.int(1, 100) or True
+    The following characters are transformed to these corresponding values:
+    - T / 1 -> 1
+    - F / 0 -> 0
+    - R -> np.random.int(2, 100)
+    - N / any other character -> np.nan
 
     Examples:
     >>> matrices_from_string("1T1,FNR")
     [array([[ 1.,  1.,  1.],
             [ 0., nan, 40.]])]
-    >>> matrices_from_string("1T1,FNR", boolean=True)
-    [array([[ True,  True,  True],
-            [False, False,  True]])]
+    >>> matrices_from_string("1T1,FNR")
+    [array([[ 1.,  1.,  1.],
+            [ 0., nan,  37]])]
     >>> matrices_from_string("RR,RR;RRR;1R")
     [array([[21., 80.],
             [43., 10.]]),
@@ -41,25 +36,16 @@ def matrices_from_string(string: str, boolean: bool = False) -> list[np.ndarray]
     matrices = []
     for part in string.split(";"):
         str_matrix = np.array([tuple(row) for row in part.split(",")], dtype="object")
-        if boolean:
-            matrix = np.full(str_matrix.shape, False, dtype=bool)
-            matrix[np.nonzero(str_matrix == "N")] = False
-            matrix[np.nonzero(str_matrix == "1")] = True
-            matrix[np.nonzero(str_matrix == "R")] = True
-
-        else:
-            matrix = np.full(str_matrix.shape, np.nan, dtype=np.floating)
-            matrix[np.nonzero(str_matrix == "N")] = np.nan
-            matrix[np.nonzero(str_matrix == "1")] = 1
-            matrix = np.where(
-                str_matrix == "R",
-                np.random.default_rng().integers(1, 100, matrix.shape),
-                matrix,
-            )
-
-        matrix[np.nonzero(str_matrix == "T")] = True
-        matrix[np.nonzero(str_matrix == "F")] = False
-
+        matrix = np.full(str_matrix.shape, np.nan, dtype=np.floating)
+        matrix[np.nonzero(str_matrix == "1")] = 1
+        matrix[np.nonzero(str_matrix == "T")] = 1
+        matrix[np.nonzero(str_matrix == "0")] = 0
+        matrix[np.nonzero(str_matrix == "F")] = 0
+        matrix = np.where(
+            str_matrix == "R",
+            np.random.default_rng().integers(2, 100, matrix.shape),
+            matrix,
+        )
         matrices.append(matrix)
 
     return matrices
@@ -195,7 +181,7 @@ def test_no_split_pixels_nans(data_string, split_vh, result_string):
     data = matrices_from_string(data_string)[0]
     numeric_values = np.ones(data.shape)
     numeric_values[np.isnan(data)] = np.nan
-    result = matrices_from_string(result_string, boolean=False)
+    result = matrices_from_string(result_string)
 
     v_split, h_split = split_vh
     gs = GridSelection(v_split, h_split, split_pixels=False)
