@@ -219,6 +219,20 @@ class GridSelection(ROISelection):
 
         group_size = n_elements / n_groups
 
+        if group_size < 1:
+            if orientation == "horizontal":  # pylint: disable=no-else-raise
+                warnings.warn(
+                    f"The number horizontal regions ({n_groups}) is larger than the "
+                    f"number of available columns ({n_elements}).",
+                    MoreHorizontalGroupsThanColumns,
+                )
+            else:
+                warnings.warn(
+                    f"The number vertical regions ({n_groups}) is larger than the "
+                    f"number of available rows ({n_elements}).",
+                    MoreVerticalGroupsThanRows,
+                )
+
         # find the right boundaries (upper values) of each group
         right_boundaries = (np.arange(n_groups) + 1) * group_size
         right_boundaries = right_boundaries[:, None]  # converts it to a row vector
@@ -267,7 +281,11 @@ class InvalidVerticalDivision(InvalidDivision):
     """Raised when the data can't be divided into vertical regions."""
 
 
-class UnevenDivision(Warning):
+class DivisionWarning(Warning):
+    pass
+
+
+class UnevenDivision(DivisionWarning):
     """Warning for when a grid selection results in groups of uneven size."""
 
 
@@ -277,6 +295,18 @@ class UnevenHorizontalDivision(UnevenDivision):
 
 class UnevenVerticalDivision(UnevenDivision):
     """Warning for when a grid selection results in vertical groups of uneven size."""
+
+
+class MoreGroupsThanVectors(DivisionWarning):
+    """Warning for when the groups outnumber the available vectors."""
+
+
+class MoreVerticalGroupsThanRows(MoreGroupsThanVectors):
+    """Warning for when the vertical groups outnumber the available rows."""
+
+
+class MoreHorizontalGroupsThanColumns(MoreGroupsThanVectors):
+    """Warning for when the horizontal groups outnumber the available rows."""
 
 
 @dataclass
