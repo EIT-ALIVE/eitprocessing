@@ -1,6 +1,7 @@
 import bisect
 import itertools
 import warnings
+from dataclasses import InitVar
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Literal
@@ -89,9 +90,11 @@ class GridSelection(ROISelection):
 
     v_split: int
     h_split: int
-    split_pixels: bool = False
+    split_pixels: InitVar[bool | None] = None
+    split_rows: bool | None = None
+    split_cols: bool | None = None
 
-    def __post_init__(self):
+    def __post_init__(self, split_pixels):
         if not isinstance(self.v_split, int):
             raise TypeError(
                 "Invalid type for `h_split`. "
@@ -110,23 +113,31 @@ class GridSelection(ROISelection):
         if self.h_split < 1:
             raise InvalidHorizontalDivision("`h_split` can't be smaller than 1.")
 
-        if not isinstance(self.split_pixels, bool):
-            raise TypeError(
-                "Invalid type for `split_pixels`. "
-                f"Should be `bool`, not {type(self.split_pixels)}"
-            )
+        if split_pixels is not None:
+            if not isinstance(split_pixels, bool):
+                raise TypeError(
+                    "Invalid type for `split_pixels`. "
+                    f"Should be `bool` or `NoneType`, not {type(split_pixels)}."
+                )
 
-    def find_grid(self, data) -> list:
+            if self.split_rows is not None or self.split_cols is not None:
+                raise AttributeError(
+                    "Don't provide both `split_pixels` and either of `split_rows` and `split_columns`."
+                )
+
+            self.split_cols = self.split_rows = split_pixels
+
+    def find_grid(self, data) -> list[NDArray]:
         function = (
             self._create_grouping_vector_split_pixels
-            if self.split_pixels
+            if self.split_rows
             else self._create_grouping_vector_no_split_pixels
         )
         horizontal_grouping_vectors = function(data, "horizontal", self.h_split)
 
         function = (
             self._create_grouping_vector_split_pixels
-            if self.split_pixels
+            if self.split_cols
             else self._create_grouping_vector_no_split_pixels
         )
         vertical_grouping_vectors = function(data, "vertical", self.v_split)
