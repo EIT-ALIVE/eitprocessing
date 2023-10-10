@@ -95,6 +95,8 @@ class GridSelection(ROISelection):
     h_split: int
     split_rows: bool = False
     split_columns: bool = False
+    ignore_nan_rows: bool = True
+    ignore_nan_columns: bool = True
 
     def __post_init__(self):
         if not isinstance(self.v_split, int):
@@ -154,15 +156,24 @@ class GridSelection(ROISelection):
 
         return matrices
 
-    @staticmethod
     def _create_grouping_vector_no_split_pixels(  # pylint: disable=too-many-locals
-        data: NDArray, orientation: Literal["horizontal", "vertical"], n_regions: int
+        self,
+        data: NDArray,
+        orientation: Literal["horizontal", "vertical"],
+        n_regions: int,
     ) -> list[NDArray]:
-        is_numeric = ~np.isnan(data)
         axis = 0 if orientation == "horizontal" else 1
-        numeric_vector_indices = np.argwhere(is_numeric.sum(axis) > 0)
-        first_numeric_vector = numeric_vector_indices.min()
-        last_vector_numeric = numeric_vector_indices.max()
+
+        if (orientation == "horizontal" and self.ignore_nan_columns) or (
+            orientation == "vertical" and self.ignore_nan_rows
+        ):
+            is_numeric = ~np.isnan(data)
+            numeric_vector_indices = np.argwhere(is_numeric.sum(axis) > 0)
+            first_numeric_vector = numeric_vector_indices.min()
+            last_vector_numeric = numeric_vector_indices.max()
+        else:
+            first_numeric_vector = 0
+            last_vector_numeric = data.shape[1 - axis] - 1
 
         n_vectors = last_vector_numeric - first_numeric_vector + 1
 
@@ -203,29 +214,39 @@ class GridSelection(ROISelection):
         vectors = []
         for start, end in itertools.pairwise(region_boundaries):
             vector = np.ones(data.shape[1 - axis])
-            vector[:start] = 0
-            vector[end:] = 0
+            vector[:start] = 0.0
+            vector[end:] = 0.0
             vectors.append(vector)
 
         return vectors
 
-    @staticmethod
     def _create_grouping_vector_split_pixels(  # pylint: disable=too-many-locals
-        matrix: NDArray, orientation: Literal["horizontal", "vertical"], n_groups: int
-    ) -> NDArray:
+        self,
+        matrix: NDArray,
+        orientation: Literal["horizontal", "vertical"],
+        n_groups: int,
+    ) -> list[NDArray]:
         """Create a grouping vector to split vector into `n` groups."""
         axis = 0 if orientation == "horizontal" else 1
 
         # create a vector that is nan if the entire column/row is nan, 1 otherwise
         vector_is_nan = np.all(np.isnan(matrix), axis=axis)
         vector = np.ones(vector_is_nan.shape)
-        vector[vector_is_nan] = np.nan
 
-        # remove non-numeric (nan) elements at vector ends
-        # nan elements between numeric elements are kept
-        numeric_element_indices = np.argwhere(~np.isnan(vector))
-        first_num_element = numeric_element_indices.min()
-        last_num_element = numeric_element_indices.max()
+        if (orientation == "horizontal" and self.ignore_nan_columns) or (
+            orientation == "vertical" and self.ignore_nan_rows
+        ):
+            vector[vector_is_nan] = np.nan
+
+            # remove non-numeric (nan) elements at vector ends
+            # nan elements between numeric elements are kept
+            numeric_element_indices = np.argwhere(~np.isnan(vector))
+            first_num_element = numeric_element_indices.min()
+            last_num_element = numeric_element_indices.max()
+        else:
+            first_num_element = 0
+            last_num_element = len(vector) - 1
+
         n_elements = last_num_element - first_num_element + 1
 
         group_size = n_elements / n_groups
