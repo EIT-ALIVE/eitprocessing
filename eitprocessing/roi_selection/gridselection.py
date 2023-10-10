@@ -148,8 +148,7 @@ class GridSelection(ROISelection):
         data: NDArray, orientation: Literal["horizontal", "vertical"], n_regions: int
     ) -> list[NDArray]:
         is_numeric = ~np.isnan(data)
-        horizontal = orientation == "horizontal"
-        axis = 0 if horizontal else 1
+        axis = 0 if orientation == "horizontal" else 1
         numeric_vector_indices = np.argwhere(is_numeric.sum(axis) > 0)
         first_numeric_vector = numeric_vector_indices.min()
         last_vector_numeric = numeric_vector_indices.max()
@@ -157,7 +156,7 @@ class GridSelection(ROISelection):
         n_vectors = last_vector_numeric - first_numeric_vector + 1
 
         if n_regions > n_vectors:
-            if horizontal:  # pylint: disable=no-else-raise
+            if orientation == "horizontal":  # pylint: disable=no-else-raise
                 raise InvalidHorizontalDivision(
                     f"The number horizontal regions is larger than the "
                     f"number of available columns ({n_vectors})."
@@ -171,12 +170,18 @@ class GridSelection(ROISelection):
         n_vectors_per_region = n_vectors / n_regions
 
         if n_vectors_per_region % 1 > 0:
-            warnings.warn(
-                f"The {orientation} regions will not have an equal number of "
-                f"{'columns' if horizontal else 'rows'}. "
-                f"{n_vectors} is not equally divisible by {n_regions}.",
-                RuntimeWarning,
-            )
+            if orientation == "horizontal":
+                warnings.warn(
+                    f"The horizontal regions will not have an equal number of "
+                    f"columns. {n_vectors} is not equally divisible by {n_regions}.",
+                    UnevenHorizontalDivision,
+                )
+            else:
+                warnings.warn(
+                    f"The vertical regions will not have an equal number of "
+                    f"columns. {n_vectors} is not equally divisible by {n_regions}.",
+                    UnevenVerticalDivision,
+                )
 
         region_boundaries = [
             first_numeric_vector
@@ -260,6 +265,18 @@ class InvalidHorizontalDivision(InvalidDivision):
 
 class InvalidVerticalDivision(InvalidDivision):
     """Raised when the data can't be divided into vertical regions."""
+
+
+class UnevenDivision(Warning):
+    """Warning for when a grid selection results in groups of uneven size."""
+
+
+class UnevenHorizontalDivision(UnevenDivision):
+    """Warning for when a grid selection results in horizontal groups of uneven size."""
+
+
+class UnevenVerticalDivision(UnevenDivision):
+    """Warning for when a grid selection results in vertical groups of uneven size."""
 
 
 @dataclass
