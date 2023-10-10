@@ -293,6 +293,10 @@ class GridSelection(ROISelection):
         final[
             :, first_num_element : last_num_element + 1
         ] = element_contribution_to_group
+
+        # convert to list of vectors
+        final = [final[n, :] for n in range(final.shape[0])]
+
         return final
 
     def matrix_layout(self) -> NDArray:
