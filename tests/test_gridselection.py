@@ -156,6 +156,9 @@ def test_split_pixels_no_nans(shape, split_vh, result):
 
     assert len(actual_result) == np.prod(split_vh)
     assert np.array_equal(num_appearances, (~np.isnan(data) * 1))
+
+    # Ideally, we'd use np.array_equal() here, but due to floating point arithmetic, they values
+    # are off by an insignificant amount.
     assert np.allclose(actual_result, expected_result)
 
 
