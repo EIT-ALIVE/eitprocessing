@@ -72,11 +72,15 @@ def matrices_from_string(string: str) -> list[np.ndarray]:
 )
 def test_initialisation(v_split, h_split, split_pixels, exception_type):
     if exception_type is None:
-        GridSelection(v_split, h_split, split_pixels)
+        GridSelection(
+            v_split, h_split, split_columns=split_pixels, split_rows=split_pixels
+        )
 
     else:
         with pytest.raises(exception_type):
-            GridSelection(v_split, h_split, split_pixels)
+            GridSelection(
+                v_split, h_split, split_columns=split_pixels, split_rows=split_pixels
+            )
 
 
 @pytest.mark.parametrize(
@@ -149,7 +153,7 @@ def test_split_pixels_no_nans(shape, split_vh, result):
     data = np.random.default_rng().integers(1, 100, shape)
     expected_result = [np.array(r) for r in result]
 
-    gs = GridSelection(*split_vh, split_pixels=True)
+    gs = GridSelection(*split_vh, split_rows=True, split_columns=True)
     actual_result = gs.find_grid(data)
 
     num_appearances = np.sum(np.stack(actual_result, axis=-1), axis=-1)
@@ -191,7 +195,7 @@ def test_no_split_pixels_nans(data_string, split_vh, result_string):
     result = matrices_from_string(result_string)
 
     v_split, h_split = split_vh
-    gs = GridSelection(v_split, h_split, split_pixels=False)
+    gs = GridSelection(v_split, h_split, split_rows=False, split_columns=False)
 
     matrices = gs.find_grid(data)
     num_appearances = np.sum(np.stack(matrices, axis=-1), axis=-1)
@@ -218,7 +222,7 @@ def test_no_split_pixels_nans(data_string, split_vh, result_string):
 )
 def test_warnings(data_string, split_vh, split_rows, split_columns, warning_type):
     data = matrices_from_string(data_string)[0]
-    gs = GridSelection(*split_vh, split_rows=split_rows, split_cols=split_columns)
+    gs = GridSelection(*split_vh, split_rows=split_rows, split_columns=split_columns)
 
     if warning_type is None:
         # catch all warnings and raises them

@@ -54,7 +54,8 @@ class GridSelection(ROISelection):
     Args:
         v_split: The number of vertical regions. Must be 1 or larger.
         h_split: The number of horizontal regions. Must be 1 or larger.
-        split_pixels: Allows rows and columns to be split over two regions.
+        split_rows: Allows rows to be split over two regions.
+        split_columns: Allows columns to be split over two regions.
 
     Examples:
         >>> pixel_map = array([[ 1,  2,  3],
@@ -92,11 +93,10 @@ class GridSelection(ROISelection):
 
     v_split: int
     h_split: int
-    split_pixels: InitVar[bool | None] = None
-    split_rows: bool | None = None
-    split_cols: bool | None = None
+    split_rows: bool = False
+    split_cols: bool = False
 
-    def __post_init__(self, split_pixels):
+    def __post_init__(self):
         if not isinstance(self.v_split, int):
             raise TypeError(
                 "Invalid type for `h_split`. "
@@ -114,20 +114,6 @@ class GridSelection(ROISelection):
 
         if self.h_split < 1:
             raise InvalidHorizontalDivision("`h_split` can't be smaller than 1.")
-
-        if split_pixels is not None:
-            if not isinstance(split_pixels, bool):
-                raise TypeError(
-                    "Invalid type for `split_pixels`. "
-                    f"Should be `bool` or `NoneType`, not {type(split_pixels)}."
-                )
-
-            if self.split_rows is not None or self.split_cols is not None:
-                raise AttributeError(
-                    "Don't provide both `split_pixels` and either of `split_rows` and `split_columns`."
-                )
-
-            self.split_cols = self.split_rows = split_pixels
 
     def find_grid(self, data) -> list[NDArray]:
         function = (
