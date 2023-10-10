@@ -94,7 +94,7 @@ class GridSelection(ROISelection):
     v_split: int
     h_split: int
     split_rows: bool = False
-    split_cols: bool = False
+    split_columns: bool = False
 
     def __post_init__(self):
         if not isinstance(self.v_split, int):
@@ -125,7 +125,7 @@ class GridSelection(ROISelection):
 
         function = (
             self._create_grouping_vector_split_pixels
-            if self.split_cols
+            if self.split_columns
             else self._create_grouping_vector_no_split_pixels
         )
         vertical_grouping_vectors = function(data, "vertical", self.v_split)
