@@ -132,6 +132,44 @@ def test_no_split_pixels_no_nans(shape, split_vh, result_string):
 
 
 @pytest.mark.parametrize(
+    "shape,split_vh,result",
+    [
+        (
+            (2, 3),
+            (1, 2),
+            [[[1.0, 0.5, 0], [1.0, 0.5, 0]], [[0, 0.5, 1.0], [0, 0.5, 1.0]]],
+        ),
+        (
+            (3, 2),
+            (2, 1),
+            [[[1.0, 1.0], [0.5, 0.5], [0, 0]], [[0, 0], [0.5, 0.5], [1, 1]]],
+        ),
+        (
+            (1, 4),
+            (1, 3),
+            [
+                [[1.0, 1 / 3, 0.0, 0.0]],
+                [[0.0, 2 / 3, 2 / 3, 0.0]],
+                [[0.0, 0.0, 1 / 3, 1.0]],
+            ],
+        ),
+    ],
+)
+def test_split_pixels_no_nans(shape, split_vh, result):
+    data = np.random.default_rng().integers(1, 100, shape)
+    expected_result = [np.array(r) for r in result]
+
+    gs = GridSelection(*split_vh, split_pixels=True)
+    actual_result = gs.find_grid(data)
+
+    num_appearances = np.sum(np.stack(actual_result, axis=-1), axis=-1)
+
+    assert len(actual_result) == np.prod(split_vh)
+    assert np.array_equal(num_appearances, (~np.isnan(data) * 1))
+    assert np.allclose(actual_result, expected_result)
+
+
+@pytest.mark.parametrize(
     "data_string,split_vh,result_string",
     [
         ("NNN,NRR,NRR", (1, 1), "NNN,NTT,NTT"),
