@@ -115,6 +115,18 @@ class GridSelection(ROISelection):
         if self.h_split < 1:
             raise InvalidHorizontalDivision("`h_split` can't be smaller than 1.")
 
+        if not isinstance(self.split_columns, bool):
+            raise TypeError(
+                "Invalid type for `split_columns`. "
+                f"Should be bool, not {type(self.h_split)}."
+            )
+
+        if not isinstance(self.split_rows, bool):
+            raise TypeError(
+                "Invalid type for `split_rows`. "
+                f"Should be bool, not {type(self.h_split)}."
+            )
+
     def find_grid(self, data) -> list[NDArray]:
         function = (
             self._create_grouping_vector_split_pixels
