@@ -135,14 +135,18 @@ class GridSelection(ROISelection):
             if self.split_rows
             else self._create_grouping_vector_no_split_pixels
         )
-        horizontal_grouping_vectors = function(data, "horizontal", self.h_split)
+        horizontal_grouping_vectors = function(
+            data, horizontal=True, n_groups=self.h_split
+        )
 
         function = (
             self._create_grouping_vector_split_pixels
             if self.split_columns
             else self._create_grouping_vector_no_split_pixels
         )
-        vertical_grouping_vectors = function(data, "vertical", self.v_split)
+        vertical_grouping_vectors = function(
+            data, horizontal=False, n_groups=self.v_split
+        )
 
         matrices = []
         for vertical, horizontal in itertools.product(
@@ -159,13 +163,15 @@ class GridSelection(ROISelection):
     def _create_grouping_vector_no_split_pixels(  # pylint: disable=too-many-locals
         self,
         data: NDArray,
-        orientation: Literal["horizontal", "vertical"],
-        n_regions: int,
+        horizontal: bool,
+        n_groups: int,
     ) -> list[NDArray]:
-        axis = 0 if orientation == "horizontal" else 1
+        """Create a grouping vector to split vector into `n` groups not allowing split elements."""
 
-        if (orientation == "horizontal" and self.ignore_nan_columns) or (
-            orientation == "vertical" and self.ignore_nan_rows
+        axis = 0 if horizontal else 1
+
+        if (horizontal and self.ignore_nan_columns) or (
+            not horizontal and self.ignore_nan_rows
         ):
             is_numeric = ~np.isnan(data)
             numeric_vector_indices = np.argwhere(is_numeric.sum(axis) > 0)
@@ -177,8 +183,8 @@ class GridSelection(ROISelection):
 
         n_vectors = last_vector_numeric - first_numeric_vector + 1
 
-        if n_regions > n_vectors:
-            if orientation == "horizontal":  # pylint: disable=no-else-raise
+        if n_groups > n_vectors:
+            if horizontal:  # pylint: disable=no-else-raise
                 raise InvalidHorizontalDivision(
                     f"The number horizontal regions is larger than the "
                     f"number of available columns ({n_vectors})."
@@ -189,26 +195,26 @@ class GridSelection(ROISelection):
                     f"number of available rows ({n_vectors})."
                 )
 
-        n_vectors_per_region = n_vectors / n_regions
+        n_vectors_per_region = n_vectors / n_groups
 
         if n_vectors_per_region % 1 > 0:
-            if orientation == "horizontal":
+            if horizontal:
                 warnings.warn(
                     f"The horizontal regions will not have an equal number of "
-                    f"columns. {n_vectors} is not equally divisible by {n_regions}.",
+                    f"columns. {n_vectors} is not equally divisible by {n_groups}.",
                     UnevenHorizontalDivision,
                 )
             else:
                 warnings.warn(
                     f"The vertical regions will not have an equal number of "
-                    f"columns. {n_vectors} is not equally divisible by {n_regions}.",
+                    f"columns. {n_vectors} is not equally divisible by {n_groups}.",
                     UnevenVerticalDivision,
                 )
 
         region_boundaries = [
             first_numeric_vector
             + bisect.bisect_left(np.arange(n_vectors) / n_vectors_per_region, c)
-            for c in range(n_regions + 1)
+            for c in range(n_groups + 1)
         ]
 
         vectors = []
@@ -223,18 +229,19 @@ class GridSelection(ROISelection):
     def _create_grouping_vector_split_pixels(  # pylint: disable=too-many-locals
         self,
         matrix: NDArray,
-        orientation: Literal["horizontal", "vertical"],
+        horizontal: bool,
         n_groups: int,
     ) -> list[NDArray]:
-        """Create a grouping vector to split vector into `n` groups."""
-        axis = 0 if orientation == "horizontal" else 1
+        """Create a grouping vector to split vector into `n` groups allowing split elements."""
+
+        axis = 0 if horizontal else 1
 
         # create a vector that is nan if the entire column/row is nan, 1 otherwise
         vector_is_nan = np.all(np.isnan(matrix), axis=axis)
         vector = np.ones(vector_is_nan.shape)
 
-        if (orientation == "horizontal" and self.ignore_nan_columns) or (
-            orientation == "vertical" and self.ignore_nan_rows
+        if (horizontal and self.ignore_nan_columns) or (
+            not horizontal and self.ignore_nan_rows
         ):
             vector[vector_is_nan] = np.nan
 
@@ -252,7 +259,7 @@ class GridSelection(ROISelection):
         group_size = n_elements / n_groups
 
         if group_size < 1:
-            if orientation == "horizontal":  # pylint: disable=no-else-raise
+            if horizontal:  # pylint: disable=no-else-raise
                 warnings.warn(
                     f"The number horizontal regions ({n_groups}) is larger than the "
                     f"number of available columns ({n_elements}).",
