@@ -18,25 +18,25 @@ class GridSelection(ROISelection):
     GridSelection contains information about how to subdivide an input matrix. Calling
     `find_grid(data)`, where data is a 2D array, results in a list of arrays with the same
     dimension as `data`, each representing a single region. Each resulting 2D array contains the
-    value False or 0 for pixels that do not belong to the region, and the value True, 1 or any
-    number between 0 and 1 for pixels that (partly) belong to the region.
+    value 0 for pixels that do not belong to the region, and the value 1 or any number between 0
+    and 1 for pixels that (partly) belong to the region.
 
     Rows and columns at the edges of `data` that only contain NaN (not a number) values are
     ignored. E.g. a (32, 32) array where the first and last two rows and first and last two columns
     only contain NaN are split as if it is a (28, 28) array. The resulting arrays have the shape
-    (32, 32) with the same rows and columns only containing NaN values.
+    (32, 32) with the same cells as the input data containing NaN values.
 
     If the number of rows or columns can not split evenly, a row or column can be split among two
     regions. This behaviour is controlled by `split_pixels`.
-
-    If `split_pixels` is `True`, e.g. a (2, 5) array that is split in two horizontal regions, the
-    first region will contain the first two columns, and half of the third column. The second
-    region contains half of the third columns, and the last column.
 
     If `split_pixels` is `False` (default), rows and columns will not be split. A warning will be
     shown stating regions don't contain equal numbers of rows/columns. The regions towards the top
     and left will be larger. E.g., when a (2, 5) array is split in two horizontal regions, the
     first region will contain the first three columns, and the second region the last two columns.
+
+    If `split_pixels` is `True`, e.g. a (2, 5) array that is split in two horizontal regions, the
+    first region will contain the first two columns, and half of the third column. The second
+    region contains half of the third columns, and the last column.
 
     Regions are ordered according to C indexing order. The `matrix_layout()` method provides a map
     showing how the regions are ordered.
