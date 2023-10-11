@@ -1,0 +1,37 @@
+:py:mod:`eitprocessing.roi_selection`
+=====================================
+
+.. py:module:: eitprocessing.roi_selection
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   functionallungspace/index.rst
+   gridselection/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.roi_selection.ROISelection
+
+
+
+
+.. py:class:: ROISelection
+
+
+   .. py:method:: minimal_cluster(pixel_map)
+      :abstractmethod:
+
+
+

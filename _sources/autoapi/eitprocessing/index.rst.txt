@@ -17,6 +17,7 @@ Subpackages
 
    binreader/index.rst
    filters/index.rst
+   roi_selection/index.rst
 
 
 Package Contents
