@@ -56,30 +56,69 @@ def matrices_from_string(string: str) -> list[np.ndarray]:
 
 
 @pytest.mark.parametrize(
-    "v_split,h_split,split_pixels,exception_type",
+    "v_split,h_split,split_columns,split_rows,ign_nan_cols,ign_nan_rows,exception_type",
     [
-        (1, 1, False, None),
-        (0, 1, False, InvalidVerticalDivision),
-        (-1, 1, False, InvalidVerticalDivision),
-        (1.1, 1, False, TypeError),
-        (1, 0, False, InvalidHorizontalDivision),
-        (1, -1, False, InvalidHorizontalDivision),
-        (1, 1.1, False, TypeError),
-        (2, 2, "not a boolean", TypeError),
-        (2, 2, 1, TypeError),
-        (2, 2, 0, TypeError),
+        (1, 1, False, False, True, True, None),
+        (1, 1, False, True, True, True, None),
+        (1, 1, True, False, True, True, None),
+        (1, 1, True, True, False, True, None),
+        (1, 1, True, True, True, False, None),
+        # Vertical divider invalid
+        (0, 1, False, False, True, True, InvalidVerticalDivision),
+        (-1, 1, False, False, True, True, InvalidVerticalDivision),
+        (1.1, 1, False, False, True, True, TypeError),
+        # Horizontal divider invalid
+        (1, 0, False, False, True, True, InvalidHorizontalDivision),
+        (1, -1, False, False, True, True, InvalidHorizontalDivision),
+        (1, 1.1, False, False, True, True, TypeError),
+        # split_rows invalid
+        (2, 2, "not a boolean", False, True, True, TypeError),
+        (2, 2, 1, False, True, True, TypeError),
+        (2, 2, 0, False, True, True, TypeError),
+        # split_columns invalid
+        (2, 2, False, "not a boolean", True, True, TypeError),
+        (2, 2, False, 1, True, True, TypeError),
+        (2, 2, False, 0, True, True, TypeError),
+        # ignore_nan_rows invalid
+        (1, 1, False, False, "not a boolean", True, TypeError),
+        (1, 1, False, False, 1, True, TypeError),
+        # ignore_nan_columns invalid
+        (1, 1, False, False, True, "not a boolean", TypeError),
+        (1, 1, False, False, True, 1, TypeError),
     ],
 )
-def test_initialisation(v_split, h_split, split_pixels, exception_type):
+def test_initialisation(
+    v_split,
+    h_split,
+    split_columns,
+    split_rows,
+    ign_nan_cols,
+    ign_nan_rows,
+    exception_type,
+):
+    """Tests the initialisation of GridSelection and corresponding expected
+    errors.
+
+    """
     if exception_type is None:
         GridSelection(
-            v_split, h_split, split_columns=split_pixels, split_rows=split_pixels
+            v_split,
+            h_split,
+            split_columns=split_columns,
+            split_rows=split_rows,
+            ignore_nan_columns=ign_nan_cols,
+            ignore_nan_rows=ign_nan_rows,
         )
 
     else:
         with pytest.raises(exception_type):
             GridSelection(
-                v_split, h_split, split_columns=split_pixels, split_rows=split_pixels
+                v_split,
+                h_split,
+                split_columns=split_columns,
+                split_rows=split_rows,
+                ignore_nan_columns=ign_nan_cols,
+                ignore_nan_rows=ign_nan_rows,
             )
 
 
