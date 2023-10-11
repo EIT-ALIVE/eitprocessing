@@ -98,18 +98,17 @@ class GridSelection(ROISelection):
     ignore_nan_rows: bool = True
     ignore_nan_columns: bool = True
 
-    def __post_init__(self):
-        if not isinstance(self.v_split, int):
-            raise TypeError(
-                "Invalid type for `h_split`. "
-                f"Should be `int`, not {type(self.h_split)}."
-            )
+    def _check_attribute_type(self, name, type_):
+        """Checks whether an attribute is an instance of the given type."""
+        attr = getattr(self, name)
+        if not isinstance(attr, type_):
+            message = f"Invalid type for `{name}`."
+            message += f"Should be {type_}, not {type(attr)}."
+            raise TypeError(message)
 
-        if not isinstance(self.h_split, int):
-            raise TypeError(
-                "Invalid type for `h_split`. "
-                f"Should be `int`, not {type(self.h_split)}."
-            )
+    def __post_init__(self):
+        self._check_attribute_type("v_split", int)
+        self._check_attribute_type("h_split", int)
 
         if self.v_split < 1:
             raise InvalidVerticalDivision("`v_split` can't be smaller than 1.")
@@ -117,17 +116,10 @@ class GridSelection(ROISelection):
         if self.h_split < 1:
             raise InvalidHorizontalDivision("`h_split` can't be smaller than 1.")
 
-        if not isinstance(self.split_columns, bool):
-            raise TypeError(
-                "Invalid type for `split_columns`. "
-                f"Should be bool, not {type(self.h_split)}."
-            )
-
-        if not isinstance(self.split_rows, bool):
-            raise TypeError(
-                "Invalid type for `split_rows`. "
-                f"Should be bool, not {type(self.h_split)}."
-            )
+        self._check_attribute_type("split_columns", bool)
+        self._check_attribute_type("split_rows", bool)
+        self._check_attribute_type("ignore_nan_columns", bool)
+        self._check_attribute_type("ignore_nan_rows", bool)
 
     def find_grid(self, data) -> list[NDArray]:
         function = (
