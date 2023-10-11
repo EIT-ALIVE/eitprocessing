@@ -1,7 +1,6 @@
 import bisect
 import itertools
 import warnings
-from dataclasses import InitVar
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Literal
@@ -266,7 +265,7 @@ class GridSelection(ROISelection):
         group_size = n_elements / n_groups
 
         if group_size < 1:
-            if horizontal:  # pylint: disable=no-else-raise
+            if horizontal:
                 warnings.warn(
                     f"The number horizontal regions ({n_groups}) is larger than the "
                     f"number of available columns ({n_elements}).",

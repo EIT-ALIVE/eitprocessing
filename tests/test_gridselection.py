@@ -87,7 +87,7 @@ def matrices_from_string(string: str) -> list[np.ndarray]:
         (1, 1, False, False, True, 1, TypeError),
     ],
 )
-def test_initialisation(
+def test_initialisation(  # pylint: disable=too-many-arguments
     v_split,
     h_split,
     split_columns,
