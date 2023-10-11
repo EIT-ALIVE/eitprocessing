@@ -274,18 +274,23 @@ def test_warnings(data_string, split_vh, split_rows, split_columns, warning_type
 
 
 @pytest.mark.parametrize(
-    "data_string,split_vh,exception_type",
+    "data_string,split_vh,split_rows,split_columns,exception_type",
     [
-        ("RR,RR", (2, 2), None),
-        ("RR,RR", (3, 1), InvalidVerticalDivision),
-        ("RR,RR", (1, 3), InvalidHorizontalDivision),
-        ("RR,RR", (3, 1), InvalidDivision),
-        ("RR,RR", (1, 3), InvalidDivision),
+        ("RR,RR", (2, 2), False, False, None),
+        ("RR,RR", (3, 1), False, False, InvalidVerticalDivision),
+        ("RR,RR", (1, 3), False, False, InvalidHorizontalDivision),
+        ("RR,RR", (3, 1), False, False, InvalidDivision),
+        ("RR,RR", (1, 3), False, False, InvalidDivision),
+        ("RR,RR", (3, 2), True, False, None),
+        ("RR,RR", (3, 2), False, False, InvalidVerticalDivision),
+        ("RR,RR", (2, 3), False, True, None),
+        ("RR,RR", (2, 3), False, False, InvalidHorizontalDivision),
     ],
 )
-def test_exceptions(data_string, split_vh, exception_type):
+def test_exceptions(data_string, split_vh, split_rows, split_columns, exception_type):
+    """Tests for exceptions raised when `find_grid()` is called."""
     data = matrices_from_string(data_string)[0]
-    gs = GridSelection(*split_vh)
+    gs = GridSelection(*split_vh, split_columns=split_columns, split_rows=split_rows)
 
     if exception_type is None:
         gs.find_grid(data)
