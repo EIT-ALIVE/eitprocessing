@@ -121,7 +121,21 @@ class GridSelection(ROISelection):
         self._check_attribute_type("ignore_nan_columns", bool)
         self._check_attribute_type("ignore_nan_rows", bool)
 
-    def find_grid(self, data) -> list[NDArray]:
+    def find_grid(self, data: NDArray) -> list[NDArray]:
+        """
+        Create 2D arrays to split a grid into regions.
+
+        Create 2D arrays to split the given data into regions. The number of 2D
+        arrays will equal the number regions, which is the multiplicaiton of
+        `v_split` and `h_split`.
+
+        Args:
+            data (NDArray): a 2D array containing any numeric or np.nan data.
+
+        Returns:
+            list[NDArray]: a list of `n` 2D arrays where `n` is `v_split *
+                h_split`.
+        """
         function = (
             self._create_grouping_vector_split_pixels
             if self.split_columns
@@ -157,7 +171,8 @@ class GridSelection(ROISelection):
         horizontal: bool,
         n_groups: int,
     ) -> list[NDArray]:
-        """Create a grouping vector to split vector into `n` groups not allowing split elements."""
+        """Create a grouping vector to split vector into `n` groups not
+        allowing split elements."""
 
         axis = 0 if horizontal else 1
 
@@ -223,7 +238,8 @@ class GridSelection(ROISelection):
         horizontal: bool,
         n_groups: int,
     ) -> list[NDArray]:
-        """Create a grouping vector to split vector into `n` groups allowing split elements."""
+        """Create a grouping vector to split vector into `n` groups allowing
+        split elements."""
 
         axis = 0 if horizontal else 1
 
@@ -298,7 +314,8 @@ class GridSelection(ROISelection):
         return final
 
     def matrix_layout(self) -> NDArray:
-        """Returns an array showing the layout of the matrices returned by `find_grid`."""
+        """Returns a 2D array showing the layout of the matrices returned by
+        `find_grid`."""
         n_regions = self.v_split * self.h_split
         return np.reshape(np.arange(n_regions), (self.v_split, self.h_split))
 
