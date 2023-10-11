@@ -5,6 +5,10 @@ from eitprocessing.roi_selection.gridselection import GridSelection
 from eitprocessing.roi_selection.gridselection import InvalidDivision
 from eitprocessing.roi_selection.gridselection import InvalidHorizontalDivision
 from eitprocessing.roi_selection.gridselection import InvalidVerticalDivision
+from eitprocessing.roi_selection.gridselection import MoreHorizontalGroupsThanColumns
+from eitprocessing.roi_selection.gridselection import MoreVerticalGroupsThanRows
+from eitprocessing.roi_selection.gridselection import UnevenHorizontalDivision
+from eitprocessing.roi_selection.gridselection import UnevenVerticalDivision
 
 
 def matrices_from_string(string: str) -> list[np.ndarray]:
@@ -195,20 +199,23 @@ def test_no_split_pixels_nans(data_string, split_vh, result_string):
 
 
 @pytest.mark.parametrize(
-    "data_string,split_vh,warning_type",
+    "data_string,split_vh,split_rows,split_columns,warning_type",
     [
-        ("RR,RR", (2, 2), None),
-        ("RRR,RRR", (2, 2), RuntimeWarning),
-        ("RRR,RRR", (1, 3), None),
-        ("RRRR,RRRR", (1, 3), RuntimeWarning),
-        ("RR,RR,RR", (2, 1), RuntimeWarning),
-        ("RR,RR,RR", (3, 1), None),
-        ("NN,RR,RR", (2, 1), None),
+        ("RR,RR", (2, 2), False, False, None),
+        ("RRR,RRR", (2, 2), False, False, UnevenHorizontalDivision),
+        ("RRR,RRR", (1, 3), False, False, None),
+        ("RRRR,RRRR", (1, 3), False, False, UnevenHorizontalDivision),
+        ("RR,RR,RR", (2, 1), False, False, UnevenVerticalDivision),
+        ("RR,RR,RR", (3, 1), False, False, None),
+        ("NN,RR,RR", (2, 1), False, False, None),
+        ("R", (2, 1), True, True, MoreVerticalGroupsThanRows),
+        ("R", (1, 2), True, True, MoreHorizontalGroupsThanColumns),
+        ("RRR,RRR,RRR", (4, 3), True, True, MoreVerticalGroupsThanRows),
     ],
 )
-def test_warnings(data_string, split_vh, warning_type):
+def test_warnings(data_string, split_vh, split_rows, split_columns, warning_type):
     data = matrices_from_string(data_string)[0]
-    gs = GridSelection(*split_vh)
+    gs = GridSelection(*split_vh, split_rows=split_rows, split_cols=split_columns)
 
     if warning_type is None:
         # catch all warnings and raises them
