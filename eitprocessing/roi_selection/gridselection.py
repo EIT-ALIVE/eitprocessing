@@ -28,16 +28,18 @@ class GridSelection(ROISelection):
     (32, 32) with the same cells as the input data containing NaN values.
 
     If the number of rows or columns can not split evenly, a row or column can be split among two
-    regions. This behaviour is controlled by `split_pixels`.
+    regions. This behaviour is controlled by `split_rows` and `split_columns`.
 
-    If `split_pixels` is `False` (default), rows and columns will not be split. A warning will be
-    shown stating regions don't contain equal numbers of rows/columns. The regions towards the top
-    and left will be larger. E.g., when a (2, 5) array is split in two horizontal regions, the
-    first region will contain the first three columns, and the second region the last two columns.
+    If `split_rows` is `False` (default), rows will not be split between two groups. A warning will
+    be shown stating regions don't contain equal numbers of rows. The regions towards the top will
+    be larger. E.g., when a (5, 2) array is split in two vertical regions, the first region will
+    contain the first three rows, and the second region the last two rows.
 
-    If `split_pixels` is `True`, e.g. a (2, 5) array that is split in two horizontal regions, the
-    first region will contain the first two columns, and half of the third column. The second
-    region contains half of the third columns, and the last column.
+    If `split_rows` is `True`, e.g. a (5, 2) array that is split in two vertical regions, the first
+    region will contain the first two rows and half of each pixel of the third row. The second
+    region contains half of each pixel in the third row, and the last two rows.
+
+    `split_columns` has the same effect on columns as `split_rows` has on rows.
 
     Regions are ordered according to C indexing order. The `matrix_layout()` method provides a map
     showing how the regions are ordered.
@@ -326,7 +328,6 @@ class VentralAndDorsal(GridSelection):
 
     v_split: Literal[2] = field(default=2, init=False)
     h_split: Literal[1] = field(default=1, init=False)
-    split_pixels: bool = False
 
 
 @dataclass
@@ -335,7 +336,6 @@ class RightAndLeft(GridSelection):
 
     v_split: Literal[1] = field(default=1, init=False)
     h_split: Literal[2] = field(default=2, init=False)
-    split_pixels: bool = False
 
 
 @dataclass
@@ -344,7 +344,6 @@ class FourLayers(GridSelection):
 
     v_split: Literal[4] = field(default=4, init=False)
     h_split: Literal[1] = field(default=1, init=False)
-    split_pixels: bool = False
 
 
 @dataclass
@@ -353,4 +352,3 @@ class Quadrants(GridSelection):
 
     v_split: Literal[2] = field(default=2, init=False)
     h_split: Literal[2] = field(default=2, init=False)
-    split_pixels: bool = False
