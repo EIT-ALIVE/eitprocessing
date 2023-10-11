@@ -132,7 +132,7 @@ class GridSelection(ROISelection):
     def find_grid(self, data) -> list[NDArray]:
         function = (
             self._create_grouping_vector_split_pixels
-            if self.split_rows
+            if self.split_columns
             else self._create_grouping_vector_no_split_pixels
         )
         horizontal_grouping_vectors = function(
@@ -141,7 +141,7 @@ class GridSelection(ROISelection):
 
         function = (
             self._create_grouping_vector_split_pixels
-            if self.split_columns
+            if self.split_rows
             else self._create_grouping_vector_no_split_pixels
         )
         vertical_grouping_vectors = function(
