@@ -202,21 +202,16 @@
 <span class="sd">            list[NDArray]: a list of `n` 2D arrays where `n` is `v_split *</span>
 <span class="sd">                h_split`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">function</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_create_grouping_vector_split_pixels</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_columns</span>
-            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_grouping_vector_no_split_pixels</span>
-        <span class="p">)</span>
-        <span class="n">horizontal_grouping_vectors</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span>
+        <span class="n">grouping_method</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="kc">True</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_grouping_vector_split_pixels</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_grouping_vector_no_split_pixels</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">horizontal_grouping_vectors</span> <span class="o">=</span> <span class="n">grouping_method</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">split_columns</span><span class="p">](</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">h_split</span>
         <span class="p">)</span>
 
-        <span class="n">function</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_create_grouping_vector_split_pixels</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_rows</span>
-            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_grouping_vector_no_split_pixels</span>
-        <span class="p">)</span>
-        <span class="n">vertical_grouping_vectors</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span>
+        <span class="n">vertical_grouping_vectors</span> <span class="o">=</span> <span class="n">grouping_method</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">split_rows</span><span class="p">](</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">v_split</span>
         <span class="p">)</span>
 
@@ -224,8 +219,7 @@
         <span class="k">for</span> <span class="n">vertical</span><span class="p">,</span> <span class="n">horizontal</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
             <span class="n">vertical_grouping_vectors</span><span class="p">,</span> <span class="n">horizontal_grouping_vectors</span>
         <span class="p">):</span>
-            <span class="c1"># [None, :] converts to row vector, [:, None] converts to column vector</span>
-            <span class="n">matrix</span> <span class="o">=</span> <span class="n">vertical</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">@</span> <span class="n">horizontal</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">vertical</span><span class="p">,</span> <span class="n">horizontal</span><span class="p">)</span>
             <span class="n">matrix</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="n">matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
 
@@ -261,12 +255,12 @@
         <span class="k">if</span> <span class="n">n_groups</span> <span class="o">&gt;</span> <span class="n">n_vectors</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">horizontal</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-else-raise</span>
                 <span class="k">raise</span> <span class="n">InvalidHorizontalDivision</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The number horizontal regions is larger than the &quot;</span>
+                    <span class="s2">&quot;The number horizontal regions is larger than the &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;number of available columns (</span><span class="si">{</span><span class="n">n_vectors</span><span class="si">}</span><span class="s2">).&quot;</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">InvalidVerticalDivision</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The number vertical regions is larger than the &quot;</span>
+                    <span class="s2">&quot;The number vertical regions is larger than the &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;number of available rows (</span><span class="si">{</span><span class="n">n_vectors</span><span class="si">}</span><span class="s2">).&quot;</span>
                 <span class="p">)</span>
 
@@ -275,13 +269,13 @@
         <span class="k">if</span> <span class="n">n_vectors_per_region</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">horizontal</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The horizontal regions will not have an equal number of &quot;</span>
+                    <span class="s2">&quot;The horizontal regions will not have an equal number of &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;columns. </span><span class="si">{</span><span class="n">n_vectors</span><span class="si">}</span><span class="s2"> is not equally divisible by </span><span class="si">{</span><span class="n">n_groups</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
                     <span class="n">UnevenHorizontalDivision</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The vertical regions will not have an equal number of &quot;</span>
+                    <span class="s2">&quot;The vertical regions will not have an equal number of &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;columns. </span><span class="si">{</span><span class="n">n_vectors</span><span class="si">}</span><span class="s2"> is not equally divisible by </span><span class="si">{</span><span class="n">n_groups</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
                     <span class="n">UnevenVerticalDivision</span><span class="p">,</span>
                 <span class="p">)</span>
@@ -353,7 +347,7 @@
 
         <span class="c1"># find the right boundaries (upper values) of each group</span>
         <span class="n">right_boundaries</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_groups</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">group_size</span>
-        <span class="n">right_boundaries</span> <span class="o">=</span> <span class="n">right_boundaries</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>  <span class="c1"># converts it to a row vector</span>
+        <span class="n">right_boundaries</span> <span class="o">=</span> <span class="n">right_boundaries</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>  <span class="c1"># converts to row vector</span>
 
         <span class="c1"># each row in the base represents one group</span>
         <span class="n">base</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_elements</span><span class="p">),</span> <span class="p">(</span><span class="n">n_groups</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
