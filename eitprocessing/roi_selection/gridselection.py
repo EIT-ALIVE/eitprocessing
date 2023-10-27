@@ -185,12 +185,12 @@ class GridSelection(ROISelection):
         if n_groups > n_vectors:
             if horizontal:  # pylint: disable=no-else-raise
                 raise InvalidHorizontalDivision(
-                    f"The number horizontal regions is larger than the "
+                    "The number horizontal regions is larger than the "
                     f"number of available columns ({n_vectors})."
                 )
             else:
                 raise InvalidVerticalDivision(
-                    f"The number vertical regions is larger than the "
+                    "The number vertical regions is larger than the "
                     f"number of available rows ({n_vectors})."
                 )
 
@@ -199,13 +199,13 @@ class GridSelection(ROISelection):
         if n_vectors_per_region % 1 > 0:
             if horizontal:
                 warnings.warn(
-                    f"The horizontal regions will not have an equal number of "
+                    "The horizontal regions will not have an equal number of "
                     f"columns. {n_vectors} is not equally divisible by {n_groups}.",
                     UnevenHorizontalDivision,
                 )
             else:
                 warnings.warn(
-                    f"The vertical regions will not have an equal number of "
+                    "The vertical regions will not have an equal number of "
                     f"columns. {n_vectors} is not equally divisible by {n_groups}.",
                     UnevenVerticalDivision,
                 )
