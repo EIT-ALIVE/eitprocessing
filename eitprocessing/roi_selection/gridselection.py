@@ -157,8 +157,7 @@ class GridSelection(ROISelection):
         for vertical, horizontal in itertools.product(
             vertical_grouping_vectors, horizontal_grouping_vectors
         ):
-            # [None, :] converts to row vector, [:, None] converts to column vector
-            matrix = vertical[:, None] @ horizontal[None, :]
+            matrix = np.outer(vertical, horizontal)
             matrix[np.isnan(data)] = np.nan
             matrices.append(matrix)
 
