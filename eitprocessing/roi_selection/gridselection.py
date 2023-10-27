@@ -135,21 +135,16 @@ class GridSelection(ROISelection):
             list[NDArray]: a list of `n` 2D arrays where `n` is `v_split *
                 h_split`.
         """
-        function = (
-            self._create_grouping_vector_split_pixels
-            if self.split_columns
-            else self._create_grouping_vector_no_split_pixels
-        )
-        horizontal_grouping_vectors = function(
+        grouping_method = {
+            True: self._create_grouping_vector_split_pixels,
+            False: self._create_grouping_vector_no_split_pixels,
+        }
+
+        horizontal_grouping_vectors = grouping_method[self.split_columns](
             data, horizontal=True, n_groups=self.h_split
         )
 
-        function = (
-            self._create_grouping_vector_split_pixels
-            if self.split_rows
-            else self._create_grouping_vector_no_split_pixels
-        )
-        vertical_grouping_vectors = function(
+        vertical_grouping_vectors = grouping_method[self.split_rows](
             data, horizontal=False, n_groups=self.v_split
         )
 
