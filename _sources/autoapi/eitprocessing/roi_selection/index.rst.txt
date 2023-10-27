@@ -10,7 +10,6 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
-   functionallungspace/index.rst
    gridselection/index.rst
 
 
