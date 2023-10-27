@@ -2,6 +2,7 @@ import warnings
 from typing import Final
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 from eitprocessing.roi_selection.gridselection import GridSelection
 from eitprocessing.roi_selection.gridselection import InvalidDivision
 from eitprocessing.roi_selection.gridselection import InvalidHorizontalDivision
@@ -15,7 +16,7 @@ from eitprocessing.roi_selection.gridselection import UnevenVerticalDivision
 N: Final = np.nan  # shorthand for readabililty
 
 
-def matrix_from_string(string: str) -> np.ndarray:
+def matrix_from_string(string: str) -> NDArray:
     """
     Generate a of matrix from a string containing a representation of that
     matrix.
@@ -53,7 +54,7 @@ def matrix_from_string(string: str) -> np.ndarray:
     return matrix
 
 
-def matrices_from_string(string: str) -> list[np.ndarray]:
+def matrices_from_string(string: str) -> list[NDArray]:
     """
     Generate a list of matrices from a string representation containing
     multiple matrices.
