@@ -279,7 +279,7 @@ class GridSelection(ROISelection):
 
         # find the right boundaries (upper values) of each group
         right_boundaries = (np.arange(n_groups) + 1) * group_size
-        right_boundaries = right_boundaries[:, None]  # converts it to a row vector
+        right_boundaries = right_boundaries[:, np.newaxis]  # converts to row vector
 
         # each row in the base represents one group
         base = np.tile(np.arange(n_elements), (n_groups, 1))
