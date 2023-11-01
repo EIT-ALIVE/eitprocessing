@@ -28,7 +28,7 @@ class BreathDetection:
     averaging_window_fun: Callable[[int], ArrayLike] | None = None
     amplitude_cutoff_fraction: float | None = 0.25
 
-    def _find_feature(
+    def _find_features(
         self, data: NDArray, invert: float = False
     ) -> tuple[NDArray, NDArray]:
         """
@@ -304,7 +304,7 @@ class BreathDetection:
     def find_breaths(self, data: NDArray):
         moving_average = self._calculate_moving_average(data)
 
-        peak_indices, peak_values = self._find_feature(data)
+        peak_indices, peak_values = self._find_features(data)
         peak_indices, peak_values = self._remove_outliers(
             peak_indices,
             peak_values,
@@ -312,7 +312,7 @@ class BreathDetection:
             moving_average=moving_average,
         )
 
-        valley_indices, valley_values = self._find_feature(data, invert=True)
+        valley_indices, valley_values = self._find_features(data, invert=True)
         valley_indices, valley_values = self._remove_outliers(
             valley_indices,
             valley_values,
