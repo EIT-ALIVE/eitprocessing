@@ -547,10 +547,10 @@ class DraegerSequence(Sequence):
     ):
         for key, value in zip(medibus_field_names, data):
             # some fields have a value of -1000 when not available; others a very large negative
-            # number which varies, but seems to always be lower than -3e37
+            # number which varies, but seems to always be lower than -1e20.
             if value == -1000:
                 continue
-            if value < -3e37:
+            if value < -1e20:
                 continue
 
             waveform_data[key][index] = value
