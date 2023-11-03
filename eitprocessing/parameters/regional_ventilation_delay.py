@@ -10,7 +10,7 @@ class RegionalVentilationDelay(ParameterExtraction):
     interpolation_kind = "cubic"  # Type of interpolation used for normalizing all inspirations between 0 and 1
     common_time = np.linspace(0, 1, 101)  # Common time axis to which is normalized
 
-    def compute_parameter(self, sequence, frameset_name: str) -> tuple[NDArray, list]:
+    def compute_parameter(self, sequence, frameset_name: str) -> tuple[NDArray, float]:
         """Computes the regional ventilation delay per breath using pixel
         impedance. Also returns the regional ventilation delay inhomogeneity
         (standard deviation of RVD of all pixels)."""
