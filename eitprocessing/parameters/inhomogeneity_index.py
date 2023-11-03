@@ -8,6 +8,11 @@ from . import ParameterExtraction
 @dataclass
 class InhomogeneityIndex(ParameterExtraction):
     breath_detection_kwargs: dict = {}
+    summary_stats: dict[str, Callable[[NDArray], float]] = {
+        "mean": np.mean,
+        "standard deviation": np.std,
+        "median": np.median,
+    }
 
     def compute_parameter(self, sequence, frameset_name) -> list:
         """Calculate inhomogeneity index
@@ -35,6 +40,8 @@ class InhomogeneityIndex(ParameterExtraction):
             abs_diff = np.abs(insp_pixel_tiv - median_tiv)
             inhomogeneities.append((np.sum(abs_diff) / np.sum(insp_pixel_tiv)))
 
-        inhomogeneity_index = np.mean(inhomogeneities)
+        inhomogeneity_index = {}
+        for name, function in self.summary_stats.items():
+            inhomogeneity_index[name] = function(inhomogeneities)
 
         return inhomogeneity_index
