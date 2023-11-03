@@ -1,7 +1,7 @@
 import itertools
-import operator
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import NamedTuple
 from typing import TypeAlias
 import numpy as np
 from numpy.typing import ArrayLike
@@ -13,8 +13,9 @@ duration: TypeAlias = float
 index: TypeAlias = int
 
 
-@dataclass
-class Breath:
+class Breath(NamedTuple):
+    """Indicates the start, middle and end of a single breath."""
+
     start_index: int
     middle_index: int
     end_index: int
@@ -22,14 +23,30 @@ class Breath:
 
 @dataclass
 class BreathDetection:
+    """Algorithm for detecting breaths in data representing respiration.
+
+    This algorithm detects the position of breaths in data by detecting valleys
+    (local minimum values) and peaks (local maximum values) in data. When
+    initializing BreathDetection, the sample frequency of the data and the
+    minimum duration of a breath have to be provided. The minimum duration
+    should be short enough to include the shortest expected breath in the data.
+
+    Args:
+        -
+
+    Examples:
+    >>> bd = BreathDetection(sample_frequency=50, minimum_duration=0.5)
+    >>> breaths = bd.find_breaths(global_impedance)
+    """
+
     sample_frequency: float
-    minimum_distance: duration
+    minimum_distance: duration = 2 / 3
     averaging_window_length: duration = 30
     averaging_window_fun: Callable[[int], ArrayLike] | None = None
     amplitude_cutoff_fraction: float | None = 0.25
 
     def _find_features(
-        self, data: NDArray, invert: float = False
+        self, data: NDArray, moving_average: NDArray, invert: float = False
     ) -> tuple[NDArray, NDArray]:
         """
         Find features (peaks or valleys) in the data.
@@ -42,56 +59,28 @@ class BreathDetection:
         should be True, which flips the data before finding peaks.
 
         Args:
-            data_ (NDArray): _description_
-            invert (float, optional): _description_. Defaults to False.
+            data (NDArray): a 1D array containing the data.
+            moving_average (NDArrag): a 1D array containing the moving average
+                of the data.
+            invert (float, optional): whether to invert the data before
+            detecting peaks. Defaults to False.
 
         Returns:
-            tuple[NDArray, NDArray]: _description_
+            A tuple containing two 1D arrays of length N with the indices (int)
+            and values (float) of the features, where N is the number of
+            features found.
         """
 
         data_ = -data if invert else data
-        naive_feature_indices, _ = signal.find_peaks(
-            data_, distance=self.minimum_distance * self.sample_frequency
+        moving_average_ = -moving_average if invert else moving_average
+        feature_indices, _ = signal.find_peaks(
+            data_,
+            distance=self.minimum_distance * self.sample_frequency,
+            height=moving_average_,
         )
 
-        naive_feature_values = data[naive_feature_indices]
+        feature_values = data[feature_indices]
 
-        return naive_feature_indices, naive_feature_values
-
-    def _remove_outliers(
-        self,
-        feature_indices: NDArray,
-        feature_values: NDArray,
-        operator_: Callable,
-        moving_average: NDArray,
-    ) -> tuple[NDArray, NDArray]:
-        """
-        Remove outlier peaks/valleys.
-
-        This method removes any feature (peak/valley) if the value of that
-        feature is below the moving average of the data at said feature.
-
-        The `operator_` argument should be a callable that takes two arguments,
-        and returns a boolean. In most cases, any of the `lt`, `le`, `gt` or
-        `ge` functions from the `operator` module suffice.
-
-        Args:
-            feature_indices (NDArray): indices of the previously detected peaks
-                or valleys.
-            feature_values (NDArray): the vallues of the previously detected
-                peaks or valleys.
-            operator_ (Callable): operator to use when comparing to the moving
-                average.
-            moving_average (NDArray): _description_
-
-        Returns:
-            tuple[NDArray, NDArray]: _description_
-        """
-        feature_outliers = np.argwhere(
-            operator_(feature_values, moving_average[feature_indices])
-        )
-        feature_indices = np.delete(feature_indices, feature_outliers)
-        feature_values = np.delete(feature_values, feature_outliers)
         return feature_indices, feature_values
 
     def _remove_edge_cases(
@@ -117,12 +106,11 @@ class BreathDetection:
         are removed. This ensures peaks only fall between valleys.
 
         Args:
-            peak_indices (NDArray): indices of the previously detected peaks
-            peak_values (NDArray):
-            valley_indices (NDArray): indices of the previously detected
-                valleys
-            valley_values (NDArray):
-            data (NDArray): the data in which the peaks/valleys are detected
+            peak_indices (NDArray): indices of the peaks
+            peak_values (NDArray): values of the peaks
+            valley_indices (NDArray): indices of the valleys
+            valley_values (NDArray): values of the valleys
+            data (NDArray): the data in which the peaks/valleys were detected
             moving_average (NDArray): the moving average of data
 
         Returns:
@@ -174,10 +162,10 @@ class BreathDetection:
         valley.
 
         Args:
-            peak_indices (NDArray): indices of the previously detected peaks
-            peak_values (NDArray): the values of the previously detected peaks
-            valley_indices (NDArray): indices of the previously detected valleys
-            valley_values (NDArray): the values of the previously detected valleys
+            peak_indices (NDArray): indices of the peaks
+            peak_values (NDArray): values of the peaks
+            valley_indices (NDArray): indices of the valleys
+            valley_values (NDArray): values of the valleys
 
         Returns:
             A tuple (peak_indices, peak_values, valley_indices, valley_values)
@@ -230,6 +218,10 @@ class BreathDetection:
         integer `M` and returns an array-like sequence containing a window with
         length `M` and area 1.
 
+        Before convolution the data is padded at the start and end with the
+        first/last value, to more accurately determine the average at the
+        boundaries of the data.
+
         Args:
             data (NDArray): input data as 1D array
 
@@ -279,8 +271,15 @@ class BreathDetection:
         If `amplitude_cutoff_fraction` is None, the input is returned
         unchanged.
 
+        Args:
+            peak_indices (NDArray): the indices of the peaks
+            peak_values (NDArray): the values of the peaks
+            valley_indices (NDArray): the indices of the valleys
+            valley_vallues (NDArray): the values of the valleys
+
         Returns:
-            NDArray: _description_
+            A tuple (peak_indices, peak_values, valley_indices, valley_values)
+            with low-amplitude breaths removed.
         """
         if not self.amplitude_cutoff_fraction:
             return peak_indices, peak_values, valley_indices, valley_values
@@ -302,22 +301,44 @@ class BreathDetection:
         return peak_indices, peak_values, valley_indices, valley_values
 
     def find_breaths(self, data: NDArray):
+        """Find breaths in the data.
+
+        This method attempts to find peaks and valleys in the data in a
+        multi-step process. First, it naively finds any peaks that are a
+        certain distance apart and higher than the moving average, and
+        similarly valleys that are a certain distance apart and below the
+        moving average.
+
+        Next, valleys at the start and end of the signal are removed
+        to ensure the first and last valleys are actual valleys, and not just
+        the start or end of the signal. Peaks before the first or after the
+        last valley are removed, to ensure peaks always fall between two
+        valleys.
+
+        At this point, it is possible multiple peaks exist between two valleys.
+        Lower peaks are removed leaving only the highest peak between two
+        valleys. Similarly, multiple valleys between two peaks are reduced to
+        only the lowest valley.
+
+        As a last step, breaths with a low amplitude (the average between the
+        inspiratory and expiratory amplitudes) are removed.
+
+        Breaths are constructed as a valley-peak-valley combination,
+        representing the start of inspiration, the end of inspiration/start of
+        expiration, and end of expiration.
+
+        Args:
+            data (NDArray): a 1D array containing the data to find breaths in.
+
+        Returns:
+            A list of Breath objects.
+
+        """
         moving_average = self._calculate_moving_average(data)
 
-        peak_indices, peak_values = self._find_features(data)
-        peak_indices, peak_values = self._remove_outliers(
-            peak_indices,
-            peak_values,
-            operator_=operator.lt,
-            moving_average=moving_average,
-        )
-
-        valley_indices, valley_values = self._find_features(data, invert=True)
-        valley_indices, valley_values = self._remove_outliers(
-            valley_indices,
-            valley_values,
-            operator_=operator.gt,
-            moving_average=moving_average,
+        peak_indices, peak_values = self._find_features(data, moving_average)
+        valley_indices, valley_values = self._find_features(
+            data, moving_average, invert=True
         )
 
         (
