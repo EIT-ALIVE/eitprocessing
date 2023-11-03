@@ -11,6 +11,7 @@ class RegionalVentilationDelay(ParameterExtraction):
     interpolation_kind = "cubic"  # Type of interpolation used for normalizing all inspirations between 0 and 1
     common_time = np.linspace(0, 1, 101)  # Common time axis to which is normalized
     summary_stats: dict[str, Callable[[NDArray], float]] = {
+        "per breath": lambda x: x,
         "mean": np.mean,
         "standard deviation": np.std,
         "median": np.median,
