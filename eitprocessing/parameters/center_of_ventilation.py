@@ -8,6 +8,7 @@ from . import ParameterExtraction
 class CenterOfVentilation(ParameterExtraction):
     breath_detection_kwargs: dict = {}
     summary_stats: dict[str, Callable[[NDArray], float]] = {
+        "per breath": lambda x: x,
         "mean": np.mean,
         "standard deviation": np.std,
         "median": np.median,
