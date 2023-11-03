@@ -1,23 +1,44 @@
 import numpy as np
 from numpy.typing import NDArray
+from ..features import BreathDetection
 from . import ParameterExtraction
 
 
+@dataclass
 class RegionalVentilationDelay(ParameterExtraction):
-    def __init__(
-        self,
-        detect_breaths_method: str = "Extreme values",
-    ):
-        self.detect_breaths_method = detect_breaths_method
+    breath_detection_kwargs: dict = {}
 
     def compute_parameter(self, sequence, frameset_name: str) -> tuple[NDArray, list]:
         """Computes the regional ventilation delay per breath using pixel
         impedance. Also returns the regional ventilation delay inhomogeneity
         (standard deviation of RVD of all pixels)."""
-        detect_breaths = DetectBreaths(method=self.detect_breaths_method)
-        breaths_indices: list[tuple[int, int, int]] = detect_breaths.apply(sequence)
-        start_inspiratory_indices = [indices[0] for indices in breaths_indices]
-        end_inspiratory_indices = [indices[1] for indices in breaths_indices]
+        global_impedance = sequence.framesets[frameset_name].global_impedance
+        breath_detector = BreathDetection(
+            sequence.framerate, **self.breath_detection_kwargs
+        )
+        breaths = breath_detector.find_breaths(global_impedance)
+
+        pixel_impedance = sequence.framesets[frameset_name].pixel_values
+
+    # interpolated_signals = []
+    # for start, end in zip(start_insp, end_insp):
+
+    #     num_timepoints = end - start
+
+    #     # By dividing by (num_timepoints - 1) the time axis starts at 0 and ends at 1
+    #     norm_time = np.arange(num_timepoints) / (num_timepoints - 1)
+
+    #     inspiration = all_pixels[start:end, :, :]
+
+    #     def interpolate(y):
+    #         return interp1d(norm_time, y, kind=INTERPOLATION_KIND)(COMMON_TIME)
+
+    #     # This applies interpolation for every pixel
+    #     interpolated_imp = np.apply_along_axis(interpolate, 0, inspiration)
+    #     interpolated_signals.append(interpolated_imp)
+
+    # # Mean inspiration for each pixel
+    # pix_matrix = np.mean(interpolated_signals, axis=0)
 
     ## Code below should be adjusted to ALIVE format
     # offset = pix_matrix[0,:,:]
