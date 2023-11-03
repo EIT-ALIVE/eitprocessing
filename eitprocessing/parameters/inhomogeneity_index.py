@@ -14,7 +14,7 @@ class InhomogeneityIndex(ParameterExtraction):
         "median": np.median,
     }
 
-    def compute_parameter(self, sequence, frameset_name) -> list:
+    def compute_parameter(self, sequence, frameset_name) -> dict:
         """Calculate inhomogeneity index
 
         Args:
