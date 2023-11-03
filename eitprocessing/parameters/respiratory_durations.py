@@ -13,7 +13,7 @@ class RespiratoryDurations(ParameterExtraction):
         "median": np.median,
     }
 
-    def compute_parameter(self, sequence, frameset_name: str) -> tuple[NDArray, float]:
+    def compute_parameter(self, sequence, frameset_name: str) -> dict:
         global_impedance = sequence.framesets[frameset_name].global_impedance
         breath_detector = BreathDetection(
             sequence.framerate, **self.breath_detection_kwargs
