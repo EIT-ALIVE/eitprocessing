@@ -42,7 +42,7 @@ class BreathDetection:
     sample_frequency: float
     minimum_distance: duration = 2 / 3
     averaging_window_length: duration = 30
-    averaging_window_fun: Callable[[int], ArrayLike] | None = None
+    averaging_window_fun: Callable[[int], ArrayLike] | None = np.bartlett
     amplitude_cutoff_fraction: float | None = 0.25
 
     def _find_features(
