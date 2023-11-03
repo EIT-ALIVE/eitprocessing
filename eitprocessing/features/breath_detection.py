@@ -1,4 +1,5 @@
 import itertools
+import math
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import NamedTuple
@@ -44,6 +45,9 @@ class BreathDetection:
     averaging_window_length: duration = 15
     averaging_window_fun: Callable[[int], ArrayLike] | None = np.bartlett
     amplitude_cutoff_fraction: float | None = 0.25
+    invalid_data_removal_window_length: duration = 1
+    invalid_data_removal_percentile: int = 5
+    invalid_data_removal_multiplier: int = 4
 
     def _find_features(
         self, data: NDArray, moving_average: NDArray, invert: float = False
@@ -300,6 +304,34 @@ class BreathDetection:
 
         return peak_indices, peak_values, valley_indices, valley_values
 
+    def _remove_breaths_around_invalid_data(self, breaths: list[Breath], data: NDArray):
+        mean = np.mean(data)
+        cutoff_low = (
+            mean
+            - (mean - np.percentile(data, self.invalid_data_removal_percentile))
+            * self.invalid_data_removal_multiplier
+        )
+        cutoff_high = (
+            mean
+            + (mean + np.percentile(data, 100 - self.invalid_data_removal_percentile))
+            * self.invalid_data_removal_multiplier
+        )
+        outliers = (data < cutoff_low) | (data > cutoff_high)
+
+        window_length = math.ceil(
+            self.invalid_data_removal_window_length * self.sample_frequency
+        )
+        window = np.ones(window_length)
+
+        extended_data_is_zero = np.convolve(outliers, window, mode="same")
+        extended_data_is_zero = extended_data_is_zero.astype(bool).astype(int)
+
+        for breath in breaths[:]:
+            if np.max(extended_data_is_zero[breath.start_index : breath.end_index]):
+                breaths.remove(breath)
+
+        return breaths
+
     def find_breaths(self, data: NDArray):
         """Find breaths in the data.
 
@@ -368,9 +400,13 @@ class BreathDetection:
             peak_indices, peak_values, valley_indices, valley_values
         )
 
-        return [
+        breaths = [
             Breath(start, middle, end)
             for middle, (start, end) in zip(
                 peak_indices, itertools.pairwise(valley_indices)
             )
         ]
+
+        breaths = self._remove_breaths_around_invalid_data(breaths, data)
+
+        return breaths
