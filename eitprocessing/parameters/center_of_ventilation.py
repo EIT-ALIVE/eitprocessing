@@ -7,8 +7,13 @@ from . import ParameterExtraction
 @dataclass
 class CenterOfVentilation(ParameterExtraction):
     breath_detection_kwargs: dict = {}
+    summary_stats: dict[str, Callable[[NDArray], float]] = {
+        "mean": np.mean,
+        "standard deviation": np.std,
+        "median": np.median,
+    }
 
-    def compute_parameter(self, sequence, frameset_name: str) -> tuple[NDArray, float]:
+    def compute_parameter(self, sequence, frameset_name: str) -> dict:
         global_impedance = sequence.framesets[frameset_name].global_impedance
         breath_detector = BreathDetection(
             sequence.framerate, **self.breath_detection_kwargs
@@ -51,12 +56,24 @@ class CenterOfVentilation(ParameterExtraction):
             centers_of_ventilation_x.append(cov_x)
             center_of_ventilation_x_positions.append(cov_x * n_cols)
 
-        center_of_ventilation_y = np.mean(centers_of_ventilation_y)
-        center_of_ventilation_y_position = np.mean(center_of_ventilation_y_positions)
-        center_of_ventilation_x = np.mean(centers_of_ventilation_x)
-        center_of_ventilation_x_position = np.mean(center_of_ventilation_x_positions)
+        center_of_ventilation = {
+            "x_fraction": {},
+            "y_fraction": {},
+            "x_position": {},
+            "y_position": {},
+        }
+        for name, function in self.summary_stats.items():
+            center_of_ventilation["x_fraction"][name] = function(
+                centers_of_ventilation_x
+            )
+            center_of_ventilation["y_fraction"][name] = function(
+                centers_of_ventilation_y
+            )
+            center_of_ventilation["x_position"][name] = function(
+                center_of_ventilation_x_positions
+            )
+            center_of_ventilation["y_position"][name] = function(
+                center_of_ventilation_y_positions
+            )
 
-        return (
-            (center_of_ventilation_x, center_of_ventilation_y),
-            (center_of_ventilation_x_position, center_of_ventilation_y_position),
-        )
+        return center_of_ventilation
