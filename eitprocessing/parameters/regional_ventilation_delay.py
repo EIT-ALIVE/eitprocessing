@@ -51,17 +51,10 @@ class RegionalVentilationDelay(ParameterExtraction):
         mean_pixel_inspiration -= offset
         max_impedance = mean_pixel_inspiration.max(axis=0)
         normalized_pixel_tiv = (mean_pixel_inspiration - 0) / (max_impedance - 0)
-        rvd = np.argmax(normalized_pixel_tiv > 0.4, axis=0)
-        non_zero_rvd = rvd[rvd != 0]
-        vmin = np.min(non_zero_rvd)
-        vmax = np.max(rvd)
+        rvd = np.nanargmax(normalized_pixel_tiv > 0.4, axis=0)
+        rvdi = np.std(rvd)
 
-    # plt.title(f"Regional ventilation delay map at {timepoint}")
-    # plt.imshow(rvd, vmin=vmin, vmax=vmax)
-    # plt.savefig(results_path / f'Regional ventilation delay map - patient {patient_ID} - {timepoint}.png', dpi=300)
-    # plt.close()
-
-    # rvdi = np.std(non_zero_rvd)
+        return (rvd, rvdi)
 
     # for row in range(0,32):
     #     for col in range (0,32):
@@ -72,5 +65,3 @@ class RegionalVentilationDelay(ParameterExtraction):
     #             plt.ylabel('Normalized impedance')
     # plt.savefig(results_path / f'Normalized pixel impedance of all ventilated pixels - patient {patient_ID} - {timepoint}.png', dpi=300)
     # plt.close()
-
-    # return rvdi
