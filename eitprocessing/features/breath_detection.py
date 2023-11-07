@@ -2,16 +2,20 @@ import itertools
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Final
+from typing import Literal
 from typing import NamedTuple
 from typing import TypeAlias
 import numpy as np
 from numpy.typing import ArrayLike
 from numpy.typing import NDArray
 from scipy import signal
+from eitprocessing.filters.butterworth_filters import HighPassFilter
 
 
 duration: TypeAlias = float
 index: TypeAlias = int
+MINUTE: Final = 60
 
 
 class Breath(NamedTuple):
@@ -48,6 +52,7 @@ class BreathDetection:
     invalid_data_removal_window_length: duration = 1
     invalid_data_removal_percentile: int = 5
     invalid_data_removal_multiplier: int = 4
+    high_pass_filter_cutoff: float | None = 6 / MINUTE
 
     def _find_features(
         self, data: NDArray, moving_average: NDArray, invert: float = False
@@ -332,6 +337,35 @@ class BreathDetection:
 
         return breaths
 
+    def _get_extreme_values(
+        self, peak_indices: NDArray, valley_indices: NDArray, data: NDArray
+    ) -> tuple[NDArray, NDArray, NDArray, NDArray]:
+        def get_new_features(
+            limit_indices: NDArray, target_indices: NDArray, function: Callable
+        ):
+            for lower_limit, upper_limit in itertools.pairwise(limit_indices):
+                features_within_limits = target_indices[
+                    (target_indices > lower_limit) & (target_indices < upper_limit)
+                ]
+                if len(features_within_limits):
+                    yield function(data[lower_limit:upper_limit]) + lower_limit
+
+        new_peak_indices = np.array(
+            list(get_new_features(valley_indices, peak_indices, np.argmax))
+        )
+        new_valley_indices = np.array(
+            list(get_new_features(peak_indices, valley_indices, np.argmin))
+        )
+        new_peak_values = data[new_peak_indices]
+        new_valley_values = data[new_valley_indices]
+
+        return (
+            new_peak_indices,
+            new_peak_values,
+            new_valley_indices,
+            new_valley_values,
+        )
+
     def find_breaths(self, data: NDArray):
         """Find breaths in the data.
 
@@ -366,12 +400,36 @@ class BreathDetection:
             A list of Breath objects.
 
         """
-        moving_average = self._calculate_moving_average(data)
+        if self.high_pass_filter_cutoff:
+            filter_ = HighPassFilter(
+                cutoff_frequency=self.high_pass_filter_cutoff,
+                order=5,
+                sample_frequency=self.sample_frequency,
+            )
+            filtered_data = filter_.apply_filter(data)
 
-        peak_indices, peak_values = self._find_features(data, moving_average)
-        valley_indices, valley_values = self._find_features(
-            data, moving_average, invert=True
-        )
+            moving_average = self._calculate_moving_average(filtered_data)
+            peak_indices, peak_values = self._find_features(
+                filtered_data, moving_average
+            )
+            valley_indices, valley_values = self._find_features(
+                filtered_data, moving_average, invert=True
+            )
+
+            (
+                peak_indices,
+                peak_values,
+                valley_indices,
+                valley_values,
+            ) = self._get_extreme_values(peak_indices, valley_indices, data)
+
+        else:
+            moving_average = self._calculate_moving_average(data)
+
+            peak_indices, peak_values = self._find_features(data, moving_average)
+            valley_indices, valley_values = self._find_features(
+                data, moving_average, invert=True
+            )
 
         indices_and_values = (peak_indices, peak_values, valley_indices, valley_values)
         indices_and_values = self._remove_edge_cases(
