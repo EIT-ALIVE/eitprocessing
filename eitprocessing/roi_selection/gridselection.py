@@ -58,37 +58,51 @@ class GridSelection(ROISelection):
         split_columns: Allows columns to be split over two regions.
 
     Examples:
-        >>> pixel_map = array([[ 1,  2,  3],
-                               [ 4,  5,  6],
-                               [ 7,  8,  9],
-                               [10, 11, 12],
-                               [13, 14, 15],
-                               [16, 17, 18]])
-        >>> gs = GridSelection(3, 1, split_pixels=False)
-        >>> matrices = gs.find_grid(pixel_map)
-        >>> matrices[0] * pixel_map
+        >>> pixel_map = np.array([[ 1,  2,  3],
+                                  [ 4,  5,  6],
+                                  [ 7,  8,  9],
+                                  [10, 11, 12],
+                                  [13, 14, 15],
+                                  [16, 17, 18]])
+        >>> gs = GridSelection(3, 1, split_rows=False)
+        >>> rois = gs.find_grid(pixel_map)
+        >>> gs.matrix_layout()
+        array([[0],
+               [1],
+               [2]])
+        >>> rois[0] * pixel_map
         array([[1, 2, 3],
                [4, 5, 6],
                [0, 0, 0],
                [0, 0, 0],
                [0, 0, 0],
                [0, 0, 0]])
-        >>> gs.matrix_layout()
-        array([[0],
-               [1],
-               [2]])
-        >>> gs2 = GridSelection(2, 2, split_pixels=True)
-        >>> matrices2 = gs.find_grid(pixel_map)
+        >>> rois[1] * pixel_map
+        array([[0, 0, 0],
+               [0, 0, 0],
+               [7, 8, 9],
+               [10, 11, 12],
+               [0, 0, 0],
+               [0, 0, 0]])
+        >>> gs2 = GridSelection(2, 2, split_columns=True)
+        >>> rois2 = gs.find_grid(pixel_map)
         >>> gs2.matrix_layout()
         array([[0, 1],
                [2, 3]])
-        >>> matrices2[2]
+        >>> rois2[2]
         array([[0. , 0. , 0. ],
                [0. , 0. , 0. ],
                [0. , 0. , 0. ],
                [1. , 0.5, 0. ],
                [1. , 0.5, 0. ],
                [1. , 0.5, 0. ]])
+        >>> rois2[3]
+        array([[0. , 0. , 0. ],
+               [0. , 0. , 0. ],
+               [0. , 0. , 0. ],
+               [0. , 0.5, 1. ],
+               [0. , 0.5, 1. ],
+               [0. , 0.5, 1. ]])
     """
 
     v_split: int
