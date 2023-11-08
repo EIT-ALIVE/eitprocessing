@@ -41,8 +41,8 @@ class GridSelection(ROISelection):
 
     `split_columns` has the same effect on columns as `split_rows` has on rows.
 
-    Regions are ordered according to C indexing order. The `matrix_layout()` method provides a map
-    showing how the regions are ordered.
+    Regions are ordered according to C indexing order. The `matrix_layout` attribute provides a map
+    showing how these regions are ordered.
 
     Common grids are pre-defined:
     - VentralAndDorsal: vertically divided into ventral and dorsal;
@@ -66,7 +66,7 @@ class GridSelection(ROISelection):
                                   [16, 17, 18]])
         >>> gs = GridSelection(3, 1, split_rows=False)
         >>> rois = gs.find_grid(pixel_map)
-        >>> gs.matrix_layout()
+        >>> gs.matrix_layout
         array([[0],
                [1],
                [2]])
@@ -86,7 +86,7 @@ class GridSelection(ROISelection):
                [0, 0, 0]])
         >>> gs2 = GridSelection(2, 2, split_columns=True)
         >>> rois2 = gs.find_grid(pixel_map)
-        >>> gs2.matrix_layout()
+        >>> gs2.matrix_layout
         array([[0, 1],
                [2, 3]])
         >>> rois2[2]
@@ -316,11 +316,15 @@ class GridSelection(ROISelection):
 
         return final
 
-    def matrix_layout(self) -> NDArray:
+    @property
+    def _matrix_layout(self) -> NDArray:
         """Returns a 2D array showing the layout of the matrices returned by
         `find_grid`."""
         n_regions = self.v_split * self.h_split
         return np.reshape(np.arange(n_regions), (self.v_split, self.h_split))
+    @_matrix_layout.getter  # private attribute with getter avoids users overriding this property
+    def matrix_layout(self):
+        return self._matrix_layout
 
 
 class InvalidDivision(Exception):
