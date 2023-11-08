@@ -17,9 +17,9 @@ index: TypeAlias = int
 class Breath(NamedTuple):
     """Indicates the start, middle and end of a single breath."""
 
-    start_index: int
-    middle_index: int
-    end_index: int
+    start_index: index
+    middle_index: index
+    end_index: index
 
 
 @dataclass
