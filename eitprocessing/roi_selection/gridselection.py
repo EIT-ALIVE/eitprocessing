@@ -4,6 +4,7 @@ import warnings
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Literal
+from typing import get_type_hints
 import numpy as np
 from numpy.typing import NDArray
 from . import ROISelection
@@ -97,28 +98,23 @@ class GridSelection(ROISelection):
     ignore_nan_rows: bool = True
     ignore_nan_columns: bool = True
 
-    def _check_attribute_type(self, name, type_):
-        """Checks whether an attribute is an instance of the given type."""
-        attr = getattr(self, name)
-        if not isinstance(attr, type_):
-            message = f"Invalid type for `{name}`."
-            message += f"Should be {type_}, not {type(attr)}."
-            raise TypeError(message)
-
     def __post_init__(self):
-        self._check_attribute_type("v_split", int)
-        self._check_attribute_type("h_split", int)
+        try:
+            if self.v_split == int(self.v_split):
+                self.v_split = int(self.v_split)
+            if self.h_split == int(self.h_split):
+                self.h_split = int(self.h_split)
+        finally:
+            for attr, type_ in get_type_hints(self).items():
+                if not isinstance(getattr(self, attr), type_):
+                    raise TypeError(
+                        f"Invalid type for `{attr}`. Should be {type_}, not {type(attr)}."
+                    )
 
         if self.v_split < 1:
             raise InvalidVerticalDivision("`v_split` can't be smaller than 1.")
-
         if self.h_split < 1:
             raise InvalidHorizontalDivision("`h_split` can't be smaller than 1.")
-
-        self._check_attribute_type("split_columns", bool)
-        self._check_attribute_type("split_rows", bool)
-        self._check_attribute_type("ignore_nan_columns", bool)
-        self._check_attribute_type("ignore_nan_rows", bool)
 
     def find_grid(self, data: NDArray) -> list[NDArray]:
         """
