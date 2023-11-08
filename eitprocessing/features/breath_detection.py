@@ -373,32 +373,14 @@ class BreathDetection:
             data, moving_average, invert=True
         )
 
-        (
-            peak_indices,
-            peak_values,
-            valley_indices,
-            valley_values,
-        ) = self._remove_edge_cases(
-            peak_indices,
-            peak_values,
-            valley_indices,
-            valley_values,
-            data,
-            moving_average,
+        indices_and_values = (peak_indices, peak_values, valley_indices, valley_values)
+        indices_and_values = self._remove_edge_cases(
+            *indices_and_values, data, moving_average
         )
+        indices_and_values = self._remove_doubles(*indices_and_values)
+        indices_and_values = self._remove_low_amplitudes(*indices_and_values)
 
-        peak_indices, peak_values, valley_indices, valley_values = self._remove_doubles(
-            peak_indices, peak_values, valley_indices, valley_values
-        )
-
-        (
-            peak_indices,
-            peak_values,
-            valley_indices,
-            valley_values,
-        ) = self._remove_low_amplitudes(
-            peak_indices, peak_values, valley_indices, valley_values
-        )
+        peak_indices, _, valley_indices, _ = indices_and_values
 
         breaths = [
             Breath(start, middle, end)
