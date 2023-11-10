@@ -17,7 +17,6 @@ Subpackages
 
    binreader/index.rst
    filters/index.rst
-   parameters/index.rst
 
 
 Package Contents

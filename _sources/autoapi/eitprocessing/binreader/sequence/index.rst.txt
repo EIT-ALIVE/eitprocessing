@@ -25,6 +25,7 @@ Classes
    eitprocessing.binreader.sequence.Sequence
    eitprocessing.binreader.sequence.DraegerSequence
    eitprocessing.binreader.sequence.TimpelSequence
+   eitprocessing.binreader.sequence.SentecSequence
 
 
 
@@ -321,6 +322,24 @@ Classes
    .. py:method:: _load_data(first_frame: int)
 
       Load data for TIMPEL files.
+
+
+
+.. py:class:: SentecSequence
+
+
+   Bases: :py:obj:`Sequence`
+
+   Sequence object for Sentec data.
+
+   .. py:attribute:: vendor
+      :type: Vendor
+
+      
+
+   .. py:method:: _load_data(first_frame: int)
+
+      Load data for Sentec files.
 
 
 
