@@ -1,0 +1,653 @@
+---
+title: "Refactoring proposal"
+jupyter: python3
+theme: 
+    light: cosmo
+    dark: darkly
+toc: true
+---
+
+## Current design
+:::{.column-page}
+```{mermaid}
+classDiagram
+
+class Sequence {
+    path: Path
+    vendor: Vendor
+    label: str
+    time: NDArray
+    framerate: int
+    events: list[Event]
+    phases: list[Phase]
+    framesets: dict[str, Frameset]
+    merge(Sequence)
+    from_path(Path) Sequence
+    _load_data(...)
+    _load_file(...)
+}
+class Frameset {
+    name: str
+    description: str
+    params: dict
+    pixel_values: NDArray
+    global_impedance: NDArray
+    waveform_data: dict[str, NDArray]
+    merge(Frameset)
+}
+class Event {
+    index: int
+    marker: int
+    text: str
+}
+class Phase {
+    index: int
+}
+class DraegerSequence {
+    vendor = Vendor.DRAEGER
+    load_data(...)
+}
+class TimpelSequence {
+    vendor = Vendor.TIMPEL
+    load_data(...)
+}
+
+Phase <|-- MinValue
+Phase <|-- MaxValue
+Phase <|-- QRSMarker
+Sequence "1" *-- "*" Frameset
+Sequence "1" *-- "*" Event
+Sequence "1" *-- "*" Phase
+Sequence <|-- DraegerSequence
+Sequence <|-- TimpelSequence
+```
+:::
+
+- Sequences are containers for EIT data primarily;
+- Sequences and subclasses have become complicated due to different vendors;
+- Sequence classes have a loading responsibilities for EIT data, but not other data;
+- Non-EIT data is difficult to handle.
+
+## Proposed design
+:::{.column-page}
+```{mermaid}
+classDiagram
+
+class Sequence {
+    label: str
+    eit_data: EITData
+    continuous_data: ContinuousData
+    sparse_data: SparseData
+    concatenate(Sequence) Sequence
+    synchronize_and_merge(Sequence) Sequence
+}
+class Vendor {
+    <<enumeration>>
+    DRAEGER
+    TIMPEL
+    SENTEC
+}
+class EITData {
+    <<abstract>>
+    path: Path
+    vendor: Vendor
+    sample_frequency: float
+    time: NDArray
+    events: list[Event]
+    phases: list[Phase]
+    variants: VariantCollection[EITDataVariant]
+    from_path(Path)
+}
+
+class Event {
+    index: int
+    message: str
+}
+class Phase {
+    index: int
+}
+class ContinuousData {
+    name: str
+    unit: str
+    loaded: bool
+    calculated_from: EITDataVariant | None
+    variants: VariantContainer[ContinuousDataVariant]
+}
+class PressureWaveformData {
+    unit = "cmH2O"
+}
+class FlowWaveformData {
+    unit = "L/s"
+}
+class VolumeWaveformData {
+    unit = "L"
+}
+
+class DraegerEITData {
+    vendor = Vendor.DRAEGER
+    sample_frequency = 20
+}
+class TimpelEITData {
+    vendor = Vendor.TIMPEL
+    sample_frequency = 50.2
+}
+class SentecEITData {
+    vendor = Vendor.SENTEC
+    sample_frequenct = 50
+}
+
+class EITDataVariant {
+    label: str
+    description: str
+    parameters: dict
+    pixel_impedance: NDArray
+    global_impedance: NDArray
+}
+
+class ContinuousDataVariant {
+    label: str
+    description: str
+    parameters: dict
+    values: NDArray
+}
+
+class SparseData {
+    name: str
+    unit: str
+    loaded: bool
+    calculated_from: ContinuousDataVariant | EITDataVariant | None
+    variants: VariantContainer[SparseDataVariant]
+}
+
+class SparseDataVariant {
+    label: str
+    description: str
+    index: NDArray<int> | None
+    values: NDArray<float> | None
+    objects: list[object]  # e.g. list[Breath]
+}
+
+
+
+Sequence "1" *-- "1" EITData
+Sequence "1" *-- "*" SparseData
+Sequence "1" *-- "*" ContinuousData
+
+EITData <|-- DraegerEITData
+EITData <|-- TimpelEITData
+EITData <|-- SentecEITData
+EITData --> Vendor
+
+EITData "1" *-- "*" EITDataVariant
+
+EITData "1" *-- "*" Event
+EITData "1" *-- "*" Phase
+
+Phase <|-- MinValue
+Phase <|-- MaxValue
+Phase <|-- QRSMark
+
+ContinuousData <|-- PressureWaveformData
+ContinuousData <|-- FlowWaveformData
+ContinuousData <|-- VolumeWaveformData
+ContinuousData *-- ContinuousDataVariant
+
+SparseData *-- SparseDataVariant
+```
+:::
+
+## Compact version
+:::{.column-page}
+``` {mermaid}
+classDiagram
+
+class Sequence {
+    label: str
+    framerate: float
+    eit_data: EITData
+    continuous_data: ContinuousData
+    sparse_data: SparseData
+    concatenate(Sequence) Sequence
+    synchronize_and_merge(Sequence) Sequence
+}
+class Vendor {
+    <<enumeration>>
+    DRAEGER
+    TIMPEL
+    SENTEC
+}
+class EITData {
+    <<abstract>>
+    path: Path
+    vendor: Vendor
+    events: list[Event]
+    phases: list[Phase]
+    variants: VariantCollection[EITDataVariant]
+    from_path(Path)
+}
+
+class Event {
+    index: int
+    message: str
+}
+class Phase {
+    index: int
+}
+class ContinuousData {
+    name: str
+    unit: str
+    variants: VariantContainer[ContinuousDataVariant]
+}
+class PressureWaveformData {
+    unit = "cmH2O"
+}
+
+class DraegerEITData {
+    vendor = Vendor.DRAEGER
+}
+
+class EITDataVariant {
+    label: str
+    description: str
+    parameters: dict
+    pixel_impedance: NDArray
+    global_impedance: NDArray
+}
+
+class ContinuousDataVariant {
+    label: str
+    description: str
+    parameters: dict
+    values: NDArray
+}
+
+class SparseData {
+    name: str
+    unit: str
+    variants: VariantContainer[SparseDataVariant]
+}
+
+class SparseDataVariant {
+    label: str
+    description: str
+    index: NDArray<int>
+    values: NDArray<float>
+}
+
+Sequence "1" *-- "1" EITData
+Sequence "1" *-- "*" SparseData
+Sequence "1" *-- "*" ContinuousData
+
+EITData <|-- DraegerEITData
+EITData --> Vendor
+
+EITData "1" *-- "*" EITDataVariant
+
+EITData "1" *-- "*" Event
+EITData "1" *-- "*" Phase
+
+Phase <|-- MinValue
+Phase <|-- MaxValue
+Phase <|-- QRSMark
+
+ContinuousData <|-- PressureWaveformData
+ContinuousData *-- ContinuousDataVariant
+
+SparseData *-- SparseDataVariant
+```
+:::
+
+- Sequences become containers for any data, not just EIT data;
+- Sequences don't know about vendors, which make them simpler;
+- Loading tasks are delegated to different classes;
+- It's easier to later add other types of data, e.g. `EMGData`.
+
+## Current interface
+
+Creating a sequence by loading EIT data
+
+``` python
+seq = Sequence.from_path("path/to/file", vendor="timpel")
+```
+
+Creating a sequence by loading waveform data
+
+``` python
+# ???
+```
+
+Creating a sequence by loading EIT and waveform data
+
+``` python
+seq = Sequence.from_path("path/to/file", vendor="timpel")
+seq.framesets["raw"].continuous_data = load_some_continuous_data()
+```
+
+## Proposed interface
+
+Creating a sequence by loading EIT data
+
+``` python
+seq = Sequence(eit_data=EITData.from_path("path/to/file", vendor="timpel"))
+```
+
+Creating a sequence by loading waveform data
+
+``` python
+seq = Sequence(continuous_data=load_some_continuous_data(...))
+```
+
+Creating a sequence by loading EIT and waveform data
+
+``` python
+seq = Sequence(
+    eit_data=EITData.from_path("path/to/file", vendor="timpel"), 
+    continuous_data=load_some_continuous_data(...),
+    sync_method=...
+)
+```
+
+
+## Variants
+
+Variants would replace the functionality of `Frameset`.
+
+``` python
+class EITDataVariant(Variant):
+    name: str
+    description: str
+    parameters: dict
+    pixel_impedance: NDArray
+
+class EITData:
+    ...
+    variants: VariantCollection
+    
+    def __init__(self):
+        self.variants = variant_collection_factory(EITDataVariant)
+
+    def load_data(self, ...):
+        raw_variant = load_data()  # EITDataVariant(name="raw")
+        self.variants.add(raw_variant)
+
+    def create_filtered_data(self, ...):
+        eit_data_variant = some_loading_function(..., name='filtered')
+        self.variants.add(eit_data_variant)  
+        # equals self.variants['filtered'] = eit_data_variant
+
+    def some_function(self, ...):
+        raw = self.variants['raw']
+        filtered = self.variants['filtered']
+
+class VariantCollection(UserDict):
+    """Dict-like object allowing adding values with name attribute as key
+    
+    Also checks for types and prevents overwriting existing variants.
+    """
+    
+    variant_type: type[Variant] | None = None
+
+    def add(variant: Variant, overwrite: bool=False):
+        if not overwrite and variant.name in self:
+            raise DuplicateVariantName()
+        
+        if self.variant_type and not isinstance(variant, self.variant_type):
+            raise InvalidVariantType()
+        
+        self[variant.name] = variant
+
+def variant_collection_factory(variant_type: type):
+    """Create a variant collection with a given variant type"""
+    variant_collection = VariantCollection() 
+    variant_collection.variant_type = variant_type
+    return variant_collection
+```
+
+## Considerations
+
+### Don't have variants
+
+There is an option to not have variants. 
+
+``` python
+pixel_data = sequence.eit_data.values
+filtered_pixel_data = HighPassFilter(...).apply_filter(pixel_data)
+
+# later in some other function
+filtered_pixel_data = HighPassFilter(...).apply_filter(pixel_data)
+```
+
+#### Pros:
+- No need to create variants and keep track of them
+- Also works with algorithm results
+
+#### Cons:
+- When creating a variant requires complicated code, storing a variant is easier; (but you can always make a function or pass results along)
+- Requires caching
+ 
+
+### Caching
+
+#### Simple caching with a function
+``` {python}
+from functools import cache
+
+
+@cache
+def some_expensive_function(name: str, n: int):
+    print(f"running with {name=} and {n=}")
+    return name * n
+
+
+print(some_expensive_function("foo", 1))
+print(some_expensive_function("bar", 1))
+print(some_expensive_function("foo", 1))
+print(some_expensive_function("foo", 2))
+```
+
+
+#### Caching methods in classes
+
+``` {python} 
+from dataclasses import dataclass
+from functools import lru_cache
+
+
+@dataclass
+class Foo:
+    name: str
+
+    # @cache is not allowed  # <1>
+    def some_expensive_method(self, n: int):
+        print(f"running with {self.name=} and {n=}")
+        return self.name * n
+
+
+a = Foo("test")
+b = Foo("test")
+
+print(a == b)
+print(a.some_expensive_method(2))
+print(b.some_expensive_method(2))
+```
+
+1. Caching requires immutable (hashable) arguments, but `self` is not immutable.
+
+#### Frozen classes
+
+``` python
+from dataclasses import dataclass
+from functools import cache
+
+
+@dataclass(frozen=True) # <1>
+class Foo:
+    name: str
+
+    @cache
+    def some_expensive_method(self, n: int):
+        print(f"running with {self.name=} and {n=}")
+        return self.name * n
+
+
+a = Foo("test")
+b = Foo("test")
+
+print(a == b)
+print(a.some_expensive_method(2))
+print(b.some_expensive_method(2))
+```
+
+1. frozen dataclasses are considered immutable (hashable). When not using dataclasses, the class needs to have a `__hash__()` method.
+
+#### `numpy` arrays are mutable
+
+``` python
+from dataclasses import dataclass
+from functools import lru_cache
+from numpy.typing import NDArray
+import numpy as np
+
+@dataclass(frozen=True)
+class Foo:
+    name: str
+
+    @cache
+    def some_expensive_method(self, n: NDArray):
+        print(f"running with {self.name=} and {n=}")
+        return self.name * n[0]
+
+
+a = Foo("test")
+b = Foo("test")
+
+a.some_expensive_method(np.arange(10))
+# -> TypeError: unhashable type: 'numpy.ndarray'
+```
+
+#### Solution?
+
+There are workarounds for numpy caches, but nothing provided by `numpy` or the standard library, so it's not widely supported, and might result in unexpected behaviour. However...
+
+- It would remove the need for variants;
+- It would remove the need to pass algorithm results around;
+- Since sometimes things **can't** be passed around, it would *probably* speed up execution of code.
+
+<!-- ## Subclassing np.ndarray
+
+Variants have a `values` attribute containing the data in an `NDArray`, and some labels
+(`name`, `description`, `parameters`).
+
+``` python
+@dataclass
+class EITDataVariant:
+    name: str
+    description: str
+    parameters: dict
+    values: NDArray
+```
+
+This could be replaces by a subclass of an `NDArray`, adding attributes.
+
+``` python
+airway_pressure: NDArray = (
+    sequence.continuous_data['airway_pressure'].variants['filtered'].values
+)
+
+airway_pressure: NDArray = (
+    sequence.continuous_data['airway_pressure'].variants['filtered']
+)
+
+# in both cases
+filter_type = airway_pressure.parameters['filter_type']
+```
+
+<https://numpy.org/doc/stable/user/basics.subclassing.html>
+
+``` python
+class RealisticInfoArray(np.ndarray):
+
+    def __new__(cls, input_array, info=None):
+        # Input array is an already formed ndarray instance
+        # We first cast to be our class type
+        obj = np.asarray(input_array).view(cls)
+        
+        # add the new attribute to the created instance
+        obj.info = info
+        
+        # Finally, we must return the newly created object:
+        return obj
+
+    def __array_finalize__(self, obj):
+        # see InfoArray.__array_finalize__ for comments
+        if obj is None: 
+            return
+        
+        self.info = getattr(obj, 'info', None)
+``` -->
+
+### Merging vs. concatenation
+
+We might need to be able to combine Sequences that occur parallel, e.g.:
+
+- We measure EIT (20 Hz) and EMG (250 Hz) data;
+- We make a Sequence containing EIT, and a Sequence containing EMG-data, because we don't want to change the framerate of eiter;
+- We calculate an envelope from EMG-data, and reduce the framerate to 20 Hz;
+- Now we want to sync and merge the Sequences.
+
+This is different from the current meaning of merge: concatenating several serial Sequences.
+
+```python
+# old
+seq1 = Sequence.from_path(path1)
+seq2 = Sequence.from_path(path2)
+longer_seq = seq1 + seq2
+longer_seq = Sequence.merge(seq1, seq2)
+longer_seq.frameset['raw'].continuous_data = load_some_continuous_data()
+
+# new
+seq1 = Sequence(EITData.from_path(path1))
+seq2 = Sequence(EITData.from_path(path2))
+seq3 = Sequence(load_some_continuous_data())
+
+longer_seq = seq1 + seq2
+longer_seq = Sequence.concatenate(seq1, seq2)
+
+longer_seq_with_waveforms = Sequence.merge(longer_seq, seq3, sync_method=...)
+longer_seq_with_waveforms = longer_seq & seq3  # syntactic sugar
+
+# in one go
+longer_seq_with_waveforms = Sequence(
+    EITData.from_path([path1, path2]), 
+    load_some_continuous_data()
+)
+
+# or
+longer_seq_with_waveforms = Sequence(
+    eit_data=EITData.from_path([path1, path2]), 
+    wavevorm_data=load_some_continuous_data()
+)
+```
+
+### Saving intermittent results
+
+Safe intermittent results as sparse or continues data.
+You have to be able to find sparse results from a specific algorithm. 
+This is not a priority, but can be necessary in the long term.
+
+This alternative is chosen over caching.
+
+### Sample frequencies
+
+We want to have the option to save data with different sample frequencies. 
+Therefore, continuous data should have its own sample frequency and time axis. 
+
+Slicing becomes a bit more complicated. 
+When slicing the entire sequence, it should be performed based on time for the different datasets.
+
+You can also duplicate a sequence and then only slice e.g. continuous data. 
+This will result in subdata with different timespans. 
+Sequence time axes therefore are no longer necessary. 
+
+Synchronisation will have to be done based on time. 
+Sequences are not allowed to contain data that is not synchronized.

@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Refactoring proposal</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="refactor_proposal_files/libs/clipboard/clipboard.min.js"></script>
+<script src="refactor_proposal_files/libs/quarto-html/quarto.js"></script>
+<script src="refactor_proposal_files/libs/quarto-html/popper.min.js"></script>
+<script src="refactor_proposal_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="refactor_proposal_files/libs/quarto-html/anchor.min.js"></script>
+<link href="refactor_proposal_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="refactor_proposal_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="refactor_proposal_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="refactor_proposal_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="refactor_proposal_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="refactor_proposal_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="refactor_proposal_files/libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="refactor_proposal_files/libs/quarto-diagram/mermaid.min.js"></script>
+<script src="refactor_proposal_files/libs/quarto-diagram/mermaid-init.js"></script>
+<link href="refactor_proposal_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#current-design" id="toc-current-design" class="nav-link active" data-scroll-target="#current-design">Current design</a></li>
+  <li><a href="#proposed-design" id="toc-proposed-design" class="nav-link" data-scroll-target="#proposed-design">Proposed design</a></li>
+  <li><a href="#compact-version" id="toc-compact-version" class="nav-link" data-scroll-target="#compact-version">Compact version</a></li>
+  <li><a href="#current-interface" id="toc-current-interface" class="nav-link" data-scroll-target="#current-interface">Current interface</a></li>
+  <li><a href="#proposed-interface" id="toc-proposed-interface" class="nav-link" data-scroll-target="#proposed-interface">Proposed interface</a></li>
+  <li><a href="#variants" id="toc-variants" class="nav-link" data-scroll-target="#variants">Variants</a></li>
+  <li><a href="#considerations" id="toc-considerations" class="nav-link" data-scroll-target="#considerations">Considerations</a>
+  <ul class="collapse">
+  <li><a href="#dont-have-variants" id="toc-dont-have-variants" class="nav-link" data-scroll-target="#dont-have-variants">Don’t have variants</a></li>
+  <li><a href="#caching" id="toc-caching" class="nav-link" data-scroll-target="#caching">Caching</a></li>
+  <li><a href="#merging-vs.-concatenation" id="toc-merging-vs.-concatenation" class="nav-link" data-scroll-target="#merging-vs.-concatenation">Merging vs.&nbsp;concatenation</a></li>
+  <li><a href="#saving-intermittent-results" id="toc-saving-intermittent-results" class="nav-link" data-scroll-target="#saving-intermittent-results">Saving intermittent results</a></li>
+  <li><a href="#sample-frequencies" id="toc-sample-frequencies" class="nav-link" data-scroll-target="#sample-frequencies">Sample frequencies</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Refactoring proposal</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="current-design" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="current-design">Current design</h2>
+<div class="column-page">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">classDiagram
+
+class Sequence {
+    path: Path
+    vendor: Vendor
+    label: str
+    time: NDArray
+    framerate: int
+    events: list[Event]
+    phases: list[Phase]
+    framesets: dict[str, Frameset]
+    merge(Sequence)
+    from_path(Path) Sequence
+    _load_data(...)
+    _load_file(...)
+}
+class Frameset {
+    name: str
+    description: str
+    params: dict
+    pixel_values: NDArray
+    global_impedance: NDArray
+    waveform_data: dict[str, NDArray]
+    merge(Frameset)
+}
+class Event {
+    index: int
+    marker: int
+    text: str
+}
+class Phase {
+    index: int
+}
+class DraegerSequence {
+    vendor = Vendor.DRAEGER
+    load_data(...)
+}
+class TimpelSequence {
+    vendor = Vendor.TIMPEL
+    load_data(...)
+}
+
+Phase &lt;|-- MinValue
+Phase &lt;|-- MaxValue
+Phase &lt;|-- QRSMarker
+Sequence "1" *-- "*" Frameset
+Sequence "1" *-- "*" Event
+Sequence "1" *-- "*" Phase
+Sequence &lt;|-- DraegerSequence
+Sequence &lt;|-- TimpelSequence
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li>Sequences are containers for EIT data primarily;</li>
+<li>Sequences and subclasses have become complicated due to different vendors;</li>
+<li>Sequence classes have a loading responsibilities for EIT data, but not other data;</li>
+<li>Non-EIT data is difficult to handle.</li>
+</ul>
+</section>
+<section id="proposed-design" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="proposed-design">Proposed design</h2>
+<div class="column-page">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">classDiagram
+
+class Sequence {
+    label: str
+    eit_data: EITData
+    continuous_data: ContinuousData
+    sparse_data: SparseData
+    concatenate(Sequence) Sequence
+    synchronize_and_merge(Sequence) Sequence
+}
+class Vendor {
+    &lt;&lt;enumeration&gt;&gt;
+    DRAEGER
+    TIMPEL
+    SENTEC
+}
+class EITData {
+    &lt;&lt;abstract&gt;&gt;
+    path: Path
+    vendor: Vendor
+    sample_frequency: float
+    time: NDArray
+    events: list[Event]
+    phases: list[Phase]
+    variants: VariantCollection[EITDataVariant]
+    from_path(Path)
+}
+
+class Event {
+    index: int
+    message: str
+}
+class Phase {
+    index: int
+}
+class ContinuousData {
+    name: str
+    unit: str
+    loaded: bool
+    calculated_from: EITDataVariant | None
+    variants: VariantContainer[ContinuousDataVariant]
+}
+class PressureWaveformData {
+    unit = "cmH2O"
+}
+class FlowWaveformData {
+    unit = "L/s"
+}
+class VolumeWaveformData {
+    unit = "L"
+}
+
+class DraegerEITData {
+    vendor = Vendor.DRAEGER
+    sample_frequency = 20
+}
+class TimpelEITData {
+    vendor = Vendor.TIMPEL
+    sample_frequency = 50.2
+}
+class SentecEITData {
+    vendor = Vendor.SENTEC
+    sample_frequenct = 50
+}
+
+class EITDataVariant {
+    label: str
+    description: str
+    parameters: dict
+    pixel_impedance: NDArray
+    global_impedance: NDArray
+}
+
+class ContinuousDataVariant {
+    label: str
+    description: str
+    parameters: dict
+    values: NDArray
+}
+
+class SparseData {
+    name: str
+    unit: str
+    loaded: bool
+    calculated_from: ContinuousDataVariant | EITDataVariant | None
+    variants: VariantContainer[SparseDataVariant]
+}
+
+class SparseDataVariant {
+    label: str
+    description: str
+    index: NDArray&lt;int&gt; | None
+    values: NDArray&lt;float&gt; | None
+    objects: list[object]  # e.g. list[Breath]
+}
+
+
+
+Sequence "1" *-- "1" EITData
+Sequence "1" *-- "*" SparseData
+Sequence "1" *-- "*" ContinuousData
+
+EITData &lt;|-- DraegerEITData
+EITData &lt;|-- TimpelEITData
+EITData &lt;|-- SentecEITData
+EITData --&gt; Vendor
+
+EITData "1" *-- "*" EITDataVariant
+
+EITData "1" *-- "*" Event
+EITData "1" *-- "*" Phase
+
+Phase &lt;|-- MinValue
+Phase &lt;|-- MaxValue
+Phase &lt;|-- QRSMark
+
+ContinuousData &lt;|-- PressureWaveformData
+ContinuousData &lt;|-- FlowWaveformData
+ContinuousData &lt;|-- VolumeWaveformData
+ContinuousData *-- ContinuousDataVariant
+
+SparseData *-- SparseDataVariant
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="compact-version" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="compact-version">Compact version</h2>
+<div class="column-page">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">classDiagram
+
+class Sequence {
+    label: str
+    framerate: float
+    eit_data: EITData
+    continuous_data: ContinuousData
+    sparse_data: SparseData
+    concatenate(Sequence) Sequence
+    synchronize_and_merge(Sequence) Sequence
+}
+class Vendor {
+    &lt;&lt;enumeration&gt;&gt;
+    DRAEGER
+    TIMPEL
+    SENTEC
+}
+class EITData {
+    &lt;&lt;abstract&gt;&gt;
+    path: Path
+    vendor: Vendor
+    events: list[Event]
+    phases: list[Phase]
+    variants: VariantCollection[EITDataVariant]
+    from_path(Path)
+}
+
+class Event {
+    index: int
+    message: str
+}
+class Phase {
+    index: int
+}
+class ContinuousData {
+    name: str
+    unit: str
+    variants: VariantContainer[ContinuousDataVariant]
+}
+class PressureWaveformData {
+    unit = "cmH2O"
+}
+
+class DraegerEITData {
+    vendor = Vendor.DRAEGER
+}
+
+class EITDataVariant {
+    label: str
+    description: str
+    parameters: dict
+    pixel_impedance: NDArray
+    global_impedance: NDArray
+}
+
+class ContinuousDataVariant {
+    label: str
+    description: str
+    parameters: dict
+    values: NDArray
+}
+
+class SparseData {
+    name: str
+    unit: str
+    variants: VariantContainer[SparseDataVariant]
+}
+
+class SparseDataVariant {
+    label: str
+    description: str
+    index: NDArray&lt;int&gt;
+    values: NDArray&lt;float&gt;
+}
+
+Sequence "1" *-- "1" EITData
+Sequence "1" *-- "*" SparseData
+Sequence "1" *-- "*" ContinuousData
+
+EITData &lt;|-- DraegerEITData
+EITData --&gt; Vendor
+
+EITData "1" *-- "*" EITDataVariant
+
+EITData "1" *-- "*" Event
+EITData "1" *-- "*" Phase
+
+Phase &lt;|-- MinValue
+Phase &lt;|-- MaxValue
+Phase &lt;|-- QRSMark
+
+ContinuousData &lt;|-- PressureWaveformData
+ContinuousData *-- ContinuousDataVariant
+
+SparseData *-- SparseDataVariant
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li>Sequences become containers for any data, not just EIT data;</li>
+<li>Sequences don’t know about vendors, which make them simpler;</li>
+<li>Loading tasks are delegated to different classes;</li>
+<li>It’s easier to later add other types of data, e.g.&nbsp;<code>EMGData</code>.</li>
+</ul>
+</section>
+<section id="current-interface" class="level2">
+<h2 class="anchored" data-anchor-id="current-interface">Current interface</h2>
+<p>Creating a sequence by loading EIT data</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>seq <span class="op">=</span> Sequence.from_path(<span class="st">"path/to/file"</span>, vendor<span class="op">=</span><span class="st">"timpel"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Creating a sequence by loading waveform data</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ???</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Creating a sequence by loading EIT and waveform data</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>seq <span class="op">=</span> Sequence.from_path(<span class="st">"path/to/file"</span>, vendor<span class="op">=</span><span class="st">"timpel"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>seq.framesets[<span class="st">"raw"</span>].continuous_data <span class="op">=</span> load_some_continuous_data()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="proposed-interface" class="level2">
+<h2 class="anchored" data-anchor-id="proposed-interface">Proposed interface</h2>
+<p>Creating a sequence by loading EIT data</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>seq <span class="op">=</span> Sequence(eit_data<span class="op">=</span>EITData.from_path(<span class="st">"path/to/file"</span>, vendor<span class="op">=</span><span class="st">"timpel"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Creating a sequence by loading waveform data</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>seq <span class="op">=</span> Sequence(continuous_data<span class="op">=</span>load_some_continuous_data(...))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Creating a sequence by loading EIT and waveform data</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>seq <span class="op">=</span> Sequence(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    eit_data<span class="op">=</span>EITData.from_path(<span class="st">"path/to/file"</span>, vendor<span class="op">=</span><span class="st">"timpel"</span>), </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    continuous_data<span class="op">=</span>load_some_continuous_data(...),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    sync_method<span class="op">=</span>...</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="variants" class="level2">
+<h2 class="anchored" data-anchor-id="variants">Variants</h2>
+<p>Variants would replace the functionality of <code>Frameset</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EITDataVariant(Variant):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    name: <span class="bu">str</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    description: <span class="bu">str</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    parameters: <span class="bu">dict</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    pixel_impedance: NDArray</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EITData:</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    variants: VariantCollection</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.variants <span class="op">=</span> variant_collection_factory(EITDataVariant)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> load_data(<span class="va">self</span>, ...):</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        raw_variant <span class="op">=</span> load_data()  <span class="co"># EITDataVariant(name="raw")</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.variants.add(raw_variant)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> create_filtered_data(<span class="va">self</span>, ...):</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        eit_data_variant <span class="op">=</span> some_loading_function(..., name<span class="op">=</span><span class="st">'filtered'</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.variants.add(eit_data_variant)  </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        <span class="co"># equals self.variants['filtered'] = eit_data_variant</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> some_function(<span class="va">self</span>, ...):</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        raw <span class="op">=</span> <span class="va">self</span>.variants[<span class="st">'raw'</span>]</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        filtered <span class="op">=</span> <span class="va">self</span>.variants[<span class="st">'filtered'</span>]</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> VariantCollection(UserDict):</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Dict-like object allowing adding values with name attribute as key</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="co">    Also checks for types and prevents overwriting existing variants.</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    variant_type: <span class="bu">type</span>[Variant] <span class="op">|</span> <span class="va">None</span> <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> add(variant: Variant, overwrite: <span class="bu">bool</span><span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> overwrite <span class="kw">and</span> variant.name <span class="kw">in</span> <span class="va">self</span>:</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> DuplicateVariantName()</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.variant_type <span class="kw">and</span> <span class="kw">not</span> <span class="bu">isinstance</span>(variant, <span class="va">self</span>.variant_type):</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> InvalidVariantType()</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>[variant.name] <span class="op">=</span> variant</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> variant_collection_factory(variant_type: <span class="bu">type</span>):</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Create a variant collection with a given variant type"""</span></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    variant_collection <span class="op">=</span> VariantCollection() </span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    variant_collection.variant_type <span class="op">=</span> variant_type</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> variant_collection</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="considerations" class="level2">
+<h2 class="anchored" data-anchor-id="considerations">Considerations</h2>
+<section id="dont-have-variants" class="level3">
+<h3 class="anchored" data-anchor-id="dont-have-variants">Don’t have variants</h3>
+<p>There is an option to not have variants.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pixel_data <span class="op">=</span> sequence.eit_data.values</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>filtered_pixel_data <span class="op">=</span> HighPassFilter(...).apply_filter(pixel_data)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># later in some other function</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>filtered_pixel_data <span class="op">=</span> HighPassFilter(...).apply_filter(pixel_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="pros" class="level4">
+<h4 class="anchored" data-anchor-id="pros">Pros:</h4>
+<ul>
+<li>No need to create variants and keep track of them</li>
+<li>Also works with algorithm results</li>
+</ul>
+</section>
+<section id="cons" class="level4">
+<h4 class="anchored" data-anchor-id="cons">Cons:</h4>
+<ul>
+<li>When creating a variant requires complicated code, storing a variant is easier; (but you can always make a function or pass results along)</li>
+<li>Requires caching</li>
+</ul>
+</section>
+</section>
+<section id="caching" class="level3">
+<h3 class="anchored" data-anchor-id="caching">Caching</h3>
+<section id="simple-caching-with-a-function" class="level4">
+<h4 class="anchored" data-anchor-id="simple-caching-with-a-function">Simple caching with a function</h4>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> functools <span class="im">import</span> cache</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="at">@cache</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> some_expensive_function(name: <span class="bu">str</span>, n: <span class="bu">int</span>):</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"running with </span><span class="sc">{</span>name<span class="op">=</span><span class="sc">}</span><span class="ss"> and </span><span class="sc">{</span>n<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> name <span class="op">*</span> n</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(some_expensive_function(<span class="st">"foo"</span>, <span class="dv">1</span>))</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(some_expensive_function(<span class="st">"bar"</span>, <span class="dv">1</span>))</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(some_expensive_function(<span class="st">"foo"</span>, <span class="dv">1</span>))</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(some_expensive_function(<span class="st">"foo"</span>, <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>running with name='foo' and n=1
+foo
+running with name='bar' and n=1
+bar
+foo
+running with name='foo' and n=2
+foofoo</code></pre>
+</div>
+</div>
+</section>
+<section id="caching-methods-in-classes" class="level4">
+<h4 class="anchored" data-anchor-id="caching-methods-in-classes">Caching methods in classes</h4>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="annotated-cell-10"><pre class="sourceCode python code-annotation-code code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-10-1"><a href="#annotated-cell-10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
+<span id="annotated-cell-10-2"><a href="#annotated-cell-10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> functools <span class="im">import</span> lru_cache</span>
+<span id="annotated-cell-10-3"><a href="#annotated-cell-10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-10-4"><a href="#annotated-cell-10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-10-5"><a href="#annotated-cell-10-5" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
+<span id="annotated-cell-10-6"><a href="#annotated-cell-10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Foo:</span>
+<span id="annotated-cell-10-7"><a href="#annotated-cell-10-7" aria-hidden="true" tabindex="-1"></a>    name: <span class="bu">str</span></span>
+<span id="annotated-cell-10-8"><a href="#annotated-cell-10-8" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="1" onclick="event.preventDefault();" href="">1</a><span id="annotated-cell-10-9" class="code-annotation-target"><a href="#annotated-cell-10-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># @cache is not allowed</span></span>
+<span id="annotated-cell-10-10"><a href="#annotated-cell-10-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> some_expensive_method(<span class="va">self</span>, n: <span class="bu">int</span>):</span>
+<span id="annotated-cell-10-11"><a href="#annotated-cell-10-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"running with </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>name<span class="op">=</span><span class="sc">}</span><span class="ss"> and </span><span class="sc">{</span>n<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="annotated-cell-10-12"><a href="#annotated-cell-10-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.name <span class="op">*</span> n</span>
+<span id="annotated-cell-10-13"><a href="#annotated-cell-10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-10-14"><a href="#annotated-cell-10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-10-15"><a href="#annotated-cell-10-15" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> Foo(<span class="st">"test"</span>)</span>
+<span id="annotated-cell-10-16"><a href="#annotated-cell-10-16" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> Foo(<span class="st">"test"</span>)</span>
+<span id="annotated-cell-10-17"><a href="#annotated-cell-10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-10-18"><a href="#annotated-cell-10-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a <span class="op">==</span> b)</span>
+<span id="annotated-cell-10-19"><a href="#annotated-cell-10-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.some_expensive_method(<span class="dv">2</span>))</span>
+<span id="annotated-cell-10-20"><a href="#annotated-cell-10-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(b.some_expensive_method(<span class="dv">2</span>))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-10" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-lines="9" data-code-cell="annotated-cell-10" data-code-annotation="1">Caching requires immutable (hashable) arguments, but <code>self</code> is not immutable.</span>
+</dd>
+</dl>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>True
+running with self.name='test' and n=2
+testtest
+running with self.name='test' and n=2
+testtest</code></pre>
+</div>
+</div>
+</section>
+<section id="frozen-classes" class="level4">
+<h4 class="anchored" data-anchor-id="frozen-classes">Frozen classes</h4>
+<div class="sourceCode" id="annotated-cell-11"><pre class="sourceCode python code-annotation-code code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-11-1"><a href="#annotated-cell-11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
+<span id="annotated-cell-11-2"><a href="#annotated-cell-11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> functools <span class="im">import</span> cache</span>
+<span id="annotated-cell-11-3"><a href="#annotated-cell-11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-11-4"><a href="#annotated-cell-11-4" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-11" data-target-annotation="1" onclick="event.preventDefault();" href="">1</a><span id="annotated-cell-11-5" class="code-annotation-target"><a href="#annotated-cell-11-5" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span>(frozen<span class="op">=</span><span class="va">True</span>)</span>
+<span id="annotated-cell-11-6"><a href="#annotated-cell-11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Foo:</span>
+<span id="annotated-cell-11-7"><a href="#annotated-cell-11-7" aria-hidden="true" tabindex="-1"></a>    name: <span class="bu">str</span></span>
+<span id="annotated-cell-11-8"><a href="#annotated-cell-11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-11-9"><a href="#annotated-cell-11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">@cache</span></span>
+<span id="annotated-cell-11-10"><a href="#annotated-cell-11-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> some_expensive_method(<span class="va">self</span>, n: <span class="bu">int</span>):</span>
+<span id="annotated-cell-11-11"><a href="#annotated-cell-11-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"running with </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>name<span class="op">=</span><span class="sc">}</span><span class="ss"> and </span><span class="sc">{</span>n<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="annotated-cell-11-12"><a href="#annotated-cell-11-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.name <span class="op">*</span> n</span>
+<span id="annotated-cell-11-13"><a href="#annotated-cell-11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-11-14"><a href="#annotated-cell-11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-11-15"><a href="#annotated-cell-11-15" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> Foo(<span class="st">"test"</span>)</span>
+<span id="annotated-cell-11-16"><a href="#annotated-cell-11-16" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> Foo(<span class="st">"test"</span>)</span>
+<span id="annotated-cell-11-17"><a href="#annotated-cell-11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-11-18"><a href="#annotated-cell-11-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a <span class="op">==</span> b)</span>
+<span id="annotated-cell-11-19"><a href="#annotated-cell-11-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(a.some_expensive_method(<span class="dv">2</span>))</span>
+<span id="annotated-cell-11-20"><a href="#annotated-cell-11-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(b.some_expensive_method(<span class="dv">2</span>))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-11" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-lines="5" data-code-cell="annotated-cell-11" data-code-annotation="1">frozen dataclasses are considered immutable (hashable). When not using dataclasses, the class needs to have a <code>__hash__()</code> method.</span>
+</dd>
+</dl>
+</section>
+<section id="numpy-arrays-are-mutable" class="level4">
+<h4 class="anchored" data-anchor-id="numpy-arrays-are-mutable"><code>numpy</code> arrays are mutable</h4>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> functools <span class="im">import</span> lru_cache</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.typing <span class="im">import</span> NDArray</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span>(frozen<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Foo:</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    name: <span class="bu">str</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">@cache</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> some_expensive_method(<span class="va">self</span>, n: NDArray):</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"running with </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>name<span class="op">=</span><span class="sc">}</span><span class="ss"> and </span><span class="sc">{</span>n<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.name <span class="op">*</span> n[<span class="dv">0</span>]</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> Foo(<span class="st">"test"</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> Foo(<span class="st">"test"</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>a.some_expensive_method(np.arange(<span class="dv">10</span>))</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co"># -&gt; TypeError: unhashable type: 'numpy.ndarray'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="solution" class="level4">
+<h4 class="anchored" data-anchor-id="solution">Solution?</h4>
+<p>There are workarounds for numpy caches, but nothing provided by <code>numpy</code> or the standard library, so it’s not widely supported, and might result in unexpected behaviour. However…</p>
+<ul>
+<li>It would remove the need for variants;</li>
+<li>It would remove the need to pass algorithm results around;</li>
+<li>Since sometimes things <strong>can’t</strong> be passed around, it would <em>probably</em> speed up execution of code.</li>
+</ul>
+
+<!-- ## Subclassing np.ndarray
+
+Variants have a `values` attribute containing the data in an `NDArray`, and some labels
+(`name`, `description`, `parameters`).
+
+``` python
+@dataclass
+class EITDataVariant:
+    name: str
+    description: str
+    parameters: dict
+    values: NDArray
+```
+
+This could be replaces by a subclass of an `NDArray`, adding attributes.
+
+``` python
+airway_pressure: NDArray = (
+    sequence.continuous_data['airway_pressure'].variants['filtered'].values
+)
+
+airway_pressure: NDArray = (
+    sequence.continuous_data['airway_pressure'].variants['filtered']
+)
+
+# in both cases
+filter_type = airway_pressure.parameters['filter_type']
+```
+
+<https://numpy.org/doc/stable/user/basics.subclassing.html>
+
+``` python
+class RealisticInfoArray(np.ndarray):
+
+    def __new__(cls, input_array, info=None):
+        # Input array is an already formed ndarray instance
+        # We first cast to be our class type
+        obj = np.asarray(input_array).view(cls)
+        
+        # add the new attribute to the created instance
+        obj.info = info
+        
+        # Finally, we must return the newly created object:
+        return obj
+
+    def __array_finalize__(self, obj):
+        # see InfoArray.__array_finalize__ for comments
+        if obj is None: 
+            return
+        
+        self.info = getattr(obj, 'info', None)
+``` -->
+</section>
+</section>
+<section id="merging-vs.-concatenation" class="level3">
+<h3 class="anchored" data-anchor-id="merging-vs.-concatenation">Merging vs.&nbsp;concatenation</h3>
+<p>We might need to be able to combine Sequences that occur parallel, e.g.:</p>
+<ul>
+<li>We measure EIT (20 Hz) and EMG (250 Hz) data;</li>
+<li>We make a Sequence containing EIT, and a Sequence containing EMG-data, because we don’t want to change the framerate of eiter;</li>
+<li>We calculate an envelope from EMG-data, and reduce the framerate to 20 Hz;</li>
+<li>Now we want to sync and merge the Sequences.</li>
+</ul>
+<p>This is different from the current meaning of merge: concatenating several serial Sequences.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># old</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>seq1 <span class="op">=</span> Sequence.from_path(path1)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>seq2 <span class="op">=</span> Sequence.from_path(path2)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>longer_seq <span class="op">=</span> seq1 <span class="op">+</span> seq2</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>longer_seq <span class="op">=</span> Sequence.merge(seq1, seq2)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>longer_seq.frameset[<span class="st">'raw'</span>].continuous_data <span class="op">=</span> load_some_continuous_data()</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"># new</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>seq1 <span class="op">=</span> Sequence(EITData.from_path(path1))</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>seq2 <span class="op">=</span> Sequence(EITData.from_path(path2))</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>seq3 <span class="op">=</span> Sequence(load_some_continuous_data())</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>longer_seq <span class="op">=</span> seq1 <span class="op">+</span> seq2</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>longer_seq <span class="op">=</span> Sequence.concatenate(seq1, seq2)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>longer_seq_with_waveforms <span class="op">=</span> Sequence.merge(longer_seq, seq3, sync_method<span class="op">=</span>...)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>longer_seq_with_waveforms <span class="op">=</span> longer_seq <span class="op">&amp;</span> seq3  <span class="co"># syntactic sugar</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co"># in one go</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>longer_seq_with_waveforms <span class="op">=</span> Sequence(</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    EITData.from_path([path1, path2]), </span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    load_some_continuous_data()</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>longer_seq_with_waveforms <span class="op">=</span> Sequence(</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    eit_data<span class="op">=</span>EITData.from_path([path1, path2]), </span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    wavevorm_data<span class="op">=</span>load_some_continuous_data()</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="saving-intermittent-results" class="level3">
+<h3 class="anchored" data-anchor-id="saving-intermittent-results">Saving intermittent results</h3>
+<p>Safe intermittent results as sparse or continues data. You have to be able to find sparse results from a specific algorithm. This is not a priority, but can be necessary in the long term.</p>
+<p>This alternative is chosen over caching.</p>
+</section>
+<section id="sample-frequencies" class="level3">
+<h3 class="anchored" data-anchor-id="sample-frequencies">Sample frequencies</h3>
+<p>We want to have the option to save data with different sample frequencies. Therefore, continuous data should have its own sample frequency and time axis.</p>
+<p>Slicing becomes a bit more complicated. When slicing the entire sequence, it should be performed based on time for the different datasets.</p>
+<p>You can also duplicate a sequence and then only slice e.g.&nbsp;continuous data. This will result in subdata with different timespans. Sequence time axes therefore are no longer necessary.</p>
+<p>Synchronisation will have to be done based on time. Sequences are not allowed to contain data that is not synchronized.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
