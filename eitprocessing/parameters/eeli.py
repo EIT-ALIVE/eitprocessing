@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
+from ..features import BreathDetection
 from . import ParameterExtraction
-from ._temp_class import DetectBreaths
 
 
 class EELI(ParameterExtraction):
