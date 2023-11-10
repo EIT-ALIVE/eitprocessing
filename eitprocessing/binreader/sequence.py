@@ -624,3 +624,34 @@ class TimpelSequence(Sequence):
             pixel_values=pixel_data,
             waveform_data=waveform_data,
         )
+
+
+@dataclass(eq=False)
+class SentecSequence(Sequence):
+    """Sequence object for Sentec data."""
+
+    vendor: Vendor = Vendor.SENTEC
+
+    def _load_data(self, first_frame: int):
+        """Load data for Sentec files."""
+
+        FRAME_SIZE_BYTES = 1024
+        file_size = self.path.stat().st_size
+        if file_size % FRAME_SIZE_BYTES:
+            raise OSError(
+                f"File size {file_size} of file {str(self.path)} not divisible by {FRAME_SIZE_BYTES}.\n"
+                "Make sure this is a valid and uncorrupted Sentec data file."
+            )
+        total_frames = file_size // FRAME_SIZE_BYTES
+
+        if first_frame > total_frames:
+            raise ValueError(
+                f"Invalid input: `first_frame` {first_frame} is larger than the "
+                f"total number of frames in the file {total_frames}."
+            )
+
+        with open(self.path, "br") as fh:
+            fh.seek(first_frame * FRAME_SIZE_BYTES)
+
+            ZeroRef = np.fromfile(fh, dtype="float32")
+            ZeroRef = np.reshape(ZeroRef, (32, 32, total_frames), "C")
