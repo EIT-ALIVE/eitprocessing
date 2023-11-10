@@ -779,46 +779,6 @@
         <span class="p">)</span></div>
 </div>
 
-
-
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<div class="viewcode-block" id="SentecSequence">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.SentecSequence">[docs]</a>
-<span class="k">class</span> <span class="nc">SentecSequence</span><span class="p">(</span><span class="n">Sequence</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sequence object for Sentec data.&quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="SentecSequence.vendor">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.SentecSequence.vendor">[docs]</a>
-    <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">=</span> <span class="n">Vendor</span><span class="o">.</span><span class="n">SENTEC</span></div>
-
-
-<div class="viewcode-block" id="SentecSequence._load_data">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/sequence/index.html#eitprocessing.binreader.SentecSequence._load_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">_load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load data for Sentec files.&quot;&quot;&quot;</span>
-
-        <span class="n">FRAME_SIZE_BYTES</span> <span class="o">=</span> <span class="mi">1024</span>
-        <span class="n">file_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span>
-        <span class="k">if</span> <span class="n">file_size</span> <span class="o">%</span> <span class="n">FRAME_SIZE_BYTES</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;File size </span><span class="si">{</span><span class="n">file_size</span><span class="si">}</span><span class="s2"> of file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2"> not divisible by </span><span class="si">{</span><span class="n">FRAME_SIZE_BYTES</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;Make sure this is a valid and uncorrupted Sentec data file.&quot;</span>
-            <span class="p">)</span>
-        <span class="n">total_frames</span> <span class="o">=</span> <span class="n">file_size</span> <span class="o">//</span> <span class="n">FRAME_SIZE_BYTES</span>
-
-        <span class="k">if</span> <span class="n">first_frame</span> <span class="o">&gt;</span> <span class="n">total_frames</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Invalid input: `first_frame` </span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s2"> is larger than the &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;total number of frames in the file </span><span class="si">{</span><span class="n">total_frames</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;br&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
-            <span class="n">fh</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">first_frame</span> <span class="o">*</span> <span class="n">FRAME_SIZE_BYTES</span><span class="p">)</span>
-
-            <span class="n">ZeroRef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">fh</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
-            <span class="n">ZeroRef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ZeroRef</span><span class="p">,</span> <span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="n">total_frames</span><span class="p">),</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span></div>
-</div>
-
 </pre></div>
 
             <div class="clearer"></div>
