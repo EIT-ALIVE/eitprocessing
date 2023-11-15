@@ -2,6 +2,7 @@ import functools
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from typing import TypeAlias
 from typing import TypeVar
@@ -25,6 +26,8 @@ class EITData(ABC):
     framerate: float
     variants: VariantCollection
     vendor: Vendor
+    phases: list = field(default_factory=list)
+    events: list = field(default_factory=list)
     label: str | None = None
 
     def __post_init__(self):

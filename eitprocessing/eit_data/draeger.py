@@ -111,7 +111,15 @@ class DraegerEITData(EITData):
         if not framerate:
             framerate = cls.framerate
 
-        obj = cls(path=path, framerate=framerate, nframes=n_frames, time=time)
+        obj = cls(
+            path=path,
+            framerate=framerate,
+            nframes=n_frames,
+            time=time,
+            phases=phases,
+            events=events,
+            label=label,
+        )
         obj.variants.add(
             EITDataVariant(
                 name="raw",
