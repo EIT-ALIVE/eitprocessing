@@ -10,13 +10,8 @@ import bisect
 import copy
 import warnings
 from dataclasses import dataclass
-from dataclasses import field
 import numpy as np
 from ..eit_data import EITData
-from ..eit_data.eit_data_variant import EITDataVariant
-from ..eit_data.event import Event
-from ..eit_data.phases import PhaseIndicator
-from ..eit_data.timing_error import TimingError
 from ..helper import NotEquivalent
 
 
