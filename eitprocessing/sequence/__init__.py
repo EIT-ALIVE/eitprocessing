@@ -98,18 +98,12 @@ class Sequence:
         except NotEquivalent as e:
             raise type(e)(f"Sequences could not be merged: {e}") from e
 
-        if a.eit_data:
+        if a.eit_data and b.eit_data:
             eit_data = EITData.concatenate(a.eit_data, b.eit_data)
         else:
             eit_data = None
 
-        def merge_attribute(attr: str) -> list:
-            a_items = getattr(a, attr)
-            b_items = getattr(b.deepcopy(), attr)  # deepcopy avoids overwriting
-            for item in b_items:
-                item.index += a.nframes
-                item.time = time[item.index]
-            return a_items + b_items
+        # TODO: add concatenation of other attached objects
 
         label = label or f"Concatenation of <{a.label}> and <{b.label}>"
 
