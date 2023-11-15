@@ -43,5 +43,5 @@ class Variant(ABC):
 
     @classmethod
     @abstractmethod
-    def concatenate(cls, a: Self, b: Self, label: str | None = None) -> Self:
+    def concatenate(cls, a: Self, b: Self) -> Self:
         ...
