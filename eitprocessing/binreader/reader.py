@@ -7,10 +7,7 @@ This file contains methods related to when electrical impedance tomographs are r
 
 import io
 import struct
-from collections.abc import Callable
 from dataclasses import dataclass
-from functools import partial
-from functools import partialmethod
 from typing import Any
 from typing import TypeVar
 import numpy as np

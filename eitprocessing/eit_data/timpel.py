@@ -1,7 +1,6 @@
 import warnings
 from dataclasses import dataclass
 from dataclasses import field
-from os import PathLike
 from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray

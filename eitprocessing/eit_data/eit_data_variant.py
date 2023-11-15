@@ -6,12 +6,10 @@ This file contains methods related to when electrical impedance tomographs are r
 """
 
 import copy
-import warnings
 from dataclasses import dataclass
 from dataclasses import field
 import numpy as np
 from typing_extensions import Self
-from ..helper import NotEquivalent
 from ..variants import Variant
 
 
