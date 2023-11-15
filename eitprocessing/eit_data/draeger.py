@@ -143,7 +143,8 @@ class DraegerEITData(EITData):
 
         frame_time = round(reader.float64() * 24 * 60 * 60, 3)
         _ = reader.float32()
-        frame_pixel_impedance = cls._reshape_frame(reader.npfloat32(length=1024))
+        frame_pixel_impedance = reader.npfloat32(length=1024)
+        frame_pixel_impedance = np.reshape(frame_pixel_impedance, (32, 32), "C")
         min_max_flag = reader.int32()
         event_marker = reader.int32()
         event_text = reader.string(length=30)
@@ -175,8 +176,3 @@ class DraegerEITData(EITData):
             phases.append(MinValue(index, frame_time))
 
         return event_marker
-
-    @staticmethod
-    def _reshape_frame(frame):
-        """Convert linear array into 2D (32x32) image-like array."""
-        return np.reshape(frame, (32, 32), "C")
