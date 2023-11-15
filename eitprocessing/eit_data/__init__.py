@@ -181,7 +181,7 @@ class EITData(ABC):
     @classmethod
     def check_equivalence(cls, a: T, b: T, raise_=False) -> bool:
         try:
-            if not isinstance(a, type(b)):
+            if a.__class__ != b.__class__:
                 raise NotEquivalent(f"Classes don't match: {type(a)}, {type(b)}")
 
             if a.framerate != b.framerate:
