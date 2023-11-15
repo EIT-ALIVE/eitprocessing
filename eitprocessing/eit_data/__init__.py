@@ -35,7 +35,7 @@ class EITData(ABC):
             self.label = f"{self.__class__.__name__}_{id(self)}"
 
     @classmethod
-    def from_path(  # pylint: disable=too-many-arguments, unused-argument
+    def from_path(  # pylint: disable=too-many-arguments
         cls,
         path: PathLike | list[PathLike],
         vendor: Vendor | str,
@@ -81,7 +81,7 @@ class EITData(ABC):
         for single_path in paths:
             single_path.resolve(strict=True)  # raises if file does not exists
             sequences.append(
-                vendor_class._from_path(
+                vendor_class._from_path(  # pylint: disable=protected-access
                     path=single_path,
                     label=label,
                     framerate=framerate,
@@ -99,9 +99,9 @@ class EITData(ABC):
 
     @staticmethod
     def _get_vendor_class(vendor: Vendor):
-        from .draeger import DraegerEITData
-        from .sentec import SentecEITData
-        from .timpel import TimpelEITData
+        from .draeger import DraegerEITData  # pylint: disable=import-outside-toplevel
+        from .sentec import SentecEITData  # pylint: disable=import-outside-toplevel
+        from .timpel import TimpelEITData  # pylint: disable=import-outside-toplevel
 
         vendor_classes = {
             Vendor.DRAEGER: DraegerEITData,
@@ -120,7 +120,7 @@ class EITData(ABC):
                 f"`first_frame` must be an int, but was given as"
                 f" {first_frame} (type: {type(first_frame)})"
             )
-        if not first_frame >= 0:
+        if first_frame < 0:
             raise ValueError(
                 f"`first_frame` can not be negative, but was given as {first_frame}"
             )
@@ -140,7 +140,7 @@ class EITData(ABC):
 
     @classmethod
     @abstractmethod
-    def _from_path(
+    def _from_path(  # pylint: disable=too-many-arguments
         cls,
         path: Path,
         label: str | None,

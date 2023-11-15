@@ -30,7 +30,7 @@ class DraegerEITData(EITData):
 
     @override  # remove vendor as argument
     @classmethod
-    def from_path(
+    def from_path(  # pylint: disable=too-many-arguments,arguments-differ
         cls,
         path: PathLike | list[PathLike],
         label: str | None = None,
@@ -43,7 +43,7 @@ class DraegerEITData(EITData):
         )
 
     @classmethod
-    def _from_path(
+    def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
         cls,
         path: Path,
         label: str | None,
@@ -131,7 +131,7 @@ class DraegerEITData(EITData):
         return obj
 
     @classmethod
-    def _read_frame(
+    def _read_frame(  # pylint: disable=too-many-arguments
         cls,
         reader: Reader,
         index: int,
@@ -159,9 +159,7 @@ class DraegerEITData(EITData):
         timing_error = reader.int32()
 
         # TODO (#79): parse medibus data into waveform data
-        medibus_data = reader.npfloat32(
-            length=52
-        )  # noqa; variable will be used in future version
+        medibus_data = reader.npfloat32(length=52)  # noqa;
 
         if index < 0:
             # do not keep any loaded data, just return the event marker

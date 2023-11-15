@@ -26,7 +26,7 @@ class TimpelEITData(EITData):
 
     @override  # remove vendor as argument
     @classmethod
-    def from_path(
+    def from_path(  # pylint: disable=arguments-differ,too-many-arguments
         cls,
         path: PathLike | list[PathLike],
         label: str | None = None,
@@ -39,7 +39,7 @@ class TimpelEITData(EITData):
         )
 
     @classmethod
-    def _from_path(
+    def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
         cls,
         path: Path,
         label: str | None,
@@ -106,7 +106,7 @@ class TimpelEITData(EITData):
 
         # extract waveform data
         # TODO: find a way to also save waveform data
-        waveform_data = {
+        waveform_data = {  # noqa;
             "airway_pressure": data[:, 1024],
             "flow": data[:, 1025],
             "volume": data[:, 1026],
