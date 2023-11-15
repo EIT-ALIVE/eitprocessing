@@ -186,7 +186,7 @@ class EITData(ABC):
                     f"Framerates do not match: {a.framerate}, {b.framerate}"
                 )
 
-            VariantCollection.check_equivalence(a.variants, b.variants, raise_=raise_)
+            VariantCollection.check_equivalence(a.variants, b.variants, raise_=True)
 
         except NotEquivalent:
             # re-raises the exceptions if raise_ is True, or returns False

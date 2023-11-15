@@ -66,7 +66,7 @@ class VariantCollection(dict):
                 )
 
             for key in a.keys():
-                Variant.check_equivalence(a[key], b[key], raise_=raise_)
+                Variant.check_equivalence(a[key], b[key], raise_=True)
 
         except NotEquivalent:
             # re-raises the exceptions if raise_ is True, or returns False
