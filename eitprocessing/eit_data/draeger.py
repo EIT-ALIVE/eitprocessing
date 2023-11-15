@@ -2,7 +2,6 @@ import sys
 import warnings
 from dataclasses import dataclass
 from dataclasses import field
-from os import PathLike
 from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
@@ -11,6 +10,7 @@ from typing_extensions import override
 from ..binreader.reader import Reader
 from ..variants.variant_collection import VariantCollection
 from . import EITData
+from . import PathLike
 from .eit_data_variant import EITDataVariant
 from .event import Event
 from .phases import MaxValue
