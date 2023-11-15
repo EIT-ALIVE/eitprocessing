@@ -28,7 +28,7 @@ class DraegerEITData(EITData):
         default_factory=lambda: VariantCollection(EITDataVariant)
     )
 
-    @override
+    @override  # remove vendor as argument
     @classmethod
     def from_path(
         cls,
