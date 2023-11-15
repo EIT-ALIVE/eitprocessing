@@ -44,34 +44,34 @@ class Sequence:
             self.label = f"Sequence_{id(self)}"
 
     def __eq__(self, other) -> bool:
-        # TODO: rewrite
-        try:
-            self.check_equivalence(self, other)
-        except (TypeError, ValueError, AttributeError):
+        if not self.check_equivalence(self, other, raise_=False):
             return False
 
-        for attr in ["nframes", "framerate", "framesets", "vendor"]:
-            if getattr(self, attr) != getattr(other, attr):
-                return False
-        for attr in ["time", "phases", "events", "timing_errors"]:
-            self_attr, other_attr = getattr(self, attr), getattr(other, attr)
-            if len(self_attr) != len(other_attr):
-                return False
-            if not np.all(np.equal(self_attr, other_attr)):
-                return False
+        # TODO: check equality of object and all attached objects
 
         return True
 
     @staticmethod
     def check_equivalence(a: Sequence, b: Sequence, raise_=False):
-        """Checks whether content of two Sequence objects is equivalent."""
-        # TODO: rewrite
+        """Checks whether content of two Sequence objects is equivalent.
+
+        It the two objects are equivalent, the method returns `True`.
+
+        If the two objects are not equivalent and `raise_` is `True`, a
+        NotEquivalent exception is raised. If `raise_` is `False`, the
+        method returns `False` instead.
+
+        Raises:
+        - NotEquivalent: when the objects are not equivalent and `raise_` is `True`
+
+        """
         try:
-            if any((a.eit_data, b.eit_data)):
-                if not all((a.eit_data, b.eit_data)):
+            if a.eit_data or b.eit_data:
+                if not a.eit_data or not b.eit_data:
                     raise NotEquivalent("Only one of the sequences contains EIT data")
 
                 EITData.check_equivalence(a.eit_data, b.eit_data, raise_=raise_)
+                # TODO: add other attached objects for equivalence
 
         except NotEquivalent:
             # re-raises the exceptions if raise_ is True, or returns False
