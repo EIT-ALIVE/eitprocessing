@@ -1,46 +1,75 @@
 import warnings
+from dataclasses import dataclass
+from dataclasses import field
+from os import PathLike
 from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
-from eitprocessing.eit_data.eit_data_variant import EITDataVariant
-from eitprocessing.eit_data.phases import MaxValue
-from eitprocessing.eit_data.phases import MinValue
-from eitprocessing.eit_data.phases import QRSMark
-from eitprocessing.eit_data.vendor import Vendor
+from typing_extensions import Self
+from typing_extensions import override
+from eitprocessing.variants.variant_collection import VariantCollection
+from ..eit_data.eit_data_variant import EITDataVariant
+from ..eit_data.phases import MaxValue
+from ..eit_data.phases import MinValue
+from ..eit_data.phases import QRSMark
+from ..eit_data.vendor import Vendor
 from . import EITData
+from . import PathLike
 
 
+@dataclass
 class TimpelEITData(EITData):
-    vendor = Vendor.TIMPEL
-    framerate = 50
+    framerate: float = 50
+    vendor: Vendor = field(default=Vendor.TIMPEL, init=False)
+    variants: VariantCollection = field(
+        default_factory=lambda: VariantCollection(EITDataVariant)
+    )
+
+    @override  # remove vendor as argument
+    @classmethod
+    def from_path(
+        cls,
+        path: PathLike | list[PathLike],
+        label: str | None = None,
+        framerate: float | None = None,
+        first_frame: int = 0,
+        max_frames: int | None = None,
+    ) -> Self:
+        return super().from_path(
+            path, cls.vendor, label, framerate, first_frame, max_frames
+        )
 
     @classmethod
     def _from_path(
-        cls, path: Path, label: str, framerate: float, first_frame: int, max_frames: int
-    ) -> "TimpelEITData":
-        ...
-
-    def _load_data(self, first_frame: int):
+        cls,
+        path: Path,
+        label: str | None,
+        framerate: float | None = 50,
+        first_frame: int = 0,
+        max_frames: int | None = None,
+    ):
         """Load data for TIMPEL files."""
 
         COLUMN_WIDTH = 1030
 
+        if not framerate:
+            framerate = cls.framerate
+
         try:
-            data = np.loadtxt(
-                str(self.path),
+            data: NDArray = np.loadtxt(
+                str(path),
                 dtype=float,
                 delimiter=",",
                 skiprows=first_frame,
-                max_rows=self.nframes,
+                max_rows=max_frames,
             )
         except UnicodeDecodeError as e:
             raise OSError(
-                f"File {self.path} could not be read as Timpel data.\n"
+                f"File {path} could not be read as Timpel data.\n"
                 "Make sure this is a valid and uncorrupted Timpel data file.\n"
                 f"Original error message: {e}"
             ) from e
 
-        data: NDArray
         if data.shape[1] != COLUMN_WIDTH:
             raise OSError(
                 f"Input does not have a width of {COLUMN_WIDTH} columns.\n"
@@ -51,29 +80,33 @@ class TimpelEITData(EITData):
                 f"Invalid input: `first_frame` {first_frame} is larger than the "
                 f"total number of frames in the file."
             )
-        if data.shape[0] != self.nframes:
-            if self.nframes:
+
+        if max_frames and data.shape[0] == max_frames:
+            nframes = max_frames
+        else:
+            if max_frames:
                 warnings.warn(
-                    f"The number of frames requested ({self.nframes}) is larger "
+                    f"The number of frames requested ({max_frames}) is larger "
                     f"than the available number ({data.shape[0]}) of frames after "
                     f"the first frame selected ({first_frame}).\n"
                     f"{data.shape[0]} frames have been loaded."
                 )
-            self.nframes = data.shape[0]
+            nframes = data.shape[0]
 
         # TODO (#80): QUESTION: check whether below issue was only a Drager problem or also
         # applicable to Timpel.
         # The implemented method seems convoluted: it's easier to create an array
         # with nframes and add a time_offset. However, this results in floating
         # point errors, creating issues with comparing times later on.
-        self.time = np.arange(self.nframes + first_frame) / self.framerate
-        self.time = self.time[first_frame:]
+        time = np.arange(nframes + first_frame) / framerate
+        time = time[first_frame:]
 
-        pixel_data = data[:, :1024]
-        pixel_data = np.reshape(pixel_data, newshape=(-1, 32, 32), order="C")
-        pixel_data = np.where(pixel_data == -1000, np.nan, pixel_data)
+        pixel_impedance = data[:, :1024]
+        pixel_impedance = np.reshape(pixel_impedance, newshape=(-1, 32, 32), order="C")
+        pixel_impedance = np.where(pixel_impedance == -1000, np.nan, pixel_impedance)
 
         # extract waveform data
+        # TODO: find a way to also save waveform data
         waveform_data = {
             "airway_pressure": data[:, 1024],
             "flow": data[:, 1025],
@@ -81,21 +114,32 @@ class TimpelEITData(EITData):
         }
 
         # extract breath start, breath end and QRS marks
+        phases = []
         for index in np.flatnonzero(data[:, 1027] == 1):
-            self.phases.append(MinValue(index, self.time[index]))
+            phases.append(MinValue(index, time[int(index)]))
 
         for index in np.flatnonzero(data[:, 1028] == 1):
-            self.phases.append(MaxValue(index, self.time[index]))
+            phases.append(MaxValue(index, time[int(index)]))
 
         for index in np.flatnonzero(data[:, 1029] == 1):
-            self.phases.append(QRSMark(index, self.time[index]))
+            phases.append(QRSMark(index, time[int(index)]))
 
-        self.phases.sort(key=lambda x: x.index)
+        phases.sort(key=lambda x: x.index)
 
-        self.framesets["raw"] = EITDataVariant(
-            name="raw",
-            description="raw timpel data",
-            params={"framerate": self.framerate},
-            pixel_impedance=pixel_data,
-            waveform_data=waveform_data,
+        obj = cls(
+            path=path,
+            nframes=nframes,
+            time=time,
+            framerate=framerate,
+            phases=phases,
+            label=label,
         )
+        obj.variants.add(
+            EITDataVariant(
+                name="raw",
+                description="raw impedance data",
+                pixel_impedance=pixel_impedance,
+            )
+        )
+
+        return obj
