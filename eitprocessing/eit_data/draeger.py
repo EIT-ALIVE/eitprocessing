@@ -34,7 +34,7 @@ class DraegerEITData(EITData):
         cls,
         path: PathLike | list[PathLike],
         label: str | None = None,
-        framerate: int | None = None,
+        framerate: float | None = None,
         first_frame: int = 0,
         max_frames: int | None = None,
     ) -> Self:
