@@ -157,7 +157,7 @@ class EITData(ABC):
     def concatenate(cls, a: Self, b: Self, label: str | None = None) -> Self:
         cls.check_equivalence(a, b, raise_=True)
 
-        subclass = a.__class__
+        subclass = cls._get_vendor_class(a.vendor)
 
         a_path = cls._ensure_path_list(a.path)
         b_path = cls._ensure_path_list(b.path)
