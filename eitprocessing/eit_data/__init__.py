@@ -44,6 +44,7 @@ class EITData(ABC):
         framerate: float | None = None,
         first_frame: int = 0,
         max_frames: int | None = None,
+        return_non_eit_data: bool = False,
     ) -> Self:
         """Load sequence from path(s)
 
@@ -88,6 +89,7 @@ class EITData(ABC):
                     framerate=framerate,
                     first_frame=first_frame,
                     max_frames=max_frames,
+                    return_non_eit_data=return_non_eit_data,
                 )
             )
         return functools.reduce(cls.concatenate, sequences)

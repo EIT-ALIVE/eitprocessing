@@ -1,5 +1,6 @@
 import sys
 import warnings
+from collections import namedtuple
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
@@ -7,7 +8,14 @@ import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
 from typing_extensions import override
+from eitprocessing.continuous_data.continuous_data_collection import (
+    ContinuousDataCollection,
+)
+from eitprocessing.continuous_data.continuous_data_variant import ContinuousDataVariant
+from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from ..binreader.reader import Reader
+from ..continuous_data import ContinuousData
+from ..sparse_data import SparseData
 from ..variants.variant_collection import VariantCollection
 from . import EITData
 from . import PathLike
@@ -37,9 +45,16 @@ class DraegerEITData(EITData):
         framerate: float | None = None,
         first_frame: int = 0,
         max_frames: int | None = None,
+        return_non_eit_data: bool = False,
     ) -> Self:
         return super().from_path(
-            path, cls.vendor, label, framerate, first_frame, max_frames
+            path,
+            cls.vendor,
+            label,
+            framerate,
+            first_frame,
+            max_frames,
+            return_non_eit_data,
         )
 
     @classmethod
@@ -50,7 +65,8 @@ class DraegerEITData(EITData):
         framerate: float | None = 20,
         first_frame: int = 0,
         max_frames: int | None = None,
-    ) -> Self:
+        return_non_eit_data: bool = False,
+    ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
         """"""
 
         FRAME_SIZE_BYTES = 4358
@@ -90,6 +106,7 @@ class DraegerEITData(EITData):
         time = np.zeros((n_frames,))
         events = []
         phases = []
+        medibus_data = np.zeros((52, n_frames))
 
         with open(path, "br") as fh:
             fh.seek(first_frame_to_load * FRAME_SIZE_BYTES)
@@ -103,10 +120,15 @@ class DraegerEITData(EITData):
                     index,
                     time,
                     pixel_impedance,
+                    medibus_data,
                     events,
                     phases,
                     previous_marker,
                 )
+
+        continuous_data_collection, sparse_data_collection = cls._convert_medibus_data(
+            medibus_data, time
+        )
 
         if not framerate:
             framerate = cls.framerate
@@ -127,16 +149,48 @@ class DraegerEITData(EITData):
                 pixel_impedance=pixel_impedance,
             )
         )
+        if return_non_eit_data:
+            return obj, continuous_data_collection, sparse_data_collection
 
         return obj
 
     @classmethod
-    def _read_frame(  # pylint: disable=too-many-arguments
+    def _convert_medibus_data(
+        cls, medibus_data: NDArray, time: NDArray
+    ) -> tuple[ContinuousDataCollection, SparseDataCollection]:
+        continuous_data_collection = ContinuousDataCollection()
+        sparse_data_collection = SparseDataCollection()
+
+        for field_info, data in zip(medibus_fields, medibus_data):
+            if field_info.continuous:
+                continuous_data = ContinuousData(
+                    name=field_info.signal_name,
+                    description=f"continuous {field_info.signal_name} data loaded from file",
+                    unit=field_info.unit,
+                    time=time,
+                    loaded=True,
+                )
+                continuous_data.variants.add(
+                    ContinuousDataVariant(
+                        name="raw", description="raw data loaded from file", values=data
+                    )
+                )
+                continuous_data_collection.add(continuous_data)
+
+            else:
+                # TODO parse sparse data
+                ...
+
+        return continuous_data_collection, sparse_data_collection
+
+    @classmethod
+    def _read_frame(  # pylint: disable=too-many-arguments,too-many-locals
         cls,
         reader: Reader,
         index: int,
         time: NDArray,
         pixel_impedance: NDArray,
+        medibus_data: NDArray,
         events: list,
         phases: list,
         previous_marker: int | None,
@@ -158,8 +212,7 @@ class DraegerEITData(EITData):
         event_text = reader.string(length=30)
         timing_error = reader.int32()
 
-        # TODO (#79): parse medibus data into waveform data
-        medibus_data = reader.npfloat32(length=52)  # noqa;
+        frame_medibus_data = reader.npfloat32(length=52)  # noqa;
 
         if index < 0:
             # do not keep any loaded data, just return the event marker
@@ -167,6 +220,7 @@ class DraegerEITData(EITData):
 
         time[index] = frame_time
         pixel_impedance[index, :, :] = frame_pixel_impedance
+        medibus_data[:, index] = frame_medibus_data
 
         # The event marker stays the same until the next event occurs.
         # Therefore, check whether the event marker has changed with
@@ -182,3 +236,63 @@ class DraegerEITData(EITData):
             phases.append(MinValue(index, frame_time))
 
         return event_marker
+
+
+medibus_field = namedtuple("medibus_field", ["signal_name", "unit", "continuous"])
+
+medibus_fields = [
+    medibus_field("airway pressure", "mbar", True),
+    medibus_field("flow", "L/min", True),
+    medibus_field("volume", "mL", True),
+    medibus_field("CO2", "%", True),
+    medibus_field("CO2", "kPa", True),
+    medibus_field("CO2", "mmHg", True),
+    medibus_field("dynamic compliance", "mL/mbar", False),
+    medibus_field("resistance", "mbar/L/s", False),
+    medibus_field("r^2", "", False),
+    medibus_field("spontaneous inspiratory time", "s", False),
+    medibus_field("minimal pressure", "mbar", False),
+    medibus_field("P0.1", "mbar", False),
+    medibus_field("mean pressure", "mbar", False),
+    medibus_field("plateau pressure", "mbar", False),
+    medibus_field("PEEP", "mbar", False),
+    medibus_field("intrinsic PEEP", "mbar", False),
+    medibus_field("mandatory respiratory rate", "/min", False),
+    medibus_field("mandatory minute volume", "L/min", False),
+    medibus_field("peak inspiratory pressure", "mbar", False),
+    medibus_field("mandatory tidal volume", "L", False),
+    medibus_field("spontaneous tidal volume", "L", False),
+    medibus_field("trapped volume", "mL", False),
+    medibus_field("mandatory expiratory tidal volume", "mL", False),
+    medibus_field("spontaneous expiratory tidal volume", "mL", False),
+    medibus_field("mandatory inspiratory tidal volume", "mL", False),
+    medibus_field("tidal volume", "mL", False),
+    medibus_field("spontaneous inspiratory tidal volume", "mL", False),
+    medibus_field("negative inspiratory force", "mbar", False),
+    medibus_field("leak minute volume", "L/min", False),
+    medibus_field("leak percentage", "%", False),
+    medibus_field("spontaneous respiratory rate", "/min", False),
+    medibus_field("percentage of spontaneous minute volume", "%", False),
+    medibus_field("spontaneous minute volume", "L/min", False),
+    medibus_field("minute volume", "L/min", False),
+    medibus_field("airway temperature", "degrees C", False),
+    medibus_field("rapid shallow breating index", "1/min/L", False),
+    medibus_field("respiratory rate", "/min", False),
+    medibus_field("inspiratory:expiratory ratio", "", False),
+    medibus_field("CO2 flow", "mL/min", False),
+    medibus_field("dead space volume", "mL", False),
+    medibus_field("percentage dead space of expiratory tidal volume", "%", False),
+    medibus_field("end-tidal CO2", "%", False),
+    medibus_field("end-tidal CO2", "kPa", False),
+    medibus_field("end-tidal CO2", "mmHg", False),
+    medibus_field("fraction inspired O2", "%", False),
+    medibus_field("spontaneous inspiratory:expiratory ratio", "", False),
+    medibus_field("elastance", "mbar/L", False),
+    medibus_field("time constant", "s", False),
+    medibus_field(
+        "ratio between upper 20% pressure range and total dynamic compliance", "", False
+    ),
+    medibus_field("end-inspiratory pressure", "mbar", False),
+    medibus_field("expiratory tidal volume", "mL", False),
+    medibus_field("time at low pressure", "s", False),
+]
