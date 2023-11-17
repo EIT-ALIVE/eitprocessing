@@ -44,7 +44,7 @@ class VariantCollection(dict):
         try:
             cls.check_equivalence(a, b, raise_=True)
         except NotEquivalent as e:
-            raise Exception("VariantCollections could not be concatenated") from e
+            raise ValueError("VariantCollections could not be concatenated") from e
 
         obj = VariantCollection(a.variant_type)
         for key in a.keys():
@@ -80,10 +80,6 @@ class VariantCollection(dict):
 class InvalidVariantType(Exception):
     """Raised when a variant that does not match the variant type is added."""
 
-    pass
-
 
 class DuplicateVariantName(Exception):
     """Raised when a variant with the same name already exists in the collection."""
-
-    pass
