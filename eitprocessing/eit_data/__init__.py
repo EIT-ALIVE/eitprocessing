@@ -6,6 +6,7 @@ from dataclasses import field
 from pathlib import Path
 from typing import TypeAlias
 from typing import TypeVar
+from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
@@ -15,7 +16,7 @@ from .vendor import Vendor
 
 
 T = TypeVar("T", bound="EITData")
-PathLike: TypeAlias = str | Path
+PathLike: TypeAlias = Union[str, Path]
 
 
 @dataclass
