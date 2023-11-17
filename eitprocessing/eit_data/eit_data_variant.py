@@ -25,7 +25,7 @@ class EITDataVariant(Variant):
             if getattr(self, attr) != getattr(other, attr):
                 return False
 
-        for attr in ["pixel_values"]:
+        for attr in ["pixel_impedance"]:
             # NaN values are not equal. Check whether values are equal or both NaN.
             s = getattr(self, attr)
             o = getattr(other, attr)
