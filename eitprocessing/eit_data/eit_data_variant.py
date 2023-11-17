@@ -32,29 +32,11 @@ class EITDataVariant(Variant):
             if not np.all((s == o) | (np.isnan(s) & np.isnan(o))):
                 return False
 
-        for attr in ["waveform_data"]:
-            s = getattr(self, attr)
-            o = getattr(other, attr)
-
-            # check whether they contain the same types of data
-            if set(s.keys()) != set(o.keys()):
-                return False
-
-            # NaN values are not equal. Check whether values are equal or both NaN
-            for key, s_values in s.items():
-                o_values = o[key]
-                if not np.all(
-                    (s_values == o_values) | (np.isnan(s_values) & np.isnan(o_values))
-                ):
-                    return False
-
         return True
 
     def select_by_indices(self, indices):
         obj = self.deepcopy()
         obj.pixel_impedance = self.pixel_impedance[indices, :, :]
-        for key, values in self.waveform_data.items():
-            obj.waveform_data[key] = values[indices]
         return obj
 
     __getitem__ = select_by_indices
