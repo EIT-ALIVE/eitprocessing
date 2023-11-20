@@ -1,30 +1,30 @@
 from typing import Any
+from typing import Generic
 from typing import TypeVar
 from typing_extensions import Self
 from ..helper import NotEquivalent
 from . import Variant
 
 
+V = TypeVar("V", bound="Variant")
 
 
-class VariantCollection(dict):
-    variant_type: type[Variant]
+class VariantCollection(dict, Generic[V]):
+    variant_type: type[V]
 
-    def __init__(self, variant_type: type[Variant], *args, **kwargs):
+    def __init__(self, variant_type: type[V], *args, **kwargs):
         self.variant_type = variant_type
         super().__init__(*args, **kwargs)
 
-    def __setitem__(self, __key: Any, __value: Any) -> None:
+    def __setitem__(self, __key: str, __value: V) -> None:
         self._check_variant(__value, key=__key)
         return super().__setitem__(__key, __value)
 
-    def add(self, variant: Variant, overwrite: bool = False) -> None:
+    def add(self, variant: V, overwrite: bool = False) -> None:
         self._check_variant(variant, overwrite=overwrite)
         return super().__setitem__(variant.name, variant)
 
-    def _check_variant(
-        self, variant: Variant, key=None, overwrite: bool = False
-    ) -> None:
+    def _check_variant(self, variant: V, key=None, overwrite: bool = False) -> None:
         if self.variant_type and not isinstance(variant, self.variant_type):
             raise InvalidVariantType(
                 f"'{type(variant)}' does not match '{self.variant_type}'."
