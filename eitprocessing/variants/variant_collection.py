@@ -5,7 +5,6 @@ from ..helper import NotEquivalent
 from . import Variant
 
 
-T = TypeVar("T", bound="VariantCollection")
 
 
 class VariantCollection(dict):
