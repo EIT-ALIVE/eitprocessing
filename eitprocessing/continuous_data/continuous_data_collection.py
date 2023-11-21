@@ -1,3 +1,4 @@
+import contextlib
 from typing import Any
 from typing_extensions import Self
 from ..helper import NotEquivalent
@@ -42,7 +43,8 @@ class ContinuousDataCollection(dict):
 
     @classmethod
     def check_equivalence(cls, a: Self, b: Self, raise_=False) -> bool:
-        try:
+        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
+        with cm:
             if set(a.keys()) != set(b.keys()):
                 raise NotEquivalent(
                     f"VariantCollections do not contain the same variants: {a.keys()=}, {b.keys()=}"
@@ -51,13 +53,9 @@ class ContinuousDataCollection(dict):
             for key in a.keys():
                 ContinuousData.check_equivalence(a[key], b[key], raise_=True)
 
-        except NotEquivalent:
-            # re-raises the exceptions if raise_ is True, or returns False
-            if raise_:
-                raise
-            return False
+            return True
 
-        return True
+        return False
 
 
 class DuplicateContinuousDataName(Exception):

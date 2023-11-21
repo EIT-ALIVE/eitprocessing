@@ -1,3 +1,4 @@
+import contextlib
 from typing import Generic
 from typing import TypeVar
 from typing_extensions import Self
@@ -52,7 +53,8 @@ class VariantCollection(dict, Generic[V]):
 
     @classmethod
     def check_equivalence(cls, a: Self, b: Self, raise_=False) -> bool:
-        try:
+        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
+        with cm:
             if a.variant_type != b.variant_type:
                 raise NotEquivalent(
                     f"Variant types do not match: {a.variant_type}, {b.variant_type}"
@@ -66,13 +68,9 @@ class VariantCollection(dict, Generic[V]):
             for key in a.keys():
                 Variant.check_equivalence(a[key], b[key], raise_=True)
 
-        except NotEquivalent:
-            # re-raises the exceptions if raise_ is True, or returns False
-            if raise_:
-                raise
-            return False
+            return True
 
-        return True
+        return False
 
 
 class InvalidVariantType(Exception):

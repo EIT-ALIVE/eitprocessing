@@ -1,3 +1,4 @@
+import contextlib
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -34,12 +35,10 @@ class Variant(ABC):
 
             if (a_ := a.params) != (b_ := b.params):
                 raise NotEquivalent(f"EITDataVariant params don't match: {a_}, {b_}")
-        except NotEquivalent:
-            if raise_:
-                raise
-            return False
 
-        return True
+            return True
+
+        return False
 
     @classmethod
     @abstractmethod

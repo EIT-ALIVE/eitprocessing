@@ -1,3 +1,4 @@
+import contextlib
 import functools
 from abc import ABC
 from abc import abstractmethod
@@ -183,7 +184,8 @@ class EITData(ABC):
 
     @classmethod
     def check_equivalence(cls, a: T, b: T, raise_=False) -> bool:
-        try:
+        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
+        with cm:
             if a.__class__ != b.__class__:
                 raise NotEquivalent(f"Classes don't match: {type(a)}, {type(b)}")
 
@@ -194,13 +196,10 @@ class EITData(ABC):
 
             VariantCollection.check_equivalence(a.variants, b.variants, raise_=True)
 
-        except NotEquivalent:
-            # re-raises the exceptions if raise_ is True, or returns False
-            if raise_:
-                raise
-            return False
+            return True
 
-        return True
+        return False
+
 
 
 class NoVendorProvided(Exception):

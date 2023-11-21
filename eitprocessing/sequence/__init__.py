@@ -7,6 +7,7 @@ as they are read.
 """
 from __future__ import annotations
 import bisect
+import contextlib
 import copy
 import warnings
 from dataclasses import dataclass
@@ -65,7 +66,8 @@ class Sequence:
         - NotEquivalent: when the objects are not equivalent and `raise_` is `True`
 
         """
-        try:
+        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
+        with cm:
             if a.eit_data or b.eit_data:
                 if not a.eit_data or not b.eit_data:
                     raise NotEquivalent("Only one of the sequences contains EIT data")
@@ -73,13 +75,9 @@ class Sequence:
                 EITData.check_equivalence(a.eit_data, b.eit_data, raise_=raise_)
                 # TODO: add other attached objects for equivalence
 
-        except NotEquivalent:
-            # re-raises the exceptions if raise_ is True, or returns False
-            if raise_:
-                raise
-            return False
+            return True
 
-        return True
+        return False
 
     def __add__(self, other: Sequence) -> Sequence:
         return self.concatenate(self, other)

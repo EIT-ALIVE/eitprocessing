@@ -1,3 +1,4 @@
+import contextlib
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -48,7 +49,8 @@ class ContinuousData:
 
     @classmethod
     def check_equivalence(cls, a: Self, b: Self, raise_: bool = False) -> bool:
-        try:
+        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
+        with cm:
             if a.name != b.name:
                 raise NotEquivalent(f"Names do not match: {a.name}, {b.name}")
             if a.unit != b.unit:
@@ -64,12 +66,9 @@ class ContinuousData:
 
             VariantCollection.check_equivalence(a.variants, b.variants, raise_=True)
 
-        except NotEquivalent:
-            if raise_:
-                raise
-            return False
+            return True
 
-        return True
+        return False
 
 
 class DataSourceUnknown(Exception):
