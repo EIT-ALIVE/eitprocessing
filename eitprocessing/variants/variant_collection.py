@@ -1,4 +1,3 @@
-from typing import Any
 from typing import Generic
 from typing import TypeVar
 from typing_extensions import Self

@@ -15,7 +15,6 @@ from eitprocessing.continuous_data.continuous_data_variant import ContinuousData
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from ..binreader.reader import Reader
 from ..continuous_data import ContinuousData
-from ..sparse_data import SparseData
 from ..variants.variant_collection import VariantCollection
 from . import EITData
 from . import PathLike

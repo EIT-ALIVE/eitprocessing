@@ -114,35 +114,8 @@ class Sequence:
         indices: slice,
         label: str | None = None,
     ):
-        # TODO: reconsider usage, rewrite to use EITData, SparseData and ContinuousData
-        if not isinstance(indices, slice):
-            raise NotImplementedError("Slicing only implemented using a slice object")
-        if indices.step not in (None, 1):
-            raise NotImplementedError(
-                "Skipping intermediate frames while slicing is not implemented."
-            )
-        if indices.start is None:
-            indices = slice(0, indices.stop, indices.step)
-        if indices.stop is None:
-            indices = slice(indices.start, self.nframes, indices.step)
-
-        obj = self.deepcopy()
-        obj.time = self.time[indices]
-        obj.nframes = len(obj.time)
-        obj.eit_data = {k: v[indices] for k, v in self.eit_data.items()}
-        obj.label = (
-            f"Slice ({indices.start}-{indices.stop}) of <{self.label}>"
-            if label is None
-            else label
-        )
-
-        range_ = range(indices.start, indices.stop)
-        for attr in ["events", "timing_errors", "phases"]:
-            setattr(obj, attr, [x for x in getattr(obj, attr) if x.index in range_])
-            for x in getattr(obj, attr):
-                x.index -= indices.start
-
-        return obj
+        ...
+        # TODO: rewrite to use EITData, SparseData and ContinuousData
 
     def __getitem__(self, indices: slice):
         # TODO: reconsider API
