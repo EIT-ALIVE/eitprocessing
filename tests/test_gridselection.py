@@ -465,7 +465,7 @@ def test_split_pixels_nans(data_string, split_vh, result):
 )
 def test_matrix_layout(split_vh: tuple[int, int], result: list[list[int]]):
     """
-    Test `matrix_layout()` method.
+    Test `matrix_layout` method.
 
     Args:
         split_vh (tuple[int, int]): `v_split` and `h_split`.
@@ -474,6 +474,5 @@ def test_matrix_layout(split_vh: tuple[int, int], result: list[list[int]]):
     """
 
     gs = GridSelection(*split_vh)
-    layout = gs.matrix_layout()
 
-    assert np.array_equal(layout, np.array(result))
+    assert np.array_equal(gs.matrix_layout, np.array(result))
