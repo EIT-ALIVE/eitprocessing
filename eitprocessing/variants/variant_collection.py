@@ -44,7 +44,7 @@ class VariantCollection(dict, Generic[V]):
     ```
     >>> vc = VariantCollection(EITDataVariant)
     >>> variant_c = SomeOtherVariant(label="offset", ...)
-    >>> vc.add(variant_c)  # raises InvalidVariantType() exception
+    >>> vc.add(variant_c)  # raises TypeError() exception
     ```
 
     """
@@ -64,15 +64,15 @@ class VariantCollection(dict, Generic[V]):
 
         This method automatically sets the key of the item to the label of the
         variant. By default, overwriting variants with the same label is
-        prevented. Trying to do so will result in a DuplicateVariantLabel
-        exception being raised. Set `overwrite` to `True` to allow overwriting.
+        prevented. Trying to do so will result in a KeyError being raised. Set
+        `overwrite` to `True` to allow overwriting.
 
         Args:
         - variant (Variant): the variant to be added. Multiple variants can be
           added at once.
 
         Raises:
-        - DuplicateVariantLabel if one attempts to add a variant with a label
+        - KeyError if one attempts to add a variant with a label
           that already exists as key.
         """
         for variant_ in variant:
@@ -81,15 +81,13 @@ class VariantCollection(dict, Generic[V]):
 
     def _check_variant(self, variant: V, key=None, overwrite: bool = False) -> None:
         if not isinstance(variant, self.variant_type):
-            raise InvalidVariantType(
-                f"'{type(variant)}' does not match '{self.variant_type}'."
-            )
+            raise TypeError(f"'{type(variant)}' does not match '{self.variant_type}'.")
 
         if key and key != variant.label:
             raise KeyError(f"'{key}' does not match variant name '{variant.label}'.")
 
         if not overwrite and key in self:
-            raise DuplicateVariantLabel(
+            raise KeyError(
                 f"Variant with name {key} already exists. Use `overwrite=True` to overwrite."
             )
 
@@ -126,11 +124,3 @@ class VariantCollection(dict, Generic[V]):
             return True
 
         return False
-
-
-class InvalidVariantType(TypeError):
-    """Raised when a variant that does not match the variant type is added."""
-
-
-class DuplicateVariantLabel(KeyError):
-    """Raised when a variant with the same name already exists in the collection."""
