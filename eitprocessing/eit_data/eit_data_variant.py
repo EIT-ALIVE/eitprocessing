@@ -5,17 +5,19 @@ Licensed under the Apache License, version 2.0. See LICENSE for details.
 This file contains methods related to when electrical impedance tomographs are read.
 """
 
-import copy
 from dataclasses import dataclass
 from dataclasses import field
 import numpy as np
+from numpy.typing import NDArray
 from typing_extensions import Self
+from eitprocessing.mixins import SelectByTime
 from ..variants import Variant
 
 
 @dataclass
-class EITDataVariant(Variant):
-    pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
+class EITDataVariant(Variant, SelectByTime):
+    _data_field_name: str = "pixel_impedance"
+    pixel_impedance: NDArray = field(repr=False, kw_only=True)
 
     def __len__(self):
         return self.pixel_impedance.shape[0]
@@ -33,13 +35,6 @@ class EITDataVariant(Variant):
                 return False
 
         return True
-
-    def select_by_indices(self, indices):
-        obj = self.deepcopy()
-        obj.pixel_impedance = self.pixel_impedance[indices, :, :]
-        return obj
-
-    __getitem__ = select_by_indices
 
     @property
     def global_baseline(self):
@@ -66,7 +61,7 @@ class EITDataVariant(Variant):
         cls.check_equivalence(a, b, raise_=True)
 
         return cls(
-            name=a.name,
+            label=a.label,
             description=a.description,
             params=a.params,
             pixel_impedance=np.concatenate(
@@ -74,4 +69,24 @@ class EITDataVariant(Variant):
             ),
         )
 
-    deepcopy = copy.deepcopy
+    def _sliced_copy(
+        self, start_index: int, end_index: int, label: str | None = None
+    ) -> Self:
+        label = label or f"Slice ({start_index}-{end_index}) of <{self.label}>"
+        pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
+
+        return self.__class__(
+            label=label,
+            description=self.description,
+            params=self.params,
+            pixel_impedance=pixel_impedance,
+        )
+
+    def copy(self, label: str | None = None):
+        label = label or f"Copy of <{self.label}>"
+        return self.__class__(
+            label=label,
+            description=self.description,
+            params=self.params,
+            pixel_impedance=np.copy(self.pixel_impedance),
+        )

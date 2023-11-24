@@ -29,7 +29,7 @@ T = TypeVar("T", bound="EITData")
 
 
 @dataclass
-class EITData(ABC):
+class EITData(SelectByTime, ABC):
     path: Path | list[Path]
     nframes: int
     time: NDArray
@@ -225,6 +225,35 @@ class EITData(ABC):
             return True
 
         return False
+
+    def _sliced_copy(
+        self: Self, start_index: int, end_index: int, label: str | None = None
+    ) -> Self:
+        cls = self._get_vendor_class(self.vendor)
+        time = self.time[start_index:end_index]
+        nframes = len(time)
+
+        phases = list(filter(lambda p: start_index <= p.index < end_index, self.phases))
+        events = list(filter(lambda e: start_index <= e.index < end_index, self.events))
+
+        obj = cls(
+            path=self.path,
+            nframes=nframes,
+            time=time,
+            framerate=self.framerate,
+            phases=phases,
+            events=events,
+            label=label,
+        )
+
+        for variant in self.variants.values():
+            obj.variants.add(
+                variant._sliced_copy(  # pylint: disable=protected-access
+                    start_index, end_index
+                )
+            )
+
+        return obj
 
     @classmethod
     @abstractmethod
