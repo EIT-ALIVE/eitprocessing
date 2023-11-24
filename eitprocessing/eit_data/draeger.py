@@ -7,7 +7,6 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
-from typing_extensions import override
 from eitprocessing.continuous_data.continuous_data_collection import (
     ContinuousDataCollection,
 )
@@ -15,9 +14,7 @@ from eitprocessing.continuous_data.continuous_data_variant import ContinuousData
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from ..binreader.reader import Reader
 from ..continuous_data import ContinuousData
-from ..variants.variant_collection import VariantCollection
-from . import EITData
-from . import PathLike
+from . import EITData_
 from .eit_data_variant import EITDataVariant
 from .event import Event
 from .phases import MaxValue
@@ -26,41 +23,17 @@ from .vendor import Vendor
 
 
 @dataclass(eq=False)
-class DraegerEITData(EITData):
+class DraegerEITData(EITData_):
     """Container for EIT data recorded using the Dräger Pulmovista PV500."""
 
     vendor: Vendor = field(default=Vendor.DRAEGER, init=False)
     framerate: float = 20
-    variants: VariantCollection = field(
-        default_factory=lambda: VariantCollection(EITDataVariant)
-    )
-
-    @override  # remove vendor as argument
-    @classmethod
-    def from_path(  # pylint: disable=too-many-arguments,arguments-differ
-        cls,
-        path: PathLike | list[PathLike],
-        label: str | None = None,
-        framerate: float | None = None,
-        first_frame: int = 0,
-        max_frames: int | None = None,
-        return_non_eit_data: bool = False,
-    ) -> Self:
-        return super().from_path(
-            path,
-            cls.vendor,
-            label,
-            framerate,
-            first_frame,
-            max_frames,
-            return_non_eit_data,
-        )
 
     @classmethod
     def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
         cls,
         path: Path,
-        label: str | None,
+        label: str | None = None,
         framerate: float | None = 20,
         first_frame: int = 0,
         max_frames: int | None = None,
@@ -125,10 +98,6 @@ class DraegerEITData(EITData):
                     previous_marker,
                 )
 
-        continuous_data_collection, sparse_data_collection = cls._convert_medibus_data(
-            medibus_data, time
-        )
-
         if not framerate:
             framerate = cls.framerate
 
@@ -143,13 +112,18 @@ class DraegerEITData(EITData):
         )
         obj.variants.add(
             EITDataVariant(
-                name="raw",
+                label="raw",
                 description="raw impedance data",
                 pixel_impedance=pixel_impedance,
             )
         )
         if return_non_eit_data:
-            return obj, continuous_data_collection, sparse_data_collection
+            (
+                continuous_data_coll,
+                sparse_data_coll,
+            ) = cls._convert_medibus_data(medibus_data, time)
+
+            return (obj, continuous_data_coll, sparse_data_coll)
 
         return obj
 
@@ -171,7 +145,9 @@ class DraegerEITData(EITData):
                 )
                 continuous_data.variants.add(
                     ContinuousDataVariant(
-                        name="raw", description="raw data loaded from file", values=data
+                        label="raw",
+                        description="raw data loaded from file",
+                        values=data,
                     )
                 )
                 continuous_data_collection.add(continuous_data)

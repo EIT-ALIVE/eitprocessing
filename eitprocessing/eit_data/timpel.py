@@ -5,50 +5,37 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
-from typing_extensions import override
+from eitprocessing.continuous_data.continuous_data_collection import (
+    ContinuousDataCollection,
+)
+from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from eitprocessing.variants.variant_collection import VariantCollection
 from ..eit_data.eit_data_variant import EITDataVariant
 from ..eit_data.phases import MaxValue
 from ..eit_data.phases import MinValue
 from ..eit_data.phases import QRSMark
 from ..eit_data.vendor import Vendor
-from . import EITData
-from . import PathLike
+from . import EITData_
 
 
 @dataclass
-class TimpelEITData(EITData):
+class TimpelEITData(EITData_):
     framerate: float = 50
     vendor: Vendor = field(default=Vendor.TIMPEL, init=False)
     variants: VariantCollection = field(
         default_factory=lambda: VariantCollection(EITDataVariant)
     )
 
-    @override  # remove vendor as argument
-    @classmethod
-    def from_path(  # pylint: disable=arguments-differ,too-many-arguments
-        cls,
-        path: PathLike | list[PathLike],
-        label: str | None = None,
-        framerate: float | None = None,
-        first_frame: int = 0,
-        max_frames: int | None = None,
-    ) -> Self:
-        return super().from_path(
-            path, cls.vendor, label, framerate, first_frame, max_frames
-        )
-
     @classmethod
     def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
         cls,
         path: Path,
-        label: str | None,
-        framerate: float | None = 50,
+        label: str | None = None,
+        framerate: float | None = 20,
         first_frame: int = 0,
         max_frames: int | None = None,
-    ):
-        """Load data for TIMPEL files."""
-
+        return_non_eit_data: bool = False,
+    ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
         COLUMN_WIDTH = 1030
 
         if not framerate:
@@ -105,7 +92,7 @@ class TimpelEITData(EITData):
         pixel_impedance = np.where(pixel_impedance == -1000, np.nan, pixel_impedance)
 
         # extract waveform data
-        # TODO: find a way to also save waveform data
+        # TODO: properly export waveform data
         waveform_data = {  # noqa;
             "airway_pressure": data[:, 1024],
             "flow": data[:, 1025],
@@ -135,7 +122,7 @@ class TimpelEITData(EITData):
         )
         obj.variants.add(
             EITDataVariant(
-                name="raw",
+                label="raw",
                 description="raw impedance data",
                 pixel_impedance=pixel_impedance,
             )
