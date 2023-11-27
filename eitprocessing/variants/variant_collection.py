@@ -133,3 +133,16 @@ class VariantCollection(dict, Generic[V]):
             return True
 
         return False
+
+    def __eq__(self: Self, other: Self) -> bool:
+        # checks for the same keys
+        if dict(self) != dict(other):
+            return False
+
+        if self.variant_type != other.variant_type:
+            return False
+
+        return True
+
+    def __ne__(self: Self, other: Self) -> bool:
+        return not self.__eq__(other)
