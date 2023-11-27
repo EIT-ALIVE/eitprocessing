@@ -16,7 +16,7 @@ class VariantCollection(dict, Generic[V]):
 
     A VariantCollection can only contain variants (of a certain type). When
     initializing VariantCollection a subclass of Variant (or Variant itself to
-    allow diverse types )must be passed as the first argument (`variant_type`),
+    allow diverse types) must be passed as the first argument (`variant_type`),
     limiting the type of variant that is allowed to be added to the collection.
     During initialization, other arguments can be passed as if initializing a
     normal dictionary.
@@ -30,8 +30,14 @@ class VariantCollection(dict, Generic[V]):
     existing variants. This behaviour can be overridden using `add(variant,
     overwrite=True)`.
 
+    NB: due to how items are set, a variant with the name 'variant_type' can't
+    be
 
-    The `add()` method
+    Args:
+    - variant_type (type[Variant]): the type of variant this collection will
+    contain
+    - *args: will be passed to dict() unchanged
+    - **kwargs: will be passed to dict() unchanged
 
     Examples:
     ```
