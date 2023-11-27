@@ -95,7 +95,7 @@ class VariantCollection(dict, Generic[V]):
         if key and key != variant.label:
             raise KeyError(f"'{key}' does not match variant name '{variant.label}'.")
 
-        if not overwrite and key in self:
+        if not overwrite and variant.label in self:
             raise KeyError(
                 f"Variant with name {key} already exists. Use `overwrite=True` to overwrite."
             )
