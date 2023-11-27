@@ -58,6 +58,9 @@ class VariantCollection(dict, Generic[V]):
     variant_type: type[V]
 
     def __init__(self, variant_type: type[V], *args, **kwargs):
+        if not issubclass(variant_type, Variant):
+            raise TypeError(f"{variant_type} is not a subclass of Variant")
+
         self.variant_type = variant_type
         super().__init__(*args, **kwargs)
 
