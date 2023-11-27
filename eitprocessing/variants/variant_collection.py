@@ -86,7 +86,7 @@ class VariantCollection(dict, Generic[V]):
         """
         for variant_ in variant:
             self._check_variant(variant_, overwrite=overwrite)
-            return super().__setitem__(variant_.label, variant_)
+            super().__setitem__(variant_.label, variant_)
 
     def _check_variant(self, variant: V, key=None, overwrite: bool = False) -> None:
         if not isinstance(variant, self.variant_type):
