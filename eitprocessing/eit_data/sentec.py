@@ -48,7 +48,7 @@ class SentecEITData(EITData_):
 
             time = []
             image = None
-            index = -1
+            index = 0
 
             while fh.tell() < file_length:
 
@@ -77,29 +77,33 @@ class SentecEITData(EITData_):
                                 index += 1
 
                                 if index < first_frame:
-                                    break
-
-                                # read quality index. We don't use it, so we skip the bytes
-                                fh.seek(1, 1)
-
-                                mes_width = struct.unpack('B', fh.read(1))[0]
-                                mes_height = struct.unpack('B', fh.read(1))[0]
-                                zero_ref = struct.unpack(f'{(payload_size - 3) // 4}f', fh.read(
-                                    payload_size - 3))
-
-                                if mes_width * mes_height != len(zero_ref):
-                                    print('wrong size, not storing zeroRef, please check file')
-                                    return
+                                    fh.seek(payload_size, 1)
                                 else:
-                                    # the sign of the zero_ref values has to be inverted
-                                    ref_reshape = -np.reshape(zero_ref, (mes_width, mes_height))
-                                    if image is not None:
-                                        image = np.concatenate(
-                                            [image, ref_reshape[np.newaxis, :, :]], axis=-0)
-                                    else:
-                                        image = ref_reshape[np.newaxis, :, :]
+                                    # read quality index. We don't use it, so we skip the bytes
+                                    fh.seek(1, 1)
 
-                                time.append(timestamp)
+                                    mes_width = struct.unpack('B', fh.read(1))[0]
+                                    mes_height = struct.unpack('B', fh.read(1))[0]
+                                    zero_ref = struct.unpack(f'{(payload_size - 3) // 4}f', fh.read(
+                                        payload_size - 3))
+
+                                    if mes_width * mes_height != len(zero_ref):
+                                        warnings.warn(f'The length of image array is '
+                                                      f'{len(zero_ref)} which is not equal to the '
+                                                      f'product of the width ({mes_width}) and '
+                                                      f'height ({mes_height}) of the frame')
+                                        return
+                                    else:
+                                        # the sign of the zero_ref values has to be inverted
+                                        # and the array has to be reshaped into the matrix
+                                        ref_reshape = -np.reshape(zero_ref, (mes_width, mes_height))
+                                        if image is not None:
+                                            image = np.concatenate(
+                                                [image, ref_reshape[np.newaxis, :, :]], axis=-0)
+                                        else:
+                                            image = ref_reshape[np.newaxis, :, :]
+
+                                    time.append(timestamp)
 
                             else:
                                 fh.seek(payload_size, 1)
@@ -113,7 +117,21 @@ class SentecEITData(EITData_):
                         else:
                             fh.seek(payload_size, 1)
 
-        n_frames = len(image)
+        n_frames = len(image) if image is not None else 0
+
+        if first_frame > index:
+            raise ValueError(
+                f"Invalid input: `first_frame` {first_frame} is larger than the "
+                f"total number of frames in the file {index}."
+            )
+
+        if max_frames and n_frames != max_frames:
+            warnings.warn(
+                f"The number of frames requested ({max_frames}) is larger "
+                f"than the available number ({n_frames}) of frames after "
+                f"the first frame selected ({first_frame}, total frames: "
+                f"{index}).\n {n_frames} frames will be loaded."
+            )
 
         obj = cls(
             path=path,
