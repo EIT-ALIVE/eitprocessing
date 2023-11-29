@@ -34,8 +34,7 @@ class Variant(ABC):
     description: str
     params: dict = field(default_factory=dict)
 
-    @staticmethod
-    def check_equivalence(a: T, b: T, raise_=False) -> bool:
+    def check_equivalence(self: T, other: T, raise_=False) -> bool:
         """Check the equivalence of two variants
 
         For two variants to be equivalent, they need to have the same class,
@@ -52,29 +51,28 @@ class Variant(ABC):
         """
         cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
         with cm:
-            if not isinstance(a, b.__class__):
+            if not isinstance(self, other.__class__):
                 raise NotEquivalent(
-                    f"Variant classes don't match: {a.__class__}, {b.__class__}"
+                    f"Variant classes don't match: {self.__class__}, {other.__class__}"
                 )
 
-            if (a_ := a.label) != (b_ := b.label):
+            if (a_ := self.label) != (b_ := other.label):
                 raise NotEquivalent(f"EITDataVariant names don't match: {a_}, {b_}")
 
-            if (a_ := a.description) != (b_ := b.description):
+            if (a_ := self.description) != (b_ := other.description):
                 raise NotEquivalent(
                     f"EITDataVariant descriptions don't match: {a_}, {b_}"
                 )
 
-            if (a_ := a.params) != (b_ := b.params):
+            if (a_ := self.params) != (b_ := other.params):
                 raise NotEquivalent(f"EITDataVariant params don't match: {a_}, {b_}")
 
             return True
 
         return False
 
-    @classmethod
     @abstractmethod
-    def concatenate(cls, a: Self, b: Self) -> Self:
+    def concatenate(self: Self, other: Self) -> Self:
         """Concatenates two variants
 
         Concatenating two variants results in a single variant with the
@@ -84,8 +82,8 @@ class Variant(ABC):
         `functools.reduce(Variant.concatenate, list_of_variants)`.
 
         Args:
-        - a (Variant)
-        - b (Variant)
+        - self (Variant)
+        - other (Variant)
 
         Raises:
         - NotEquivalent if a and b are not equivalent and can't be merged

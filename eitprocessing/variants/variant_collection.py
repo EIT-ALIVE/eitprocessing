@@ -97,38 +97,40 @@ class VariantCollection(dict, Generic[V]):
 
         if not overwrite and variant.label in self:
             raise KeyError(
-                f"Variant with name {key} already exists. Use `overwrite=True` to overwrite."
+                f"Variant with name '{variant.label}' already exists. Use `overwrite=True` to overwrite."
             )
 
-    @classmethod
-    def concatenate(cls, a: Self, b: Self) -> Self:
+    def concatenate(self: Self, other: Self) -> Self:
         try:
-            cls.check_equivalence(a, b, raise_=True)
+            self.check_equivalence(other, raise_=True)
         except NotEquivalent as e:
             raise ValueError("VariantCollections could not be concatenated") from e
 
-        obj = VariantCollection(a.variant_type)
-        for key in a.keys():
-            obj.add(a.variant_type.concatenate(a[key], b[key]))
+        obj = VariantCollection(self.variant_type)
+        for key in self.keys():
+            obj.add(self[key].concatenate(other[key]))
 
         return obj
 
-    @classmethod
-    def check_equivalence(cls, a: Self, b: Self, raise_=False) -> bool:
+    def check_equivalence(self: Self, other: Self, raise_=False) -> bool:
         cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
         with cm:
-            if a.variant_type != b.variant_type:
+            if not isinstance(other, self.__class__):
+                raise TypeError(
+                    f"Invalid type {other.__class__}. `other` is not a {self.__class__}."
+                )
+            if self.variant_type != other.variant_type:
                 raise NotEquivalent(
-                    f"Variant types do not match: {a.variant_type}, {b.variant_type}"
+                    f"Variant types do not match: {self.variant_type}, {other.variant_type}"
                 )
 
-            if set(a.keys()) != set(b.keys()):
+            if set(self.keys()) != set(other.keys()):
                 raise NotEquivalent(
-                    f"VariantCollections do not contain the same variants: {a.keys()=}, {b.keys()=}"
+                    f"VariantCollections do not contain the same variants: {self.keys()=}, {other.keys()=}"
                 )
 
-            for key in a.keys():
-                Variant.check_equivalence(a[key], b[key], raise_=True)
+            for key in self.keys():
+                Variant.check_equivalence(self[key], other[key], raise_=True)
 
             return True
 

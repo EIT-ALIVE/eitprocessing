@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from unittest.mock import patch
 import pytest
+from typing_extensions import Self
 from eitprocessing.helper import NotEquivalent
 from eitprocessing.variants import Variant
 
@@ -42,9 +43,11 @@ def VariantSubA():
     class VariantSubA(Variant):
         data: list = field(repr=False, kw_only=True)
 
-        @classmethod
-        def concatenate(cls, a, b):
-            return super().concatenate(a, b)
+        def concatenate(self: Self, other: Self) -> Self:
+            self.check_equivalence(other)
+            return self.__class__(
+                self.label, self.description, self.params, data=self.data + other.data
+            )
 
     return VariantSubA
 
@@ -55,9 +58,11 @@ def VariantSubB():
     class VariantSubB(Variant):
         data: list = field(repr=False, kw_only=True)
 
-        @classmethod
-        def concatenate(cls, a, b):
-            return super().concatenate(a, b)
+        def concatenate(self: Self, other: Self) -> Self:
+            self.check_equivalence(other)
+            return self.__class__(
+                self.label, self.description, self.params, data=self.data + other.data
+            )
 
     return VariantSubB
 
@@ -100,28 +105,36 @@ def test_equivalence(variant_a, variant_a_copy, variant_b, variant_c):
     assert variant_a != variant_a_copy  # objects contain different data
     # objects are still equivalent
     assert Variant.check_equivalence(variant_a, variant_a_copy)
+    assert variant_a.check_equivalence(variant_a_copy)
 
     # objects with different attributes are not equivalent
     variant_a_copy.label = "different label"
     assert not Variant.check_equivalence(variant_a, variant_a_copy)
+    assert not variant_a.check_equivalence(variant_a_copy)
     variant_a_copy.label = variant_a.label
 
     # objects with different attributes are not equivalent
     variant_a_copy.description = "different description"
     assert not Variant.check_equivalence(variant_a, variant_a_copy)
+    assert not variant_a.check_equivalence(variant_a_copy)
     variant_a_copy.description = variant_a.description
 
     # objects with different parameters are not equivalent
     variant_a_copy.params["some_dict"]["some_string"] = "another string"
     assert not Variant.check_equivalence(variant_a, variant_a_copy)
+    assert not variant_a.check_equivalence(variant_a_copy)
     variant_a_copy.params["some_dict"]["some_string"] = variant_a.params["some_dict"][
         "some_string"
     ]
 
     # objects with different attribute values are not equivalent
     assert not Variant.check_equivalence(variant_a, variant_b)
+    assert not variant_a.check_equivalence(variant_b)
     with pytest.raises(NotEquivalent):
         assert not Variant.check_equivalence(variant_a, variant_b, raise_=True)
+    with pytest.raises(NotEquivalent):
+        assert not variant_a.check_equivalence(variant_b, raise_=True)
 
     # objects with different classes are not equivalent
     assert not Variant.check_equivalence(variant_b, variant_c)
+    assert not variant_b.check_equivalence(variant_c)
