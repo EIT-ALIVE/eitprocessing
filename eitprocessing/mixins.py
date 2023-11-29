@@ -25,13 +25,10 @@ class SelectByIndex(ABC):
         if start is None:
             start = 0
 
-        if end is None:
-            end = len(self.time)
-
         if not start_inclusive:
             start += 1
 
-        if end_inclusive:
+        if end_inclusive and end is not None:
             end += 1
 
         return self._sliced_copy(start_index=start, end_index=end, label=label)
