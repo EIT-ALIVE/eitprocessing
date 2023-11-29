@@ -10,12 +10,12 @@ from dataclasses import field
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
-from eitprocessing.mixins.slicing import SelectByTime
+from eitprocessing.mixins.slicing import SelectByIndex
 from eitprocessing.variants import Variant
 
 
 @dataclass
-class EITDataVariant(Variant, SelectByTime):
+class EITDataVariant(Variant, SelectByIndex):
     _data_field_name: str = "pixel_impedance"
     pixel_impedance: NDArray = field(repr=False, kw_only=True)
 
