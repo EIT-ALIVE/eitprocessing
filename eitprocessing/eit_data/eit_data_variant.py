@@ -5,6 +5,7 @@ Licensed under the Apache License, version 2.0. See LICENSE for details.
 This file contains methods related to when electrical impedance tomographs are read.
 """
 
+import copy
 from dataclasses import dataclass
 from dataclasses import field
 import numpy as np
@@ -77,15 +78,15 @@ class EITDataVariant(Variant, SelectByIndex):
         return self.__class__(
             label=label,
             description=self.description,
-            params=self.params,
+            params=copy.deepcopy(self.params),
             pixel_impedance=pixel_impedance,
         )
 
-    def copy(self, label: str | None = None):
+    def copy(self, label: str | None = None) -> Self:
         label = label or f"Copy of <{self.label}>"
         return self.__class__(
             label=label,
             description=self.description,
-            params=self.params,
+            params=copy.deepcopy(self.params),
             pixel_impedance=np.copy(self.pixel_impedance),
         )
