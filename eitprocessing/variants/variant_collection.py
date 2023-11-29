@@ -116,7 +116,7 @@ class VariantCollection(dict, Generic[V]):
         cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
         with cm:
             if not isinstance(other, self.__class__):
-                raise TypeError(
+                raise NotEquivalent(
                     f"Invalid type {other.__class__}. `other` is not a {self.__class__}."
                 )
             if self.variant_type != other.variant_type:
