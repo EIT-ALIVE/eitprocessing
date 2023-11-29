@@ -1,5 +1,6 @@
 import copy
 import pytest
+from eitprocessing.helper import NotEquivalent
 from eitprocessing.variants import Variant
 from eitprocessing.variants.variant_collection import VariantCollection
 from .test_variant import VariantSubA
@@ -25,13 +26,13 @@ def variant_A_b(VariantSubA):
 
 
 @pytest.fixture
-def variant_B_a(VariantSubA):
-    return VariantSubA("label_a", "description_a", data=[])
+def variant_B_a(VariantSubB):
+    return VariantSubB("label_a", "description_a", data=[])
 
 
 @pytest.fixture
-def variant_B_b(VariantSubA):
-    return VariantSubA("label_b", "description_b", data=[])
+def variant_B_b(VariantSubB):
+    return VariantSubB("label_b", "description_b", data=[])
 
 
 def test_compare(
@@ -127,9 +128,59 @@ def test_keys(VariantSubA, variant_A_a, variant_A_b, variant_B_a, variant_B_b):
         vc1["some_label"] = variant_B_b
 
 
-def test_check_equivalence():
-    ...
+def test_check_equivalence(VariantSubA):
+    v1a = VariantSubA("label_a", "description_a", data=[1, 2, 3])
+    v1b = VariantSubA("label_b", "description_b", data=[4, 5, 6])
+    v1c = VariantSubA("label_c", "description_c", data=[7, 8, 9])
+    vc1 = VariantCollection(VariantSubA)
+    vc1.add(v1a, v1b, v1c)
+
+    vc3 = VariantCollection(Variant)
+    vc3.add(v1a, v1b, v1c)
+
+    assert dict(vc1) == dict(vc3)
+    assert not VariantCollection.check_equivalence(vc1, vc3)
+
+    v2a = VariantSubA("label_a", "description_a", data=[10, 11, 12])
+    v2b = VariantSubA("label_b", "description_b", data=[13, 14, 15])
+    v2c = VariantSubA("label_c", "description_c", data=[16, 17, 18])
+    vc2 = VariantCollection(VariantSubA)
+    vc2.add(v2a, v2b)
+
+    assert not VariantCollection.check_equivalence(vc1, vc2)
+    vc2.add(v2c)
+    assert VariantCollection.check_equivalence(vc1, vc2)
+
+    v1a.params = dict(key="value")
+    assert not VariantCollection.check_equivalence(vc1, vc2)
+    v2a.params = dict(key="value")
+    assert VariantCollection.check_equivalence(vc1, vc2)
 
 
-def test_concatenate():
-    ...
+def test_concatenate(VariantSubA):
+    v1a = VariantSubA("label_a", "description_a", data=[1, 2, 3])
+    v1b = VariantSubA("label_b", "description_a", data=[4, 5, 6])
+    vc1 = VariantCollection(Variant)
+    vc1.add(v1a, v1b)
+
+    with pytest.raises(TypeError):
+        vc1.concatenate(v1a)
+
+    v2a = VariantSubA("label_a", "description_a", data=[7, 8, 9])
+    v2b = VariantSubA("label_b", "description_a", data=[10, 11, 12])
+    vc2 = VariantCollection(Variant)
+    vc2.add(v2a)
+
+    with pytest.raises(ValueError):
+        _ = vc1.concatenate(vc2)
+
+    vc2.add(v2b)
+
+    vc_concat1 = vc1.concatenate(vc2)
+    vc_concat2 = VariantCollection.concatenate(vc1, vc2)
+
+    assert vc_concat1 == vc_concat2
+    assert vc_concat1["label_a"].data == v1a.data + v2a.data
+    assert vc_concat1["label_b"].data == v1b.data + v2b.data
+    assert vc_concat1["label_a"].check_equivalence(v1a)
+    assert vc_concat1["label_a"].check_equivalence(v2a)
