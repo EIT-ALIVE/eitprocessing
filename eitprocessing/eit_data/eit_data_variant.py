@@ -55,16 +55,15 @@ class EITDataVariant(Variant, SelectByIndex):
     def global_impedance(self):
         return np.nansum(self.pixel_impedance, axis=(1, 2))
 
-    @classmethod
-    def concatenate(cls, a: Self, b: Self) -> Self:
-        cls.check_equivalence(a, b, raise_=True)
+    def concatenate(self, other: Self) -> Self:
+        self.check_equivalence(other, raise_=True)
 
-        return cls(
-            label=a.label,
-            description=a.description,
-            params=a.params,
+        return self.__class__(
+            label=self.label,
+            description=self.description,
+            params=self.params,
             pixel_impedance=np.concatenate(
-                [a.pixel_impedance, b.pixel_impedance], axis=0
+                [self.pixel_impedance, other.pixel_impedance], axis=0
             ),
         )
 
