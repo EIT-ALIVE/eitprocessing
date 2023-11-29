@@ -28,12 +28,10 @@ class EITDataVariant(Variant, SelectByIndex):
             if getattr(self, attr) != getattr(other, attr):
                 return False
 
-        for attr in ["pixel_impedance"]:
-            # NaN values are not equal. Check whether values are equal or both NaN.
-            s = getattr(self, attr)
-            o = getattr(other, attr)
-            if not np.all((s == o) | (np.isnan(s) & np.isnan(o))):
-                return False
+        if not np.array_equal(
+            self.pixel_impedance, other.pixel_impedance, equal_nan=True
+        ):
+            return False
 
         return True
 
