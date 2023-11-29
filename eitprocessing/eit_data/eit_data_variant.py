@@ -15,9 +15,23 @@ from eitprocessing.mixins.slicing import SelectByIndex
 from eitprocessing.variants import Variant
 
 
+# TODO: make config system
+STRICT_EIT_DATA_SHAPE = True
+
+
 @dataclass
 class EITDataVariant(Variant, SelectByIndex):
     pixel_impedance: NDArray = field(repr=False, kw_only=True)
+
+    def __post_init__(self):
+        super().__post_init__()
+
+        if STRICT_EIT_DATA_SHAPE:
+            shape = self.pixel_impedance.shape
+            if len(shape) != 3 or shape[1:] != (32, 32) or shape[0] == 0:
+                raise ValueError(
+                    f"Invalid shape {shape} for `pixel_impedance`. Should be (n, 32, 32)."
+                )
 
     def __len__(self) -> int:
         return self.pixel_impedance.shape[0]
