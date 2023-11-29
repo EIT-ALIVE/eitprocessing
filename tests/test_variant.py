@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
+from typing import get_type_hints
 from unittest.mock import patch
 import pytest
 from typing_extensions import Self
@@ -94,6 +95,19 @@ def test_init(VariantSubA, make_params):
 
     with pytest.raises(TypeError):
         _ = VariantSubA("label", "description")
+
+    assert get_type_hints(VariantSubA) == dict(
+        label=str, description=str, params=dict, data=list
+    )
+
+    with pytest.raises(TypeError):
+        _ = VariantSubA(1, "description", data=[])
+
+    with pytest.raises(TypeError):
+        _ = VariantSubA("label", 1, data=[])
+
+    with pytest.raises(TypeError):
+        _ = VariantSubA("label", "description", data={1})
 
 
 def test_equivalence(variant_a, variant_a_copy, variant_b, variant_c):
