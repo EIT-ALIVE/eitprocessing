@@ -17,13 +17,12 @@ from eitprocessing.variants import Variant
 
 @dataclass
 class EITDataVariant(Variant, SelectByIndex):
-    _data_field_name: str = "pixel_impedance"
     pixel_impedance: NDArray = field(repr=False, kw_only=True)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.pixel_impedance.shape[0]
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         for attr in ["name", "description", "params"]:
             if getattr(self, attr) != getattr(other, attr):
                 return False
@@ -36,23 +35,23 @@ class EITDataVariant(Variant, SelectByIndex):
         return True
 
     @property
-    def global_baseline(self):
+    def global_baseline(self) -> NDArray:
         return np.nanmin(self.pixel_impedance)
 
     @property
-    def pixel_impedance_global_offset(self):
+    def pixel_impedance_global_offset(self) -> NDArray:
         return self.pixel_impedance - self.global_baseline
 
     @property
-    def pixel_baseline(self):
+    def pixel_baseline(self) -> NDArray:
         return np.nanmin(self.pixel_impedance, axis=0)
 
     @property
-    def pixel_impedance_individual_offset(self):
+    def pixel_impedance_individual_offset(self) -> NDArray:
         return self.pixel_impedance - np.min(self.pixel_impedance, axis=0)
 
     @property
-    def global_impedance(self):
+    def global_impedance(self) -> NDArray:
         return np.nansum(self.pixel_impedance, axis=(1, 2))
 
     def concatenate(self, other: Self) -> Self:
