@@ -10,7 +10,6 @@ from typing_extensions import Self
 
 
 class SelectByIndex(ABC):
-    time: NDArray
     label: str
 
     def select_by_index(  # pylint: disable=too-many-arguments
@@ -25,7 +24,15 @@ class SelectByIndex(ABC):
 
         start = start or 0
         if end is None:
-            end = len(self.time)
+            end = len(self)
+
+        if label is None:
+            if start > end:
+                label = f"No frames selected from <{self.label}>"
+            elif start < end - 1:
+                label = f"Frames ({start}-{end-1}) of <{self.label}>"
+            else:
+                label = f"Frame ({start}) of <{self.label}>"
 
         return self._sliced_copy(start_index=start, end_index=end, label=label)
 
@@ -40,7 +47,7 @@ class SelectByIndex(ABC):
             return self.select_by_index(start_index, end_index)
 
         if isinstance(key, int):
-            return self.select_by_index(start=key, end=key)
+            return self.select_by_index(start=key, end=key + 1)
 
         raise TypeError(
             f"Invalid slicing input. Should be `slice` or `int`, not {type(key)}."
@@ -48,16 +55,11 @@ class SelectByIndex(ABC):
 
     @abstractmethod
     def _sliced_copy(
-        self, start_index: int, end_index: int, label: str | None = None
+        self,
+        start_index: int,
+        end_index: int,
+        label: str,
     ) -> Self:
-        if label is None:
-            if start_index >= end_index:
-                pass
-            elif start_index < end_index - 1:
-                label = f"Frame ({start_index}) of <{self.label}>"
-            else:
-                label = f"Slice ({start_index}-{end_index-1}) of <{self.label}>"
-
         ...
 
 
