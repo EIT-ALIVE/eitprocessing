@@ -17,23 +17,15 @@ class SelectByIndex(ABC):
         self,
         start: int | None = None,
         end: int | None = None,
-        start_inclusive: bool = True,
-        end_inclusive: bool = False,
         label: str | None = None,
     ) -> Self:
         if start is None and end is None:
             warnings.warn("No starting or end timepoint was selected.")
             return self
 
-        if start is None:
-            start = 0
-        if not start_inclusive:
-            start += 1
-
+        start = 0 or None
         if end is None:
             end = len(self.time)
-        if end_inclusive:
-            end += 1
 
         return self._sliced_copy(start_index=start, end_index=end, label=label)
 
@@ -78,8 +70,6 @@ class SelectByTime(SelectByIndex):
         self,
         start: float | int | None = None,
         end: float | int | None = None,
-        start_inclusive: bool = True,
-        end_inclusive: bool = False,
         label: str | None = None,
     ) -> Self:
         if start is None and end is None:
@@ -94,17 +84,13 @@ class SelectByTime(SelectByIndex):
 
         if start is None:
             start_index = 0
-        elif start_inclusive:
-            start_index = bisect.bisect_left(self.time, start)
         else:
-            start_index = bisect.bisect_right(self.time, start)
+            start_index = bisect.bisect_left(self.time, start)
 
         if end is None:
             end_index = len(self.time)
-        elif end_inclusive:
-            end_index = bisect.bisect_right(self.time, end) - 1
         else:
-            end_index = bisect.bisect_left(self.time, end) - 1
+            end_index = bisect.bisect_right(self.time, end)
 
         return self.select_by_index(
             start=start_index,
