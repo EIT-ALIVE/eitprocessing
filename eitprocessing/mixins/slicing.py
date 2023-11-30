@@ -11,6 +11,7 @@ from typing_extensions import Self
 
 class SelectByIndex(ABC):
     time: NDArray
+    label: str
 
     def select_by_index(  # pylint: disable=too-many-arguments
         self,
@@ -20,21 +21,17 @@ class SelectByIndex(ABC):
         end_inclusive: bool = False,
         label: str | None = None,
     ) -> Self:
-        if not any((start, end)):
+        if start is None and end is None:
             warnings.warn("No starting or end timepoint was selected.")
             return self
 
-        self._check_time_sorted()
-
         if start is None:
             start = 0
-
-        if end is None:
-            end = len(self.time)
-
         if not start_inclusive:
             start += 1
 
+        if end is None:
+            end = len(self.time)
         if end_inclusive:
             end += 1
 
@@ -53,22 +50,27 @@ class SelectByIndex(ABC):
             )
 
         if isinstance(key, int):
-            return self.select_by_index(start=key, end=key, end_inclusive=True)
+            return self.select_by_index(
+                start=key, end=key, start_inclusive=True, end_inclusive=True
+            )
 
-        raise TypeError(f"Invalid key type. Should be slice or int, not {type(key)}.")
+        raise TypeError(
+            f"Invalid slicing input. Should be `slice` or `int`, not {type(key)}."
+        )
 
     @abstractmethod
     def _sliced_copy(
         self, start_index: int, end_index: int, label: str | None = None
     ) -> Self:
-        ...
+        if label is None:
+            if start_index >= end_index:
+                pass
+            elif start_index < end_index - 1:
+                label = f"Frame ({start_index}) of <{self.label}>"
+            else:
+                label = f"Slice ({start_index}-{end_index-1}) of <{self.label}>"
 
-    def _check_time_sorted(self):
-        if not np.all(np.sort(self.time) == self.time):
-            raise ValueError(
-                f"Time stamps for {self} are not sorted and therefor data"
-                "cannot be selected by time."
-            )
+        ...
 
 
 class SelectByTime(SelectByIndex):
@@ -80,9 +82,15 @@ class SelectByTime(SelectByIndex):
         end_inclusive: bool = False,
         label: str | None = None,
     ) -> Self:
-        if not any((start, end)):
+        if start is None and end is None:
             warnings.warn("No starting or end timepoint was selected.")
             return self
+
+        if not np.all(np.sort(self.time) == self.time):
+            raise ValueError(
+                f"Time stamps for {self} are not sorted and therefore data"
+                "cannot be selected by time."
+            )
 
         if start is None:
             start_index = 0
@@ -119,11 +127,15 @@ class TimeIndexer:
         if isinstance(key, slice):
             if key.step:
                 raise ValueError("Can't slice by time using specific step sizes.")
-            start_value = key.start or self.obj.time[0]
-            end_value = key.stop or np.inf
+            if start_value is None:
+                start_value = self.obj.time[0]
+            if end_value is None:
+                end_value = np.inf
             return self.obj.select_by_time(start_value, end_value)
+
         if isinstance(key, (int, float)):
             return self.obj.select_by_time(start=key, end=key, end_inclusive=True)
+
         raise TypeError(
-            f"Invalid key type. Should be slice, int or float, not {type(key)}."
+            f"Invalid slicing input. Should be `slice` or `int` or `float`, not {type(key)}."
         )

@@ -72,7 +72,8 @@ class EITDataVariant(Variant, SelectByTime):
     def _sliced_copy(
         self, start_index: int, end_index: int, label: str | None = None
     ) -> Self:
-        label = label or f"Slice ({start_index}-{end_index}) of <{self.label}>"
+        super()._sliced_copy(start_index, end_index, label)
+
         pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
 
         return self.__class__(

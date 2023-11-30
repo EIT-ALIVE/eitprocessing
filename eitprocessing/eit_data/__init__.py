@@ -229,6 +229,7 @@ class EITData(SelectByTime, ABC):
     def _sliced_copy(
         self: Self, start_index: int, end_index: int, label: str | None = None
     ) -> Self:
+        super()._sliced_copy(start_index, end_index, label)
         cls = self._get_vendor_class(self.vendor)
         time = self.time[start_index:end_index]
         nframes = len(time)
