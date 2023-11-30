@@ -17,23 +17,15 @@ class SelectByIndex(ABC):
         self,
         start: int | None = None,
         end: int | None = None,
-        start_inclusive: bool = True,
-        end_inclusive: bool = False,
         label: str | None = None,
     ) -> Self:
         if start is None and end is None:
             warnings.warn("No starting or end timepoint was selected.")
             return self
 
-        if start is None:
-            start = 0
-        if not start_inclusive:
-            start += 1
-
+        start = start or 0
         if end is None:
             end = len(self.time)
-        if end_inclusive:
-            end += 1
 
         return self._sliced_copy(start_index=start, end_index=end, label=label)
 
@@ -45,14 +37,10 @@ class SelectByIndex(ABC):
                 )
             start_index = key.start
             end_index = key.stop
-            return self.select_by_index(
-                start_index, end_index, start_inclusive=True, end_inclusive=False
-            )
+            return self.select_by_index(start_index, end_index)
 
         if isinstance(key, int):
-            return self.select_by_index(
-                start=key, end=key, start_inclusive=True, end_inclusive=True
-            )
+            return self.select_by_index(start=key, end=key)
 
         raise TypeError(
             f"Invalid slicing input. Should be `slice` or `int`, not {type(key)}."
@@ -74,6 +62,8 @@ class SelectByIndex(ABC):
 
 
 class SelectByTime(SelectByIndex):
+    time: NDArray
+
     def select_by_time(  # pylint: disable=too-many-arguments
         self,
         start: float | int | None = None,
@@ -109,8 +99,6 @@ class SelectByTime(SelectByIndex):
         return self.select_by_index(
             start=start_index,
             end=end_index,
-            start_inclusive=True,
-            end_inclusive=False,
             label=label,
         )
 
