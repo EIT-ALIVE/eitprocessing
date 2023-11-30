@@ -18,6 +18,7 @@ from eitprocessing.continuous_data.continuous_data_collection import (
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.helper import NotEquivalent
+from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from eitprocessing.variants.variant_collection import VariantCollection
@@ -28,8 +29,8 @@ PathArg: TypeAlias = PathLike | list[PathLike]
 T = TypeVar("T", bound="EITData")
 
 
-@dataclass
-class EITData(SelectByTime, ABC):
+@dataclass(eq=False)
+class EITData(SelectByTime, Equivalence, ABC):
     path: Path | list[Path]
     nframes: int
     time: NDArray
@@ -272,7 +273,7 @@ class EITData(SelectByTime, ABC):
         ...
 
 
-@dataclass
+@dataclass(eq=False)
 class EITData_(EITData):
     vendor: Vendor = field(init=False)
 

@@ -11,8 +11,8 @@ from ..helper import NotEquivalent
 T = TypeVar("T", bound="Variant")
 
 
-@dataclass
-class Variant(ABC):
+@dataclass(eq=False)
+class Variant(Equivalence, ABC):
     """Contains a single variant of a dataset.
 
     A variant of a dataset is defined as either the raw data, or an edited
