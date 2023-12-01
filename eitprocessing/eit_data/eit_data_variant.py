@@ -9,7 +9,6 @@ import copy
 from dataclasses import dataclass
 from dataclasses import field
 import numpy as np
-from numpy.typing import NDArray
 from typing_extensions import Self
 from eitprocessing.mixins.slicing import SelectByIndex
 from eitprocessing.variants import Variant
@@ -21,9 +20,9 @@ STRICT_EIT_DATA_SHAPE = True
 
 @dataclass
 class EITDataVariant(Variant, SelectByIndex):
-    pixel_impedance: NDArray = field(repr=False, kw_only=True)
+    pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         super().__post_init__()
 
         if STRICT_EIT_DATA_SHAPE:
@@ -49,23 +48,23 @@ class EITDataVariant(Variant, SelectByIndex):
         return True
 
     @property
-    def global_baseline(self) -> NDArray:
+    def global_baseline(self) -> np.ndarray:
         return np.nanmin(self.pixel_impedance)
 
     @property
-    def pixel_impedance_global_offset(self) -> NDArray:
+    def pixel_impedance_global_offset(self) -> np.ndarray:
         return self.pixel_impedance - self.global_baseline
 
     @property
-    def pixel_baseline(self) -> NDArray:
+    def pixel_baseline(self) -> np.ndarray:
         return np.nanmin(self.pixel_impedance, axis=0)
 
     @property
-    def pixel_impedance_individual_offset(self) -> NDArray:
+    def pixel_impedance_individual_offset(self) -> np.ndarray:
         return self.pixel_impedance - np.min(self.pixel_impedance, axis=0)
 
     @property
-    def global_impedance(self) -> NDArray:
+    def global_impedance(self) -> np.ndarray:
         return np.nansum(self.pixel_impedance, axis=(1, 2))
 
     def concatenate(self, other: Self) -> Self:
