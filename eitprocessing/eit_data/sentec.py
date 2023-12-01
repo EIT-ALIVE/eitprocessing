@@ -1,10 +1,11 @@
 import numpy as np
-import struct
 import warnings
 from dataclasses import dataclass, field
 from eitprocessing.continuous_data.continuous_data_collection import ContinuousDataCollection
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
+from numpy.typing import NDArray
 from pathlib import Path
+from typing import BinaryIO
 from typing_extensions import Self
 from . import EITData_
 from .eit_data_variant import EITDataVariant
@@ -24,7 +25,7 @@ class SentecEITData(EITData_):
     )
 
     @classmethod
-    def _from_path(  # pylint: disable=too-many-arguments
+    def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
         cls,
         path: Path,
         label: str | None = None,
@@ -55,11 +56,9 @@ class SentecEITData(EITData_):
             image = None
             index = 0
 
-            while fh.tell() < file_length:
-
-                # if the number of read data points is higher than the maximum specified, end
-                if max_frames and len(time) >= max_frames:
-                    break
+            # while there are still data to be read and the number of read data points is higher
+            # than the maximum specified, keep reading
+            while fh.tell() < file_length and (max_frames is None or len(time) < max_frames):
 
                 # Read time stamp uint64
                 timestamp = reader.unsigned_long_long('little')
@@ -68,55 +67,30 @@ class SentecEITData(EITData_):
                 # read number of data fields uint8
                 number_data_fields = reader.unsigned_char('little')
 
-                for data_field in range(number_data_fields):
+                for _ in range(number_data_fields):
                     # read data id uint8
                     data_id = reader.unsigned_char('little')
                     # read payload size ushort
                     payload_size = reader.unsigned_short('little')
 
                     if payload_size != 0:
-                        # read measurements data
-                        if domain_id == 16:
-                            if data_id == 5:
-                                index += 1
+                        # read frame (domain 16 = measurements, data 5 = zero_ref_image)
+                        if domain_id == 16 and data_id == 5:
+                            index += 1
 
-                                if index < first_frame:
-                                    fh.seek(payload_size, 1)
-                                else:
-                                    # read quality index. We don't use it, so we skip the bytes
-                                    fh.seek(1, 1)
+                            ref = cls._read_frame(fh, index, payload_size, reader, first_frame)
 
-                                    mes_width = reader.unsigned_char('little')
-                                    mes_height = reader.unsigned_char('little')
-                                    zero_ref = reader.npfloat32((payload_size - 3) // 4, 'little')
+                            if ref is not None:
+                                image = np.concatenate([image, ref[np.newaxis, :, :]], axis=0) \
+                                    if image is not None else ref[np.newaxis, :, :]
 
-                                    if mes_width * mes_height != len(zero_ref):
-                                        warnings.warn(f'The length of image array is '
-                                                      f'{len(zero_ref)} which is not equal to the '
-                                                      f'product of the width ({mes_width}) and '
-                                                      f'height ({mes_height}) of the frame')
-                                        return
-                                    else:
-                                        # the sign of the zero_ref values has to be inverted
-                                        # and the array has to be reshaped into the matrix
-                                        ref_reshape = -np.reshape(zero_ref, (mes_width, mes_height))
-                                        if image is not None:
-                                            image = np.concatenate(
-                                                [image, ref_reshape[np.newaxis, :, :]], axis=-0)
-                                        else:
-                                            image = ref_reshape[np.newaxis, :, :]
+                                time.append(timestamp)
 
-                                    time.append(timestamp)
+                        # read the framerate from the file, if present
+                        # (domain 64 = configuration, data 5 = framerate)
+                        elif domain_id == 64 and data_id == 1:
+                            framerate = reader.float32('little')
 
-                            else:
-                                fh.seek(payload_size, 1)
-                        # read configuration data
-                        elif domain_id == 64:
-                            if data_id == 1:
-                                # read the framerate from the file, if present
-                                framerate = reader.float32('little')
-                            else:
-                                fh.seek(payload_size, 1)
                         else:
                             fh.seek(payload_size, 1)
 
@@ -152,3 +126,52 @@ class SentecEITData(EITData_):
         )
 
         return obj
+
+    @classmethod
+    def _read_frame(  # pylint: disable=too-many-arguments
+        cls,
+        fh: BinaryIO,
+        index: int,
+        payload_size: int,
+        reader: Reader,
+        first_frame: int = 0
+    ) -> NDArray | None:
+        """
+        Read a single frame in the file. The current position of the file has to be already
+        set to the point where the image should be read (data_id 5).
+        Args:
+            fh: opened file object
+            index: current number of read frames
+            payload_size: size of the payload of the data to be read.
+            reader: bites reader object
+            first_frame: index of first time point of sequence
+
+        Returns: A 32 x 32 matrix, containing the pixels values.
+
+        """
+        if index < first_frame:
+            fh.seek(payload_size, 1)
+
+            return None
+
+        # read quality index. We don't use it, so we skip the bytes
+        fh.seek(1, 1)
+
+        mes_width = reader.unsigned_char('little')
+        mes_height = reader.unsigned_char('little')
+        zero_ref = reader.npfloat32((payload_size - 3) // 4, 'little')
+
+        if mes_width * mes_height != len(zero_ref):
+            warnings.warn(f'The length of image array is '
+                          f'{len(zero_ref)} which is not equal to the '
+                          f'product of the width ({mes_width}) and '
+                          f'height ({mes_height}) of the frame.'
+                          f'Image will not be stored')
+
+            return None
+
+        # the sign of the zero_ref values has to be inverted
+        # and the array has to be reshaped into the matrix
+        ref_reshape = -np.reshape(zero_ref, (mes_width, mes_height))
+
+        return ref_reshape

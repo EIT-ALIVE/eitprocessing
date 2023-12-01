@@ -33,7 +33,8 @@ class Reader:
         data = [cast(d) for d in data]
         return data
 
-    def read_array(self, type_code: str, cast: type[N], length: int, endian: str = None) -> NDArray[N]:
+    def read_array(self, type_code: str, cast: type[N], length: int, endian: str = None
+                   ) -> NDArray[N]:
         full_type_code = f"{length}{type_code}"
         data = self._read_full_type_code(full_type_code, endian)
         return np.array(data, dtype=cast)
@@ -50,7 +51,7 @@ class Reader:
                 full_type_code = '<' + full_type_code if endian == 'little' else '>' + full_type_code
             else:
                 warnings.warn('Endian type not recognized. Allowed values are '
-                              '\'little\' and \' big\'')
+                              '\'little\' and \'big\'')
         data_size = struct.calcsize(full_type_code)
         packed_data = self.file_handle.read(data_size)
         data = struct.unpack(full_type_code, packed_data)
