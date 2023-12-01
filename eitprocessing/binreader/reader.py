@@ -27,14 +27,17 @@ class Reader:
         data = self._read_full_type_code(type_code, endian)
         return cast(data[0])
 
-    def read_list(self, type_code: str, cast: type[T], length: int, endian: str = None) -> list[T]:
+    def read_list(
+        self, type_code: str, cast: type[T], length: int, endian: str = None
+    ) -> list[T]:
         full_type_code = f"{length}{type_code}"
         data = self._read_full_type_code(full_type_code, endian)
         data = [cast(d) for d in data]
         return data
 
-    def read_array(self, type_code: str, cast: type[N], length: int, endian: str = None
-                   ) -> NDArray[N]:
+    def read_array(
+        self, type_code: str, cast: type[N], length: int, endian: str = None
+    ) -> NDArray[N]:
         full_type_code = f"{length}{type_code}"
         data = self._read_full_type_code(full_type_code, endian)
         return np.array(data, dtype=cast)
@@ -45,13 +48,19 @@ class Reader:
         data = data[0].decode().rstrip()
         return data
 
-    def _read_full_type_code(self, full_type_code, endian: str = None) -> tuple[Any, ...]:
+    def _read_full_type_code(
+        self, full_type_code, endian: str = None
+    ) -> tuple[Any, ...]:
         if endian:
-            if endian in ['little', 'big']:
-                full_type_code = '<' + full_type_code if endian == 'little' else '>' + full_type_code
+            if endian in ["little", "big"]:
+                full_type_code = (
+                    "<" + full_type_code if endian == "little" else ">" + full_type_code
+                )
             else:
-                warnings.warn('Endian type not recognized. Allowed values are '
-                              '\'little\' and \'big\'')
+                warnings.warn(
+                    "Endian type not recognized. Allowed values are "
+                    "'little' and 'big'"
+                )
         data_size = struct.calcsize(full_type_code)
         packed_data = self.file_handle.read(data_size)
         data = struct.unpack(full_type_code, packed_data)
@@ -64,16 +73,22 @@ class Reader:
         return self.read_single(type_code="d", cast=float, endian=endian)
 
     def npfloat32(self, length=1, endian: str = None) -> NDArray[np.float32]:
-        return self.read_array(type_code="f", cast=np.float32, length=length, endian=endian)
+        return self.read_array(
+            type_code="f", cast=np.float32, length=length, endian=endian
+        )
 
     def npfloat64(self, length=1, endian: str = None) -> NDArray[np.float64]:
-        return self.read_array(type_code="d", cast=np.float64, length=length, endian=endian)
+        return self.read_array(
+            type_code="d", cast=np.float64, length=length, endian=endian
+        )
 
     def int32(self, endian: str = None) -> int:
         return self.read_single(type_code="i", cast=int, endian=endian)
 
     def npint32(self, length=1, endian: str = None) -> NDArray[np.int32]:
-        return self.read_array(type_code="i", cast=np.int32, length=length, endian=endian)
+        return self.read_array(
+            type_code="i", cast=np.int32, length=length, endian=endian
+        )
 
     def string(self, length=1) -> str:
         return self.read_string(length=length)

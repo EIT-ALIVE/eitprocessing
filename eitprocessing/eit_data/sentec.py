@@ -1,7 +1,9 @@
 import numpy as np
 import warnings
 from dataclasses import dataclass, field
-from eitprocessing.continuous_data.continuous_data_collection import ContinuousDataCollection
+from eitprocessing.continuous_data.continuous_data_collection import (
+    ContinuousDataCollection,
+)
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from numpy.typing import NDArray
 from pathlib import Path
@@ -34,7 +36,6 @@ class SentecEITData(EITData_):
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
     ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
-
         with open(path, "br") as fh:
             # Find the length of the file
             fh.seek(0, 2)
@@ -47,10 +48,10 @@ class SentecEITData(EITData_):
             reader = Reader(fh)
 
             # read the version int8
-            version = reader.unsigned_char('little')
+            version = reader.unsigned_char("little")
 
             if version < 2:
-                warnings.warn(f'File version {version}. Version 2 or higher expected.')
+                warnings.warn(f"File version {version}. Version 2 or higher expected.")
 
             time = []
             image = None
@@ -58,38 +59,46 @@ class SentecEITData(EITData_):
 
             # while there are still data to be read and the number of read data points is higher
             # than the maximum specified, keep reading
-            while fh.tell() < file_length and (max_frames is None or len(time) < max_frames):
-
+            while fh.tell() < file_length and (
+                max_frames is None or len(time) < max_frames
+            ):
                 # Read time stamp uint64
-                timestamp = reader.unsigned_long_long('little')
+                timestamp = reader.unsigned_long_long("little")
                 # Read DomainId uint8
-                domain_id = reader.unsigned_char('little')
+                domain_id = reader.unsigned_char("little")
                 # read number of data fields uint8
-                number_data_fields = reader.unsigned_char('little')
+                number_data_fields = reader.unsigned_char("little")
 
                 for _ in range(number_data_fields):
                     # read data id uint8
-                    data_id = reader.unsigned_char('little')
+                    data_id = reader.unsigned_char("little")
                     # read payload size ushort
-                    payload_size = reader.unsigned_short('little')
+                    payload_size = reader.unsigned_short("little")
 
                     if payload_size != 0:
                         # read frame (domain 16 = measurements, data 5 = zero_ref_image)
                         if domain_id == 16 and data_id == 5:
                             index += 1
 
-                            ref = cls._read_frame(fh, index, payload_size, reader, first_frame)
+                            ref = cls._read_frame(
+                                fh, index, payload_size, reader, first_frame
+                            )
 
                             if ref is not None:
-                                image = np.concatenate([image, ref[np.newaxis, :, :]], axis=0) \
-                                    if image is not None else ref[np.newaxis, :, :]
+                                image = (
+                                    np.concatenate(
+                                        [image, ref[np.newaxis, :, :]], axis=0
+                                    )
+                                    if image is not None
+                                    else ref[np.newaxis, :, :]
+                                )
 
                                 time.append(timestamp)
 
                         # read the framerate from the file, if present
                         # (domain 64 = configuration, data 5 = framerate)
                         elif domain_id == 64 and data_id == 1:
-                            framerate = reader.float32('little')
+                            framerate = reader.float32("little")
 
                         else:
                             fh.seek(payload_size, 1)
@@ -115,7 +124,7 @@ class SentecEITData(EITData_):
             framerate=framerate,
             nframes=n_frames,
             time=np.array(time),
-            label=label
+            label=label,
         )
         obj.variants.add(
             EITDataVariant(
@@ -134,7 +143,7 @@ class SentecEITData(EITData_):
         index: int,
         payload_size: int,
         reader: Reader,
-        first_frame: int = 0
+        first_frame: int = 0,
     ) -> NDArray | None:
         """
         Read a single frame in the file. The current position of the file has to be already
@@ -157,16 +166,18 @@ class SentecEITData(EITData_):
         # read quality index. We don't use it, so we skip the bytes
         fh.seek(1, 1)
 
-        mes_width = reader.unsigned_char('little')
-        mes_height = reader.unsigned_char('little')
-        zero_ref = reader.npfloat32((payload_size - 3) // 4, 'little')
+        mes_width = reader.unsigned_char("little")
+        mes_height = reader.unsigned_char("little")
+        zero_ref = reader.npfloat32((payload_size - 3) // 4, "little")
 
         if mes_width * mes_height != len(zero_ref):
-            warnings.warn(f'The length of image array is '
-                          f'{len(zero_ref)} which is not equal to the '
-                          f'product of the width ({mes_width}) and '
-                          f'height ({mes_height}) of the frame.'
-                          f'Image will not be stored')
+            warnings.warn(
+                f"The length of image array is "
+                f"{len(zero_ref)} which is not equal to the "
+                f"product of the width ({mes_width}) and "
+                f"height ({mes_height}) of the frame."
+                f"Image will not be stored"
+            )
 
             return None
 
