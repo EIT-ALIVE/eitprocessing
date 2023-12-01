@@ -45,10 +45,10 @@ class SentecEITData(EITData_):
             fh.seek(0, 0)
 
             # instantiate reader
-            reader = Reader(fh)
+            reader = Reader(fh, "little")
 
             # read the version int8
-            version = reader.unsigned_char("little")
+            version = reader.unsigned_char()
 
             if version < 2:
                 warnings.warn(f"File version {version}. Version 2 or higher expected.")
@@ -63,17 +63,17 @@ class SentecEITData(EITData_):
                 max_frames is None or len(time) < max_frames
             ):
                 # Read time stamp uint64
-                timestamp = reader.unsigned_long_long("little")
+                timestamp = reader.unsigned_long_long()
                 # Read DomainId uint8
-                domain_id = reader.unsigned_char("little")
+                domain_id = reader.unsigned_char()
                 # read number of data fields uint8
-                number_data_fields = reader.unsigned_char("little")
+                number_data_fields = reader.unsigned_char()
 
                 for _ in range(number_data_fields):
                     # read data id uint8
-                    data_id = reader.unsigned_char("little")
+                    data_id = reader.unsigned_char()
                     # read payload size ushort
-                    payload_size = reader.unsigned_short("little")
+                    payload_size = reader.unsigned_short()
 
                     if payload_size != 0:
                         # read frame (domain 16 = measurements, data 5 = zero_ref_image)
@@ -98,7 +98,7 @@ class SentecEITData(EITData_):
                         # read the framerate from the file, if present
                         # (domain 64 = configuration, data 5 = framerate)
                         elif domain_id == 64 and data_id == 1:
-                            framerate = reader.float32("little")
+                            framerate = reader.float32()
 
                         else:
                             fh.seek(payload_size, 1)
@@ -166,9 +166,11 @@ class SentecEITData(EITData_):
         # read quality index. We don't use it, so we skip the bytes
         fh.seek(1, 1)
 
-        mes_width = reader.unsigned_char("little")
-        mes_height = reader.unsigned_char("little")
-        zero_ref = reader.npfloat32((payload_size - 3) // 4, "little")
+        mes_width = reader.unsigned_char()
+        mes_height = reader.unsigned_char()
+        zero_ref = reader.npfloat32(
+            (payload_size - 3) // 4,
+        )
 
         if mes_width * mes_height != len(zero_ref):
             warnings.warn(
