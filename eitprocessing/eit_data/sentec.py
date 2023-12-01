@@ -9,6 +9,7 @@ from typing_extensions import Self
 from . import EITData_
 from .eit_data_variant import EITDataVariant
 from .vendor import Vendor
+from ..binreader.reader import Reader
 from ..variants.variant_collection import VariantCollection
 
 
@@ -40,11 +41,15 @@ class SentecEITData(EITData_):
 
             # go back to the beginning of the file
             fh.seek(0, 0)
+
+            # instantiate reader
+            reader = Reader(fh)
+
             # read the version int8
-            version = int.from_bytes(fh.read(1), "little")
+            version = reader.unsigned_char('little')
 
             if version < 2:
-                warnings.warn("Old file version")
+                warnings.warn(f'File version {version}. Version 2 or higher expected.')
 
             time = []
             image = None
@@ -57,18 +62,17 @@ class SentecEITData(EITData_):
                     break
 
                 # Read time stamp uint64
-                timestamp = struct.unpack('<Q', fh.read(8))[0]
+                timestamp = reader.unsigned_long_long('little')
                 # Read DomainId uint8
-                domain_id = int.from_bytes(fh.read(1), "little")
+                domain_id = reader.unsigned_char('little')
                 # read number of data fields uint8
-                number_data_fields = int.from_bytes(fh.read(1), "little")
+                number_data_fields = reader.unsigned_char('little')
 
                 for data_field in range(number_data_fields):
                     # read data id uint8
-                    data_id = int.from_bytes(fh.read(1), "little")
+                    data_id = reader.unsigned_char('little')
                     # read payload size ushort
-                    payload_size_bytes = fh.read(2)
-                    payload_size = struct.unpack('<H', payload_size_bytes)[0]
+                    payload_size = reader.unsigned_short('little')
 
                     if payload_size != 0:
                         # read measurements data
@@ -82,10 +86,9 @@ class SentecEITData(EITData_):
                                     # read quality index. We don't use it, so we skip the bytes
                                     fh.seek(1, 1)
 
-                                    mes_width = struct.unpack('B', fh.read(1))[0]
-                                    mes_height = struct.unpack('B', fh.read(1))[0]
-                                    zero_ref = struct.unpack(f'{(payload_size - 3) // 4}f', fh.read(
-                                        payload_size - 3))
+                                    mes_width = reader.unsigned_char('little')
+                                    mes_height = reader.unsigned_char('little')
+                                    zero_ref = reader.npfloat32((payload_size - 3) // 4, 'little')
 
                                     if mes_width * mes_height != len(zero_ref):
                                         warnings.warn(f'The length of image array is '
@@ -111,7 +114,7 @@ class SentecEITData(EITData_):
                         elif domain_id == 64:
                             if data_id == 1:
                                 # read the framerate from the file, if present
-                                framerate = struct.unpack('<f', fh.read(payload_size))[0]
+                                framerate = reader.float32('little')
                             else:
                                 fh.seek(payload_size, 1)
                         else:
