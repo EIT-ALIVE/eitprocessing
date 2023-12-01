@@ -27,7 +27,7 @@ class EITDataVariant(Variant, SelectByIndex):
 
         if STRICT_EIT_DATA_SHAPE:
             shape = self.pixel_impedance.shape
-            if len(shape) != 3 or shape[1:] != (32, 32) or shape[0] == 0:
+            if self.pixel_impedance.ndim != 3 or shape[1:] != (32, 32) or shape[0] == 0:
                 raise ValueError(
                     f"Invalid shape {shape} for `pixel_impedance`. Should be (n, 32, 32)."
                 )
