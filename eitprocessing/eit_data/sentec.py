@@ -99,6 +99,8 @@ class SentecEITData(EITData_):
                         # (domain 64 = configuration, data 5 = framerate)
                         elif domain_id == 64 and data_id == 1:
                             framerate = reader.float32()
+                            warnings.warn(f"Framerate value found in file. The framerate value"
+                                          f"will be set to {framerate}")
 
                         else:
                             fh.seek(payload_size, 1)
