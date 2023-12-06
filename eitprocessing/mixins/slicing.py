@@ -84,19 +84,19 @@ class SelectByTime(SelectByIndex):
                 "cannot be selected by time."
             )
 
-        if start is None:
+        if start is None or start < self.time[0]:
             start_index = 0
         elif start_inclusive:
-            start_index = bisect.bisect_left(self.time, start)
+            start_index = bisect.bisect_right(self.time, start) - 1
         else:
-            start_index = bisect.bisect_right(self.time, start)
+            start_index = bisect.bisect_left(self.time, start)
 
         if end is None:
             end_index = len(self.time)
         elif end_inclusive:
-            end_index = bisect.bisect_right(self.time, end) - 1
+            end_index = bisect.bisect_left(self.time, end) + 1
         else:
-            end_index = bisect.bisect_left(self.time, end) - 1
+            end_index = bisect.bisect_right(self.time, end)
 
         return self.select_by_index(
             start=start_index,
@@ -117,11 +117,7 @@ class TimeIndexer:
         if isinstance(key, slice):
             if key.step:
                 raise ValueError("Can't slice by time using specific step sizes.")
-            if start_value is None:
-                start_value = self.obj.time[0]
-            if end_value is None:
-                end_value = np.inf
-            return self.obj.select_by_time(start_value, end_value)
+            return self.obj.select_by_time(key.start, key.stop)
 
         if isinstance(key, (int, float)):
             return self.obj.select_by_time(start=key, end=key, end_inclusive=True)
