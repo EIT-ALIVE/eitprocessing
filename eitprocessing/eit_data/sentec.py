@@ -45,10 +45,10 @@ class SentecEITData(EITData_):
             fh.seek(0, 0)
 
             # instantiate reader
-            reader = Reader(fh, "little")
+            reader = Reader(fh, endian="little")
 
             # read the version int8
-            version = reader.unsigned_char()
+            version = reader.uint8()
 
             if version < 2:
                 warnings.warn(f"File version {version}. Version 2 or higher expected.")
@@ -63,17 +63,17 @@ class SentecEITData(EITData_):
                 max_frames is None or len(time) < max_frames
             ):
                 # Read time stamp uint64
-                timestamp = reader.unsigned_long_long()
+                timestamp = reader.uint64()
                 # Read DomainId uint8
-                domain_id = reader.unsigned_char()
+                domain_id = reader.uint8()
                 # read number of data fields uint8
-                number_data_fields = reader.unsigned_char()
+                number_data_fields = reader.uint8()
 
                 for _ in range(number_data_fields):
                     # read data id uint8
-                    data_id = reader.unsigned_char()
+                    data_id = reader.uint8()
                     # read payload size ushort
-                    payload_size = reader.unsigned_short()
+                    payload_size = reader.ushort()
 
                     if payload_size != 0:
                         # read frame (domain 16 = measurements, data 5 = zero_ref_image)
@@ -166,8 +166,8 @@ class SentecEITData(EITData_):
         # read quality index. We don't use it, so we skip the bytes
         fh.seek(1, 1)
 
-        mes_width = reader.unsigned_char()
-        mes_height = reader.unsigned_char()
+        mes_width = reader.uint8()
+        mes_height = reader.uint8()
         zero_ref = reader.npfloat32(
             (payload_size - 3) // 4,
         )

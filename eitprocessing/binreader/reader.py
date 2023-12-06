@@ -86,11 +86,11 @@ class Reader:
     def string(self, length=1) -> str:
         return self.read_string(length=length)
 
-    def unsigned_char(self) -> int:
+    def uint8(self) -> int:
         return self.read_single(type_code="B", cast=int)
 
-    def unsigned_short(self) -> int:
+    def ushort(self) -> int:
         return self.read_single(type_code="H", cast=int)
 
-    def unsigned_long_long(self) -> int:
+    def uint64(self) -> int:
         return self.read_single(type_code="Q", cast=int)
