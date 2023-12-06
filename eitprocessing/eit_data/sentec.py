@@ -22,9 +22,6 @@ class SentecEITData(EITData_):
 
     vendor: Vendor = field(default=Vendor.SENTEC, init=False)
     framerate: float = 50.2
-    variants: VariantCollection = field(
-        default_factory=lambda: VariantCollection(EITDataVariant)
-    )
 
     @classmethod
     def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
