@@ -18,7 +18,7 @@ from ..eit_data.vendor import Vendor
 from . import EITData_
 
 
-@dataclass
+@dataclass(eq=False)
 class TimpelEITData(EITData_):
     framerate: float = 50
     vendor: Vendor = field(default=Vendor.TIMPEL, init=False)

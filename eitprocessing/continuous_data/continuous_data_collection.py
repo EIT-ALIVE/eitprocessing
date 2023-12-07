@@ -1,11 +1,11 @@
-import contextlib
 from typing import Any
 from typing_extensions import Self
-from ..helper import NotEquivalent
-from . import ContinuousData
+from eitprocessing.continuous_data import ContinuousData
+from eitprocessing.mixins.equality import Equivalence
+from eitprocessing.mixins.equality import EquivalenceError
 
 
-class ContinuousDataCollection(dict):
+class ContinuousDataCollection(dict, Equivalence):
     def __setitem__(self, __key: Any, __value: Any) -> None:
         self._check_data(__value, key=__key)
         return super().__setitem__(__key, __value)
@@ -31,8 +31,8 @@ class ContinuousDataCollection(dict):
     @classmethod
     def concatenate(cls, a: Self, b: Self) -> Self:
         try:
-            cls.check_equivalence(a, b, raise_=True)
-        except NotEquivalent as e:
+            cls.isequivalent(a, b, raise_=True)
+        except EquivalenceError as e:
             raise ValueError("VariantCollections could not be concatenated") from e
 
         obj = ContinuousDataCollection()
@@ -41,21 +41,19 @@ class ContinuousDataCollection(dict):
 
         return obj
 
-    @classmethod
-    def check_equivalence(cls, a: Self, b: Self, raise_=False) -> bool:
-        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
-        with cm:
-            if set(a.keys()) != set(b.keys()):
-                raise NotEquivalent(
-                    f"VariantCollections do not contain the same variants: {a.keys()=}, {b.keys()=}"
-                )
-
-            for key in a.keys():
-                ContinuousData.check_equivalence(a[key], b[key], raise_=True)
-
-            return True
-
-        return False
+    def isequivalent(
+        self,
+        other: Self,
+        raise_: bool = False,
+    ) -> bool:
+        # fmt: off
+        checks = {
+            f"VariantCollections do not contain the same variants: {self.keys()=}, {other.keys()=}": set(self.keys()) == set(other.keys()),
+        }
+        for key in self.keys():
+            checks[f"Continuous data ({key}) is not equivalent: {self[key]}, {other[key]}"] = ContinuousData.isequivalent(self[key], other[key], raise_)
+        # fmt: on
+        return super().isequivalent(other, raise_, checks)
 
 
 class DuplicateContinuousDataName(Exception):

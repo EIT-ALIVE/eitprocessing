@@ -1,5 +1,4 @@
 from __future__ import annotations
-import contextlib
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -17,7 +16,6 @@ from eitprocessing.continuous_data.continuous_data_collection import (
 )
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.helper import NotEquivalent
 from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
@@ -183,7 +181,7 @@ class EITData(SelectByTime, Equivalence, ABC):
 
     @classmethod
     def concatenate(cls, a: T, b: T, label: str | None = None) -> T:
-        cls.check_equivalence(a, b, raise_=True)
+        cls.isequivalent(a, b, raise_=True)
 
         a_path = cls._ensure_path_list(a.path)
         b_path = cls._ensure_path_list(b.path)
@@ -209,23 +207,18 @@ class EITData(SelectByTime, Equivalence, ABC):
             variants=variants,
         )
 
-    @classmethod
-    def check_equivalence(cls, a: T, b: T, raise_=False) -> bool:
-        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
-        with cm:
-            if a.__class__ != b.__class__:
-                raise NotEquivalent(f"Classes don't match: {type(a)}, {type(b)}")
-
-            if a.framerate != b.framerate:
-                raise NotEquivalent(
-                    f"Framerates do not match: {a.framerate}, {b.framerate}"
-                )
-
-            VariantCollection.check_equivalence(a.variants, b.variants, raise_=True)
-
-            return True
-
-        return False
+    def isequivalent(
+        self,
+        other: Self,
+        raise_: bool = False,
+    ) -> bool:
+        # fmt: off
+        checks = {
+            f"Framerates don't match: {self.framerate}, {other.framerate}": self.framerate == other.framerate,
+            "VariantCollections are not equivalent": VariantCollection.isequivalent(self.variants, other.variants, raise_),
+        }
+        # fmt: on
+        return super().isequivalent(other, raise_, checks)
 
     def _sliced_copy(
         self,

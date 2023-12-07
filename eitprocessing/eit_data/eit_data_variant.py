@@ -37,7 +37,7 @@ class EITDataVariant(Variant, SelectByTime):
 
     @classmethod
     def concatenate(cls, a: Self, b: Self) -> Self:
-        cls.check_equivalence(a, b, raise_=True)
+        cls.isequivalent(a, b, raise_=True)
 
         return cls(
             label=a.label,
