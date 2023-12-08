@@ -41,7 +41,10 @@ class EITDataVariant(Variant, SelectByIndex):
         return self.pixel_impedance.shape[0]
 
     def __eq__(self, other: Self) -> bool:
-        for attr in ["name", "description", "params"]:
+        if type(self) is not type(other):
+            return False
+
+        for attr in ["name", "label", "description", "params"]:
             if getattr(self, attr) != getattr(other, attr):
                 return False
 
