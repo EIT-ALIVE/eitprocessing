@@ -77,6 +77,7 @@ class EITDataVariant(Variant, SelectByIndex):
 
         return self.__class__(
             name=self.name,
+            label="",
             description=self.description,
             params=self.params,
             pixel_impedance=np.concatenate(
@@ -91,7 +92,8 @@ class EITDataVariant(Variant, SelectByIndex):
         pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
 
         return self.__class__(
-            name=label,
+            name=self.name,
+            label=label,
             description=self.description,
             params=copy.deepcopy(self.params),
             pixel_impedance=pixel_impedance,
@@ -100,7 +102,8 @@ class EITDataVariant(Variant, SelectByIndex):
     def copy(self, label: str | None = None) -> Self:
         label = label or f"Copy of <{self.name}>"
         return self.__class__(
-            name=label,
+            name=self.name,
+            label=label,
             description=self.description,
             params=copy.deepcopy(self.params),
             pixel_impedance=np.copy(self.pixel_impedance),
