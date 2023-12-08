@@ -47,9 +47,6 @@ class SentecEITData(EITData_):
             # read the version int8
             version = reader.uint8()
 
-            if version < 2:
-                warnings.warn(f"File version {version}. Version 2 or higher expected.")
-
             time = []
             image = None
             index = 0
@@ -78,7 +75,7 @@ class SentecEITData(EITData_):
                             index += 1
 
                             ref = cls._read_frame(
-                                fh, index, payload_size, reader, first_frame
+                                fh, version, index, payload_size, reader, first_frame
                             )
 
                             if ref is not None:
@@ -96,8 +93,10 @@ class SentecEITData(EITData_):
                         # (domain 64 = configuration, data 5 = framerate)
                         elif domain_id == 64 and data_id == 1:
                             framerate = reader.float32()
-                            warnings.warn(f"Framerate value found in file. The framerate value"
-                                          f"will be set to {framerate}")
+                            warnings.warn(
+                                f"Framerate value found in file. The framerate value "
+                                f"will be set to {framerate}"
+                            )
 
                         else:
                             fh.seek(payload_size, 1)
@@ -139,20 +138,22 @@ class SentecEITData(EITData_):
     def _read_frame(  # pylint: disable=too-many-arguments
         cls,
         fh: BinaryIO,
+        version: int,
         index: int,
         payload_size: int,
         reader: Reader,
         first_frame: int = 0,
     ) -> NDArray | None:
         """
-        Read a single frame in the file. The current position of the file has to be already
-        set to the point where the image should be read (data_id 5).
-        Args:
-            fh: opened file object
-            index: current number of read frames
-            payload_size: size of the payload of the data to be read.
-            reader: bites reader object
-            first_frame: index of first time point of sequence
+                Read a single frame in the file. The current position of the file has to be already
+                set to the point where the image should be read (data_id 5).
+                Args:
+                    fh: opened file object
+                    version: version of the Sentec file
+                    index: current number of read frames
+                    payload_size: size of the payload of the data to be read.
+                    reader: bites reader object
+                    first_frame: index of first time point of sequence
 
         Returns: A 32 x 32 matrix, containing the pixels values.
 
@@ -162,14 +163,16 @@ class SentecEITData(EITData_):
 
             return None
 
-        # read quality index. We don't use it, so we skip the bytes
-        fh.seek(1, 1)
+        if version > 1:
+            # read quality index. We don't use it, so we skip the bytes
+            fh.seek(1, 1)
+            zero_ref_payload = (payload_size - 3) // 4
+        else:
+            zero_ref_payload = (payload_size - 2) // 4
 
         mes_width = reader.uint8()
         mes_height = reader.uint8()
-        zero_ref = reader.npfloat32(
-            (payload_size - 3) // 4,
-        )
+        zero_ref = reader.npfloat32(zero_ref_payload)
 
         if mes_width * mes_height != len(zero_ref):
             warnings.warn(
