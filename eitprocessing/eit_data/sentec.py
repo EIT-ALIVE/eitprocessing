@@ -49,14 +49,15 @@ class SentecEITData(EITData_):
             time = []
             image = []
             index = 0
+            first_time = None
 
             # while there are still data to be read and the number of read data points is higher
             # than the maximum specified, keep reading
             while fh.tell() < file_length and (
                 max_frames is None or len(time) < max_frames
             ):
-                # Read time stamp uint64
-                timestamp = reader.uint64()
+                # Skip timestamp reading
+                fh.seek(8, 1)
                 # Read DomainId uint8
                 domain_id = reader.uint8()
                 # read number of data fields uint8
@@ -73,7 +74,16 @@ class SentecEITData(EITData_):
                         if domain_id == 16:
                             if data_id == 0:
                                 time_caption = reader.uint32()
-                                time.append(time_caption)
+
+                                # save the first time value and subtract it from each time stamp
+                                if not first_time:
+                                    first_time = time_caption
+
+                                time_caption -= first_time
+
+                                # convert to seconds and store
+                                time.append(time_caption / 1000000)
+
                             elif data_id == 5:
                                 index += 1
 
