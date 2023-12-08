@@ -25,11 +25,16 @@ class EITDataVariant(Variant, SelectByIndex):
     def __post_init__(self) -> None:
         super().__post_init__()
 
+        pi_shape = self.pixel_impedance.shape
+        if self.pixel_impedance.ndim != 3 or pi_shape[0] == 0:
+            raise ValueError(
+                f"Invalid shape {pi_shape} for `pixel_impedance`. Should be (n, 32, 32)."
+            )
+
         if STRICT_EIT_DATA_SHAPE:
-            shape = self.pixel_impedance.shape
-            if self.pixel_impedance.ndim != 3 or shape[1:] != (32, 32) or shape[0] == 0:
+            if pi_shape[1:] != (32, 32):
                 raise ValueError(
-                    f"Invalid shape {shape} for `pixel_impedance`. Should be (n, 32, 32)."
+                    f"Invalid shape {pi_shape} for `pixel_impedance`. Should be (n, 32, 32)."
                 )
 
     def __len__(self) -> int:
