@@ -135,7 +135,7 @@ class SelectByTime(SelectByIndex):
         elif end_inclusive:
             end_index = bisect.bisect_left(self.time, end_time) + 1
         else:
-            end_index = bisect.bisect_right(self.time, end_time)
+            end_index = bisect.bisect_left(self.time, end_time)
 
         return self.select_by_index(
             start=start_index,
