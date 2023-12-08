@@ -5,7 +5,7 @@ import pytest
 from typing_extensions import Self
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.helper import NotEquivalent
-from eitprocessing.mixins import SelectByIndex
+from eitprocessing.mixins.slicing import SelectByIndex
 from eitprocessing.variants import Variant
 
 
@@ -36,24 +36,32 @@ def NonEITDataVariant():
 
 
 def test_init():
-    _ = EITDataVariant("label", "desc", pixel_impedance=np.zeros((100, 32, 32)))
+    _ = EITDataVariant("name", "label", "desc", pixel_impedance=np.zeros((100, 32, 32)))
     with pytest.raises(TypeError):
-        _ = EITDataVariant("label", "desc")
+        _ = EITDataVariant("name", "label", "desc")
 
     with pytest.raises(ValueError):
-        _ = EITDataVariant("label", "desc", pixel_impedance=np.zeros((0, 32, 32)))
+        _ = EITDataVariant(
+            "name", "label", "desc", pixel_impedance=np.zeros((0, 32, 32))
+        )
 
     with pytest.raises(ValueError):
-        _ = EITDataVariant("label", "desc", pixel_impedance=np.zeros((32, 32, 100)))
+        _ = EITDataVariant(
+            "name", "label", "desc", pixel_impedance=np.zeros((32, 32, 100))
+        )
 
     with pytest.raises(ValueError):
-        _ = EITDataVariant("label", "desc", pixel_impedance=np.zeros((100, 32, 16)))
+        _ = EITDataVariant(
+            "name", "label", "desc", pixel_impedance=np.zeros((100, 32, 16))
+        )
 
 
 def test_len(gen_pixel_impedance):
     for n in range(10, 100, 10):
         pixel_impedance = gen_pixel_impedance(n, 1, 1)
-        edv = EITDataVariant("label", "description", pixel_impedance=pixel_impedance)
+        edv = EITDataVariant(
+            "name", "label", "description", pixel_impedance=pixel_impedance
+        )
         assert len(edv) == pixel_impedance.shape[0]
 
 
@@ -61,18 +69,21 @@ def test_eq(gen_pixel_impedance, NonEITDataVariant):
     pixel_impedance = gen_pixel_impedance(1000, 0, 100)
 
     edv1 = EITDataVariant(
+        "name",
         "label",
         "description",
         {"foo": "bar", "other": 1},
         pixel_impedance=pixel_impedance,
     )
     edv2 = EITDataVariant(
+        "name",
         "label",
         "description",
         {"other": 1, "foo": "bar"},
         pixel_impedance=np.copy(pixel_impedance),
     )
     nedv = NonEITDataVariant(
+        "name",
         "label",
         "description",
         {"foo": "bar", "other": 1},
@@ -94,12 +105,14 @@ def test_eq(gen_pixel_impedance, NonEITDataVariant):
 
 def test_equivalent(gen_pixel_impedance):
     edv1 = EITDataVariant(
+        "name",
         "label",
         "description",
         {"foo": "bar", "other": 1},
         pixel_impedance=gen_pixel_impedance(1, 0, 100),
     )
     edv2 = EITDataVariant(
+        "name",
         "label",
         "description",
         {"other": 1, "foo": "bar"},

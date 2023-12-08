@@ -10,22 +10,30 @@ from eitprocessing.variants import Variant
 
 @pytest.fixture
 def variant_a(VariantSubA, make_params):
-    return VariantSubA("label_a", "description_a", params=make_params(), data=[1, 2, 3])
+    return VariantSubA(
+        "name_a", "label_a", "description_a", params=make_params(), data=[1, 2, 3]
+    )
 
 
 @pytest.fixture
 def variant_a_copy(VariantSubA, make_params):
-    return VariantSubA("label_a", "description_a", params=make_params(), data=[1, 2, 3])
+    return VariantSubA(
+        "name_a", "label_a", "description_a", params=make_params(), data=[1, 2, 3]
+    )
 
 
 @pytest.fixture
 def variant_b(VariantSubA, make_params):
-    return VariantSubA("label_b", "description_b", make_params(), data=[4, 5, 6])
+    return VariantSubA(
+        "name_b", "label_b", "description_b", make_params(), data=[4, 5, 6]
+    )
 
 
 @pytest.fixture
 def variant_c(VariantSubB, make_params):
-    return VariantSubB("label_b", "description_b", make_params(), data=[4, 5, 6])
+    return VariantSubB(
+        "name_b", "label_b", "description_b", make_params(), data=[4, 5, 6]
+    )
 
 
 @pytest.fixture
@@ -47,7 +55,11 @@ def VariantSubA():
         def concatenate(self: Self, other: Self) -> Self:
             self.check_equivalence(other)
             return self.__class__(
-                self.label, self.description, self.params, data=self.data + other.data
+                self.name,
+                self.label,
+                self.description,
+                self.params,
+                data=self.data + other.data,
             )
 
     return VariantSubA
@@ -62,52 +74,55 @@ def VariantSubB():
         def concatenate(self: Self, other: Self) -> Self:
             self.check_equivalence(other)
             return self.__class__(
-                self.label, self.description, self.params, data=self.data + other.data
+                self.name,
+                self.label,
+                self.description,
+                self.params,
+                data=self.data + other.data,
             )
 
     return VariantSubB
 
 
 def test_init(VariantSubA, make_params):
-    _ = VariantSubA("label", "description", data=[])
-    _ = VariantSubA("label", "description", make_params(), data=[])
-    _ = VariantSubA("label", "description", data=[], params=make_params())
+    _ = VariantSubA("name", "label", "description", data=[])
+    _ = VariantSubA("name", "label", "description", make_params(), data=[])
+    _ = VariantSubA("name", "label", "description", data=[], params=make_params())
 
     with pytest.raises(TypeError):
         # you should not be able to initialize the abstract base class Variant
-        _ = Variant("label", "description")
+        _ = Variant("name", "label", "description")
 
     with pytest.raises(TypeError):
-        # you should not be able to initialize without label, description and data
         _ = VariantSubA()
 
     with pytest.raises(TypeError):
-        # you should not be able to initialize without description and data
-        _ = VariantSubA("label")
+        _ = VariantSubA("name")
 
     with pytest.raises(TypeError):
-        # you should not be able to initialize without description and data
-        _ = VariantSubA(label="label")
+        _ = VariantSubA(name="name")
 
     with pytest.raises(TypeError):
-        # you should not be able to initialize without label and data
-        _ = VariantSubA(description="description")
+        _ = VariantSubA(name="name", description="description")
 
     with pytest.raises(TypeError):
-        _ = VariantSubA("label", "description")
+        _ = VariantSubA("name", "label", "description")
 
     assert get_type_hints(VariantSubA) == dict(
-        label=str, description=str, params=dict, data=list
+        name=str, label=str, description=str, params=dict, data=list
     )
 
     with pytest.raises(TypeError):
-        _ = VariantSubA(1, "description", data=[])
+        _ = VariantSubA(1, "label", "description", data=[])
 
     with pytest.raises(TypeError):
-        _ = VariantSubA("label", 1, data=[])
+        _ = VariantSubA("name", 1, "description", data=[])
 
     with pytest.raises(TypeError):
-        _ = VariantSubA("label", "description", data={1})
+        _ = VariantSubA("name", "label", 1, data=[])
+
+    with pytest.raises(TypeError):
+        _ = VariantSubA("name", "label", "description", data={1})
 
 
 def test_equivalence(variant_a, variant_a_copy, variant_b, variant_c):

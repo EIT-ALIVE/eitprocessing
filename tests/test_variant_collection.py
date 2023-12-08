@@ -17,38 +17,36 @@ def NonVariant():
 
 @pytest.fixture
 def variant_A_a(VariantSubA):
-    return VariantSubA("label_a", "description_a", data=[])
+    return VariantSubA("name_a", "label_a", "description_a", data=[])
 
 
 @pytest.fixture
 def variant_A_b(VariantSubA):
-    return VariantSubA("label_b", "description_b", data=[])
+    return VariantSubA("name_b", "label_b", "description_b", data=[])
 
 
 @pytest.fixture
 def variant_B_a(VariantSubB):
-    return VariantSubB("label_a", "description_a", data=[])
+    return VariantSubB("name_a", "label_a", "description_a", data=[])
 
 
 @pytest.fixture
 def variant_B_b(VariantSubB):
-    return VariantSubB("label_b", "description_b", data=[])
+    return VariantSubB("name_b", "label_a", "description_b", data=[])
 
 
 def test_compare(
     VariantSubA, VariantSubB, variant_A_a, variant_A_b, variant_B_a, variant_B_b
 ):
-    vc1 = VariantCollection(VariantSubA, label_a=variant_A_a)
-    vc2 = VariantCollection(VariantSubA, label_a=variant_A_b)
+    vc1 = VariantCollection(VariantSubA, name_a=variant_A_a)
+    vc2 = VariantCollection(VariantSubA, name_a=variant_A_b)
     assert vc1 != vc2
 
-    vc3 = VariantCollection(
-        VariantSubB, {"label_a": variant_B_a, "label_b": variant_B_b}
-    )
+    vc3 = VariantCollection(VariantSubB, {"name_a": variant_B_a, "name_b": variant_B_b})
     assert vc1 != vc3
 
     vc4 = VariantCollection(VariantSubA)
-    variant_A_a_copy = VariantSubA("label_a", "description_a", data=[])
+    variant_A_a_copy = VariantSubA("name_a", "label_a", "description_a", data=[])
     vc4.add(variant_A_a_copy)
 
     assert variant_A_a == variant_A_a_copy
@@ -56,7 +54,7 @@ def test_compare(
     assert vc1 == vc4
     assert vc1 is not vc4
 
-    vc5 = VariantCollection(Variant, label_a=variant_A_a)
+    vc5 = VariantCollection(Variant, name_a=variant_A_a)
     assert vc1 != vc5
 
 
@@ -70,16 +68,14 @@ def test_init(VariantSubA, variant_A_a, variant_A_b, NonVariant):
         _ = VariantCollection(NonVariant)
 
     # tests whether four types of initializing dicts all have the same result
-    vc1 = VariantCollection(
-        VariantSubA, {"label_a": variant_A_a, "label_b": variant_A_b}
-    )
-    vc2 = VariantCollection(VariantSubA, label_a=variant_A_a, label_b=variant_A_b)
+    vc1 = VariantCollection(VariantSubA, {"name_a": variant_A_a, "name_b": variant_A_b})
+    vc2 = VariantCollection(VariantSubA, name_a=variant_A_a, name_b=variant_A_b)
     vc3 = VariantCollection(
-        VariantSubA, [("label_a", variant_A_a), ("label_b", variant_A_b)]
+        VariantSubA, [("name_a", variant_A_a), ("name_b", variant_A_b)]
     )
     vc4 = VariantCollection(VariantSubA)
-    vc4["label_a"] = variant_A_a
-    vc4["label_b"] = variant_A_b
+    vc4["name_a"] = variant_A_a
+    vc4["name_b"] = variant_A_b
 
     assert vc1 == vc2 == vc3 == vc4
 
@@ -90,7 +86,7 @@ def test_set_item_add(variant_A_a, variant_A_b, variant_B_b, VariantSubA, NonVar
     vc2 = copy.deepcopy(vc1)
 
     vc1.add(variant_A_a)
-    vc2["label_a"] = variant_A_a
+    vc2["name_a"] = variant_A_a
     assert vc1 == vc2
     assert len(vc1) == len(vc2) == 1
 
@@ -105,8 +101,8 @@ def test_set_item_add(variant_A_a, variant_A_b, variant_B_b, VariantSubA, NonVar
     vc4 = VariantCollection(VariantSubA)
     vc4.add(variant_A_a, variant_A_b)
     assert len(vc4) == 2
-    assert "label_a" in vc4
-    assert "label_b" in vc4
+    assert "name_a" in vc4
+    assert "name_b" in vc4
 
 
 def test_keys(VariantSubA, variant_A_a, variant_A_b, variant_B_a, variant_B_b):
@@ -129,9 +125,9 @@ def test_keys(VariantSubA, variant_A_a, variant_A_b, variant_B_a, variant_B_b):
 
 
 def test_check_equivalence(VariantSubA):
-    v1a = VariantSubA("label_a", "description_a", data=[1, 2, 3])
-    v1b = VariantSubA("label_b", "description_b", data=[4, 5, 6])
-    v1c = VariantSubA("label_c", "description_c", data=[7, 8, 9])
+    v1a = VariantSubA("name_a", "label_a", "description_a", data=[1, 2, 3])
+    v1b = VariantSubA("name_b", "label_b", "description_b", data=[4, 5, 6])
+    v1c = VariantSubA("name_c", "label_c", "description_c", data=[7, 8, 9])
     vc1 = VariantCollection(VariantSubA)
     vc1.add(v1a, v1b, v1c)
 
@@ -141,9 +137,9 @@ def test_check_equivalence(VariantSubA):
     assert dict(vc1) == dict(vc3)
     assert not VariantCollection.check_equivalence(vc1, vc3)
 
-    v2a = VariantSubA("label_a", "description_a", data=[10, 11, 12])
-    v2b = VariantSubA("label_b", "description_b", data=[13, 14, 15])
-    v2c = VariantSubA("label_c", "description_c", data=[16, 17, 18])
+    v2a = VariantSubA("name_a", "label_a", "description_a", data=[10, 11, 12])
+    v2b = VariantSubA("name_b", "label_b", "description_b", data=[13, 14, 15])
+    v2c = VariantSubA("name_c", "label_c", "description_c", data=[16, 17, 18])
     vc2 = VariantCollection(VariantSubA)
     vc2.add(v2a, v2b)
 
@@ -158,16 +154,16 @@ def test_check_equivalence(VariantSubA):
 
 
 def test_concatenate(VariantSubA):
-    v1a = VariantSubA("label_a", "description_a", data=[1, 2, 3])
-    v1b = VariantSubA("label_b", "description_a", data=[4, 5, 6])
+    v1a = VariantSubA("name_a", "label_a", "description_a", data=[1, 2, 3])
+    v1b = VariantSubA("name_b", "label_b", "description_a", data=[4, 5, 6])
     vc1 = VariantCollection(Variant)
     vc1.add(v1a, v1b)
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         vc1.concatenate(v1a)
 
-    v2a = VariantSubA("label_a", "description_a", data=[7, 8, 9])
-    v2b = VariantSubA("label_b", "description_a", data=[10, 11, 12])
+    v2a = VariantSubA("name_a", "label_a", "description_a", data=[7, 8, 9])
+    v2b = VariantSubA("name_b", "label_b", "description_a", data=[10, 11, 12])
     vc2 = VariantCollection(Variant)
     vc2.add(v2a)
 
@@ -180,7 +176,7 @@ def test_concatenate(VariantSubA):
     vc_concat2 = VariantCollection.concatenate(vc1, vc2)
 
     assert vc_concat1 == vc_concat2
-    assert vc_concat1["label_a"].data == v1a.data + v2a.data
-    assert vc_concat1["label_b"].data == v1b.data + v2b.data
-    assert vc_concat1["label_a"].check_equivalence(v1a)
-    assert vc_concat1["label_a"].check_equivalence(v2a)
+    assert vc_concat1["name_a"].data == v1a.data + v2a.data
+    assert vc_concat1["name_b"].data == v1b.data + v2b.data
+    assert vc_concat1["name_a"].check_equivalence(v1a)
+    assert vc_concat1["name_a"].check_equivalence(v2a)
