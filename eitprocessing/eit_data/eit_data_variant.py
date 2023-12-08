@@ -10,8 +10,8 @@ from dataclasses import field
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
-from eitprocessing.mixins import SelectByTime
-from ..variants import Variant
+from eitprocessing.mixins.slicing import SelectByTime
+from eitprocessing.variants import Variant
 
 
 @dataclass
@@ -72,7 +72,6 @@ class EITDataVariant(Variant, SelectByTime):
     def _sliced_copy(
         self, start_index: int, end_index: int, label: str | None = None
     ) -> Self:
-        label = label or f"Slice ({start_index}-{end_index}) of <{self.label}>"
         pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
 
         return self.__class__(

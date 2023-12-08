@@ -16,11 +16,11 @@ from eitprocessing.continuous_data.continuous_data_collection import (
     ContinuousDataCollection,
 )
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
-from eitprocessing.mixins import SelectByTime
+from eitprocessing.eit_data.vendor import Vendor
+from eitprocessing.helper import NotEquivalent
+from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from eitprocessing.variants.variant_collection import VariantCollection
-from ..helper import NotEquivalent
-from .vendor import Vendor
 
 
 PathLike: TypeAlias = str | Path
@@ -227,7 +227,10 @@ class EITData(SelectByTime, ABC):
         return False
 
     def _sliced_copy(
-        self: Self, start_index: int, end_index: int, label: str | None = None
+        self,
+        start_index: int,
+        end_index: int,
+        label: str,
     ) -> Self:
         cls = self._get_vendor_class(self.vendor)
         time = self.time[start_index:end_index]
