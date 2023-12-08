@@ -14,7 +14,7 @@ from eitprocessing.mixins.slicing import SelectByIndex
 from eitprocessing.variants import Variant
 
 
-# TODO: make config system
+# TODO #135: make config system
 STRICT_EIT_DATA_SHAPE = True
 
 
