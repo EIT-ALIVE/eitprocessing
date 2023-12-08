@@ -13,7 +13,6 @@ from . import EITData_
 from .eit_data_variant import EITDataVariant
 from .vendor import Vendor
 from ..binreader.reader import Reader
-from ..variants.variant_collection import VariantCollection
 
 
 @dataclass(eq=False)
@@ -71,23 +70,32 @@ class SentecEITData(EITData_):
 
                     if payload_size != 0:
                         # read frame (domain 16 = measurements, data 5 = zero_ref_image)
-                        if domain_id == 16 and data_id == 5:
-                            index += 1
+                        if domain_id == 16:
+                            if data_id == 0:
+                                time_caption = reader.uint32()
+                                time.append(time_caption)
+                            elif data_id == 5:
+                                index += 1
 
-                            ref = cls._read_frame(
-                                fh, version, index, payload_size, reader, first_frame
-                            )
-
-                            if ref is not None:
-                                image = (
-                                    np.concatenate(
-                                        [image, ref[np.newaxis, :, :]], axis=0
-                                    )
-                                    if image is not None
-                                    else ref[np.newaxis, :, :]
+                                ref = cls._read_frame(
+                                    fh,
+                                    version,
+                                    index,
+                                    payload_size,
+                                    reader,
+                                    first_frame,
                                 )
 
-                                time.append(timestamp)
+                                if ref is not None:
+                                    image = (
+                                        np.concatenate(
+                                            [image, ref[np.newaxis, :, :]], axis=0
+                                        )
+                                        if image is not None
+                                        else ref[np.newaxis, :, :]
+                                    )
+                            else:
+                                fh.seek(payload_size, 1)
 
                         # read the framerate from the file, if present
                         # (domain 64 = configuration, data 5 = framerate)

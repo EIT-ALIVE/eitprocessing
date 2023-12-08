@@ -92,5 +92,8 @@ class Reader:
     def ushort(self) -> int:
         return self.read_single(type_code="H", cast=int)
 
+    def uint32(self) -> int:
+        return self.read_single(type_code="I", cast=int)
+
     def uint64(self) -> int:
         return self.read_single(type_code="Q", cast=int)
