@@ -12,6 +12,6 @@ eit: SentecEITData = SentecEITData.from_path(path)
 from eitprocessing.plotting.animate import animate_pixel_impedance
 
 
-raw = eit[280:840].variants["Slice (280-840) of <raw>"]
+raw = eit.variants["raw"]
 animate_pixel_impedance(raw.pixel_impedance_individual_offset, framerate=eit.framerate)
 # %%
