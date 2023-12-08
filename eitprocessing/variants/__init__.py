@@ -40,7 +40,8 @@ class Variant(ABC):
         for attr, type_ in get_type_hints(type(self)).items():
             if not isinstance(getattr(self, attr), type_):
                 raise TypeError(
-                    f"Invalid type for `{attr}`. Should be {type_}, not {type(attr)}."
+                    f"Invalid type for `{attr}`. "
+                    f"Should be {type_}, not {type(getattr(self, attr))}."
                 )
 
     def check_equivalence(self: T, other: T, raise_=False) -> bool:
@@ -67,6 +68,9 @@ class Variant(ABC):
 
             if (a_ := self.name) != (b_ := other.name):
                 raise NotEquivalent(f"EITDataVariant names don't match: {a_}, {b_}")
+
+            if (a_ := self.label) != (b_ := other.label):
+                raise NotEquivalent(f"EITDataVariant labels don't match: {a_}, {b_}")
 
             if (a_ := self.description) != (b_ := other.description):
                 raise NotEquivalent(
