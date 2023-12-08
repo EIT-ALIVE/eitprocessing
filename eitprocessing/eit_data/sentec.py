@@ -47,7 +47,7 @@ class SentecEITData(EITData_):
             version = reader.uint8()
 
             time = []
-            image = None
+            image = []
             index = 0
 
             # while there are still data to be read and the number of read data points is higher
@@ -87,13 +87,7 @@ class SentecEITData(EITData_):
                                 )
 
                                 if ref is not None:
-                                    image = (
-                                        np.concatenate(
-                                            [image, ref[np.newaxis, :, :]], axis=0
-                                        )
-                                        if image is not None
-                                        else ref[np.newaxis, :, :]
-                                    )
+                                    image.append(ref)
                             else:
                                 fh.seek(payload_size, 1)
 
@@ -136,7 +130,7 @@ class SentecEITData(EITData_):
             EITDataVariant(
                 label="raw",
                 description="raw impedance data",
-                pixel_impedance=image,
+                pixel_impedance=np.array(image),
             )
         )
 
@@ -195,6 +189,6 @@ class SentecEITData(EITData_):
 
         # the sign of the zero_ref values has to be inverted
         # and the array has to be reshaped into the matrix
-        ref_reshape = -np.reshape(zero_ref, (mes_width, mes_height))
+        ref_reshape = -np.reshape(zero_ref, (mes_width, mes_height)).T
 
         return ref_reshape
