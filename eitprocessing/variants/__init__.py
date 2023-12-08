@@ -31,6 +31,7 @@ class Variant(ABC):
       which filters and filters settigs were used
     """
 
+    name: str
     label: str
     description: str
     params: dict = field(default_factory=dict)
@@ -64,7 +65,7 @@ class Variant(ABC):
                     f"Variant classes don't match: {self.__class__}, {other.__class__}"
                 )
 
-            if (a_ := self.label) != (b_ := other.label):
+            if (a_ := self.name) != (b_ := other.name):
                 raise NotEquivalent(f"EITDataVariant names don't match: {a_}, {b_}")
 
             if (a_ := self.description) != (b_ := other.description):

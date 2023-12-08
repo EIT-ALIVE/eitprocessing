@@ -86,18 +86,18 @@ class VariantCollection(dict, Generic[V]):
         """
         for variant_ in variant:
             self._check_variant(variant_, overwrite=overwrite)
-            super().__setitem__(variant_.label, variant_)
+            super().__setitem__(variant_.name, variant_)
 
     def _check_variant(self, variant: V, key=None, overwrite: bool = False) -> None:
         if not isinstance(variant, self.variant_type):
             raise TypeError(f"'{type(variant)}' does not match '{self.variant_type}'.")
 
-        if key and key != variant.label:
-            raise KeyError(f"'{key}' does not match variant name '{variant.label}'.")
+        if key and key != variant.name:
+            raise KeyError(f"'{key}' does not match variant name '{variant.name}'.")
 
-        if not overwrite and variant.label in self:
+        if not overwrite and variant.name in self:
             raise KeyError(
-                f"Variant with name '{variant.label}' already exists. Use `overwrite=True` to overwrite."
+                f"Variant with name '{variant.name}' already exists. Use `overwrite=True` to overwrite."
             )
 
     def concatenate(self: Self, other: Self) -> Self:

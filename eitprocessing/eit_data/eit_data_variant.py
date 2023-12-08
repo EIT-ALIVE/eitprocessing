@@ -71,7 +71,7 @@ class EITDataVariant(Variant, SelectByIndex):
         self.check_equivalence(other, raise_=True)
 
         return self.__class__(
-            label=self.label,
+            name=self.name,
             description=self.description,
             params=self.params,
             pixel_impedance=np.concatenate(
@@ -82,19 +82,20 @@ class EITDataVariant(Variant, SelectByIndex):
     def _sliced_copy(
         self, start_index: int, end_index: int | None = None, label: str | None = None
     ) -> Self:
+        label = label or f"Slice ({start_index}-{end_index}) of <{self.name}>"
         pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
 
         return self.__class__(
-            label=label,
+            name=label,
             description=self.description,
             params=copy.deepcopy(self.params),
             pixel_impedance=pixel_impedance,
         )
 
     def copy(self, label: str | None = None) -> Self:
-        label = label or f"Copy of <{self.label}>"
+        label = label or f"Copy of <{self.name}>"
         return self.__class__(
-            label=label,
+            name=label,
             description=self.description,
             params=copy.deepcopy(self.params),
             pixel_impedance=np.copy(self.pixel_impedance),

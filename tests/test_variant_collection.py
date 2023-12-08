@@ -114,18 +114,18 @@ def test_keys(VariantSubA, variant_A_a, variant_A_b, variant_B_a, variant_B_b):
     vc1.add(variant_A_a)
 
     # don't allow overwriting existing key
-    assert variant_A_a.label == variant_B_a.label
+    assert variant_A_a.name == variant_B_a.name
     with pytest.raises(KeyError):
         vc1.add(variant_B_a)
     with pytest.raises(KeyError):
-        vc1["label_a"] = variant_B_a
+        vc1["name_a"] = variant_B_a
 
     # allow overwriting existing key explictely
     vc1.add(variant_B_a, overwrite=True)
 
     # don't allow writing with wrong key
     with pytest.raises(KeyError):
-        vc1["some_label"] = variant_B_b
+        vc1["some_name"] = variant_B_b
 
 
 def test_check_equivalence(VariantSubA):
