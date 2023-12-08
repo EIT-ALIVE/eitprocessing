@@ -11,6 +11,7 @@ from typing_extensions import Self, override
 
 from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data.vendor import Vendor
+from eitprocessing.mixins.addition import Addition
 from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
 
@@ -23,7 +24,7 @@ T = TypeVar("T", bound="EITData")
 
 
 @dataclass(eq=False)
-class EITData(SelectByTime, Equivalence, ABC):
+class EITData(SelectByTime, Addition, Equivalence, ABC):
     path: Path | list[Path]
     nframes: int
     time: NDArray
@@ -267,13 +268,14 @@ class EITData(SelectByTime, Equivalence, ABC):
     def global_impedance(self) -> np.ndarray:
         return np.nansum(self.pixel_impedance, axis=(1, 2))
 
+    @property
+    def _data_storage(self) -> tuple(str):
+        return ("time", "pixel_impedance")
+
 
 @dataclass(eq=False)
 class EITData_(EITData):  # noqa: N801
     vendor: Vendor = field(init=False)
-
-    def __add__(self: T, other: T) -> T:
-        return self.concatenate(self, other)
 
     @override  # remove vendor as argument
     @classmethod
