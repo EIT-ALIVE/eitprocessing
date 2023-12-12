@@ -1,3 +1,4 @@
+import itertools
 from dataclasses import dataclass
 from dataclasses import field
 import numpy as np
@@ -148,8 +149,32 @@ def test_equivalent(gen_pixel_impedance):
     edv2.params["other"] = edv1.params["other"]
 
 
-def test_properties():
-    raise NotImplementedError()
+@pytest.mark.parametrize("execution_number", range(5))
+def test_properties(gen_pixel_impedance, execution_number):
+    rng = np.random.default_rng()
+    baseline = rng.integers(0, 100)
+    pixel_impedance = gen_pixel_impedance(1000, baseline, 100)
+    edv1 = EITDataVariant(
+        "name",
+        "label",
+        "description",
+        {"foo": "bar", "other": 1},
+        pixel_impedance=pixel_impedance,
+    )
+
+    assert edv1.global_baseline == baseline
+    assert np.nanmin(edv1.pixel_impedance_global_offset) == 0
+    assert np.array_equal(
+        edv1.pixel_baseline, np.nanmin(pixel_impedance, axis=0), equal_nan=True
+    )
+
+    min_pixel_values = np.nanmin(edv1.pixel_impedance_individual_offset, axis=0)
+    fill_nan_with_zero = np.nan_to_num(min_pixel_values)
+    assert np.all(fill_nan_with_zero == np.zeros((32, 32)))
+
+    assert np.array_equal(
+        edv1.global_impedance, np.nansum(pixel_impedance, axis=(1, 2))
+    )
 
 
 def test_concatenate():
