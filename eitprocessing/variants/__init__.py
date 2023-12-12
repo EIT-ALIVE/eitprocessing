@@ -1,19 +1,15 @@
-import contextlib
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from dataclasses import field
-from typing import TypeVar
 from typing import get_type_hints
 from typing_extensions import Self
-from ..helper import NotEquivalent
+from eitprocessing.mixins.equality import Equivalence
+from eitprocessing.mixins.equality import EquivalenceError
 
 
-T = TypeVar("T", bound="Variant")
-
-
-@dataclass
-class Variant(ABC):
+@dataclass(eq=False)
+class Variant(Equivalence, ABC):
     """Contains a single variant of a dataset.
 
     A variant of a dataset is defined as either the raw data, or an edited
@@ -44,45 +40,20 @@ class Variant(ABC):
                     f"Should be {type_}, not {type(getattr(self, attr))}."
                 )
 
-    def check_equivalence(self: T, other: T, raise_=False) -> bool:
-        """Check the equivalence of two variants
-
-        For two variants to be equivalent, they need to have the same class,
-        the same label, the same description and the same parameters. Only the
-        actual data can differ between variants.
-
-        Args:
-        - a (Variant)
-        - b (Variant)
-
-        Raises:
-        - NotEquivalent (only if raise_ is `True`) when a and b are not
-          equivalent on one of the attributes
-        """
-        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
-        with cm:
-            if not isinstance(self, other.__class__):
-                raise NotEquivalent(
-                    f"Variant classes don't match: {self.__class__}, {other.__class__}"
-                )
-
-            if (a_ := self.name) != (b_ := other.name):
-                raise NotEquivalent(f"EITDataVariant names don't match: {a_}, {b_}")
-
-            if (a_ := self.label) != (b_ := other.label):
-                raise NotEquivalent(f"EITDataVariant labels don't match: {a_}, {b_}")
-
-            if (a_ := self.description) != (b_ := other.description):
-                raise NotEquivalent(
-                    f"EITDataVariant descriptions don't match: {a_}, {b_}"
-                )
-
-            if (a_ := self.params) != (b_ := other.params):
-                raise NotEquivalent(f"EITDataVariant params don't match: {a_}, {b_}")
-
-            return True
-
-        return False
+    def isequivalent(
+        self,
+        other: Self,
+        raise_=False,
+    ) -> bool:
+        EDV = "EITDataVariant"
+        # fmt: off
+        checks = {
+            f"{EDV} labels don't match: {self.label}, {other.label}": self.label == other.label,
+            f"{EDV} descriptions don't match: {self.description}, {other.description}": self.description == other.description,
+            f"{EDV} params don't match: {self.params}, {other.params}": self.params == other.params,
+        }
+        # fmt: on
+        return super().isequivalent(other, raise_, checks)
 
     @abstractmethod
     def concatenate(self: Self, other: Self) -> Self:
@@ -99,5 +70,5 @@ class Variant(ABC):
         - other (Variant)
 
         Raises:
-        - NotEquivalent if a and b are not equivalent and can't be merged
+        - EquivalenceError if a and b are not equivalent and can't be merged
         """

@@ -5,7 +5,7 @@ from typing_extensions import Self
 from ..variants import Variant
 
 
-@dataclass
+@dataclass(eq=False)
 class ContinuousDataVariant(Variant):
     values: NDArray = field(kw_only=True)
 

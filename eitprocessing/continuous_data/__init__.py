@@ -1,17 +1,18 @@
-import contextlib
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
-from ..helper import NotEquivalent
-from ..variants.variant_collection import VariantCollection
-from .continuous_data_variant import ContinuousDataVariant
+from typing_extensions import override
+from eitprocessing.continuous_data.continuous_data_variant import ContinuousDataVariant
+from eitprocessing.mixins.equality import Equivalence
+from eitprocessing.mixins.equality import EquivalenceError
+from eitprocessing.variants.variant_collection import VariantCollection
 
 
-@dataclass
-class ContinuousData:
+@dataclass(eq=False)
+class ContinuousData(Equivalence):
     name: str
     unit: str
     description: str
@@ -30,7 +31,7 @@ class ContinuousData:
 
     @classmethod
     def concatenate(cls, a: Self, b: Self) -> Self:
-        cls.check_equivalence(a, b, raise_=True)
+        cls.isequivalent(a, b, raise_=True)
 
         calculcated_from = None if a.loaded else [a.calculated_from, b.calculated_from]
 
@@ -47,28 +48,22 @@ class ContinuousData:
         )
         return obj
 
-    @classmethod
-    def check_equivalence(cls, a: Self, b: Self, raise_: bool = False) -> bool:
-        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
-        with cm:
-            if a.name != b.name:
-                raise NotEquivalent(f"Names do not match: {a.name}, {b.name}")
-            if a.unit != b.unit:
-                raise NotEquivalent(f"Units do not match: {a.unit}, {b.unit}")
-            if a.description != b.description:
-                raise NotEquivalent(
-                    f"Descriptions do not match: {a.description}, {b.description}"
-                )
-            if a.loaded != b.loaded:
-                raise NotEquivalent(
-                    f"Only one of the datasets is loaded: {a.loaded=}, {b.loaded=}"
-                )
-
-            VariantCollection.check_equivalence(a.variants, b.variants, raise_=True)
-
-            return True
-
-        return False
+    @override
+    def isequivalent(
+        self,
+        other: Self,
+        raise_: bool = False,
+    ) -> bool:
+        # fmt: off
+        checks = {
+            f"Names don't match: {self.name}, {other.name}.": self.name == other.name,
+            f"Units don't match: {self.unit}, {other.unit}.": self.unit == other.unit,
+            f"Descriptions don't match: {self.description}, {other.description}.": self.description == other.description,
+            f"Only one of the datasets is loaded: {self.loaded=}, {other.loaded=}.": self.loaded == other.loaded,
+            f"VariantCollections are not equivalent: {self.variants}, {other.variants}.": VariantCollection.isequivalent(self.variants,other.variants, raise_),
+        }
+        # fmt: on
+        return super().isequivalent(other, raise_, checks)
 
 
 class DataSourceUnknown(Exception):

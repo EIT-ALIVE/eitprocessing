@@ -1,15 +1,15 @@
-import contextlib
 from typing import Generic
 from typing import TypeVar
 from typing_extensions import Self
-from ..helper import NotEquivalent
-from . import Variant
+from eitprocessing.mixins.equality import Equivalence
+from eitprocessing.mixins.equality import EquivalenceError
+from eitprocessing.variants import Variant
 
 
 V = TypeVar("V", bound="Variant")
 
 
-class VariantCollection(dict, Generic[V]):
+class VariantCollection(dict, Equivalence, Generic[V]):
     """A collection of variants of a single type
 
     A VariantCollection is a dictionary with some added features.
@@ -102,8 +102,8 @@ class VariantCollection(dict, Generic[V]):
 
     def concatenate(self: Self, other: Self) -> Self:
         try:
-            self.check_equivalence(other, raise_=True)
-        except NotEquivalent as e:
+            self.isequivalent(other, raise_=True)
+        except EquivalenceError as e:
             raise ValueError("VariantCollections could not be concatenated") from e
 
         obj = VariantCollection(self.variant_type)
@@ -112,39 +112,21 @@ class VariantCollection(dict, Generic[V]):
 
         return obj
 
-    def check_equivalence(self: Self, other: Self, raise_=False) -> bool:
-        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
-        with cm:
-            if not isinstance(other, self.__class__):
-                raise NotEquivalent(
-                    f"Invalid type {other.__class__}. `other` is not a {self.__class__}."
-                )
-            if self.variant_type != other.variant_type:
-                raise NotEquivalent(
-                    f"Variant types do not match: {self.variant_type}, {other.variant_type}"
-                )
-
-            if set(self.keys()) != set(other.keys()):
-                raise NotEquivalent(
-                    f"VariantCollections do not contain the same variants: {self.keys()=}, {other.keys()=}"
-                )
-
-            for key in self.keys():
-                Variant.check_equivalence(self[key], other[key], raise_=True)
-
-            return True
-
-        return False
-
-    def __eq__(self: Self, other: Self) -> bool:
-        # checks for the same keys
-        if dict(self) != dict(other):
-            return False
-
-        if self.variant_type != other.variant_type:
-            return False
-
-        return True
+    def isequivalent(
+        self,
+        other: Self,
+        raise_=True,
+    ) -> bool:
+        # fmt: off
+        checks = {
+            f"Variant types don't match: {self.variant_type}, {other.variant_type}": self.variant_type == other.variant_type,
+            f"VariantCollections do not contain the same variants: {self.keys()=}, {other.keys()=}": set(self.keys()) == set(other.keys()),
+        }
+        for key in self.keys():
+            checks[f"Variant data ({key}) is not equivalent: {self[key]}, {other[key]}"] = \
+                Variant.isequivalent(self[key], other[key], raise_)
+        # fmt: on
+        return super().isequivalent(other, raise_, checks)
 
     def __ne__(self: Self, other: Self) -> bool:
         return not self.__eq__(other)

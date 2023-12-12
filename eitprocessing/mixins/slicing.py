@@ -17,6 +17,8 @@ class SelectByIndex(ABC):
     square brackets (as e.g. done for lists) then return the expected sliced object.
     """
 
+    label: str
+
     def __getitem__(self, key: slice | int):
         if isinstance(key, slice):
             if key.step and key.step != 1:
@@ -40,7 +42,11 @@ class SelectByIndex(ABC):
         end: int | None = None,
         label: str | None = None,
     ) -> Self:
-        """De facto implementation of the `__getitem__ function."""
+        """De facto implementation of the `__getitem__ function.
+
+        This function can also be called directly to add a label to the sliced object.
+        Otherwise a default label describing the slice and original object is attached.
+        """
 
         if start is None and end is None:
             warnings.warn("No starting or end timepoint was selected.")
@@ -107,7 +113,7 @@ class SelectByTime(SelectByIndex):
             ValueError: if time stamps are not sorted.
 
         Returns:
-            Self: _description_
+            Slice of self.
         """
 
         if not "time" in vars(self):
@@ -154,7 +160,7 @@ class TimeIndexer:
 
     Example:
     ```
-    >>> data = DraegerEITData.from_path(<path>)
+    >>> data = EITData.from_path(<path>)
     >>> tp_start = data.time[1]
     >>> tp_end = data.time[4]
     >>> time_slice = data.t[tp_start:tp_end]
