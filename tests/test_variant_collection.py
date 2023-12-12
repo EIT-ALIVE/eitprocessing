@@ -1,6 +1,5 @@
 import copy
 import pytest
-from eitprocessing.helper import NotEquivalent
 from eitprocessing.variants import Variant
 from eitprocessing.variants.variant_collection import VariantCollection
 from .test_variant import VariantSubA
@@ -62,7 +61,7 @@ def test_init(VariantSubA, variant_A_a, variant_A_b, NonVariant):
     _ = VariantCollection(Variant)
     _ = VariantCollection(VariantSubA)
     with pytest.raises(TypeError):
-        _ = VariantCollection()
+        _ = VariantCollection()  # type: ignore
 
     with pytest.raises(TypeError):
         _ = VariantCollection(NonVariant)
@@ -135,7 +134,7 @@ def test_check_equivalence(VariantSubA):
     vc3.add(v1a, v1b, v1c)
 
     assert dict(vc1) == dict(vc3)
-    assert not VariantCollection.check_equivalence(vc1, vc3)
+    assert not VariantCollection.isequivalent(vc1, vc3)
 
     v2a = VariantSubA("name_a", "label_a", "description_a", data=[10, 11, 12])
     v2b = VariantSubA("name_b", "label_b", "description_b", data=[13, 14, 15])
@@ -143,14 +142,14 @@ def test_check_equivalence(VariantSubA):
     vc2 = VariantCollection(VariantSubA)
     vc2.add(v2a, v2b)
 
-    assert not VariantCollection.check_equivalence(vc1, vc2)
+    assert not VariantCollection.isequivalent(vc1, vc2)
     vc2.add(v2c)
-    assert VariantCollection.check_equivalence(vc1, vc2)
+    assert VariantCollection.isequivalent(vc1, vc2)
 
     v1a.params = dict(key="value")
-    assert not VariantCollection.check_equivalence(vc1, vc2)
+    assert not VariantCollection.isequivalent(vc1, vc2)
     v2a.params = dict(key="value")
-    assert VariantCollection.check_equivalence(vc1, vc2)
+    assert VariantCollection.isequivalent(vc1, vc2)
 
 
 def test_concatenate(VariantSubA):

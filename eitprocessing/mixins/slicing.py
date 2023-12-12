@@ -71,7 +71,7 @@ class SelectByIndex(ABC):
         self,
         start_index: int,
         end_index: int,
-        label: str,
+        label: str | None,
     ) -> Self:
         """Slicing method that must be implemented by all subclasses.
 

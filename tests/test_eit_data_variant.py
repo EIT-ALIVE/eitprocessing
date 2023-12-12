@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from typing_extensions import Self
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
-from eitprocessing.helper import NotEquivalent
+from eitprocessing.mixins.equality import EquivalenceError
 from eitprocessing.mixins.slicing import SelectByIndex
 from eitprocessing.variants import Variant
 
@@ -53,7 +53,7 @@ def NonEITDataVariant():
 def test_init():
     _ = EITDataVariant("name", "label", "desc", pixel_impedance=np.zeros((100, 32, 32)))
     with pytest.raises(TypeError):
-        _ = EITDataVariant("name", "label", "desc")
+        _ = EITDataVariant("name", "label", "desc")  # type: ignore
 
     with pytest.raises(ValueError):
         _ = EITDataVariant(
@@ -134,18 +134,18 @@ def test_equivalent(gen_pixel_impedance):
         pixel_impedance=gen_pixel_impedance(2, 0, 100),
     )
 
-    assert edv1.check_equivalence(edv2)
-    assert EITDataVariant.check_equivalence(edv1, edv2)
-    edv1.check_equivalence(edv2, raise_=True)
+    assert edv1.isequivalent(edv2)
+    assert EITDataVariant.isequivalent(edv1, edv2)
+    edv1.isequivalent(edv2, raise_=True)
 
     edv2.name = "different label"
-    assert not edv1.check_equivalence(edv2)
-    with pytest.raises(NotEquivalent):
-        edv1.check_equivalence(edv2, raise_=True)
+    assert not edv1.isequivalent(edv2)
+    with pytest.raises(EquivalenceError):
+        edv1.isequivalent(edv2, raise_=True)
     edv2.name = edv1.name
 
     edv2.params["other"] = 2
-    assert not EITDataVariant.check_equivalence(edv1, edv2)
+    assert not EITDataVariant.isequivalent(edv1, edv2)
     edv2.params["other"] = edv1.params["other"]
 
 
