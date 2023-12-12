@@ -11,9 +11,23 @@ from eitprocessing.variants import Variant
 
 @pytest.fixture
 def gen_pixel_impedance():
-    def _pixel_impedance(n, baseline, amplitude):
+    def _pixel_impedance(length: int, baseline: float, amplitude: float):
         rng = np.random.default_rng()
-        return rng.random((n, 32, 32), np.float_) * amplitude + baseline
+        pixel_impedance = rng.random((length, 32, 32), np.float_) * amplitude + baseline
+
+        # add some nan values
+        for j, k, l in itertools.product(
+            rng.integers(length, size=4),
+            rng.integers(31, size=4),
+            rng.integers(31, size=4),
+        ):
+            pixel_impedance[j, k, l] = np.nan
+
+        # force the lowest value to be equal to baseline
+        pixel_impedance = np.where(
+            pixel_impedance == np.nanmin(pixel_impedance), baseline, pixel_impedance
+        )
+        return pixel_impedance
 
     return _pixel_impedance
 
