@@ -126,3 +126,34 @@ def test_ensure_vendor_invalid_vendor_string():
 # def test_ensure_vendor_invalid_vendor_type():
 #     with pytest.raises(TypeError, match="must be a str or Vendor enum"):
 #         EITData._ensure_vendor(123)
+
+
+def test_check_first_frame_none():
+    result = EITData._check_first_frame(None)
+    assert result == 0
+
+
+def test_check_first_frame_positive_integer():
+    result = EITData._check_first_frame(5)
+    assert result == 5
+
+
+def test_check_first_frame_negative_integer():
+    with pytest.raises(ValueError):
+        EITData._check_first_frame(-3)
+
+
+def test_check_first_frame_float():
+    with pytest.raises(TypeError):
+        EITData._check_first_frame(3.5)
+
+
+# TODO: check if we want to take into account other types (to except)
+# def test_check_first_frame_string():
+#     with pytest.raises(TypeError):
+#         EITData._check_first_frame("abc")
+#
+#
+# def test_check_first_frame_object():
+#     with pytest.raises(TypeError):
+#         EITData._check_first_frame(object())
