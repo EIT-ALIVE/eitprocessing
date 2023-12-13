@@ -25,6 +25,16 @@ def EITDataSubA():
 
 
 @pytest.fixture
+def EITDataSubB():
+    @dataclass
+    class EITDataSubB(EITData):
+        def _from_path(self):
+            return self
+
+    return EITDataSubB
+
+
+@pytest.fixture
 def mock_variant():
     @dataclass
     class MockVariant(Variant):
@@ -44,6 +54,93 @@ def variant_a(mock_variant):
 @pytest.fixture
 def variant_b(mock_variant):
     return mock_variant("name_b", "label_b", "description_b", data=np.arange(50, 150))
+
+
+framerate = 100
+n_frames_a = 100
+n_frames_b = 200
+time_a = (np.arange(0, 100),)
+time_a2 = (np.arange(100, 200),)
+time_b = (np.arange(50, 200),)
+
+
+@pytest.fixture
+def variant_collection_a(mock_variant, variant_a):
+    return VariantCollection(mock_variant, {"name_a": variant_a})
+
+
+@pytest.fixture
+def variant_collection_b(mock_variant, variant_a):
+    return VariantCollection(mock_variant, {"name_a": variant_b})
+
+
+@pytest.fixture
+def data_a_vc_a_1(EITDataSubA, variant_collection_a):
+    return EITDataSubA(
+        path=[],
+        vendor=Vendor.DRAEGER,
+        label="A",
+        nframes=n_frames_a,
+        time=time_a,
+        framerate=framerate,
+        variants=variant_collection_a,
+    )
+
+
+# overlapping time with data_a_vc_a_1
+@pytest.fixture
+def data_a_vc_a_2(EITDataSubA, variant_collection_a):
+    return EITDataSubA(
+        path=[],
+        vendor=Vendor.DRAEGER,
+        label="A",
+        nframes=n_frames_a,
+        time=time_b,
+        framerate=framerate,
+        variants=variant_collection_a,
+    )
+
+
+# framerate different from a_type_1
+@pytest.fixture
+def data_a_vc_a_3(EITDataSubA, variant_collection_a):
+    return EITDataSubA(
+        path=[],
+        vendor=Vendor.DRAEGER,
+        label="A",
+        nframes=n_frames_a,
+        time=time_a2,
+        framerate=framerate + 1,
+        variants=variant_collection_a,
+    )
+
+
+# different variant from a_type_1
+@pytest.fixture
+def data_a_vc_b_1(EITDataSubA, variant_collection_b):
+    return EITDataSubA(
+        path=[],
+        vendor=Vendor.DRAEGER,
+        label="B",
+        nframes=n_frames_b,
+        time=time_a2,
+        framerate=framerate,
+        variants=variant_collection_b,
+    )
+
+
+# different eit data class
+@pytest.fixture
+def data_b_vc_a_1(EITDataSubB, variant_collection_a):
+    return EITDataSubB(
+        path=[],
+        vendor=Vendor.DRAEGER,
+        label="A",
+        nframes=n_frames_a,
+        time=time_a,
+        framerate=framerate,
+        variants=variant_collection_a,
+    )
 
 
 def test_init(EITDataSubA):
@@ -186,33 +283,18 @@ def test_check_first_frame_float():
 #         EITData._check_first_frame(object())
 
 
-def test_concatenate_valid(variant_a, mock_variant, EITDataSubA):
-    framerate = 100
-    n_frames_a = 100
-    n_frames_b = 200
-    time_a = (np.arange(0, 100),)
-    time_b = (np.arange(100, 200),)
-    vc_a = VariantCollection(mock_variant, {"name_a": variant_a})
-    a = EITDataSubA(
-        path=[],
-        vendor=Vendor.DRAEGER,
-        label="A",
-        nframes=n_frames_a,
-        time=time_a,
-        framerate=framerate,
-        variants=vc_a,
-    )
+def test_concatenate_valid(data_a_vc_a_1, EITDataSubA, variant_collection_a):
     b = EITDataSubA(
         path=[],
         vendor=Vendor.DRAEGER,
         label="B",
         nframes=n_frames_b,
-        time=time_b,
+        time=time_a2,
         framerate=framerate,
-        variants=vc_a,
+        variants=variant_collection_a,
     )
 
-    result = EITDataSubA.concatenate(a, b, label="Concatenated Data")
+    result = EITData.concatenate(data_a_vc_a_1, b, label="Concatenated Data")
     # TODO: This is no more an instance of EITDataSubA, because the vendor class is automatically
     # used. Not sure if this is the intended behavior
     assert isinstance(result, EITData)
@@ -220,80 +302,62 @@ def test_concatenate_valid(variant_a, mock_variant, EITDataSubA):
     assert result.label == "Concatenated Data"
     assert result.framerate == framerate
     assert result.nframes == n_frames_a + n_frames_b
-    np.testing.assert_array_equal(result.time, np.concatenate((time_a, time_b)))
+    np.testing.assert_array_equal(result.time, np.concatenate((time_a, time_a2)))
     # no test for the variant concatenation. It depends on the specific variant
 
 
-def test_concatenate_invalid(variant_a, variant_b, mock_variant, EITDataSubA):
-    framerate = 100
-    n_frames_a = 100
-    n_frames_b = 200
-    time_a = (np.arange(0, 100),)
-    time_a2 = (np.arange(100, 200),)
-    time_b = (np.arange(50, 200),)
-
-    vc_a = VariantCollection(mock_variant, {"name_a": variant_a})
-    vc_b = VariantCollection(mock_variant, {"name_b": variant_b})
-
-    a_type_1 = EITDataSubA(
-        path=[],
-        vendor=Vendor.DRAEGER,
-        label="A",
-        nframes=n_frames_a,
-        time=time_a,
-        framerate=framerate,
-        variants=vc_a,
-    )
-
-    # overlapping time with a_type_1
-    a_type_2 = EITDataSubA(
-        path=[],
-        vendor=Vendor.DRAEGER,
-        label="A",
-        nframes=n_frames_a,
-        time=time_b,
-        framerate=framerate,
-        variants=vc_a,
-    )
-
-    # framerate different from a_type_1
-    a_type_3 = EITDataSubA(
-        path=[],
-        vendor=Vendor.DRAEGER,
-        label="A",
-        nframes=n_frames_a,
-        time=time_a2,
-        framerate=framerate + 1,
-        variants=vc_a,
-    )
-
-    # Vendor different from a_type_1
-    a_type_4 = EITDataSubA(
-        path=[],
-        vendor=Vendor.SENTEC,
-        label="A",
-        nframes=n_frames_a,
-        time=time_a2,
-        framerate=framerate,
-        variants=vc_a,
-    )
-
-    # different variant from a_type_1
-    b_type_1 = EITDataSubA(
-        path=[],
-        vendor=Vendor.DRAEGER,
-        label="B",
-        nframes=n_frames_b,
-        time=time_a2,
-        framerate=framerate,
-        variants=vc_b,
-    )
-
+def test_concatenate_invalid(
+    data_a_vc_a_1,
+    data_a_vc_a_2,
+    data_a_vc_a_3,
+    data_a_vc_b_1,
+    variant_a,
+    variant_b,
+    mock_variant,
+    EITDataSubA,
+):
     with pytest.raises(NotEquivalent):
-        _ = EITDataSubA.concatenate(a_type_1, b_type_1, label="Concatenated Data")
+        _ = EITData.concatenate(data_a_vc_a_1, data_a_vc_b_1, label="Concatenated Data")
 
     with pytest.raises(ValueError):
-        _ = EITDataSubA.concatenate(a_type_1, a_type_2, label="Concatenated Data")
+        _ = EITData.concatenate(data_a_vc_a_1, data_a_vc_a_2, label="Concatenated Data")
 
     with pytest.raises(NotEquivalent):
-        _ = EITDataSubA.concatenate(a_type_1, a_type_3, label="Concatenated Data")
+        _ = EITData.concatenate(data_a_vc_a_1, data_a_vc_a_3, label="Concatenated Data")
+
+
+def test_check_equivalence_equal_objects(data_a_vc_a_1, data_a_vc_a_2, data_a_vc_a_3):
+    # check equivalence in identical objects
+    assert EITData.check_equivalence(data_a_vc_a_1, data_a_vc_a_1)
+
+    # check equivalence in objects with the same class and variant collection, but different data
+    assert EITData.check_equivalence(data_a_vc_a_1, data_a_vc_a_2)
+
+
+def test_check_equivalence_different_timeframe(data_a_vc_a_1, data_a_vc_a_3):
+    # different timeframes
+    with pytest.raises(NotEquivalent):
+        _ = EITData.check_equivalence(data_a_vc_a_1, data_a_vc_a_3, raise_=True)
+
+    result = EITData.check_equivalence(data_a_vc_a_1, data_a_vc_a_3, raise_=False)
+    assert not result
+
+
+def test_check_equivalence_different_variant_collection(data_a_vc_a_1, data_a_vc_b_1):
+    # different variant collections
+    with pytest.raises(NotEquivalent):
+        _ = EITData.check_equivalence(data_a_vc_a_1, data_a_vc_b_1, raise_=True)
+
+    result = EITData.check_equivalence(data_a_vc_a_1, data_a_vc_b_1, raise_=False)
+
+    assert not result
+
+
+def test_check_equivalence_different_classes(data_a_vc_a_1, data_b_vc_a_1):
+    # different EITData classes
+    with pytest.raises(NotEquivalent):
+        _ = EITData.check_equivalence(data_a_vc_a_1, data_b_vc_a_1, raise_=True)
+
+    result = EITData.check_equivalence(data_a_vc_a_1, data_b_vc_a_1, raise_=False)
+
+    assert not result
