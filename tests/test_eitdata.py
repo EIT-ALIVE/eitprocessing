@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 from eitprocessing.eit_data import EITData
+from eitprocessing.eit_data.draeger import DraegerEITData
+from eitprocessing.eit_data.timpel import TimpelEITData
+from eitprocessing.eit_data.sentec import SentecEITData
 from eitprocessing.eit_data.vendor import Vendor
 from pathlib import Path
 import pytest
@@ -49,3 +52,26 @@ def test_ensure_path_list_multiple():
 
     assert result_string == paths_obj
     assert result_obj == paths_obj
+
+
+def test_get_vendor_class_draeger():
+    vendor = Vendor.DRAEGER
+    result = EITData._get_vendor_class(vendor)
+    assert result == DraegerEITData
+
+
+def test_get_vendor_class_sentec():
+    vendor = Vendor.SENTEC
+    result = EITData._get_vendor_class(vendor)
+    assert result == SentecEITData
+
+
+def test_get_vendor_class_timpel():
+    vendor = Vendor.TIMPEL
+    result = EITData._get_vendor_class(vendor)
+    assert result == TimpelEITData
+
+
+def test_get_vendor_class_invalid_vendor():
+    with pytest.raises(KeyError):
+        EITData._get_vendor_class("unexistent_key")
