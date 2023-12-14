@@ -5,8 +5,10 @@ from dataclasses import dataclass
 from dataclasses import field
 from functools import reduce
 from pathlib import Path
+from typing import Literal
 from typing import TypeAlias
 from typing import TypeVar
+from typing import overload
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
@@ -46,6 +48,20 @@ class EITData(SelectByTime, Equivalence, ABC):
     def __post_init__(self):
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
+
+    # fmt: off
+    @overload
+    @classmethod
+    def from_path(cls, path: PathArg, vendor: Vendor | str, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: Literal[False] = False) -> Self: ...
+    
+    @overload
+    @classmethod
+    def from_path(cls, path: PathArg, vendor: Vendor | str, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: Literal[True] = True) -> tuple[Self, ContinuousDataCollection, SparseDataCollection]: ...
+
+    @overload
+    @classmethod
+    def from_path(cls, path: PathArg, vendor: Vendor | str, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]: ...
+    # fmt: on
 
     @classmethod
     def from_path(  # pylint: disable=too-many-arguments,too-many-locals
@@ -100,29 +116,34 @@ class EITData(SelectByTime, Equivalence, ABC):
             single_path.resolve(strict=True)  # raises if file does not exists
 
         for single_path in paths:
-            loaded_data = vendor_class._from_path(  # pylint: disable=protected-access
-                path=single_path,
-                label=label,
-                framerate=framerate,
-                first_frame=first_frame,
-                max_frames=max_frames,
-                return_non_eit_data=return_non_eit_data,
-            )
-
             if return_non_eit_data:
-                eit, continuous, sparse = loaded_data
-
-                # assertions for type checking
-                assert isinstance(eit, EITData)
-                assert isinstance(continuous, ContinuousDataCollection)
-                assert isinstance(sparse, SparseDataCollection)
-
+                (
+                    eit,
+                    continuous,
+                    sparse,
+                ) = vendor_class._from_path(  # pylint: disable=protected-access
+                    path=single_path,
+                    label=label,
+                    framerate=framerate,
+                    first_frame=first_frame,
+                    max_frames=max_frames,
+                    return_non_eit_data=True,
+                )
                 eit_datasets.append(eit)
                 continuous_datasets.append(continuous)
                 sparse_datasets.append(sparse)
 
             else:
-                assert isinstance(loaded_data, EITData)
+                loaded_data = (
+                    vendor_class._from_path(  # pylint: disable=protected-access
+                        path=single_path,
+                        label=label,
+                        framerate=framerate,
+                        first_frame=first_frame,
+                        max_frames=max_frames,
+                        return_non_eit_data=False,
+                    )
+                )
                 eit_datasets.append(loaded_data)
 
         if return_non_eit_data:
@@ -254,6 +275,23 @@ class EITData(SelectByTime, Equivalence, ABC):
 
         return obj
 
+    # fmt: off
+    @overload
+    @classmethod
+    @abstractmethod
+    def _from_path(cls, path: Path, label: str | None = None, framerate: float | None = None, first_frame: int | None = None, max_frames: int | None = None, return_non_eit_data: Literal[False] = False) -> Self: ...
+
+    @overload
+    @classmethod
+    @abstractmethod
+    def _from_path(cls, path: Path, label: str | None = None, framerate: float | None = None, first_frame: int | None = None, max_frames: int | None = None, return_non_eit_data: Literal[True] = True) -> tuple[Self, ContinuousDataCollection, SparseDataCollection]: ...
+
+    @overload
+    @classmethod
+    @abstractmethod
+    def _from_path(cls, path: Path, label: str | None = None, framerate: float | None = None, first_frame: int | None = None, max_frames: int | None = None, return_non_eit_data: bool = False) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]: ...
+    # fmt: on
+
     @classmethod
     @abstractmethod
     def _from_path(  # pylint: disable=too-many-arguments
@@ -275,6 +313,20 @@ class EITData_(EITData):
     def __add__(self: T, other: T) -> T:
         return self.concatenate(self, other)
 
+    # fmt: off
+    @overload
+    @classmethod
+    def from_path(cls, path: PathArg, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: Literal[False] = False) -> Self: ...
+
+    @overload
+    @classmethod
+    def from_path(cls, path: PathArg, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: Literal[True] = True) -> tuple[Self, ContinuousDataCollection, SparseDataCollection]: ...
+
+    @overload
+    @classmethod
+    def from_path(cls, path: PathArg, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]: ...
+    # fmt: on
+
     @override  # remove vendor as argument
     @classmethod
     def from_path(  # pylint: disable=too-many-arguments,arguments-differ
@@ -287,13 +339,13 @@ class EITData_(EITData):
         return_non_eit_data: bool = False,
     ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
         return super().from_path(
-            path,
-            cls.vendor,
-            label,
-            framerate,
-            first_frame,
-            max_frames,
-            return_non_eit_data,
+            path=path,
+            vendor=cls.vendor,
+            label=label,
+            framerate=framerate,
+            first_frame=first_frame,
+            max_frames=max_frames,
+            return_non_eit_data=return_non_eit_data,
         )
 
 
