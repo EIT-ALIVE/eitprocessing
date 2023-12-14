@@ -19,6 +19,10 @@ class SelectByIndex(ABC):
 
     label: str
 
+    @abstractmethod
+    def __len__(self) -> int:
+        ...
+
     def __getitem__(self, key: slice | int):
         if isinstance(key, slice):
             if key.step and key.step != 1:
