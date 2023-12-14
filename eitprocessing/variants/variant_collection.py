@@ -57,6 +57,9 @@ class VariantCollection(dict, Equivalence, Generic[V]):
 
     variant_type: type[V]
 
+    def __eq__(self, other):
+        return self.variant_type == other.variant_type and super().__eq__(other)
+
     def __init__(self, variant_type: type[V], *args, **kwargs):
         if not issubclass(variant_type, Variant):
             raise TypeError(f"{variant_type} is not a subclass of Variant")
