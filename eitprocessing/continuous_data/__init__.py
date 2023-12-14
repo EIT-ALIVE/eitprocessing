@@ -7,7 +7,6 @@ from typing_extensions import Self
 from typing_extensions import override
 from eitprocessing.continuous_data.continuous_data_variant import ContinuousDataVariant
 from eitprocessing.mixins.equality import Equivalence
-from eitprocessing.mixins.equality import EquivalenceError
 from eitprocessing.variants.variant_collection import VariantCollection
 
 
