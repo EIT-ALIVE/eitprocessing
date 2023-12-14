@@ -23,13 +23,15 @@ from eitprocessing.variants.variant_collection import VariantCollection
 
 
 PathLike: TypeAlias = str | Path
-PathArg: TypeAlias = PathLike | list[PathLike]
+# this requires explicit list[Path] and list[str] separately for type checking
+PathArg: TypeAlias = PathLike | list[PathLike] | list[Path] | list[str]
+PathAttr: TypeAlias = Path | list[Path]
 T = TypeVar("T", bound="EITData")
 
 
 @dataclass(eq=False)
 class EITData(SelectByTime, Equivalence, ABC):
-    path: Path | list[Path]
+    path: PathAttr
     nframes: int
     time: NDArray
     framerate: float
@@ -255,7 +257,7 @@ class EITData(SelectByTime, Equivalence, ABC):
     @classmethod
     @abstractmethod
     def _from_path(  # pylint: disable=too-many-arguments
-        cls: type[Self],
+        cls,
         path: Path,
         label: str | None = None,
         framerate: float | None = None,

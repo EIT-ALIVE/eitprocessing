@@ -49,7 +49,7 @@ class ButterworthFilter(TimeDomainFilter):
     """
 
     filter_type: Literal["lowpass", "highpass", "bandpass", "bandstop"]
-    cutoff_frequency: float | tuple[float]
+    cutoff_frequency: float | tuple[float, float]
     order: int
     sample_frequency: float
     ignore_max_order: InitVar[bool] = False

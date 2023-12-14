@@ -36,7 +36,7 @@ class Equivalence(ABC):
         self,
         other: Self,
         raise_: bool = False,
-        checks: dict[str, bool] = None,
+        checks: dict[str, bool] | None = None,
     ) -> bool:
         """Test whether the data structure between two objects are equivalent.
 
