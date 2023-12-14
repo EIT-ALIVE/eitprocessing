@@ -113,6 +113,7 @@ class DraegerEITData(EITData_):
         obj.variants.add(
             EITDataVariant(
                 name="raw",
+                label="",
                 description="raw impedance data",
                 pixel_impedance=pixel_impedance,
             )
@@ -146,6 +147,7 @@ class DraegerEITData(EITData_):
                 continuous_data.variants.add(
                     ContinuousDataVariant(
                         name="raw",
+                        label="",
                         description="raw data loaded from file",
                         values=data,
                     )

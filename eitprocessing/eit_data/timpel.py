@@ -123,6 +123,7 @@ class TimpelEITData(EITData_):
         obj.variants.add(
             EITDataVariant(
                 name="raw",
+                label="",
                 description="raw impedance data",
                 pixel_impedance=pixel_impedance,
             )
