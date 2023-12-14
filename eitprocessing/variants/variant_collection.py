@@ -118,17 +118,24 @@ class VariantCollection(dict, Equivalence, Generic[V]):
     def isequivalent(
         self,
         other: Self,
-        raise_=True,
+        raise_=False,
     ) -> bool:
-        # fmt: off
-        checks = {
-            f"Variant types don't match: {self.variant_type}, {other.variant_type}": self.variant_type == other.variant_type,
-            f"VariantCollections do not contain the same variants: {self.keys()=}, {other.keys()=}": set(self.keys()) == set(other.keys()),
-        }
-        for key in self.keys():
-            checks[f"Variant data ({key}) is not equivalent: {self[key]}, {other[key]}"] = \
-                Variant.isequivalent(self[key], other[key], raise_)
-        # fmt: on
+        try:
+            # fmt: off
+            checks = {
+                f"Variant types don't match: {self.variant_type}, {other.variant_type if hasattr(other, 'variant_type') else ''}": hasattr(self, "variant_type") and hasattr(other, "variant_type") and self.variant_type == other.variant_type,
+                f"VariantCollections do not contain the same variants: {self.keys()=}, {other.keys() if hasattr(other, 'keys') else ''=}": hasattr(self, "keys") and hasattr(other, "keys") and set(self.keys()) == set(other.keys()),
+            }
+            for key in set(self.keys()) & set(other.keys()):
+                checks[f"Variant data ({key}) is not equivalent: {self[key]}, {other[key]}"] = \
+                    Variant.isequivalent(self[key], other[key], raise_)
+            # fmt: on
+        except EquivalenceError:
+            if raise_:
+                raise
+            return False
+        except Exception:
+            raise EquivalenceError("Unknown error")
         return super().isequivalent(other, raise_, checks)
 
     def __ne__(self: Self, other: Self) -> bool:
