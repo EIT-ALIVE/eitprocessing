@@ -123,7 +123,7 @@ def test_keys(VariantSubA, variant_A_a, variant_A_b, variant_B_a, variant_B_b):
         vc1["some_name"] = variant_B_b
 
 
-def test_check_equivalence(VariantSubA):
+def test_isequivalent(VariantSubA):
     v1a = VariantSubA("name_a", "label_a", "description_a", data=[1, 2, 3])
     v1b = VariantSubA("name_b", "label_b", "description_b", data=[4, 5, 6])
     v1c = VariantSubA("name_c", "label_c", "description_c", data=[7, 8, 9])
@@ -177,5 +177,5 @@ def test_concatenate(VariantSubA):
     assert vc_concat1 == vc_concat2
     assert vc_concat1["name_a"].data == v1a.data + v2a.data
     assert vc_concat1["name_b"].data == v1b.data + v2b.data
-    assert vc_concat1["name_a"].check_equivalence(v1a)
-    assert vc_concat1["name_a"].check_equivalence(v2a)
+    assert vc_concat1["name_a"].isequivalent(v1a)
+    assert vc_concat1["name_a"].isequivalent(v2a)
