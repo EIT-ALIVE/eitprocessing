@@ -13,7 +13,7 @@ class Equivalence(ABC):
         if self is other:
             return True
         if is_dataclass(self):
-            if self.__class__ is not other.__class__:
+            if type(self) is not type(other):
                 return NotImplemented
             t1 = astuple(self)
             t2 = astuple(other)
