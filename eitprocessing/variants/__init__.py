@@ -5,7 +5,6 @@ from dataclasses import field
 from typing import get_type_hints
 from typing_extensions import Self
 from eitprocessing.mixins.equality import Equivalence
-from eitprocessing.mixins.equality import EquivalenceError
 
 
 @dataclass(eq=False)
