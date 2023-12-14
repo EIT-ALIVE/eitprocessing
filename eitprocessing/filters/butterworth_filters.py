@@ -100,7 +100,15 @@ class ButterworthFilter(TimeDomainFilter):
 
         elif self.filter_type in ("bandpass", "bandstop"):
             if isinstance(self.cutoff_frequency, list):
-                self.cutoff_frequency = tuple(self.cutoff_frequency)
+                # check length before setting self.cutoff_frequency to appease
+                # the type checker
+                cutoff_frequency = tuple(self.cutoff_frequency)
+                if len(cutoff_frequency) != 2:
+                    raise ValueError(
+                        f"Invalid `cutoff_frequency` {self.cutoff_frequency}. "
+                        "Must have length 2."
+                    )
+                self.cutoff_frequency = cutoff_frequency
             elif not isinstance(self.cutoff_frequency, tuple):
                 raise TypeError(
                     "Invalid `cutoff_frequency`. "
