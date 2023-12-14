@@ -44,7 +44,7 @@ def test_butterworth_order(filter_arguments):
     del filter_arguments["order"]
 
     with pytest.raises(TypeError):
-        ButterworthFilter(**filter_arguments, order="not a number")
+        ButterworthFilter(**filter_arguments, order="not a number")  # type: ignore
 
     with pytest.raises(ValueError):
         ButterworthFilter(**filter_arguments, order=-5)
@@ -108,7 +108,7 @@ def test_butterworth_cutoff_frequency_sequence(filter_arguments):
 
     try:
         ButterworthFilter(**filter_arguments, cutoff_frequency=(20, 30))
-        ButterworthFilter(**filter_arguments, cutoff_frequency=[20, 30])
+        ButterworthFilter(**filter_arguments, cutoff_frequency=[20, 30])  # type: ignore
     except (ValueError, TypeError):
         pytest.fail("Unexpected error")
 
@@ -117,7 +117,7 @@ def test_butterworth_sample_frequency(filter_arguments):
     del filter_arguments["sample_frequency"]
 
     with pytest.raises(TypeError):
-        ButterworthFilter(**filter_arguments, sample_frequency="a string")
+        ButterworthFilter(**filter_arguments, sample_frequency="a string")  # type: ignore
 
     with pytest.raises(ValueError):
         ButterworthFilter(**filter_arguments, sample_frequency=-1)
