@@ -120,7 +120,7 @@ class SelectByTime(SelectByIndex):
             Slice of self.
         """
 
-        if not "time" in vars(self):
+        if "time" not in vars(self):
             raise TypeError(f"Object {self} has no time axis.")
 
         if start_time is None and end_time is None:
