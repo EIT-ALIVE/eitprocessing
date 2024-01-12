@@ -1,17 +1,37 @@
 from dataclasses import dataclass, field
+
+from eitprocessing.continuous_data import ContinuousData
+from eitprocessing.continuous_data.continuous_data_collection import (
+    ContinuousDataCollection,
+)
 from eitprocessing.eit_data import EITData
 from eitprocessing.eit_data import NotEquivalent, NoVendorProvided, UnknownVendor
 from eitprocessing.eit_data.draeger import DraegerEITData
 from eitprocessing.eit_data.timpel import TimpelEITData
 from eitprocessing.eit_data.sentec import SentecEITData
 from eitprocessing.eit_data.vendor import Vendor
+from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from eitprocessing.variants import Variant
 from eitprocessing.variants.variant_collection import VariantCollection
 from pathlib import Path
 from typing_extensions import Self
 
 import numpy as np
+import os
 import pytest
+
+from eitprocessing.eit_data.eit_data_variant import EITDataVariant
+
+environment = os.environ.get(
+    "EIT_PROCESSING_TEST_DATA",
+    os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+)
+data_directory = os.path.join(environment, "tests", "test_data")
+draeger_file1 = os.path.join(data_directory, "Draeger_Test.bin")
+draeger_file2 = os.path.join(data_directory, "Draeger_Test3.bin")
+sentec_file = os.path.join(data_directory, "Sentec_Test.zri")
+timpel_file = os.path.join(data_directory, "Timpel_Test.txt")
+dummy_file = os.path.join(data_directory, "not_a_file.dummy")
 
 
 @pytest.fixture
@@ -361,3 +381,62 @@ def test_check_equivalence_different_classes(data_a_vc_a_1, data_b_vc_a_1):
     result = EITData.check_equivalence(data_a_vc_a_1, data_b_vc_a_1, raise_=False)
 
     assert not result
+
+
+def test_from_path_illegal_path():
+    for vendor in ["draeger", "timpel", "sentec"]:
+        with pytest.raises(FileNotFoundError):
+            _ = EITData.from_path(dummy_file, vendor=vendor)
+
+
+def test_from_path_illegal_vendor():
+    for file in [draeger_file1, timpel_file, sentec_file]:
+        with pytest.raises(UnknownVendor):
+            _ = EITData.from_path(path=file, vendor="some vendor")
+
+    for vendor in ["draeger", "timpel"]:
+        with pytest.raises(OSError):
+            _ = EITData.from_path(path=sentec_file, vendor=vendor)
+
+    # TODO: these tests will fail as the Sentec data reader is not yet merged
+    for vendor in ["sentec", "draeger"]:
+        with pytest.raises(OSError):
+            _ = EITData.from_path(path=timpel_file, vendor=vendor)
+
+    # TODO: these tests will fail as the Sentec data reader is not yet merged
+    for vendor in ["timpel", "sentec"]:
+        with pytest.raises(OSError):
+            _ = EITData.from_path(path=draeger_file1, vendor=vendor)
+
+    with pytest.raises(OSError):
+        _ = EITData.from_path(path=[draeger_file1, timpel_file], vendor="draeger")
+
+
+def test_from_path_draeger():
+    draeger_data1 = EITData.from_path(path=draeger_file1, vendor="draeger")
+    draeger_data2 = EITData.from_path(path=draeger_file2, vendor="draeger")
+
+    assert isinstance(draeger_data1, DraegerEITData)
+    assert len(draeger_data1.time) == 20740
+    assert draeger_data1 != draeger_data2
+
+    # Multiple files
+    draeger_data_both = EITData.from_path(
+        path=[draeger_file1, draeger_file2], vendor="draeger"
+    )
+
+    assert isinstance(draeger_data_both, DraegerEITData)
+    assert len(draeger_data_both.time) == len(draeger_data1.time) + len(
+        draeger_data2.time
+    )
+
+
+def test_from_path_non_eit_data():
+    loaded_data = EITData.from_path(
+        path=draeger_file1, vendor="draeger", return_non_eit_data=True
+    )
+
+    assert isinstance(loaded_data, tuple)
+    assert isinstance(loaded_data[0], DraegerEITData)
+    assert isinstance(loaded_data[1], ContinuousDataCollection)
+    assert isinstance(loaded_data[2], SparseDataCollection)

@@ -238,7 +238,14 @@ class EITData(SelectByTime, Equivalence, ABC):
         end_index: int,
         label: str,
     ) -> Self:
-        cls = self.__class__
+        cls = self._get_vendor_class(self.vendor)
+
+        if end_index <= start_index:
+            msg = f"{end_index} (end_index) lower than {start_index} (start_index)."
+            raise ValueError(
+                msg,
+            )
+
         time = self.time[start_index:end_index]
         nframes = len(time)
 
