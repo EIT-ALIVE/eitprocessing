@@ -83,6 +83,8 @@ time_a = (np.arange(0, 100),)
 time_a2 = (np.arange(100, 200),)
 time_b = (np.arange(50, 200),)
 
+draeger_filelength = 20740
+
 
 @pytest.fixture
 def variant_collection_a(mock_variant, variant_a):
@@ -417,7 +419,7 @@ def test_from_path_draeger():
     draeger_data2 = EITData.from_path(path=draeger_file2, vendor="draeger")
 
     assert isinstance(draeger_data1, DraegerEITData)
-    assert len(draeger_data1.time) == 20740
+    assert len(draeger_data1.time) == draeger_filelength
     assert draeger_data1 != draeger_data2
 
     # Multiple files
@@ -440,3 +442,84 @@ def test_from_path_non_eit_data():
     assert isinstance(loaded_data[0], DraegerEITData)
     assert isinstance(loaded_data[1], ContinuousDataCollection)
     assert isinstance(loaded_data[2], SparseDataCollection)
+
+
+def test_sliced_copy():
+    draeger_data1 = EITData.from_path(
+        path=draeger_file1, vendor="draeger", return_non_eit_data=False
+    )
+
+    timpel_data = EITData.from_path(
+        path=timpel_file, vendor="timpel", return_non_eit_data=False
+    )
+
+    # sentec_data = EITData.from_path(
+    #     path=sentec_file, vendor="sentec", return_non_eit_data=False
+    # )
+
+    start_index = 10
+    end_index = 100
+
+    draeger_start_time = draeger_data1.time[start_index]
+    draeger_end_time = draeger_data1.time[end_index - 1]
+
+    timpel_start_time = timpel_data.time[start_index]
+    timpel_end_time = timpel_data.time[end_index - 1]
+
+    # invalid indexes
+    with pytest.raises(ValueError):
+        _ = draeger_data1._sliced_copy(
+            start_index=end_index, end_index=start_index, label="sliced draeger"
+        )
+    with pytest.raises(ValueError):
+        _ = timpel_data._sliced_copy(
+            start_index=end_index, end_index=start_index, label="sliced timpel"
+        )
+    # with pytest.raises(ValueError):
+    #     _ = sentec_data._sliced_copy(
+    #         start_index=end_index, end_index=start_index, label="sliced sentec"
+    #     )
+
+    # index out file length
+    # TODO: add sentec data
+    for data in [draeger_data1, timpel_data]:
+        filelength = len(data.time)
+
+        with pytest.raises(ValueError):
+            _ = data._sliced_copy(
+                start_index=filelength + 1,
+                end_index=filelength + 2,
+                label="sliced draeger",
+            )
+
+    draeger_data1_sliced = draeger_data1._sliced_copy(
+        start_index=start_index, end_index=end_index, label="sliced draeger"
+    )
+
+    timpel_data_sliced = timpel_data._sliced_copy(
+        start_index=start_index, end_index=end_index, label="sliced timpel"
+    )
+    # sentec_data_sliced = sentec_data._sliced_copy(
+    #     start_index=start_index, end_index=end_index, label="sliced sentec"
+    # )
+
+    assert isinstance(draeger_data1_sliced, DraegerEITData)
+    assert draeger_data1_sliced.vendor == Vendor.DRAEGER
+    assert isinstance(timpel_data_sliced, TimpelEITData)
+    assert timpel_data_sliced.vendor == Vendor.TIMPEL
+    # assert isinstance(sentec_data_sliced, SentecEITData)
+    # assert sentec_data_sliced.vendor == Vendor.SENTEC
+
+    # TODO: add sentec data
+    for data in [draeger_data1_sliced, timpel_data_sliced]:
+        assert len(data.time) == end_index - start_index
+
+        if data == draeger_data1_sliced:
+            start_time = draeger_start_time
+            end_time = draeger_end_time
+        elif data == timpel_data_sliced:
+            start_time = timpel_start_time
+            end_time = timpel_end_time
+
+        assert data.time[0] == start_time
+        assert data.time[-1] == end_time

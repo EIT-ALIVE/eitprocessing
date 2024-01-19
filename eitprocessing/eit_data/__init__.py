@@ -246,6 +246,18 @@ class EITData(SelectByTime, Equivalence, ABC):
                 msg,
             )
 
+        time_length = len(self.time)
+
+        if start_index >= time_length:
+            raise ValueError(
+                f"{start_index} (start_index) higher than maximum time length {time_length}."
+            )
+
+        if end_index >= time_length:
+            raise ValueError(
+                f"{end_index} (end_index) higher than maximum time length {time_length}."
+            )
+
         time = self.time[start_index:end_index]
         nframes = len(time)
 
