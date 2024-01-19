@@ -1,6 +1,4 @@
 from dataclasses import dataclass, field
-
-from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.continuous_data.continuous_data_collection import (
     ContinuousDataCollection,
 )
@@ -20,8 +18,6 @@ import numpy as np
 import os
 import pytest
 
-from eitprocessing.eit_data.eit_data_variant import EITDataVariant
-
 environment = os.environ.get(
     "EIT_PROCESSING_TEST_DATA",
     os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
@@ -32,6 +28,15 @@ draeger_file2 = os.path.join(data_directory, "Draeger_Test3.bin")
 sentec_file = os.path.join(data_directory, "Sentec_Test.zri")
 timpel_file = os.path.join(data_directory, "Timpel_Test.txt")
 dummy_file = os.path.join(data_directory, "not_a_file.dummy")
+
+framerate = 100
+n_frames_a = 100
+n_frames_b = 200
+time_a = (np.arange(0, 100),)
+time_a2 = (np.arange(100, 200),)
+time_b = (np.arange(50, 200),)
+
+draeger_filelength = 20740
 
 
 @pytest.fixture
@@ -74,16 +79,6 @@ def variant_a(mock_variant):
 @pytest.fixture
 def variant_b(mock_variant):
     return mock_variant("name_b", "label_b", "description_b", data=np.arange(50, 150))
-
-
-framerate = 100
-n_frames_a = 100
-n_frames_b = 200
-time_a = (np.arange(0, 100),)
-time_a2 = (np.arange(100, 200),)
-time_b = (np.arange(50, 200),)
-
-draeger_filelength = 20740
 
 
 @pytest.fixture
@@ -257,9 +252,12 @@ def test_ensure_vendor_valid_timpel():
     assert result_string == vendor_enum
 
 
-def test_ensure_vendor_invalid_vendor_string():
+def test_ensure_vendor_invalid_vendor():
     with pytest.raises(UnknownVendor):
         EITData._ensure_vendor("unknown_vendor")
+
+    with pytest.raises(UnknownVendor):
+        EITData._ensure_vendor(123)
 
     with pytest.raises(NoVendorProvided):
         EITData._ensure_vendor("")
@@ -268,41 +266,27 @@ def test_ensure_vendor_invalid_vendor_string():
         EITData._ensure_vendor(None)
 
 
-# TODO: add also other types?
-# def test_ensure_vendor_invalid_vendor_type():
-#     with pytest.raises(TypeError, match="must be a str or Vendor enum"):
-#         EITData._ensure_vendor(123)
+def test_check_first_frame():
+    # valid values
 
-
-def test_check_first_frame_none():
     result = EITData._check_first_frame(None)
     assert result == 0
 
-
-def test_check_first_frame_positive_integer():
     result = EITData._check_first_frame(5)
     assert result == 5
 
-
-def test_check_first_frame_negative_integer():
+    # invalid values
     with pytest.raises(ValueError):
         EITData._check_first_frame(-3)
 
-
-def test_check_first_frame_float():
     with pytest.raises(TypeError):
         EITData._check_first_frame(3.5)
 
+    with pytest.raises(TypeError):
+        EITData._check_first_frame("abc")
 
-# TODO: check if we want to take into account other types (to except)
-# def test_check_first_frame_string():
-#     with pytest.raises(TypeError):
-#         EITData._check_first_frame("abc")
-#
-#
-# def test_check_first_frame_object():
-#     with pytest.raises(TypeError):
-#         EITData._check_first_frame(object())
+    with pytest.raises(TypeError):
+        EITData._check_first_frame(object())
 
 
 def test_concatenate_valid(data_a_vc_a_1, EITDataSubA, variant_collection_a):

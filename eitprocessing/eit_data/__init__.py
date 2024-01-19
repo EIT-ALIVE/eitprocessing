@@ -177,8 +177,9 @@ class EITData(SelectByTime, Equivalence, ABC):
         if first_frame is None:
             first_frame = 0
         if int(first_frame) != first_frame:
-            msg = f"`first_frame` must be an int, but was given as {first_frame} (type: {type(first_frame)})"
-            raise TypeError(msg)
+            raise TypeError(
+                f"`first_frame` must be an int, but was given as" f" {first_frame} (type: {type(first_frame)})"
+            )
         if first_frame < 0:
             msg = f"`first_frame` can not be negative, but was given as {first_frame}"
             raise ValueError(msg)
@@ -249,14 +250,10 @@ class EITData(SelectByTime, Equivalence, ABC):
         time_length = len(self.time)
 
         if start_index >= time_length:
-            raise ValueError(
-                f"{start_index} (start_index) higher than maximum time length {time_length}."
-            )
+            raise ValueError(f"{start_index} (start_index) higher than maximum time length {time_length}.")
 
         if end_index >= time_length:
-            raise ValueError(
-                f"{end_index} (end_index) higher than maximum time length {time_length}."
-            )
+            raise ValueError(f"{end_index} (end_index) higher than maximum time length {time_length}.")
 
         time = self.time[start_index:end_index]
         nframes = len(time)
