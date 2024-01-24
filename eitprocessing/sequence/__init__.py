@@ -12,7 +12,9 @@ import copy
 import warnings
 from dataclasses import dataclass
 import numpy as np
+from ..continuous_data import ContinuousData
 from ..eit_data import EITData
+from ..sparse_data import SparseData
 from ..helper import NotEquivalent
 
 
@@ -38,7 +40,9 @@ class Sequence:
     """
 
     label: str | None = None
+    continuous_data: ContinuousData | None = None
     eit_data: EITData | None = None
+    sparse_data: SparseData | None = None
 
     def __post_init__(self):
         if self.label is None:
