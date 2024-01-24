@@ -3,10 +3,12 @@
 import copy
 import os
 import pytest  # noqa
-from eitprocessing.binreader.sequence import DraegerSequence
-from eitprocessing.binreader.sequence import Sequence
-from eitprocessing.binreader.sequence import TimpelSequence
-from eitprocessing.binreader.sequence import Vendor
+
+
+# from eitprocessing.binreader.sequence import DraegerSequence
+# from eitprocessing.binreader.sequence import Sequence
+# from eitprocessing.binreader.sequence import TimpelSequence
+# from eitprocessing.binreader.sequence import Vendor
 
 
 environment = os.environ.get(
@@ -46,9 +48,9 @@ def timpel_data_double():
 
 
 def test_from_path_draeger(
-    draeger_data1: DraegerSequence,
-    draeger_data2: DraegerSequence,
-    draeger_data_both: DraegerSequence,
+    draeger_data1,  #: DraegerSequence,
+    draeger_data2,  #: DraegerSequence,
+    draeger_data_both,  #: DraegerSequence,
 ):
     assert isinstance(draeger_data1, DraegerSequence)
     assert isinstance(draeger_data1, Sequence)
@@ -69,9 +71,9 @@ def test_from_path_draeger(
 
 
 def test_from_path_timpel(
-    draeger_data1: DraegerSequence,
-    timpel_data: TimpelSequence,
-    timpel_data_double: TimpelSequence,
+    draeger_data1,  #: DraegerSequence,
+    timpel_data,  #: TimpelSequence,
+    timpel_data_double,  #: TimpelSequence,
 ):
     using_vendor = Sequence.from_path(timpel_file, vendor=Vendor.TIMPEL)
     assert timpel_data == using_vendor
@@ -115,11 +117,11 @@ def test_illegal_vendor():
 
 
 def test_merge(  # pylint: disable=too-many-locals
-    draeger_data1: DraegerSequence,
-    draeger_data2: DraegerSequence,
-    draeger_data_both: DraegerSequence,
-    timpel_data: TimpelSequence,
-    timpel_data_double: TimpelSequence,
+    draeger_data1,  #: DraegerSequence,
+    draeger_data2,  #: DraegerSequence,
+    draeger_data_both,  #: DraegerSequence,
+    timpel_data,  #: TimpelSequence,
+    timpel_data_double,  #: TimpelSequence,
 ):
     merged_draeger = Sequence.merge(draeger_data1, draeger_data2)
     assert len(merged_draeger) == len(draeger_data2) + len(draeger_data1)
@@ -170,8 +172,8 @@ def test_merge(  # pylint: disable=too-many-locals
 
 
 def test_copy(
-    draeger_data1: DraegerSequence,
-    timpel_data: TimpelSequence,
+    draeger_data1,  #: DraegerSequence,
+    timpel_data,  #: TimpelSequence,
 ):
     data: Sequence
     for data in [draeger_data1, timpel_data]:
@@ -181,8 +183,8 @@ def test_copy(
 
 
 def test_equals(
-    draeger_data1: DraegerSequence,
-    timpel_data: TimpelSequence,
+    draeger_data1,  #: DraegerSequence,
+    timpel_data,  #: TimpelSequence,
 ):
     data: Sequence
     for data in [draeger_data1, timpel_data]:
@@ -221,8 +223,8 @@ def test_equals(
 
 
 def test_slicing(
-    draeger_data1: DraegerSequence,
-    timpel_data: TimpelSequence,
+    draeger_data1,  #: DraegerSequence,
+    timpel_data,  #: TimpelSequence,
 ):
     cutoff = 100
 
@@ -240,8 +242,8 @@ def test_slicing(
 
 
 def test_load_partial(
-    draeger_data2: DraegerSequence,
-    timpel_data: TimpelSequence,
+    draeger_data2,  #: DraegerSequence,
+    timpel_data,  #: TimpelSequence,
 ):
     cutoff = 58
     # Keep cutoff at 58 for draeger_data2 as there is an event mark at this
@@ -284,7 +286,7 @@ def test_illegal_first():
 
 
 def test_select_by_time(
-    draeger_data2: DraegerSequence,
+    draeger_data2,  #: DraegerSequence,
 ):
     # TODO (#82): this function is kinda ugly. Would be nice to refactor it
     # but I am struggling to think of a logical way to loop through.
@@ -370,8 +372,8 @@ def test_select_by_time(
 
 
 def test_label(
-    draeger_data1: DraegerSequence,
-    draeger_data2: DraegerSequence,
+    draeger_data1,  #: DraegerSequence,
+    draeger_data2,  #: DraegerSequence,
 ):
     assert isinstance(draeger_data1.label, str), "default label is not a string"
     assert (
@@ -414,8 +416,8 @@ def test_label(
 
 
 def test_relabeling(
-    timpel_data: TimpelSequence,
-    draeger_data2: DraegerSequence,
+    timpel_data,  #: TimpelSequence,
+    draeger_data2,  #: DraegerSequence,
 ):
     test_label = "test label"
 
