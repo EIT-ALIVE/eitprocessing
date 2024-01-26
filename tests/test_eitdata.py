@@ -428,6 +428,21 @@ def test_from_path_non_eit_data():
     assert isinstance(loaded_data[2], SparseDataCollection)
 
 
+def test_from_path_non_eit_data_not_present():
+    # timpel returns just eit data
+    with pytest.warns(UserWarning):
+        loaded_data = EITData.from_path(
+            path=timpel_file, vendor="timpel", return_non_eit_data=True
+        )
+
+        assert isinstance(loaded_data, tuple)
+        assert isinstance(loaded_data[0], TimpelEITData)
+        assert isinstance(loaded_data[1], ContinuousDataCollection)
+        assert len(loaded_data[1]) == 0
+        assert isinstance(loaded_data[2], SparseDataCollection)
+        assert len(loaded_data[2]) == 0
+
+
 def test_sliced_copy():
     draeger_data1 = EITData.from_path(
         path=draeger_file1, vendor="draeger", return_non_eit_data=False
