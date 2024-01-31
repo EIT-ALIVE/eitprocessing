@@ -82,7 +82,7 @@ class SentecEITData(EITData_):
                                 time_caption -= first_time
 
                                 # convert to seconds and store
-                                time.append(time_caption / 1000000)
+                                time.append(time_caption)
 
                             elif data_id == 5:
                                 index += 1
@@ -133,7 +133,7 @@ class SentecEITData(EITData_):
             path=path,
             framerate=framerate,
             nframes=n_frames,
-            time=np.array(time),
+            time=np.unwrap(np.array(time), period=np.iinfo(np.uint32).max) / 1000000,
             label=label,
         )
         obj.variants.add(
