@@ -1,3 +1,4 @@
+import mmap
 import numpy as np
 import warnings
 from dataclasses import dataclass, field
@@ -32,86 +33,87 @@ class SentecEITData(EITData_):
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
     ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
-        with open(path, "br") as fh:
-            # Find the length of the file
-            fh.seek(0, 2)
-            file_length = fh.tell()
+        with open(path, "br") as fo:
+            with mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
+                # Find the length of the file
+                fh.seek(0, 2)
+                file_length = fh.tell()
 
-            # go back to the beginning of the file
-            fh.seek(0, 0)
+                # go back to the beginning of the file
+                fh.seek(0, 0)
 
-            # instantiate reader
-            reader = Reader(fh, endian="little")
+                # instantiate reader
+                reader = Reader(fh, endian="little")
 
-            # read the version int8
-            version = reader.uint8()
+                # read the version int8
+                version = reader.uint8()
 
-            time = []
-            image = []
-            index = 0
-            first_time = None
+                time = []
+                image = []
+                index = 0
+                first_time = None
 
-            # while there are still data to be read and the number of read data points is higher
-            # than the maximum specified, keep reading
-            while fh.tell() < file_length and (
-                max_frames is None or len(time) < max_frames
-            ):
-                # Skip timestamp reading
-                fh.seek(8, 1)
-                # Read DomainId uint8
-                domain_id = reader.uint8()
-                # read number of data fields uint8
-                number_data_fields = reader.uint8()
+                # while there are still data to be read and the number of read data points is higher
+                # than the maximum specified, keep reading
+                while fh.tell() < file_length and (
+                    max_frames is None or len(time) < max_frames
+                ):
+                    # Skip timestamp reading
+                    fh.seek(8, 1)
+                    # Read DomainId uint8
+                    domain_id = reader.uint8()
+                    # read number of data fields uint8
+                    number_data_fields = reader.uint8()
 
-                for _ in range(number_data_fields):
-                    # read data id uint8
-                    data_id = reader.uint8()
-                    # read payload size ushort
-                    payload_size = reader.ushort()
+                    for _ in range(number_data_fields):
+                        # read data id uint8
+                        data_id = reader.uint8()
+                        # read payload size ushort
+                        payload_size = reader.ushort()
 
-                    if payload_size != 0:
-                        # read frame (domain 16 = measurements, data 5 = zero_ref_image)
-                        if domain_id == 16:
-                            if data_id == 0:
-                                time_caption = reader.uint32()
+                        if payload_size != 0:
+                            # read frame (domain 16 = measurements, data 5 = zero_ref_image)
+                            if domain_id == 16:
+                                if data_id == 0:
+                                    time_caption = reader.uint32()
 
-                                # save the first time value and subtract it from each time stamp
-                                if not first_time:
-                                    first_time = time_caption
+                                    # save the first time value and subtract it from each time stamp
+                                    if not first_time:
+                                        first_time = time_caption
 
-                                time_caption -= first_time
+                                    time_caption -= first_time
 
-                                # convert to seconds and store
-                                time.append(time_caption)
+                                    # convert to seconds and store
+                                    time.append(time_caption)
 
-                            elif data_id == 5:
-                                index += 1
+                                elif data_id == 5:
+                                    index += 1
 
-                                ref = cls._read_frame(
-                                    fh,
-                                    version,
-                                    index,
-                                    payload_size,
-                                    reader,
-                                    first_frame,
+                                    ref = cls._read_frame(
+                                        fh,
+                                        version,
+                                        index,
+                                        payload_size,
+                                        reader,
+                                        first_frame,
+                                    )
+
+                                    if ref is not None:
+                                        image.append(ref)
+                                else:
+                                    fh.seek(payload_size, 1)
+
+                            # read the framerate from the file, if present
+                            # (domain 64 = configuration, data 5 = framerate)
+                            elif domain_id == 64 and data_id == 1:
+                                framerate = reader.float32()
+                                warnings.warn(
+                                    f"Framerate value found in file. The framerate value "
+                                    f"will be set to {framerate}"
                                 )
 
-                                if ref is not None:
-                                    image.append(ref)
                             else:
                                 fh.seek(payload_size, 1)
-
-                        # read the framerate from the file, if present
-                        # (domain 64 = configuration, data 5 = framerate)
-                        elif domain_id == 64 and data_id == 1:
-                            framerate = reader.float32()
-                            warnings.warn(
-                                f"Framerate value found in file. The framerate value "
-                                f"will be set to {framerate}"
-                            )
-
-                        else:
-                            fh.seek(payload_size, 1)
 
         n_frames = len(image) if image is not None else 0
 
