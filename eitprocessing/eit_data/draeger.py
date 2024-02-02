@@ -1,24 +1,24 @@
 import sys
 import warnings
 from collections import namedtuple
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from pathlib import Path
+
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
+
 from eitprocessing.continuous_data.continuous_data_collection import (
     ContinuousDataCollection,
 )
-from eitprocessing.continuous_data.continuous_data_variant import ContinuousDataVariant
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
+
 from ..binreader.reader import Reader
 from ..continuous_data import ContinuousData
 from . import EITData_
 from .eit_data_variant import EITDataVariant
 from .event import Event
-from .phases import MaxValue
-from .phases import MinValue
+from .phases import MaxValue, MinValue
 from .vendor import Vendor
 
 
@@ -45,17 +45,23 @@ class DraegerEITData(EITData_):
 
         file_size = path.stat().st_size
         if file_size % FRAME_SIZE_BYTES:
-            raise OSError(
-                f"File size {file_size} of file {str(path)} not divisible by "
+            msg = (
+                f"File size {file_size} of file {path!s} not divisible by "
                 f"{FRAME_SIZE_BYTES}.\n"
                 f"Make sure this is a valid and uncorrupted Dräger data file."
+            )
+            raise OSError(
+                msg,
             )
         total_frames = file_size // FRAME_SIZE_BYTES
 
         if first_frame > total_frames:
-            raise ValueError(
+            msg = (
                 f"Invalid input: `first_frame` {first_frame} is larger than the "
                 f"total number of frames in the file {total_frames}."
+            )
+            raise ValueError(
+                msg,
             )
 
         n_frames = min(total_frames - first_frame, max_frames or sys.maxsize)
@@ -65,7 +71,7 @@ class DraegerEITData(EITData_):
                 f"The number of frames requested ({max_frames}) is larger "
                 f"than the available number ({n_frames}) of frames after "
                 f"the first frame selected ({first_frame}, total frames: "
-                f"{total_frames}).\n {n_frames} frames will be loaded."
+                f"{total_frames}).\n {n_frames} frames will be loaded.",
             )
 
         # We need to load 1 frame before first actual frame to check if there
@@ -115,42 +121,35 @@ class DraegerEITData(EITData_):
                 label="raw",
                 description="raw impedance data",
                 pixel_impedance=pixel_impedance,
-            )
+            ),
         )
         if return_non_eit_data:
             (
                 continuous_data_coll,
                 sparse_data_coll,
-            ) = cls._convert_medibus_data(medibus_data, time)
+            ) = cls._convert_medibus_data(medibus_data)
 
             return (obj, continuous_data_coll, sparse_data_coll)
 
         return obj
 
     @classmethod
-    def _convert_medibus_data(
-        cls, medibus_data: NDArray, time: NDArray
-    ) -> tuple[ContinuousDataCollection, SparseDataCollection]:
+    def _convert_medibus_data(cls, medibus_data: NDArray) -> tuple[ContinuousDataCollection, SparseDataCollection]:
         continuous_data_collection = ContinuousDataCollection()
         sparse_data_collection = SparseDataCollection()
 
         for field_info, data in zip(medibus_fields, medibus_data):
             if field_info.continuous:
                 continuous_data = ContinuousData(
+                    label=field_info.signal_name,
                     name=field_info.signal_name,
-                    description=f"continuous {field_info.signal_name} data loaded from file",
+                    description=f"Continuous {field_info.signal_name} data loaded from file",
                     unit=field_info.unit,
-                    time=time,
                     loaded=True,
-                    category=field_info.unit,
+                    values=data,
+                    category=field_info.signal_name,
                 )
-                continuous_data.variants.add(
-                    ContinuousDataVariant(
-                        label="raw",
-                        description="raw data loaded from file",
-                        values=data,
-                    )
-                )
+                continuous_data.lock()
                 continuous_data_collection.add(continuous_data)
 
             else:
@@ -178,7 +177,6 @@ class DraegerEITData(EITData_):
         index is non-negative. When the index is negative, no data is saved. In
         any case, the event marker is returned.
         """
-
         frame_time = round(reader.float64() * 24 * 60 * 60, 3)
         _ = reader.float32()
         frame_pixel_impedance = reader.npfloat32(length=1024)
@@ -265,9 +263,7 @@ medibus_fields = [
     medibus_field("spontaneous inspiratory:expiratory ratio", "", False),
     medibus_field("elastance", "mbar/L", False),
     medibus_field("time constant", "s", False),
-    medibus_field(
-        "ratio between upper 20% pressure range and total dynamic compliance", "", False
-    ),
+    medibus_field("ratio between upper 20% pressure range and total dynamic compliance", "", False),
     medibus_field("end-inspiratory pressure", "mbar", False),
     medibus_field("expiratory tidal volume", "mL", False),
     medibus_field("time at low pressure", "s", False),
