@@ -14,8 +14,6 @@ coverage.xml
 .pytest_cache
 .tox
 
-test_data/*
-
 conda.deps
 
 docs/_build
@@ -33,9 +31,8 @@ env3
 venv
 venv3
 
-
 # temporary test data
 
-test_data/*
+**/test_data/*
 .helpers/dock_test_data/*
 .helpers/dock_test_add/*
