@@ -10,6 +10,7 @@ class ContinuousData:
     label: str
     name: str
     unit: str
+    category: str
     description: str = ""
     parameters: dict[str, Any] = field(default_factory=dict)
     loaded: bool = False
