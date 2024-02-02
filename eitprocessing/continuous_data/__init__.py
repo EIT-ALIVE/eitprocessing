@@ -44,3 +44,13 @@ class ContinuousData:
         copy = self.copy(label)
         copy.values = function(copy.values)
         return copy
+
+    def lock(self):
+        self.values.flags["WRITEABLE"] = False
+
+    def unlock(self):
+        self.values.flags["WRITEABLE"] = True
+
+    @property
+    def locked(self):
+        return not self.values.flags["WRITEABLE"]
