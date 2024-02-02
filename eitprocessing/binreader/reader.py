@@ -89,7 +89,7 @@ class Reader:
     def uint8(self) -> int:
         return self.read_single(type_code="B", cast=int)
 
-    def ushort(self) -> int:
+    def uint16(self) -> int:
         return self.read_single(type_code="H", cast=int)
 
     def uint32(self) -> int:
