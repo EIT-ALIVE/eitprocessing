@@ -21,6 +21,7 @@ N = TypeVar("N", bound=np.number)
 @dataclass
 class Reader:
     file_handle: io.BufferedReader
+    endian: str | None = None
 
     def read_single(self, type_code: str, cast: type[T]) -> T:
         data = self._read_full_type_code(type_code)
@@ -32,7 +33,12 @@ class Reader:
         data = [cast(d) for d in data]
         return data
 
-    def read_array(self, type_code: str, cast: type[N], length: int) -> NDArray[N]:
+    def read_array(
+        self,
+        type_code: str,
+        cast: type[N],
+        length: int,
+    ) -> NDArray[N]:
         full_type_code = f"{length}{type_code}"
         data = self._read_full_type_code(full_type_code)
         return np.array(data, dtype=cast)
@@ -44,6 +50,16 @@ class Reader:
         return data
 
     def _read_full_type_code(self, full_type_code) -> tuple[Any, ...]:
+        if self.endian:
+            if self.endian not in ["little", "big"]:
+                raise ValueError(
+                    f"Endian type '{self.endian}' not recognized. "
+                    f"Allowed values are 'little' and 'big'."
+                )
+
+            prefix = "<" if self.endian == "little" else ">"
+            full_type_code = prefix + full_type_code
+
         data_size = struct.calcsize(full_type_code)
         packed_data = self.file_handle.read(data_size)
         data = struct.unpack(full_type_code, packed_data)
@@ -69,3 +85,15 @@ class Reader:
 
     def string(self, length=1) -> str:
         return self.read_string(length=length)
+
+    def uint8(self) -> int:
+        return self.read_single(type_code="B", cast=int)
+
+    def uint16(self) -> int:
+        return self.read_single(type_code="H", cast=int)
+
+    def uint32(self) -> int:
+        return self.read_single(type_code="I", cast=int)
+
+    def uint64(self) -> int:
+        return self.read_single(type_code="Q", cast=int)
