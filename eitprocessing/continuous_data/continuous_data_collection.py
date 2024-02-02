@@ -10,7 +10,7 @@ class ContinuousDataCollection(dict):
     def add(self, *item: ContinuousData, overwrite: bool = False) -> None:
         for item_ in item:
             self._check_item(item_, overwrite=overwrite)
-            return super().__setitem__(item_.name, item_)
+            super().__setitem__(item_.name, item_)
 
     def _check_item(
         self, item: ContinuousData, key=None, overwrite: bool = False
