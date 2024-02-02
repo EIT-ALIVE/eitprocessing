@@ -58,7 +58,7 @@ class VariantCollection(dict, Equivalence, Generic[V]):
         super().__init__(*args, **kwargs)
 
     def __setitem__(self, __key: str, __value: V) -> None:
-        self._check_variant(__value, key=__key)
+        self._check_item(__value, key=__key)
         return super().__setitem__(__key, __value)
 
     def add(self, *variant: V, overwrite: bool = False) -> None:
@@ -78,10 +78,10 @@ class VariantCollection(dict, Equivalence, Generic[V]):
         that already exists as key.
         """
         for variant_ in variant:
-            self._check_variant(variant_, overwrite=overwrite)
+            self._check_item(variant_, overwrite=overwrite)
             return super().__setitem__(variant_.label, variant_)
 
-    def _check_variant(self, variant: V, key=None, overwrite: bool = False) -> None:
+    def _check_item(self, variant: V, key=None, overwrite: bool = False) -> None:
         if not isinstance(variant, self.variant_type):
             raise InvalidVariantType(
                 f"'{type(variant)}' does not match '{self.variant_type}'."

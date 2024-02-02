@@ -1,28 +1,25 @@
-from typing import Any
-
-from typing_extensions import Self
-
-from eitprocessing.continuous_data import ContinuousData
-from eitprocessing.mixins.equality import Equivalence, EquivalenceError
+from . import ContinuousData
 
 
-class ContinuousDataCollection(dict, Equivalence):
-    def __setitem__(self, __key: Any, __value: Any) -> None:
-        self._check_data(__value, key=__key)
+class ContinuousDataCollection(dict):
+
+    def __setitem__(self, __key: str, __value: ContinuousData) -> None:
+        self._check_item(__value, key=__key)
         return super().__setitem__(__key, __value)
 
-    def add(self, data: ContinuousData, overwrite: bool = False) -> None:
-        self._check_data(data, overwrite=overwrite)
-        return super().__setitem__(data.name, data)
+    def add(self, *item: ContinuousData, overwrite: bool = False) -> None:
+        for item_ in item:
+            self._check_item(item_, overwrite=overwrite)
+            return super().__setitem__(item_.name, item_)
 
-    def _check_data(
-        self, data: ContinuousData, key=None, overwrite: bool = False
+    def _check_item(
+        self, item: ContinuousData, key=None, overwrite: bool = False
     ) -> None:
-        if not isinstance(data, ContinuousData):
-            raise TypeError(f"type of `data` is {type(data)}, not 'ContinuousData'")
+        if not isinstance(item, ContinuousData):
+            raise TypeError(f"type of `data` is {type(item)}, not 'ContinuousData'")
 
-        if key and key != data.name:
-            raise KeyError(f"'{key}' does not match variant name '{data.name}'.")
+        if key and key != item.name:
+            raise KeyError(f"'{key}' does not match variant name '{item.name}'.")
 
         if not overwrite and key in self:
             raise KeyError(
