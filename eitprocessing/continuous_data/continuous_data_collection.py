@@ -25,3 +25,14 @@ class ContinuousDataCollection(dict):
             raise KeyError(
                 f"Variant with name {key} already exists. Use `overwrite=True` to overwrite."
             )
+
+    def get_loaded_data(self):
+        """Return all continous data that was directly loaded from disk."""
+        return {k: v for k, v in self.items() if v.loaded}
+
+    def get_data_derived_from(self, obj):
+        """Return all continous data that was derived from..."""
+        return {k: v for k, v in self.items() if obj in v.derived_from}
+
+    def get_derived_data(self):
+        return {k: v for k, v in self.items() if len(v.derived_from) >= 1}
