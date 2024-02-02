@@ -17,7 +17,7 @@ class ContinuousData:
     derived_from: Any | list[Any] = field(default_factory=list)
     values: np.ndarray = field(kw_only=True)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not self.loaded and not self.derived_from:
             raise ValueError("Data must be loaded or calculated form another dataset.")
 
@@ -45,12 +45,12 @@ class ContinuousData:
         copy.values = function(copy.values)
         return copy
 
-    def lock(self):
+    def lock(self) -> None:
         self.values.flags["WRITEABLE"] = False
 
-    def unlock(self):
+    def unlock(self) -> None:
         self.values.flags["WRITEABLE"] = True
 
     @property
-    def locked(self):
+    def locked(self) -> bool:
         return not self.values.flags["WRITEABLE"]
