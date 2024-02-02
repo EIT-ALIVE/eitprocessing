@@ -25,25 +25,6 @@ class ContinuousDataCollection(dict, Equivalence):
             raise KeyError(f"'{key}' does not match variant name '{data.name}'.")
 
         if not overwrite and key in self:
-            raise DuplicateContinuousDataName(
+            raise KeyError(
                 f"Variant with name {key} already exists. Use `overwrite=True` to overwrite."
             )
-
-    @classmethod
-    def concatenate(cls, a: Self, b: Self) -> Self:
-        try:
-            cls.isequivalent(a, b, raise_=True)
-        except EquivalenceError as e:
-            raise EquivalenceError(
-                "ContinuousDataCollections could not be concatenated"
-            ) from e
-
-        obj = ContinuousDataCollection()
-        for key in a.keys() & b.keys():
-            obj.add(ContinuousData.concatenate(a[key], b[key]))
-
-        return obj
-
-
-class DuplicateContinuousDataName(Exception):
-    """Raised when a variant with the same name already exists in the collection."""
