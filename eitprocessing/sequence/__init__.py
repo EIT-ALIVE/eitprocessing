@@ -1,25 +1,17 @@
-"""
-Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
-Licensed under the Apache License, version 2.0. See LICENSE for details.
-
-This file contains methods related to parts of electrical impedance tomographs
-as they are read.
-"""
 from __future__ import annotations
 import bisect
-import contextlib
 import copy
 import warnings
 from dataclasses import dataclass
 import numpy as np
-from ..continuous_data import ContinuousData
-from ..eit_data import EITData
-from ..sparse_data import SparseData
-from ..helper import NotEquivalent
+from eitprocessing.continuous_data import ContinuousData
+from eitprocessing.eit_data import EITData
+from eitprocessing.mixins.equality import Equivalence
+from eitprocessing.sparse_data import SparseData
 
 
 @dataclass(eq=False)
-class Sequence:
+class Sequence(Equivalence):
     """Sequence of timepoints containing EIT and/or waveform data.
 
     A Sequence is a representation of a continuous set of data points, either EIT frames,
@@ -48,41 +40,6 @@ class Sequence:
         if self.label is None:
             self.label = f"Sequence_{id(self)}"
 
-    def __eq__(self, other) -> bool:
-        if not self.check_equivalence(self, other, raise_=False):
-            return False
-
-        # TODO: check equality of object and all attached objects
-
-        return True
-
-    @staticmethod
-    def check_equivalence(a: Sequence, b: Sequence, raise_=False):
-        """Checks whether content of two Sequence objects is equivalent.
-
-        It the two objects are equivalent, the method returns `True`.
-
-        If the two objects are not equivalent and `raise_` is `True`, a
-        NotEquivalent exception is raised. If `raise_` is `False`, the
-        method returns `False` instead.
-
-        Raises:
-        - NotEquivalent: when the objects are not equivalent and `raise_` is `True`
-
-        """
-        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
-        with cm:
-            if a.eit_data or b.eit_data:
-                if not a.eit_data or not b.eit_data:
-                    raise NotEquivalent("Only one of the sequences contains EIT data")
-
-                EITData.check_equivalence(a.eit_data, b.eit_data, raise_=raise_)
-                # TODO: add other attached objects for equivalence
-
-            return True
-
-        return False
-
     def __add__(self, other: Sequence) -> Sequence:
         return self.concatenate(self, other)
 
@@ -95,10 +52,6 @@ class Sequence:
     ) -> Sequence:
         """Create a merge of two Sequence objects."""
         # TODO: rewrite
-        try:
-            Sequence.check_equivalence(a, b, raise_=True)
-        except NotEquivalent as e:
-            raise type(e)(f"Sequences could not be merged: {e}") from e
 
         if a.eit_data and b.eit_data:
             eit_data = EITData.concatenate(a.eit_data, b.eit_data)

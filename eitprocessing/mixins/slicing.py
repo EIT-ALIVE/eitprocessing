@@ -12,10 +12,13 @@ from typing_extensions import Self
 class SelectByIndex(ABC):
     """Adds slicing functionality to subclass by implementing `__getitem__`.
 
-    Subclasses must implement a `_sliced_copy` function that defines what should happen
-    when the object is sliced. This class ensures that when calling a slice between
-    square brackets (as e.g. done for lists) then return the expected sliced object.
+    Subclasses must implement a `_sliced_copy` function that defines what should
+    happen when the object is sliced. This class ensures that when calling a
+    slice between square brackets (as e.g. done for lists) then return the
+    expected sliced object.
     """
+
+    label: str
 
     def __getitem__(self, key: slice | int):
         if isinstance(key, slice):
@@ -40,7 +43,12 @@ class SelectByIndex(ABC):
         end: int | None = None,
         label: str | None = None,
     ) -> Self:
-        """De facto implementation of the `__getitem__ function."""
+        """De facto implementation of the `__getitem__ function.
+
+        This function can also be called directly to add a label to the sliced
+        object. Otherwise a default label describing the slice and original
+        object is attached.
+        """
 
         if start is None and end is None:
             warnings.warn("No starting or end timepoint was selected.")
@@ -95,22 +103,22 @@ class SelectByTime(SelectByIndex):
             start_time: first time point to include. Defaults to first frame of sequence.
             end_time: last time point. Defaults to last frame of sequence.
             start_inclusive (default: `True`), end_inclusive (default `False`):
-                these arguments control the behavior if the given time stamp does not
-                match exactly with an existing time stamp of the input.
+                these arguments control the behavior if the given time stamp
+                does not match exactly with an existing time stamp of the input.
                 if `True`: the given time stamp will be inside the sliced object.
                 if `False`: the given time stamp will be outside the sliced object.
-            label: Description. Defaults to None, which will create a label based on the original
-                object label and the frames by which it is sliced.
+            label: Description. Defaults to None, which will create a label based
+                on the original object label and the frames by which it is sliced.
 
         Raises:
             TypeError: if `self` does not contain a `time` attribute.
             ValueError: if time stamps are not sorted.
 
         Returns:
-            Self: _description_
+            Slice of self.
         """
 
-        if not "time" in vars(self):
+        if "time" not in vars(self):
             raise TypeError(f"Object {self} has no time axis.")
 
         if start_time is None and end_time is None:
@@ -150,11 +158,11 @@ class SelectByTime(SelectByIndex):
 
 @dataclass
 class TimeIndexer:
-    """Helper class allowing for slicing an object using the time axis rather than indices
+    """Helper class for slicing an object using the time axis instead of indices.
 
     Example:
     ```
-    >>> data = DraegerEITData.from_path(<path>)
+    >>> data = EITData.from_path(<path>, ...)
     >>> tp_start = data.time[1]
     >>> tp_end = data.time[4]
     >>> time_slice = data.t[tp_start:tp_end]

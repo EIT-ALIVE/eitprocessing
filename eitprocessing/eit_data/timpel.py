@@ -1,24 +1,23 @@
 import warnings
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from pathlib import Path
+
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
+
 from eitprocessing.continuous_data.continuous_data_collection import (
     ContinuousDataCollection,
 )
+from eitprocessing.eit_data import EITData_
+from eitprocessing.eit_data.eit_data_variant import EITDataVariant
+from eitprocessing.eit_data.phases import MaxValue, MinValue, QRSMark
+from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from eitprocessing.variants.variant_collection import VariantCollection
-from ..eit_data.eit_data_variant import EITDataVariant
-from ..eit_data.phases import MaxValue
-from ..eit_data.phases import MinValue
-from ..eit_data.phases import QRSMark
-from ..eit_data.vendor import Vendor
-from . import EITData_
 
 
-@dataclass
+@dataclass(eq=False)
 class TimpelEITData(EITData_):
     framerate: float = 50
     vendor: Vendor = field(default=Vendor.TIMPEL, init=False)
@@ -93,7 +92,7 @@ class TimpelEITData(EITData_):
 
         # extract waveform data
         # TODO: properly export waveform data
-        waveform_data = {  # noqa;
+        waveform_data = {  # noqa
             "airway_pressure": data[:, 1024],
             "flow": data[:, 1025],
             "volume": data[:, 1026],

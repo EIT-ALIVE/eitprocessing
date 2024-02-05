@@ -1,10 +1,3 @@
-"""
-Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
-Licensed under the Apache License, version 2.0. See LICENSE for details.
-
-This file contains methods related to when electrical impedance tomographs are read.
-"""
-
 from dataclasses import dataclass
 from dataclasses import field
 import numpy as np
@@ -14,27 +7,13 @@ from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.variants import Variant
 
 
-@dataclass
+@dataclass(eq=False)
 class EITDataVariant(Variant, SelectByTime):
     _data_field_name: str = "pixel_impedance"
     pixel_impedance: NDArray = field(repr=False, kw_only=True)
 
     def __len__(self):
         return self.pixel_impedance.shape[0]
-
-    def __eq__(self, other):
-        for attr in ["name", "description", "params"]:
-            if getattr(self, attr) != getattr(other, attr):
-                return False
-
-        for attr in ["pixel_impedance"]:
-            # NaN values are not equal. Check whether values are equal or both NaN.
-            s = getattr(self, attr)
-            o = getattr(other, attr)
-            if not np.all((s == o) | (np.isnan(s) & np.isnan(o))):
-                return False
-
-        return True
 
     @property
     def global_baseline(self):
@@ -58,7 +37,7 @@ class EITDataVariant(Variant, SelectByTime):
 
     @classmethod
     def concatenate(cls, a: Self, b: Self) -> Self:
-        cls.check_equivalence(a, b, raise_=True)
+        cls.isequivalent(a, b, raise_=True)
 
         return cls(
             label=a.label,
@@ -70,7 +49,10 @@ class EITDataVariant(Variant, SelectByTime):
         )
 
     def _sliced_copy(
-        self, start_index: int, end_index: int, label: str | None = None
+        self,
+        start_index: int,
+        end_index: int,
+        label: str | None = None,
     ) -> Self:
         pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
 

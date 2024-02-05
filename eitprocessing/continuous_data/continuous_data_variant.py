@@ -1,11 +1,12 @@
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
+
 from numpy.typing import NDArray
 from typing_extensions import Self
-from ..variants import Variant
+
+from eitprocessing.variants import Variant
 
 
-@dataclass
+@dataclass(eq=False)
 class ContinuousDataVariant(Variant):
     values: NDArray = field(kw_only=True)
 
