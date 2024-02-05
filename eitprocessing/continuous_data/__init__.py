@@ -1,20 +1,21 @@
-import contextlib
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from typing import Any
+
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
-from ..helper import NotEquivalent
-from ..variants.variant_collection import VariantCollection
-from .continuous_data_variant import ContinuousDataVariant
+
+from eitprocessing.continuous_data.continuous_data_variant import ContinuousDataVariant
+from eitprocessing.mixins.equality import Equivalence
+from eitprocessing.variants.variant_collection import VariantCollection
 
 
-@dataclass
-class ContinuousData:
+@dataclass(eq=False)
+class ContinuousData(Equivalence):
     name: str
     unit: str
     description: str
+    category: str
     time: NDArray
     loaded: bool
     calculated_from: Any | list[Any] | None = None
@@ -27,10 +28,11 @@ class ContinuousData:
             raise DataSourceUnknown(
                 "Data must be loaded or calculated form another dataset."
             )
+        self._check_equivalence = ["unit", "category"]
 
     @classmethod
     def concatenate(cls, a: Self, b: Self) -> Self:
-        cls.check_equivalence(a, b, raise_=True)
+        cls.isequivalent(a, b, raise_=True)
 
         calculcated_from = None if a.loaded else [a.calculated_from, b.calculated_from]
 
@@ -46,29 +48,6 @@ class ContinuousData:
             variants=VariantCollection.concatenate(a.variants, b.variants),
         )
         return obj
-
-    @classmethod
-    def check_equivalence(cls, a: Self, b: Self, raise_: bool = False) -> bool:
-        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
-        with cm:
-            if a.name != b.name:
-                raise NotEquivalent(f"Names do not match: {a.name}, {b.name}")
-            if a.unit != b.unit:
-                raise NotEquivalent(f"Units do not match: {a.unit}, {b.unit}")
-            if a.description != b.description:
-                raise NotEquivalent(
-                    f"Descriptions do not match: {a.description}, {b.description}"
-                )
-            if a.loaded != b.loaded:
-                raise NotEquivalent(
-                    f"Only one of the datasets is loaded: {a.loaded=}, {b.loaded=}"
-                )
-
-            VariantCollection.check_equivalence(a.variants, b.variants, raise_=True)
-
-            return True
-
-        return False
 
 
 class DataSourceUnknown(Exception):

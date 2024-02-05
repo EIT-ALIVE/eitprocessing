@@ -1,11 +1,12 @@
-import contextlib
 from typing import Any
+
 from typing_extensions import Self
-from ..helper import NotEquivalent
-from . import ContinuousData
+
+from eitprocessing.continuous_data import ContinuousData
+from eitprocessing.mixins.equality import Equivalence, EquivalenceError
 
 
-class ContinuousDataCollection(dict):
+class ContinuousDataCollection(dict, Equivalence):
     def __setitem__(self, __key: Any, __value: Any) -> None:
         self._check_data(__value, key=__key)
         return super().__setitem__(__key, __value)
@@ -31,31 +32,17 @@ class ContinuousDataCollection(dict):
     @classmethod
     def concatenate(cls, a: Self, b: Self) -> Self:
         try:
-            cls.check_equivalence(a, b, raise_=True)
-        except NotEquivalent as e:
-            raise ValueError("VariantCollections could not be concatenated") from e
+            cls.isequivalent(a, b, raise_=True)
+        except EquivalenceError as e:
+            raise EquivalenceError(
+                "ContinuousDataCollections could not be concatenated"
+            ) from e
 
         obj = ContinuousDataCollection()
         for key in a.keys() & b.keys():
             obj.add(ContinuousData.concatenate(a[key], b[key]))
 
         return obj
-
-    @classmethod
-    def check_equivalence(cls, a: Self, b: Self, raise_=False) -> bool:
-        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
-        with cm:
-            if set(a.keys()) != set(b.keys()):
-                raise NotEquivalent(
-                    f"VariantCollections do not contain the same variants: {a.keys()=}, {b.keys()=}"
-                )
-
-            for key in a.keys():
-                ContinuousData.check_equivalence(a[key], b[key], raise_=True)
-
-            return True
-
-        return False
 
 
 class DuplicateContinuousDataName(Exception):

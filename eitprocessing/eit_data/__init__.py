@@ -1,35 +1,32 @@
 from __future__ import annotations
-import contextlib
-from abc import ABC
-from abc import abstractmethod
-from dataclasses import dataclass
-from dataclasses import field
+
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from functools import reduce
 from pathlib import Path
-from typing import TypeAlias
-from typing import TypeVar
+from typing import TypeAlias, TypeVar
+
 import numpy as np
 from numpy.typing import NDArray
-from typing_extensions import Self
-from typing_extensions import override
+from typing_extensions import Self, override
+
 from eitprocessing.continuous_data.continuous_data_collection import (
     ContinuousDataCollection,
 )
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.helper import NotEquivalent
+from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from eitprocessing.variants.variant_collection import VariantCollection
-
 
 PathLike: TypeAlias = str | Path
 PathArg: TypeAlias = PathLike | list[PathLike]
 T = TypeVar("T", bound="EITData")
 
 
-@dataclass
-class EITData(SelectByTime, ABC):
+@dataclass(eq=False)
+class EITData(SelectByTime, Equivalence, ABC):
     path: Path | list[Path]
     nframes: int
     time: NDArray
@@ -45,6 +42,7 @@ class EITData(SelectByTime, ABC):
     def __post_init__(self):
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
+        self._check_equivalence = ["vendor", "framerate"]
 
     @classmethod
     def from_path(  # pylint: disable=too-many-arguments,too-many-locals
@@ -182,7 +180,7 @@ class EITData(SelectByTime, ABC):
 
     @classmethod
     def concatenate(cls, a: T, b: T, label: str | None = None) -> T:
-        cls.check_equivalence(a, b, raise_=True)
+        cls.isequivalent(a, b, raise_=True)
 
         a_path = cls._ensure_path_list(a.path)
         b_path = cls._ensure_path_list(b.path)
@@ -207,24 +205,6 @@ class EITData(SelectByTime, ABC):
             time=time,
             variants=variants,
         )
-
-    @classmethod
-    def check_equivalence(cls, a: T, b: T, raise_=False) -> bool:
-        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
-        with cm:
-            if a.__class__ != b.__class__:
-                raise NotEquivalent(f"Classes don't match: {type(a)}, {type(b)}")
-
-            if a.framerate != b.framerate:
-                raise NotEquivalent(
-                    f"Framerates do not match: {a.framerate}, {b.framerate}"
-                )
-
-            VariantCollection.check_equivalence(a.variants, b.variants, raise_=True)
-
-            return True
-
-        return False
 
     def _sliced_copy(
         self,
@@ -272,7 +252,7 @@ class EITData(SelectByTime, ABC):
         ...
 
 
-@dataclass
+@dataclass(eq=False)
 class EITData_(EITData):
     vendor: Vendor = field(init=False)
 

@@ -1,15 +1,14 @@
-import contextlib
-from typing import Generic
-from typing import TypeVar
-from typing_extensions import Self
-from ..helper import NotEquivalent
-from . import Variant
+from typing import Generic, TypeVar
 
+from typing_extensions import Self
+
+from eitprocessing.mixins.equality import Equivalence, EquivalenceError
+from eitprocessing.variants import Variant
 
 V = TypeVar("V", bound="Variant")
 
 
-class VariantCollection(dict, Generic[V]):
+class VariantCollection(dict, Equivalence, Generic[V]):
     """A collection of variants of a single type
 
     A VariantCollection is a dictionary with some added features.
@@ -51,6 +50,9 @@ class VariantCollection(dict, Generic[V]):
 
     variant_type: type[V]
 
+    def __eq__(self, other: Self):  # otherwise uses the dict.__eq__ method
+        return Equivalence.__eq__(self, other)
+
     def __init__(self, variant_type: type[V], *args, **kwargs):
         self.variant_type = variant_type
         super().__init__(*args, **kwargs)
@@ -69,11 +71,11 @@ class VariantCollection(dict, Generic[V]):
 
         Args:
         - variant (Variant): the variant to be added. Multiple variants can be
-          added at once.
+        added at once.
 
         Raises:
         - DuplicateVariantLabel if one attempts to add a variant with a label
-          that already exists as key.
+        that already exists as key.
         """
         for variant_ in variant:
             self._check_variant(variant_, overwrite=overwrite)
@@ -96,36 +98,15 @@ class VariantCollection(dict, Generic[V]):
     @classmethod
     def concatenate(cls, a: Self, b: Self) -> Self:
         try:
-            cls.check_equivalence(a, b, raise_=True)
-        except NotEquivalent as e:
+            cls.isequivalent(a, b, raise_=True)
+        except EquivalenceError as e:
             raise ValueError("VariantCollections could not be concatenated") from e
 
         obj = VariantCollection(a.variant_type)
-        for key in a.keys():
+        for key in a:
             obj.add(a.variant_type.concatenate(a[key], b[key]))
 
         return obj
-
-    @classmethod
-    def check_equivalence(cls, a: Self, b: Self, raise_=False) -> bool:
-        cm = contextlib.nullcontext() if raise_ else contextlib.suppress(NotEquivalent)
-        with cm:
-            if a.variant_type != b.variant_type:
-                raise NotEquivalent(
-                    f"Variant types do not match: {a.variant_type}, {b.variant_type}"
-                )
-
-            if set(a.keys()) != set(b.keys()):
-                raise NotEquivalent(
-                    f"VariantCollections do not contain the same variants: {a.keys()=}, {b.keys()=}"
-                )
-
-            for key in a.keys():
-                Variant.check_equivalence(a[key], b[key], raise_=True)
-
-            return True
-
-        return False
 
 
 class InvalidVariantType(TypeError):
