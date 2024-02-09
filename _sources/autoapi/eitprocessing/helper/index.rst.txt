@@ -1,0 +1,17 @@
+:py:mod:`eitprocessing.helper`
+==============================
+
+.. py:module:: eitprocessing.helper
+
+
+Module Contents
+---------------
+
+.. py:exception:: NotConsecutive
+
+
+   Bases: :py:obj:`Exception`
+
+   Raised when trying to concatenate non-consecutive datasets.
+
+

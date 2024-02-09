@@ -1,0 +1,100 @@
+:py:mod:`eitprocessing.eit_data.eit_data_variant`
+=================================================
+
+.. py:module:: eitprocessing.eit_data.eit_data_variant
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.eit_data.eit_data_variant.EITDataVariant
+
+
+
+
+.. py:class:: EITDataVariant
+
+
+   Bases: :py:obj:`eitprocessing.variants.Variant`, :py:obj:`eitprocessing.mixins.slicing.SelectByTime`
+
+   Contains a single variant of a dataset.
+
+   A variant of a dataset is defined as either the raw data, or an edited
+   version of that raw data. For example, EIT data can contain a "raw"
+   versions and a "filtered" version. Both variants share the same time axis.
+
+   The actual data of a variant is contained in a variable that must be set by
+   a subclass inheriting from this class.
+
+   Attributes:
+   - label (str): a short descriptor for the variant, that is used to access
+     the variant
+   - description (str): a longer description of the variant
+   - params (dict): contains information on how to reproduce the variant, e.g.
+     which filters and filters settigs were used
+
+   .. py:property:: global_baseline
+
+
+   .. py:property:: pixel_impedance_global_offset
+
+
+   .. py:property:: pixel_baseline
+
+
+   .. py:property:: pixel_impedance_individual_offset
+
+
+   .. py:property:: global_impedance
+
+
+   .. py:attribute:: _data_field_name
+      :type: str
+      :value: 'pixel_impedance'
+
+      
+
+   .. py:attribute:: pixel_impedance
+      :type: numpy.typing.NDArray
+
+      
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
+      :classmethod:
+
+      Concatenates two variants.
+
+      Concatenating two variants results in a single variant with the
+      combined length of both variants.
+
+      To merge more than two variants, use
+      `functools.reduce(Variant.concatenate, list_of_variants)`.
+
+      Args:
+      - a (Variant)
+      - b (Variant)
+
+      Raises:
+      - EquivalenceError if a and b are not equivalent and can't be merged
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str | None = None) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+   .. py:method:: copy(label: str | None = None)
+
+
+

@@ -1,0 +1,297 @@
+:py:mod:`eitprocessing.sequence`
+================================
+
+.. py:module:: eitprocessing.sequence
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.sequence.EITData
+   eitprocessing.sequence.Equivalence
+   eitprocessing.sequence.Sequence
+
+
+
+
+.. py:class:: EITData
+
+
+   Bases: :py:obj:`eitprocessing.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`abc.ABC`
+
+   Adds slicing functionality to subclass by implementing `__getitem__`.
+
+   Subclasses must implement a `_sliced_copy` function that defines what should
+   happen when the object is sliced. This class ensures that when calling a
+   slice between square brackets (as e.g. done for lists) then return the
+   expected sliced object.
+
+   .. py:attribute:: path
+      :type: pathlib.Path | list[pathlib.Path]
+
+      
+
+   .. py:attribute:: nframes
+      :type: int
+
+      
+
+   .. py:attribute:: time
+      :type: numpy.typing.NDArray
+
+      
+
+   .. py:attribute:: framerate
+      :type: float
+
+      
+
+   .. py:attribute:: vendor
+      :type: vendor.Vendor
+
+      
+
+   .. py:attribute:: phases
+      :type: list
+
+      
+
+   .. py:attribute:: events
+      :type: list
+
+      
+
+   .. py:attribute:: label
+      :type: str | None
+
+      
+
+   .. py:attribute:: variants
+      :type: eitprocessing.variants.variant_collection.VariantCollection
+
+      
+
+   .. py:method:: __post_init__()
+
+
+   .. py:method:: from_path(path: PathArg, vendor: vendor.Vendor | str, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> typing_extensions.Self | tuple[typing_extensions.Self, eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection, eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection]
+      :classmethod:
+
+      Load sequence from path(s).
+
+      :param path: path(s) to data file.
+      :type path: Path | str | list[Path | str]
+      :param vendor: vendor indicating the device used.
+      :type vendor: Vendor | str
+      :param label: description of object for human interpretation.
+                    Defaults to "Sequence_<unique_id>".
+      :type label: str
+      :param framerate: framerate at which the data was recorded.
+                        Default for Draeger: 20
+                        Default for Timpel: 50
+      :type framerate: int, optional
+      :param first_frame: index of first time point of sequence
+                          (i.e. NOT the timestamp).
+                          Defaults to 0.
+      :type first_frame: int, optional
+      :param max_frames: maximum number of frames to load.
+                         The actual number of frames can be lower than this if this
+                         would surpass the final frame.
+      :type max_frames: int, optional
+
+      :raises NotImplementedError: is raised when there is no loading method for
+      :raises the given vendor.:
+
+      :returns: a sequence containing the loaded data from all files in path
+      :rtype: Sequence
+
+
+   .. py:method:: _ensure_path_list(path: PathArg) -> list[pathlib.Path]
+      :staticmethod:
+
+
+   .. py:method:: _get_vendor_class(vendor: vendor.Vendor) -> type[EITData_]
+      :staticmethod:
+
+
+   .. py:method:: _check_first_frame(first_frame)
+      :staticmethod:
+
+
+   .. py:method:: _ensure_vendor(vendor: vendor.Vendor | str) -> vendor.Vendor
+      :staticmethod:
+
+      Check whether vendor exists, and assure it's a Vendor object.
+
+
+   .. py:method:: concatenate(a: T, b: T, label: str | None = None) -> T
+      :classmethod:
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+   .. py:method:: _from_path(path: pathlib.Path, label: str | None = None, framerate: float | None = None, first_frame: int | None = None, max_frames: int | None = None, return_non_eit_data: bool = False) -> typing_extensions.Self | tuple[typing_extensions.Self, eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection, eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection]
+      :classmethod:
+      :abstractmethod:
+
+
+
+.. py:class:: Equivalence
+
+
+   Bases: :py:obj:`abc.ABC`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: __eq__(other: typing_extensions.Self)
+
+      Return self==value.
+
+
+   .. py:method:: _array_safe_eq(a, b) -> bool
+      :staticmethod:
+
+      Check if a and b are equal, even if they are numpy arrays containing nans.
+
+
+   .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
+
+      Test whether the data structure between two objects are equivalent.
+
+      Equivalence, in this case means that objects are compatible e.g. to be
+      merged. Data content can vary, but e.g. the category of data (e.g.
+      airway pressure, flow, tidal volume) and unit, etc., must match.
+
+
+      :param other: object that will be compared to self.
+      :param raise_: sets this method's behavior in case of non-equivalence. If
+                     True, an `EquivalenceError` is raised, otherwise `False` is
+                     returned.
+
+      :raises EquivalenceError: if `raise_ == True` and the objects are not
+      :raises equivalent.:
+
+      :returns: bool describing result of equivalence comparison.
+
+
+
+.. py:class:: Sequence
+
+
+   Bases: :py:obj:`eitprocessing.mixins.equality.Equivalence`
+
+   Sequence of timepoints containing EIT and/or waveform data.
+
+   A Sequence is a representation of a continuous set of data points, either EIT frames,
+   waveform data, or both. A Sequence can consist of an entire measurement, a section of a
+   measurement, a single breath, or even a portion of a breath.
+   A sequence can be split up into separate sections of a measurement or multiple (similar)
+   Sequence objects can be merged together to form a single Sequence.
+
+   EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
+
+   :param label: description of object for human interpretation.
+                 Defaults to "Sequence_<unique_id>".
+   :type label: str
+   :param framesets: dictionary of framesets
+   :type framesets: dict[str, Frameset]
+   :param events: list of Event objects in data
+   :type events: list[Event]
+   :param timing_errors: list of TimingError objects in data
+   :type timing_errors: list[TimingError]
+   :param phases: list of PhaseIndicator objects in data
+   :type phases: list[PhaseIndicator]
+
+   .. py:attribute:: label
+      :type: str | None
+
+      
+
+   .. py:attribute:: continuous_data
+      :type: eitprocessing.continuous_data.ContinuousData | None
+
+      
+
+   .. py:attribute:: eit_data
+      :type: eitprocessing.eit_data.EITData | None
+
+      
+
+   .. py:attribute:: sparse_data
+      :type: eitprocessing.sparse_data.SparseData | None
+
+      
+
+   .. py:method:: __post_init__()
+
+
+   .. py:method:: __add__(other: Sequence) -> Sequence
+
+
+   .. py:method:: concatenate(a: Sequence, b: Sequence, label: str | None = None) -> Sequence
+      :classmethod:
+
+      Create a merge of two Sequence objects.
+
+
+   .. py:method:: select_by_index(indices: slice, label: str | None = None)
+
+
+   .. py:method:: __getitem__(indices: slice)
+
+
+   .. py:method:: select_by_time(start: float | int | None = None, end: float | int | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> Sequence
+
+      Select subset of sequence by the `Sequence.time` information (i.e.
+      based on the time stamp).
+
+      :param start: starting time point.
+                    Defaults to None.
+      :type start: float | int | None, optional
+      :param end: ending time point.
+                  Defaults to None.
+      :type end: float | int | None, optional
+      :param start_inclusive: include starting timepoint if
+                              `start` is present in `Sequence.time`.
+                              Defaults to True.
+      :type start_inclusive: bool, optional
+      :param end_inclusive: include ending timepoint if
+                            `end` is present in `Sequence.time`.
+                            Defaults to False.
+      :type end_inclusive: bool, optional
+
+      :raises ValueError: if the Sequence.time is not sorted
+
+      :returns: a slice of `self` based on time information given.
+      :rtype: Sequence
+
+
+   .. py:method:: deepcopy(label: str | None = None, relabel: bool | None = True) -> Sequence
+
+      Create a deep copy of `Sequence` object.
+
+      :param label: Create a new `label` for the copy.
+                    Defaults to None, which will trigger behavior described for relabel (below)
+      :type label: str
+      :param relabel: If `True` (default), the label of self is re-used for the copy,
+                      otherwise the following label is assigned f"Deepcopy of {self.label}".
+                      Note that this setting is ignored if a label is given.
+      :type relabel: bool
+
+      :returns: a deep copy of self
+      :rtype: Sequence
+
+
+

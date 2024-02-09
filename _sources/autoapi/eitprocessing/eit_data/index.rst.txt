@@ -1,0 +1,592 @@
+:py:mod:`eitprocessing.eit_data`
+================================
+
+.. py:module:: eitprocessing.eit_data
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   draeger/index.rst
+   eit_data_variant/index.rst
+   event/index.rst
+   phases/index.rst
+   sentec/index.rst
+   timpel/index.rst
+   vendor/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.eit_data.ContinuousDataCollection
+   eitprocessing.eit_data.EITDataVariant
+   eitprocessing.eit_data.Vendor
+   eitprocessing.eit_data.Equivalence
+   eitprocessing.eit_data.SelectByTime
+   eitprocessing.eit_data.SparseDataCollection
+   eitprocessing.eit_data.VariantCollection
+   eitprocessing.eit_data.EITData
+   eitprocessing.eit_data.EITData_
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.eit_data.PathLike
+   eitprocessing.eit_data.PathArg
+   eitprocessing.eit_data.T
+
+
+.. py:class:: ContinuousDataCollection
+
+
+   Bases: :py:obj:`dict`, :py:obj:`eitprocessing.mixins.equality.Equivalence`
+
+   dict() -> new empty dictionary
+   dict(mapping) -> new dictionary initialized from a mapping object's
+       (key, value) pairs
+   dict(iterable) -> new dictionary initialized as if via:
+       d = {}
+       for k, v in iterable:
+           d[k] = v
+   dict(**kwargs) -> new dictionary initialized with the name=value pairs
+       in the keyword argument list.  For example:  dict(one=1, two=2)
+
+   .. py:method:: __setitem__(__key: Any, __value: Any) -> None
+
+      Set self[key] to value.
+
+
+   .. py:method:: add(data: eitprocessing.continuous_data.ContinuousData, overwrite: bool = False) -> None
+
+
+   .. py:method:: _check_data(data: eitprocessing.continuous_data.ContinuousData, key=None, overwrite: bool = False) -> None
+
+
+   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
+      :classmethod:
+
+
+
+.. py:class:: EITDataVariant
+
+
+   Bases: :py:obj:`eitprocessing.variants.Variant`, :py:obj:`eitprocessing.mixins.slicing.SelectByTime`
+
+   Contains a single variant of a dataset.
+
+   A variant of a dataset is defined as either the raw data, or an edited
+   version of that raw data. For example, EIT data can contain a "raw"
+   versions and a "filtered" version. Both variants share the same time axis.
+
+   The actual data of a variant is contained in a variable that must be set by
+   a subclass inheriting from this class.
+
+   Attributes:
+   - label (str): a short descriptor for the variant, that is used to access
+     the variant
+   - description (str): a longer description of the variant
+   - params (dict): contains information on how to reproduce the variant, e.g.
+     which filters and filters settigs were used
+
+   .. py:property:: global_baseline
+
+
+   .. py:property:: pixel_impedance_global_offset
+
+
+   .. py:property:: pixel_baseline
+
+
+   .. py:property:: pixel_impedance_individual_offset
+
+
+   .. py:property:: global_impedance
+
+
+   .. py:attribute:: _data_field_name
+      :type: str
+      :value: 'pixel_impedance'
+
+      
+
+   .. py:attribute:: pixel_impedance
+      :type: numpy.typing.NDArray
+
+      
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
+      :classmethod:
+
+      Concatenates two variants.
+
+      Concatenating two variants results in a single variant with the
+      combined length of both variants.
+
+      To merge more than two variants, use
+      `functools.reduce(Variant.concatenate, list_of_variants)`.
+
+      Args:
+      - a (Variant)
+      - b (Variant)
+
+      Raises:
+      - EquivalenceError if a and b are not equivalent and can't be merged
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str | None = None) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+   .. py:method:: copy(label: str | None = None)
+
+
+
+.. py:class:: Vendor
+
+
+   Bases: :py:obj:`strenum.LowercaseStrEnum`
+
+   Enum indicating the vendor (manufacturer) of the source EIT device.
+
+   .. py:attribute:: DRAEGER
+
+      
+
+   .. py:attribute:: TIMPEL
+
+      
+
+   .. py:attribute:: SENTEC
+
+      
+
+   .. py:attribute:: DRAGER
+
+      
+
+   .. py:attribute:: DRÄGER
+
+      
+
+
+.. py:class:: Equivalence
+
+
+   Bases: :py:obj:`abc.ABC`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: __eq__(other: typing_extensions.Self)
+
+      Return self==value.
+
+
+   .. py:method:: _array_safe_eq(a, b) -> bool
+      :staticmethod:
+
+      Check if a and b are equal, even if they are numpy arrays containing nans.
+
+
+   .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
+
+      Test whether the data structure between two objects are equivalent.
+
+      Equivalence, in this case means that objects are compatible e.g. to be
+      merged. Data content can vary, but e.g. the category of data (e.g.
+      airway pressure, flow, tidal volume) and unit, etc., must match.
+
+
+      :param other: object that will be compared to self.
+      :param raise_: sets this method's behavior in case of non-equivalence. If
+                     True, an `EquivalenceError` is raised, otherwise `False` is
+                     returned.
+
+      :raises EquivalenceError: if `raise_ == True` and the objects are not
+      :raises equivalent.:
+
+      :returns: bool describing result of equivalence comparison.
+
+
+
+.. py:class:: SelectByTime
+
+
+   Bases: :py:obj:`SelectByIndex`
+
+   Adds slicing functionality to subclass by implementing `__getitem__`.
+
+   Subclasses must implement a `_sliced_copy` function that defines what should
+   happen when the object is sliced. This class ensures that when calling a
+   slice between square brackets (as e.g. done for lists) then return the
+   expected sliced object.
+
+   .. py:property:: t
+      :type: TimeIndexer
+
+
+   .. py:attribute:: time
+      :type: numpy.typing.NDArray
+
+      
+
+   .. py:method:: select_by_time(start_time: float | int | None = None, end_time: float | int | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
+
+      Get a slice from start to end time stamps.
+
+      Given a start and end time stamp (i.e. its value, not its index),
+      return a slice of the original object, which must contain a time axis.
+
+      :param start_time: first time point to include. Defaults to first frame of sequence.
+      :param end_time: last time point. Defaults to last frame of sequence.
+      :param start_inclusive (default: `True`), end_inclusive (default `False`):
+                                       these arguments control the behavior if the given time stamp
+                                       does not match exactly with an existing time stamp of the input.
+                                       if `True`: the given time stamp will be inside the sliced object.
+                                       if `False`: the given time stamp will be outside the sliced object.
+      :param label: Description. Defaults to None, which will create a label based
+                    on the original object label and the frames by which it is sliced.
+
+      :raises TypeError: if `self` does not contain a `time` attribute.
+      :raises ValueError: if time stamps are not sorted.
+
+      :returns: Slice of self.
+
+
+
+.. py:class:: SparseDataCollection
+
+
+   Bases: :py:obj:`dict`
+
+   dict() -> new empty dictionary
+   dict(mapping) -> new dictionary initialized from a mapping object's
+       (key, value) pairs
+   dict(iterable) -> new dictionary initialized as if via:
+       d = {}
+       for k, v in iterable:
+           d[k] = v
+   dict(**kwargs) -> new dictionary initialized with the name=value pairs
+       in the keyword argument list.  For example:  dict(one=1, two=2)
+
+   .. py:method:: concatenate(a, b) -> typing_extensions.Self
+      :classmethod:
+
+
+
+.. py:class:: VariantCollection(variant_type: type[V], *args, **kwargs)
+
+
+   Bases: :py:obj:`dict`, :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
+
+   A collection of variants of a single type.
+
+   A VariantCollection is a dictionary with some added features.
+
+   A VariantCollection can only contain variants (of a certain type). When
+   initializing VariantCollection a subclass of Variant (or Variant itself to
+   allow diverse types )must be passed as the first argument (`variant_type`),
+   limiting the type of variant that is allowed to be added to the collection.
+   During initialization, other arguments can be passed as if initializing a
+   normal dictionary.
+
+   When adding a variant, the key of the item in the dictionary must equal the
+   label of the variant. The method `add()` can be used instead, which
+   automatically sets the variant label as the key.
+
+   Thirdly, when setting a variant with a label that already exists, the
+   default behaviour is to raise an exception. This prevents overwriting
+   existing variants. This behaviour can be overridden using `add(variant,
+   overwrite=True)`.
+
+
+   The `add()` method
+
+   Examples:
+   ```
+   >>> variant_a = EITDataVariant(label="raw", ...)
+   >>> vc = VariantCollection(EITDataVariant, raw=variant_a)
+   >>> variant_b = EITDataVariant(label="filtered", ...)
+   >>> vc.add(variant_b)  # equals vc["filtered"] = variant
+   ```
+
+   ```
+   >>> vc = VariantCollection(EITDataVariant)
+   >>> variant_c = SomeOtherVariant(label="offset", ...)
+   >>> vc.add(variant_c)  # raises InvalidVariantType() exception
+   ```
+
+
+   .. py:attribute:: variant_type
+      :type: type[V]
+
+      
+
+   .. py:method:: __eq__(other: typing_extensions.Self)
+
+      Return self==value.
+
+
+   .. py:method:: __setitem__(__key: str, __value: V) -> None
+
+      Set self[key] to value.
+
+
+   .. py:method:: add(*variant: V, overwrite: bool = False) -> None
+
+      Add one or multiple variants to the dictionary.
+
+      This method automatically sets the key of the item to the label of the
+      variant. By default, overwriting variants with the same label is
+      prevented. Trying to do so will result in a DuplicateVariantLabel
+      exception being raised. Set `overwrite` to `True` to allow overwriting.
+
+      Args:
+      - variant (Variant): the variant to be added. Multiple variants can be
+      added at once.
+
+      Raises:
+      - DuplicateVariantLabel if one attempts to add a variant with a label
+      that already exists as key.
+
+
+   .. py:method:: _check_variant(variant: V, key=None, overwrite: bool = False) -> None
+
+
+   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
+      :classmethod:
+
+
+
+.. py:data:: PathLike
+   :type: TypeAlias
+
+   
+
+.. py:data:: PathArg
+   :type: TypeAlias
+
+   
+
+.. py:data:: T
+
+   
+
+.. py:class:: EITData
+
+
+   Bases: :py:obj:`eitprocessing.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`abc.ABC`
+
+   Adds slicing functionality to subclass by implementing `__getitem__`.
+
+   Subclasses must implement a `_sliced_copy` function that defines what should
+   happen when the object is sliced. This class ensures that when calling a
+   slice between square brackets (as e.g. done for lists) then return the
+   expected sliced object.
+
+   .. py:attribute:: path
+      :type: pathlib.Path | list[pathlib.Path]
+
+      
+
+   .. py:attribute:: nframes
+      :type: int
+
+      
+
+   .. py:attribute:: time
+      :type: numpy.typing.NDArray
+
+      
+
+   .. py:attribute:: framerate
+      :type: float
+
+      
+
+   .. py:attribute:: vendor
+      :type: vendor.Vendor
+
+      
+
+   .. py:attribute:: phases
+      :type: list
+
+      
+
+   .. py:attribute:: events
+      :type: list
+
+      
+
+   .. py:attribute:: label
+      :type: str | None
+
+      
+
+   .. py:attribute:: variants
+      :type: eitprocessing.variants.variant_collection.VariantCollection
+
+      
+
+   .. py:method:: __post_init__()
+
+
+   .. py:method:: from_path(path: PathArg, vendor: vendor.Vendor | str, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> typing_extensions.Self | tuple[typing_extensions.Self, eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection, eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection]
+      :classmethod:
+
+      Load sequence from path(s).
+
+      :param path: path(s) to data file.
+      :type path: Path | str | list[Path | str]
+      :param vendor: vendor indicating the device used.
+      :type vendor: Vendor | str
+      :param label: description of object for human interpretation.
+                    Defaults to "Sequence_<unique_id>".
+      :type label: str
+      :param framerate: framerate at which the data was recorded.
+                        Default for Draeger: 20
+                        Default for Timpel: 50
+      :type framerate: int, optional
+      :param first_frame: index of first time point of sequence
+                          (i.e. NOT the timestamp).
+                          Defaults to 0.
+      :type first_frame: int, optional
+      :param max_frames: maximum number of frames to load.
+                         The actual number of frames can be lower than this if this
+                         would surpass the final frame.
+      :type max_frames: int, optional
+
+      :raises NotImplementedError: is raised when there is no loading method for
+      :raises the given vendor.:
+
+      :returns: a sequence containing the loaded data from all files in path
+      :rtype: Sequence
+
+
+   .. py:method:: _ensure_path_list(path: PathArg) -> list[pathlib.Path]
+      :staticmethod:
+
+
+   .. py:method:: _get_vendor_class(vendor: vendor.Vendor) -> type[EITData_]
+      :staticmethod:
+
+
+   .. py:method:: _check_first_frame(first_frame)
+      :staticmethod:
+
+
+   .. py:method:: _ensure_vendor(vendor: vendor.Vendor | str) -> vendor.Vendor
+      :staticmethod:
+
+      Check whether vendor exists, and assure it's a Vendor object.
+
+
+   .. py:method:: concatenate(a: T, b: T, label: str | None = None) -> T
+      :classmethod:
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+   .. py:method:: _from_path(path: pathlib.Path, label: str | None = None, framerate: float | None = None, first_frame: int | None = None, max_frames: int | None = None, return_non_eit_data: bool = False) -> typing_extensions.Self | tuple[typing_extensions.Self, eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection, eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection]
+      :classmethod:
+      :abstractmethod:
+
+
+
+.. py:class:: EITData_
+
+
+   Bases: :py:obj:`EITData`
+
+   Adds slicing functionality to subclass by implementing `__getitem__`.
+
+   Subclasses must implement a `_sliced_copy` function that defines what should
+   happen when the object is sliced. This class ensures that when calling a
+   slice between square brackets (as e.g. done for lists) then return the
+   expected sliced object.
+
+   .. py:attribute:: vendor
+      :type: vendor.Vendor
+
+      
+
+   .. py:method:: __add__(other: T) -> T
+
+
+   .. py:method:: from_path(path: PathArg, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> typing_extensions.Self | tuple[typing_extensions.Self, eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection, eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection]
+      :classmethod:
+
+      Load sequence from path(s).
+
+      :param path: path(s) to data file.
+      :type path: Path | str | list[Path | str]
+      :param vendor: vendor indicating the device used.
+      :type vendor: Vendor | str
+      :param label: description of object for human interpretation.
+                    Defaults to "Sequence_<unique_id>".
+      :type label: str
+      :param framerate: framerate at which the data was recorded.
+                        Default for Draeger: 20
+                        Default for Timpel: 50
+      :type framerate: int, optional
+      :param first_frame: index of first time point of sequence
+                          (i.e. NOT the timestamp).
+                          Defaults to 0.
+      :type first_frame: int, optional
+      :param max_frames: maximum number of frames to load.
+                         The actual number of frames can be lower than this if this
+                         would surpass the final frame.
+      :type max_frames: int, optional
+
+      :raises NotImplementedError: is raised when there is no loading method for
+      :raises the given vendor.:
+
+      :returns: a sequence containing the loaded data from all files in path
+      :rtype: Sequence
+
+
+
+.. py:exception:: NoVendorProvided
+
+
+   Bases: :py:obj:`Exception`
+
+   Raised when no vendor is provided when trying to load data.
+
+
+.. py:exception:: UnknownVendor
+
+
+   Bases: :py:obj:`Exception`
+
+   Raised when an unknown vendor is provided when trying to load data.
+
+

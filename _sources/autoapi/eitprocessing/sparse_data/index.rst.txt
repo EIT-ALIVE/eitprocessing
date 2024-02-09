@@ -1,0 +1,32 @@
+:py:mod:`eitprocessing.sparse_data`
+===================================
+
+.. py:module:: eitprocessing.sparse_data
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   sparse_data_collection/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.sparse_data.SparseData
+
+
+
+
+.. py:class:: SparseData
+
+
+

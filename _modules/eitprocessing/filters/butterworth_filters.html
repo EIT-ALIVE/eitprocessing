@@ -25,8 +25,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="../filters.html" accesskey="U">eitprocessing.filters</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../filters.html" accesskey="U">eitprocessing.filters</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.filters.butterworth_filters</a></li> 
       </ul>
     </div>  
@@ -37,13 +36,18 @@
           <div class="body" role="main">
             
   <h1>Source code for eitprocessing.filters.butterworth_filters</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">InitVar</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">InitVar</span><span class="p">,</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Literal</span>
+
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">TimeDomainFilter</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -55,13 +59,13 @@
 <span class="sd">    Generates a low-pass, high-pass, band-pass or band-stop digital Butterworth filter of order</span>
 <span class="sd">    `order`. Filters are created using cascaded second-order sections representation, providing</span>
 <span class="sd">    better stability compared to the traditionally used transfer function (numerator/denominator or</span>
-<span class="sd">    b/a representation). </span>
+<span class="sd">    b/a representation).</span>
 
 <span class="sd">    The `apply_filter()` method applies the filter to the provided data using forward-backward</span>
 <span class="sd">    filtering. This minimizes the phase shift, and effectively doubles the order of the filter.</span>
 
-<span class="sd">    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions: </span>
-<span class="sd">        - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html </span>
+<span class="sd">    ``ButterworthFilter`` is a wrapper of the `scipy.butter()` and `scipy.filtfilt()` functions:</span>
+<span class="sd">        - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.butter.html</span>
 <span class="sd">        - https://docs.scipy.org/doc/scipy-1.10.1/reference/generated/scipy.signal.filtfilt.html</span>
 
 <span class="sd">    Args:</span>
@@ -72,7 +76,7 @@
 <span class="sd">            `cutoff_frequency` is a sequence containing two frequencies.</span>
 <span class="sd">        order: Order of the filter. The effective order size is twice the given order, due to</span>
 <span class="sd">            forward-backward filtering. Higher orders improve the effectiveness of a filter, but</span>
-<span class="sd">            can result in unstable or incorrect filtering. </span>
+<span class="sd">            can result in unstable or incorrect filtering.</span>
 <span class="sd">        sample_frequency: The sample frequency of the data to be filtered (in Hz).</span>
 <span class="sd">        ignore_max_order: Whether to raise an exception if the order is larger than the maximum of</span>
 <span class="sd">            10. Defaults to False.</span>
@@ -119,15 +123,14 @@
 
 <div class="viewcode-block" id="ButterworthFilter._set_filter_type_class">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter._set_filter_type_class">[docs]</a>
-    <span class="k">def</span> <span class="nf">_set_filter_type_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_filter_type_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ButterworthFilter</span><span class="p">)</span>
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">!=</span> <span class="n">ButterworthFilter</span>
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">filter_type</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;conflicting type info; `filter_type=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">` does not match </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Conflicting type info; `filter_type=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">` does not match </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="c1"># Note that this way of re-assigning classes is considered to be a bad practice</span>
         <span class="c1"># (https://tinyurl.com/2x2cea6h), but the objections raised don&#39;t seem to be prohibtive.</span>
@@ -137,7 +140,7 @@
 
 <div class="viewcode-block" id="ButterworthFilter._check_init">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/filters/butterworth_filters/index.html#eitprocessing.filters.butterworth_filters.ButterworthFilter._check_init">[docs]</a>
-    <span class="k">def</span> <span class="nf">_check_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ignore_max_order</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_check_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ignore_max_order</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check the arguments of __init__ and raise exceptions when they don&#39;t meet requirements.</span>
 
@@ -154,59 +157,46 @@
 <span class="sd">            TypeError: if the sample frequency is not numeric.</span>
 <span class="sd">            ValueError: if the sample frequency is 0 or negative.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;lowpass&quot;</span><span class="p">,</span> <span class="s2">&quot;highpass&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="s2">&quot;Invalid `cutoff_frequency`. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Must be an integer or float, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-                <span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid `cutoff_frequency`. Must be an integer or float, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="s2">&quot;bandstop&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">)</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="s2">&quot;Invalid `cutoff_frequency`. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Must be a tuple, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-                <span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid `cutoff_frequency`. Must be a tuple, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Invalid `cutoff_frequency` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="si">}</span><span class="s2">). &quot;</span>
-                    <span class="s2">&quot;Must have length 2.&quot;</span>
-                <span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid `cutoff_frequency` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="si">}</span><span class="s2">). Must have length 2.&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
-                <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span>
-            <span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Invalid `cutoff_frequency` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="si">}</span><span class="s2">). &quot;</span>
-                    <span class="s2">&quot;Must be a tuple containing two numbers.&quot;</span>
-                <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid `cutoff_frequency` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff_frequency</span><span class="si">}</span><span class="s2">). Must be a tuple containing two numbers.&quot;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Invalid `filter_type` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">). &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Must be one of </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FILTER_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid `filter_type` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">). Must be one of </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FILTER_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid `order`. Must be an int, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid `order`. Must be an int, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">&gt;</span> <span class="n">MAX_ORDER</span> <span class="ow">and</span> <span class="n">ignore_max_order</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Invalid `order` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="si">}</span><span class="s2">). Must be between 1 and </span><span class="si">{</span><span class="n">MAX_ORDER</span><span class="si">}</span><span class="s2">. &quot;</span>
                 <span class="s2">&quot;To use higher values, set `ignore_max_order` to `True`.&quot;</span>
             <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Invalid `sample_frequency` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="si">}</span><span class="s2">). Must be a number.&quot;</span>
-            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid `sample_frequency` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="si">}</span><span class="s2">). Must be a number.&quot;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Invalid `sample_frequency` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="si">}</span><span class="s2">). Must be positive&quot;</span>
-            <span class="p">)</span></div>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid `sample_frequency` (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="si">}</span><span class="s2">). Must be positive&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ButterworthFilter.apply_filter">
@@ -232,8 +222,7 @@
             <span class="n">output</span><span class="o">=</span><span class="s2">&quot;sos&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="n">filtered_data</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">sos</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">filtered_data</span></div>
+        <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">sos</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span></div>
 </div>
 
 
@@ -368,8 +357,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="../filters.html" >eitprocessing.filters</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../filters.html" >eitprocessing.filters</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.filters.butterworth_filters</a></li> 
       </ul>
     </div>
