@@ -1,5 +1,3 @@
-"""Tests for the eitprocessing.my_module module.
-"""
 import copy
 import os
 import pytest  # noqa
