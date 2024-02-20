@@ -102,10 +102,10 @@ Attributes
    .. py:method:: __post_init__(ignore_max_order)
 
 
-   .. py:method:: _set_filter_type_class() -> None
+   .. py:method:: _set_filter_type_class()
 
 
-   .. py:method:: _check_init(ignore_max_order) -> None
+   .. py:method:: _check_init(ignore_max_order)
 
       Check the arguments of __init__ and raise exceptions when they don't meet requirements.
 

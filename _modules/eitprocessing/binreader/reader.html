@@ -24,7 +24,8 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" accesskey="U">eitprocessing</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.binreader.reader</a></li> 
       </ul>
     </div>  
@@ -35,160 +36,71 @@
           <div class="body" role="main">
             
   <h1>Source code for eitprocessing.binreader.reader</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.</span>
+<span class="sd">Licensed under the Apache License, version 2.0. See LICENSE for details.</span>
+
+<span class="sd">This file contains methods related to when electrical impedance tomographs are read.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">struct</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeVar</span>
-
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partialmethod</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">io</span>
 
-    <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
-
-<div class="viewcode-block" id="T">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.T">[docs]</a>
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="N">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.N">[docs]</a>
-<span class="n">N</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">)</span></div>
-
-
-
-<span class="nd">@dataclass</span>
 <div class="viewcode-block" id="Reader">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader">[docs]</a>
 <span class="k">class</span> <span class="nc">Reader</span><span class="p">:</span>
 <div class="viewcode-block" id="Reader.file_handle">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.file_handle">[docs]</a>
-    <span class="n">file_handle</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BufferedReader</span></div>
-
-<div class="viewcode-block" id="Reader.endian">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.endian">[docs]</a>
-    <span class="n">endian</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">file_handle</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="Reader.read_single">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.read_single">[docs]</a>
-    <span class="k">def</span> <span class="nf">read_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cast</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">type_code</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_handle</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_handle</span> <span class="o">=</span> <span class="n">file_handle</span>
 
-
-<div class="viewcode-block" id="Reader.read_list">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.read_list">[docs]</a>
-    <span class="k">def</span> <span class="nf">read_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cast</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-        <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}{</span><span class="n">type_code</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span></div>
-
-
-<div class="viewcode-block" id="Reader.read_array">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.read_array">[docs]</a>
-    <span class="k">def</span> <span class="nf">read_array</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">type_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">cast</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">N</span><span class="p">],</span>
-        <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">N</span><span class="p">]:</span>
-        <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}{</span><span class="n">type_code</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cast</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Reader.read_string">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.read_string">[docs]</a>
-    <span class="k">def</span> <span class="nf">read_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2">s&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="Reader._read_full_type_code">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader._read_full_type_code">[docs]</a>
-    <span class="k">def</span> <span class="nf">_read_full_type_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_type_code</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;little&quot;</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">]:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Endian type &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endian</span><span class="si">}</span><span class="s2">&#39; not recognized. Allowed values are &#39;little&#39; and &#39;big&#39;.&quot;</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="n">msg</span><span class="p">,</span>
-                <span class="p">)</span>
-
-            <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;&lt;&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">==</span> <span class="s2">&quot;little&quot;</span> <span class="k">else</span> <span class="s2">&quot;&gt;&quot;</span>
-            <span class="n">full_type_code</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">full_type_code</span>
-
+<div class="viewcode-block" id="Reader.read">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.read">[docs]</a>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_code</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">type_code</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">full_type_code</span> <span class="o">=</span> <span class="n">type_code</span> <span class="o">*</span> <span class="n">length</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}{</span><span class="n">type_code</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">data_size</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
         <span class="n">packed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data_size</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">,</span> <span class="n">packed_data</span><span class="p">)</span></div>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">,</span> <span class="n">packed_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">cast</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Reader.cast_string">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.cast_string">[docs]</a>
+    <span class="k">def</span> <span class="nf">cast_string</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="Reader.float32">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.float32">[docs]</a>
-    <span class="k">def</span> <span class="nf">float32</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span></div>
-
+    <span class="n">float32</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">read</span><span class="p">,</span> <span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Reader.float64">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.float64">[docs]</a>
-    <span class="k">def</span> <span class="nf">float64</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Reader.npfloat32">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.npfloat32">[docs]</a>
-    <span class="k">def</span> <span class="nf">npfloat32</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Reader.npfloat64">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.npfloat64">[docs]</a>
-    <span class="k">def</span> <span class="nf">npfloat64</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span></div>
-
+    <span class="n">float64</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">read</span><span class="p">,</span> <span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Reader.int32">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.int32">[docs]</a>
-    <span class="k">def</span> <span class="nf">int32</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Reader.npint32">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.npint32">[docs]</a>
-    <span class="k">def</span> <span class="nf">npint32</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span></div>
-
+    <span class="n">int32</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">read</span><span class="p">,</span> <span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Reader.string">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.string">[docs]</a>
-    <span class="k">def</span> <span class="nf">string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_string</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Reader.uint8">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.uint8">[docs]</a>
-    <span class="k">def</span> <span class="nf">uint8</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Reader.uint16">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.uint16">[docs]</a>
-    <span class="k">def</span> <span class="nf">uint16</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Reader.uint32">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.uint32">[docs]</a>
-    <span class="k">def</span> <span class="nf">uint32</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Reader.uint64">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.Reader.uint64">[docs]</a>
-    <span class="k">def</span> <span class="nf">uint64</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
+    <span class="n">string</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">read</span><span class="p">,</span> <span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="n">cast_string</span><span class="p">)</span></div>
 </div>
 
 </pre></div>
@@ -224,6 +136,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.binreader.reader</a></li> 
       </ul>
     </div>

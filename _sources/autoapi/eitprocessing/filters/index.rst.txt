@@ -34,7 +34,8 @@ Classes
 
       
 
-   .. py:method:: apply_filter(input_data) -> NoReturn
+   .. py:method:: apply_filter(input_data)
+      :abstractmethod:
 
 
 

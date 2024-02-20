@@ -1,166 +1,60 @@
-:py:mod:`eitprocessing.binreader`
-=================================
+:py:mod:`eitprocessing.binreader.sequence`
+==========================================
 
-.. py:module:: eitprocessing.binreader
+.. py:module:: eitprocessing.binreader.sequence
 
 .. autoapi-nested-parse::
 
-   Loading and processing binary EIT data from the Dräger Pulmovista 500
+   Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
+   Licensed under the Apache License, version 2.0. See LICENSE for details.
+
+   This file contains methods related to parts of electrical impedance tomographs
+   as they are read.
 
 
 
-Submodules
-----------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 1
-
-   event/index.rst
-   frameset/index.rst
-   phases/index.rst
-   reader/index.rst
-   sequence/index.rst
-   timing_error/index.rst
-
-
-Package Contents
-----------------
+Module Contents
+---------------
 
 Classes
 ~~~~~~~
 
 .. autoapisummary::
 
-   eitprocessing.binreader.Frameset
-   eitprocessing.binreader.MaxValue
-   eitprocessing.binreader.MinValue
-   eitprocessing.binreader.QRSMark
-   eitprocessing.binreader.DraegerSequence
-   eitprocessing.binreader.Sequence
-   eitprocessing.binreader.TimpelSequence
-   eitprocessing.binreader.Vendor
+   eitprocessing.binreader.sequence.Vendor
+   eitprocessing.binreader.sequence.Sequence
+   eitprocessing.binreader.sequence.DraegerSequence
+   eitprocessing.binreader.sequence.TimpelSequence
 
 
 
 
-.. py:class:: Frameset
+.. py:class:: Vendor
 
 
-   .. py:property:: global_baseline
+   Bases: :py:obj:`strenum.LowercaseStrEnum`
 
+   Enum indicating the vendor (manufacturer) of the EIT device with which the data was gathered.
 
-   .. py:property:: pixel_values_global_offset
-
-
-   .. py:property:: pixel_baseline
-
-
-   .. py:property:: pixel_values_individual_offset
-
-
-   .. py:property:: global_impedance
-
-
-   .. py:attribute:: name
-      :type: str
+   .. py:attribute:: DRAEGER
 
       
 
-   .. py:attribute:: description
-      :type: str
+   .. py:attribute:: TIMPEL
 
       
 
-   .. py:attribute:: params
-      :type: dict
+   .. py:attribute:: SENTEC
 
       
 
-   .. py:attribute:: pixel_values
-      :type: numpy.ndarray
+   .. py:attribute:: DRAGER
 
       
 
-   .. py:attribute:: waveform_data
-      :type: dict
+   .. py:attribute:: DRÄGER
 
       
-
-   .. py:attribute:: __getitem__
-
-      
-
-   .. py:attribute:: deepcopy
-
-      
-
-   .. py:method:: __len__()
-
-
-   .. py:method:: __eq__(other)
-
-      Return self==value.
-
-
-   .. py:method:: select_by_indices(indices)
-
-
-   .. py:method:: plot_waveforms(waveforms=None)
-
-
-   .. py:method:: animate(cmap: str = 'plasma', show_progress: bool | str = 'notebook', waveforms: bool | list[str] = False)
-
-
-   .. py:method:: merge(a, b)
-      :classmethod:
-
-
-
-.. py:class:: MaxValue
-
-
-   Bases: :py:obj:`PhaseIndicator`
-
-
-.. py:class:: MinValue
-
-
-   Bases: :py:obj:`PhaseIndicator`
-
-
-.. py:class:: QRSMark
-
-
-   Bases: :py:obj:`PhaseIndicator`
-
-
-.. py:class:: DraegerSequence
-
-
-   Bases: :py:obj:`Sequence`
-
-   Sequence object for DRAEGER data.
-
-   .. py:attribute:: vendor
-      :type: Vendor
-
-      
-
-   .. py:method:: _load_data(first_frame: int)
-
-      Load data for DRAEGER files.
-
-
-   .. py:method:: _read_frame(reader: eitprocessing.binreader.reader.Reader, index: int, pixel_values: numpy.typing.NDArray, previous_marker: int | None)
-
-      Read frame by frame data from DRAEGER files.
-
-
-   .. py:method:: reshape_frame(frame)
-      :staticmethod:
-
-      Convert linear array into 2D (32x32) image-like array.
-
 
 
 .. py:class:: Sequence
@@ -383,6 +277,35 @@ Classes
 
 
 
+.. py:class:: DraegerSequence
+
+
+   Bases: :py:obj:`Sequence`
+
+   Sequence object for DRAEGER data.
+
+   .. py:attribute:: vendor
+      :type: Vendor
+
+      
+
+   .. py:method:: _load_data(first_frame: int)
+
+      Load data for DRAEGER files.
+
+
+   .. py:method:: _read_frame(reader: eitprocessing.binreader.reader.Reader, index: int, pixel_values: numpy.typing.NDArray, previous_marker: int | None)
+
+      Read frame by frame data from DRAEGER files.
+
+
+   .. py:method:: reshape_frame(frame)
+      :staticmethod:
+
+      Convert linear array into 2D (32x32) image-like array.
+
+
+
 .. py:class:: TimpelSequence
 
 
@@ -399,33 +322,5 @@ Classes
 
       Load data for TIMPEL files.
 
-
-
-.. py:class:: Vendor
-
-
-   Bases: :py:obj:`strenum.LowercaseStrEnum`
-
-   Enum indicating the vendor (manufacturer) of the EIT device with which the data was gathered.
-
-   .. py:attribute:: DRAEGER
-
-      
-
-   .. py:attribute:: TIMPEL
-
-      
-
-   .. py:attribute:: SENTEC
-
-      
-
-   .. py:attribute:: DRAGER
-
-      
-
-   .. py:attribute:: DRÄGER
-
-      
 
 
