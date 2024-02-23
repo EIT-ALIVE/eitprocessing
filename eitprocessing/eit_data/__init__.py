@@ -196,7 +196,6 @@ class EITData(SelectByTime, Equivalence, ABC):
         label = label or f"Concatenation of <{a.label}> and <{b.label}>"
         framerate = a.framerate
         nframes = a.nframes + b.nframes
-        variants = VariantCollection.concatenate(a.variants, b.variants)
 
         cls_ = cls._get_vendor_class(a.vendor)
 
@@ -215,7 +214,7 @@ class EITData(SelectByTime, Equivalence, ABC):
         end_index: int,
         label: str,
     ) -> Self:
-        cls = self._get_vendor_class(self.vendor)
+        cls = self.__class__
         time = self.time[start_index:end_index]
         nframes = len(time)
 
