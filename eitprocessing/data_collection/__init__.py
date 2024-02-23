@@ -1,8 +1,7 @@
-from . import ContinuousData
+from ..continuous_data import ContinuousData
 
 
 class ContinuousDataCollection(dict):
-
     def __setitem__(self, __key: str, __value: ContinuousData) -> None:
         self._check_item(__value, key=__key)
         return super().__setitem__(__key, __value)
@@ -13,7 +12,10 @@ class ContinuousDataCollection(dict):
             super().__setitem__(item_.name, item_)
 
     def _check_item(
-        self, item: ContinuousData, key=None, overwrite: bool = False,
+        self,
+        item: ContinuousData,
+        key=None,
+        overwrite: bool = False,
     ) -> None:
         if not isinstance(item, ContinuousData):
             msg = f"type of `data` is {type(item)}, not 'ContinuousData'"
