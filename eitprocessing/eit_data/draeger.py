@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+_FRAME_SIZE_BYTES = 4358
+
 
 @dataclass(eq=False)
 class DraegerEITData(EITData_):
@@ -37,19 +39,16 @@ class DraegerEITData(EITData_):
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-
-        FRAME_SIZE_BYTES = 4358
-
     ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
         file_size = path.stat().st_size
-        if file_size % FRAME_SIZE_BYTES:
+        if file_size % _FRAME_SIZE_BYTES:
             msg = (
                 f"File size {file_size} of file {path!s} not divisible by "
-                f"{FRAME_SIZE_BYTES}.\n"
+                f"{_FRAME_SIZE_BYTES}.\n"
                 f"Make sure this is a valid and uncorrupted Dräger data file."
             )
             raise OSError(msg)
-        total_frames = file_size // FRAME_SIZE_BYTES
+        total_frames = file_size // _FRAME_SIZE_BYTES
 
         if first_frame > total_frames:
             msg = (
@@ -82,7 +81,7 @@ class DraegerEITData(EITData_):
         medibus_data = np.zeros((52, n_frames))
 
         with open(path, "br") as fh:
-            fh.seek(first_frame_to_load * FRAME_SIZE_BYTES)
+            fh.seek(first_frame_to_load * _FRAME_SIZE_BYTES)
             reader = Reader(fh)
             previous_marker = None
 

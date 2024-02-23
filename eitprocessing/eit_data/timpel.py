@@ -19,13 +19,17 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
+_COLUMN_WIDTH = 1030
+_NAN_VALUE = -1000
+
+
 @dataclass(eq=False)
 class TimpelEITData(EITData_):
     framerate: float = 50
     vendor: Vendor = field(default=Vendor.TIMPEL, init=False)
 
     @classmethod
-    def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
+    def _from_path(  # noqa: C901, PLR0913
         cls,
         path: Path,
         framerate: float | None = 20,
@@ -33,8 +37,6 @@ class TimpelEITData(EITData_):
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
     ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
-        COLUMN_WIDTH = 1030
-
         if not framerate:
             framerate = cls.framerate
 
@@ -54,9 +56,9 @@ class TimpelEITData(EITData_):
             )
             raise OSError(msg) from e
 
-        if data.shape[1] != COLUMN_WIDTH:
+        if data.shape[1] != _COLUMN_WIDTH:
             msg = (
-                f"Input does not have a width of {COLUMN_WIDTH} columns.\n"
+                f"Input does not have a width of {_COLUMN_WIDTH} columns.\n"
                 "Make sure this is a valid and uncorrupted Timpel data file."
             )
             raise OSError(msg)
@@ -86,7 +88,8 @@ class TimpelEITData(EITData_):
 
         pixel_impedance = data[:, :1024]
         pixel_impedance = np.reshape(pixel_impedance, newshape=(-1, 32, 32), order="C")
-        pixel_impedance = np.where(pixel_impedance == -1000, np.nan, pixel_impedance)
+
+        pixel_impedance = np.where(pixel_impedance == _NAN_VALUE, np.nan, pixel_impedance)
 
         # extract waveform data
         # TODO: properly export waveform data
@@ -131,13 +134,13 @@ class TimpelEITData(EITData_):
         # extract breath start, breath end and QRS marks
         phases = []
         for index in np.flatnonzero(data[:, 1027] == 1):
-            phases.append(MinValue(index, time[int(index)]))
+            phases.append(MinValue(index, time[int(index)]))  # noqa: PERF401
 
         for index in np.flatnonzero(data[:, 1028] == 1):
-            phases.append(MaxValue(index, time[int(index)]))
+            phases.append(MaxValue(index, time[int(index)]))  # noqa: PERF401
 
         for index in np.flatnonzero(data[:, 1029] == 1):
-            phases.append(QRSMark(index, time[int(index)]))
+            phases.append(QRSMark(index, time[int(index)]))  # noqa: PERF401
 
         phases.sort(key=lambda x: x.index)
 

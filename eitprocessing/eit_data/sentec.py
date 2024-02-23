@@ -21,7 +21,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from numpy.typing import NDArray
-    from typing_extensions import Self
 
 
 @dataclass(eq=False)
@@ -32,7 +31,7 @@ class SentecEITData(EITData_):
     framerate: float = 50.2
 
     @classmethod
-    def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
+    def _from_path(  # noqa: C901, PLR0913
         cls,
         path: Path,
         framerate: float | None = 50.2,
@@ -74,7 +73,7 @@ class SentecEITData(EITData_):
                             index += 1
 
                             ref = cls._read_frame(
-                                fh,  # type: ignore
+                                fh,
                                 version,
                                 index,
                                 payload_size,
@@ -101,10 +100,11 @@ class SentecEITData(EITData_):
         n_frames = len(image) if image is not None else 0
 
         if first_frame > index:
-            raise ValueError(
+            msg = (
                 f"Invalid input: `first_frame` {first_frame} is larger than the "
                 f"total number of frames in the file {index}.",
             )
+            raise ValueError(msg)
 
         if max_frames and n_frames != max_frames:
             msg = (
@@ -135,7 +135,7 @@ class SentecEITData(EITData_):
         return eit_data_collection
 
     @classmethod
-    def _read_frame(  # pylint: disable=too-many-arguments
+    def _read_frame(  # noqa: PLR0913
         cls,
         fh: BinaryIO,
         version: int,
@@ -145,8 +145,9 @@ class SentecEITData(EITData_):
         first_frame: int = 0,
     ) -> NDArray | None:
         """
-        Read a single frame in the file. The current position of the file has to be already set to the point where the
-        image should be read (data_id 5).
+        Read a single frame in the file.
+
+        The current position of the file has to be already set to the point where the image should be read (data_id 5).
 
         Args:
                     fh: opened file object

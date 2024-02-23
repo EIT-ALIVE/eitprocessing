@@ -40,7 +40,7 @@ class EITData(SelectByTime, Equivalence, ABC):
         self._check_equivalence = ["vendor", "framerate"]
 
     @classmethod
-    def from_path(  # pylint: disable=too-many-arguments,too-many-locals
+    def from_path(  # noqa: PLR0913
         cls,
         path: PathArg,
         vendor: Vendor | str,
@@ -65,6 +65,7 @@ class EITData(SelectByTime, Equivalence, ABC):
             max_frames (int, optional): maximum number of frames to load.
                 The actual number of frames can be lower than this if this
                 would surpass the final frame.
+            return_non_eit_data (bool): whether to load continuous and sparse data.
 
         Raises:
             NotImplementedError: is raised when there is no loading method for
@@ -90,7 +91,7 @@ class EITData(SelectByTime, Equivalence, ABC):
             single_path.resolve(strict=True)  # raises if file does not exists
 
         for single_path in paths:
-            loaded_data = vendor_class._from_path(  # pylint: disable=protected-access
+            loaded_data = vendor_class._from_path(  # noqa: SLF001
                 path=single_path,
                 framerate=framerate,
                 first_frame=first_frame,
@@ -107,16 +108,16 @@ class EITData(SelectByTime, Equivalence, ABC):
                     eit, continuous, sparse = loaded_data
 
                 # assertions for type checking
-                assert isinstance(eit, EITData)
-                assert isinstance(continuous, DataCollection)
-                assert isinstance(sparse, DataCollection)
+                assert isinstance(eit, EITData)  # noqa: S101
+                assert isinstance(continuous, DataCollection)  # noqa: S101
+                assert isinstance(sparse, DataCollection)  # noqa: S101
 
                 eit_datasets.append(eit)
                 continuous_datasets.append(continuous)
                 sparse_datasets.append(sparse)
 
             else:
-                assert isinstance(loaded_data, EITData)
+                assert isinstance(loaded_data, EITData)  # noqa: S101
                 eit_datasets.append(loaded_data)
 
         if return_non_eit_data:
@@ -159,7 +160,7 @@ class EITData(SelectByTime, Equivalence, ABC):
         return vendor_classes[vendor]
 
     @staticmethod
-    def _check_first_frame(first_frame):
+    def _check_first_frame(first_frame: int | None) -> int:
         if first_frame is None:
             first_frame = 0
         if int(first_frame) != first_frame:
@@ -173,12 +174,11 @@ class EITData(SelectByTime, Equivalence, ABC):
     @staticmethod
     def _ensure_vendor(vendor: Vendor | str) -> Vendor:
         """Check whether vendor exists, and assure it's a Vendor object."""
-
         try:
             return Vendor(vendor)
         except ValueError as e:
             msg = f"Unknown vendor {vendor}."
-            raise UnknownVendor(msg) from e
+            raise UnknownVendorError(msg) from e
 
     @classmethod
     def concatenate(cls, a: T, b: T, label: str | None = None) -> T:
@@ -259,7 +259,7 @@ class EITData(SelectByTime, Equivalence, ABC):
 
 
 @dataclass(eq=False)
-class EITData_(EITData):
+class EITData_(EITData):  # noqa: N801
     vendor: Vendor = field(init=False)
 
     def __add__(self: T, other: T) -> T:
@@ -285,6 +285,5 @@ class EITData_(EITData):
         )
 
 
-
-class UnknownVendor(Exception):
+class UnknownVendorError(Exception):
     """Raised when an unknown vendor is provided when trying to load data."""
