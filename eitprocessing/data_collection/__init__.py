@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import Generic, TypeVar
+from typing import Generic, Self, TypeVar
+
+from eitprocessing.mixins.equality import Equivalence
 
 V = TypeVar("V")
 
 
-class DataCollection(dict, Generic[V]):
+class DataCollection(dict, Equivalence, Generic[V]):
     data_type: type
 
     def __init__(self, data_type: type[V], *args, **kwargs):
@@ -50,3 +52,12 @@ class DataCollection(dict, Generic[V]):
     def get_derived_data(self) -> dict[str, V]:
         """Return all data that was derived from any source."""
         return {k: v for k, v in self.items() if len(v.derived_from) >= 1}
+
+    def concatenate(self, other: Self[V]) -> Self[V]:
+        self.isequivalent(other, raise_=True)
+
+        concatenated = self.__class__(self.data_type)
+        for key in self.keys():
+            concatenated[key] = self[key].concatenate(other[key])
+
+        return concatenated
