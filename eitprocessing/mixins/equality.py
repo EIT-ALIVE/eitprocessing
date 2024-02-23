@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 from abc import ABC
 from dataclasses import astuple, is_dataclass
+from typing import TYPE_CHECKING
 
 import numpy as np
-from typing_extensions import Self
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 
 class Equivalence(ABC):
@@ -21,7 +26,6 @@ class Equivalence(ABC):
     @staticmethod
     def _array_safe_eq(a, b) -> bool:
         """Check if a and b are equal, even if they are numpy arrays containing nans."""
-
         if isinstance(a, np.ndarray) and isinstance(b, np.ndarray):
             return a.shape == b.shape and np.array_equal(a, b, equal_nan=True)
         try:
@@ -50,29 +54,25 @@ class Equivalence(ABC):
         Returns:
             bool describing result of equivalence comparison.
         """
-
         if self == other:
             return True
 
         try:
             # check whether types match
             if type(self) is not type(other):
-                raise EquivalenceError(
-                    f"Types don't match: {type(self)}, {type(other)}"
-                )
+                msg = f"Types don't match: {type(self)}, {type(other)}"
+                raise EquivalenceError(msg)
 
             # check keys in collection
             if isinstance(self, dict):
                 if set(self.keys()) != set(other.keys()):
-                    raise EquivalenceError(
-                        f"Keys don't match:\n\t{self.keys()},\n\t{other.keys()}"
-                    )
+                    msg = f"Keys don't match:\n\t{self.keys()},\n\t{other.keys()}"
+                    raise EquivalenceError(msg)
 
                 for key in self:
                     if not self[key].isequivalent(other[key], False):
-                        raise EquivalenceError(
-                            f"Data in {key} doesn't match: {self[key]}, {other[key]}"
-                        )
+                        msg = f"Data in {key} doesn't match: {self[key]}, {other[key]}"
+                        raise EquivalenceError(msg)
 
             # check attributes of data
             else:
@@ -82,9 +82,9 @@ class Equivalence(ABC):
                         raise f"{attr.capitalize()}s don't match: {s}, {o}"
 
         # raise or return if a check fails
-        except EquivalenceError as e:
+        except EquivalenceError:
             if raise_:
-                raise e
+                raise
             return False
 
         # if all checks pass
