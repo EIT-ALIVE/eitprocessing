@@ -56,11 +56,11 @@ class DataCollection(dict, Equivalence, Generic[V]):
         """Return all data that was derived from any source."""
         return {k: v for k, v in self.items() if len(v.derived_from) >= 1}
 
-    def concatenate(self, other: Self[V]) -> Self[V]:
+    def concatenate(self: Self[V], other: Self[V]) -> Self[V]:
         self.isequivalent(other, raise_=True)
 
         concatenated = self.__class__(self.data_type)
-        for key in self.keys():
+        for key in self:
             concatenated[key] = self[key].concatenate(other[key])
 
         return concatenated
