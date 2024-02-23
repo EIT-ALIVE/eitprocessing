@@ -3,11 +3,6 @@
 
 .. py:module:: eitprocessing
 
-.. autoapi-nested-parse::
-
-   Documentation about eitprocessing
-
-
 
 Subpackages
 -----------
@@ -16,24 +11,21 @@ Subpackages
    :maxdepth: 3
 
    binreader/index.rst
+   continuous_data/index.rst
+   eit_data/index.rst
    filters/index.rst
+   mixins/index.rst
+   sequence/index.rst
+   sparse_data/index.rst
+   variants/index.rst
 
 
-Package Contents
-----------------
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
 
-.. py:data:: __author__
-   :value: 'Dani Bodor'
+   helper/index.rst
 
-   
-
-.. py:data:: __email__
-   :value: 'd.bodor@esciencecenter.nl'
-
-   
-
-.. py:data:: __version__
-   :value: '0.1.0'
-
-   
 

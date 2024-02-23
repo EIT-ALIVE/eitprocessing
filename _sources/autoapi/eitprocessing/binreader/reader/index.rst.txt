@@ -3,14 +3,6 @@
 
 .. py:module:: eitprocessing.binreader.reader
 
-.. autoapi-nested-parse::
-
-   Copyright 2023 Netherlands eScience Center and Erasmus University Medical Center.
-   Licensed under the Apache License, version 2.0. See LICENSE for details.
-
-   This file contains methods related to when electrical impedance tomographs are read.
-
-
 
 Module Contents
 ---------------
@@ -25,34 +17,82 @@ Classes
 
 
 
-.. py:class:: Reader(file_handle)
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.binreader.reader.T
+   eitprocessing.binreader.reader.N
+
+
+.. py:data:: T
+
+   
+
+.. py:data:: N
+
+   
+
+.. py:class:: Reader
 
 
    .. py:attribute:: file_handle
+      :type: io.BufferedReader
 
       
 
-   .. py:attribute:: float32
+   .. py:attribute:: endian
+      :type: str | None
 
       
 
-   .. py:attribute:: float64
-
-      
-
-   .. py:attribute:: int32
-
-      
-
-   .. py:attribute:: string
-
-      
-
-   .. py:method:: read(type_code, length=1, cast=None)
+   .. py:method:: read_single(type_code: str, cast: type[T]) -> T
 
 
-   .. py:method:: cast_string(data)
-      :staticmethod:
+   .. py:method:: read_list(type_code: str, cast: type[T], length: int) -> list[T]
+
+
+   .. py:method:: read_array(type_code: str, cast: type[N], length: int) -> numpy.typing.NDArray[N]
+
+
+   .. py:method:: read_string(length=1)
+
+
+   .. py:method:: _read_full_type_code(full_type_code) -> tuple[Any, Ellipsis]
+
+
+   .. py:method:: float32() -> float
+
+
+   .. py:method:: float64() -> float
+
+
+   .. py:method:: npfloat32(length=1) -> numpy.typing.NDArray[numpy.float32]
+
+
+   .. py:method:: npfloat64(length=1) -> numpy.typing.NDArray[numpy.float64]
+
+
+   .. py:method:: int32() -> int
+
+
+   .. py:method:: npint32(length=1) -> numpy.typing.NDArray[numpy.int32]
+
+
+   .. py:method:: string(length=1) -> str
+
+
+   .. py:method:: uint8() -> int
+
+
+   .. py:method:: uint16() -> int
+
+
+   .. py:method:: uint32() -> int
+
+
+   .. py:method:: uint64() -> int
 
 
 

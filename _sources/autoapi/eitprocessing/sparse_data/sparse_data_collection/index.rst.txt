@@ -1,0 +1,39 @@
+:py:mod:`eitprocessing.sparse_data.sparse_data_collection`
+==========================================================
+
+.. py:module:: eitprocessing.sparse_data.sparse_data_collection
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection
+
+
+
+
+.. py:class:: SparseDataCollection
+
+
+   Bases: :py:obj:`dict`
+
+   dict() -> new empty dictionary
+   dict(mapping) -> new dictionary initialized from a mapping object's
+       (key, value) pairs
+   dict(iterable) -> new dictionary initialized as if via:
+       d = {}
+       for k, v in iterable:
+           d[k] = v
+   dict(**kwargs) -> new dictionary initialized with the name=value pairs
+       in the keyword argument list.  For example:  dict(one=1, two=2)
+
+   .. py:method:: concatenate(a, b) -> typing_extensions.Self
+      :classmethod:
+
+
+

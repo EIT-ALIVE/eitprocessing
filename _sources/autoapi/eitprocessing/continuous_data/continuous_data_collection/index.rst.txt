@@ -1,0 +1,58 @@
+:py:mod:`eitprocessing.continuous_data.continuous_data_collection`
+==================================================================
+
+.. py:module:: eitprocessing.continuous_data.continuous_data_collection
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection
+
+
+
+
+.. py:class:: ContinuousDataCollection
+
+
+   Bases: :py:obj:`dict`, :py:obj:`eitprocessing.mixins.equality.Equivalence`
+
+   dict() -> new empty dictionary
+   dict(mapping) -> new dictionary initialized from a mapping object's
+       (key, value) pairs
+   dict(iterable) -> new dictionary initialized as if via:
+       d = {}
+       for k, v in iterable:
+           d[k] = v
+   dict(**kwargs) -> new dictionary initialized with the name=value pairs
+       in the keyword argument list.  For example:  dict(one=1, two=2)
+
+   .. py:method:: __setitem__(__key: Any, __value: Any) -> None
+
+      Set self[key] to value.
+
+
+   .. py:method:: add(data: eitprocessing.continuous_data.ContinuousData, overwrite: bool = False) -> None
+
+
+   .. py:method:: _check_data(data: eitprocessing.continuous_data.ContinuousData, key=None, overwrite: bool = False) -> None
+
+
+   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
+      :classmethod:
+
+
+
+.. py:exception:: DuplicateContinuousDataName
+
+
+   Bases: :py:obj:`Exception`
+
+   Raised when a variant with the same name already exists in the collection.
+
+

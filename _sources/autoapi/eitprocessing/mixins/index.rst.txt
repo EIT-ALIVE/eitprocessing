@@ -1,0 +1,16 @@
+:py:mod:`eitprocessing.mixins`
+==============================
+
+.. py:module:: eitprocessing.mixins
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   equality/index.rst
+   slicing/index.rst
+
+
