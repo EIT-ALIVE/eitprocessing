@@ -1,21 +1,19 @@
 from __future__ import annotations
 
-import bisect
 import copy
-import warnings
 from dataclasses import dataclass, field
-
-import numpy as np
+from typing import Self
 
 from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData
 from eitprocessing.mixins.equality import Equivalence
+from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.sparse_data import SparseData
 
 
 @dataclass(eq=False)
-class Sequence(Equivalence):
+class Sequence(Equivalence, SelectByTime):
     """Sequence of timepoints containing EIT and/or waveform data.
 
     A Sequence is a representation of a continuous set of data points, either EIT frames,
@@ -36,8 +34,8 @@ class Sequence(Equivalence):
     """
 
     label: str | None = None
-    continuous_data: DataCollection = field(default_factory=DataCollection(ContinuousData))
     eit_data: DataCollection = field(default_factory=DataCollection(EITData))
+    continuous_data: DataCollection = field(default_factory=DataCollection(ContinuousData))
     sparse_data: DataCollection = field(default_factory=DataCollection(SparseData))
 
     def __post_init__(self):
@@ -65,70 +63,27 @@ class Sequence(Equivalence):
 
         return a.__class__(label=label, eit_data=eit_data)
 
-    def select_by_index(
-        self,
-        indices: slice,
-        label: str | None = None,
-    ) -> None:
-        ...
-        # TODO: rewrite to use EITData, SparseData and ContinuousData
+    def _sliced_copy(self, start_index: int, end_index: int, label: str) -> Self:
+        eit_data = DataCollection(EITData)
+        for key, value in self.eit_data:
+            eit_data.add(key, value[start_index:end_index])
 
-    def __getitem__(self, indices: slice):
-        # TODO: reconsider API
-        return self.select_by_index(indices)
+        continuous_data = DataCollection(ContinuousData)
+        for key, value in self.continuous_data:
+            continuous_data.add(key, value[start_index:end_index])
 
-    def select_by_time(  # pylint: disable=too-many-arguments
-        self,
-        start: float | int | None = None,
-        end: float | int | None = None,
-        start_inclusive: bool = True,
-        end_inclusive: bool = False,
-        label: str | None = None,
-    ) -> Sequence:
-        """Select subset of sequence by the `Sequence.time` information (i.e. based on the time stamp).
+        sparse_data = DataCollection(SparseData)
+        start_time = self.time[start_index]
+        end_time = self.time[end_index]
+        for key, value in self.sparse_data:
+            sparse_data.add(key, value.t[start_time:end_time])
 
-        Args:
-            start (float | int | None, optional): starting time point.
-                Defaults to None.
-            end (float | int | None, optional): ending time point.
-                Defaults to None.
-            start_inclusive (bool, optional): include starting timepoint if
-                `start` is present in `Sequence.time`.
-                Defaults to True.
-            end_inclusive (bool, optional): include ending timepoint if
-                `end` is present in `Sequence.time`.
-                Defaults to False.
-
-        Raises:
-            ValueError: if the Sequence.time is not sorted
-
-        Returns:
-            Sequence: a slice of `self` based on time information given.
-        """
-        # TODO: rewrite
-
-        if not any((start, end)):
-            warnings.warn("No starting or end timepoint was selected.")
-            return self
-        if not np.all(np.sort(self.time) == self.time):
-            msg = f"Time stamps for {self} are not sorted and therefor data cannot be selected by time."
-            raise ValueError(msg)
-
-        if start is None:
-            start_index = 0
-        elif start_inclusive:
-            start_index = bisect.bisect_left(self.time, start)
-        else:
-            start_index = bisect.bisect_right(self.time, start)
-
-        if end is None:
-            end_index = len(self)
-        elif end_inclusive:
-            end_index = bisect.bisect_right(self.time, end) - 1
-        else:
-            end_index = bisect.bisect_left(self.time, end) - 1
-
-        return self.select_by_index(slice(start_index, end_index), label=label)
+        return self.__class__(
+            label,
+            eit_data=eit_data,
+            continuous_data=continuous_data,
+            sparse_data=sparse_data,
+        )
 
     def deepcopy(
         self,

@@ -89,8 +89,8 @@ class SelectByTime(SelectByIndex):
 
     def select_by_time(  # pylint: disable=too-many-arguments
         self,
-        start_time: float | int | None = None,
-        end_time: float | int | None = None,
+        start_time: float | None = None,
+        end_time: float | None = None,
         start_inclusive: bool = True,
         end_inclusive: bool = False,
         label: str | None = None,
@@ -173,7 +173,7 @@ class TimeIndexer:
 
     obj: SelectByTime
 
-    def __getitem__(self, key: slice | int | float):
+    def __getitem__(self, key: slice | float):
         if isinstance(key, slice):
             if key.step:
                 msg = "Can't slice by time using specific step sizes."
