@@ -60,12 +60,7 @@ class SelectByIndex(ABC):
             end = len(self)
 
         if label is None:
-            if start > end:
-                label = f"No frames selected from <{self.label}>"
-            elif start < end - 1:
-                label = f"Frames ({start}-{end-1}) of <{self.label}>"
-            else:
-                label = f"Frame ({start}) of <{self.label}>"
+            label = self.label
 
         return self._sliced_copy(start_index=start, end_index=end, label=label)
 
