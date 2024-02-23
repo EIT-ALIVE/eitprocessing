@@ -6,39 +6,33 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from eitprocessing.continuous_data import ContinuousData
+from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData_
-from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.eit_data.phases import MaxValue, MinValue, QRSMark
 from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.variants.variant_collection import VariantCollection
+from eitprocessing.sparse_data import SparseData
 
 if TYPE_CHECKING:
     from pathlib import Path
 
     from numpy.typing import NDArray
-    from typing_extensions import Self
-
-    from eitprocessing.data_collection import DataCollection
 
 
 @dataclass(eq=False)
 class TimpelEITData(EITData_):
     framerate: float = 50
     vendor: Vendor = field(default=Vendor.TIMPEL, init=False)
-    variants: VariantCollection = field(
-        default_factory=lambda: VariantCollection(EITDataVariant),
-    )
 
     @classmethod
     def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
         cls,
         path: Path,
-        label: str | None = None,
         framerate: float | None = 20,
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, DataCollection, DataCollection]:
+    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
         COLUMN_WIDTH = 1030
 
         if not framerate:
@@ -96,11 +90,43 @@ class TimpelEITData(EITData_):
 
         # extract waveform data
         # TODO: properly export waveform data
-        waveform_data = {  # noqa
-            "airway_pressure": data[:, 1024],
-            "flow": data[:, 1025],
-            "volume": data[:, 1026],
-        }
+
+        continuous_data_collection = DataCollection(ContinuousData)
+        continuous_data_collection.add(
+            ContinuousData(
+                "airway_pressure_(timpel)",
+                "Airway pressure",
+                "cmH2O",
+                "pressure",
+                "Airway pressure measured by Timpel device",
+                loaded=True,
+                values=data[:, 1024],
+            ),
+        )
+
+        continuous_data_collection.add(
+            ContinuousData(
+                "flow_(timpel)",
+                "Flow",
+                "L/s",
+                "flow",
+                "FLow measures by Timpel device",
+                loaded=True,
+                values=data[:, 1025],
+            ),
+        )
+
+        continuous_data_collection.add(
+            ContinuousData(
+                "volume_(timpel)",
+                "Volume",
+                "L",
+                "volume",
+                "Volume measured by Timpel device",
+                loaded=True,
+                values=data[:, 1026],
+            ),
+        )
 
         # extract breath start, breath end and QRS marks
         phases = []
@@ -115,20 +141,20 @@ class TimpelEITData(EITData_):
 
         phases.sort(key=lambda x: x.index)
 
-        obj = cls(
-            path=path,
-            nframes=nframes,
-            time=time,
-            framerate=framerate,
-            phases=phases,
-            label=label,
-        )
-        obj.variants.add(
-            EITDataVariant(
+        eit_data_collection = DataCollection(cls)
+        eit_data_collection.add(
+            cls(
                 label="raw",
-                description="raw impedance data",
+                path=path,
+                nframes=nframes,
+                time=time,
+                framerate=framerate,
+                phases=phases,
                 pixel_impedance=pixel_impedance,
             ),
         )
 
-        return obj
+        if return_non_eit_data:
+            return eit_data_collection, continuous_data_collection, DataCollection(SparseData)
+
+        return eit_data_collection

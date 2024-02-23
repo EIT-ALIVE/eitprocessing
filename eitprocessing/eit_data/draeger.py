@@ -12,7 +12,6 @@ from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 
 from . import EITData_
-from .eit_data_variant import EITDataVariant
 from .event import Event
 from .phases import MaxValue, MinValue
 from .vendor import Vendor
@@ -21,7 +20,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from numpy.typing import NDArray
-    from typing_extensions import Self
 
 
 @dataclass(eq=False)
@@ -35,16 +33,14 @@ class DraegerEITData(EITData_):
     def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
         cls,
         path: Path,
-        label: str | None = None,
         framerate: float | None = 20,
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, DataCollection, DataCollection]:
-        """"""
 
         FRAME_SIZE_BYTES = 4358
 
+    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
         file_size = path.stat().st_size
         if file_size % FRAME_SIZE_BYTES:
             msg = (
@@ -113,14 +109,9 @@ class DraegerEITData(EITData_):
             time=time,
             phases=phases,
             events=events,
-            label=label,
-        )
-        obj.variants.add(
-            EITDataVariant(
-                label="raw",
-                description="raw impedance data",
-                pixel_impedance=pixel_impedance,
-            ),
+            label="raw",
+            description="raw impedance data",
+            pixel_impedance=pixel_impedance,
         )
         if return_non_eit_data:
             (

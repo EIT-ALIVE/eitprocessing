@@ -10,11 +10,9 @@ import numpy as np
 from typing_extensions import Self, override
 
 from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
-from eitprocessing.variants.variant_collection import VariantCollection
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -34,9 +32,7 @@ class EITData(SelectByTime, Equivalence, ABC):
     phases: list = field(default_factory=list)
     events: list = field(default_factory=list)
     label: str | None = None
-    variants: VariantCollection = field(
-        default_factory=lambda: VariantCollection(EITDataVariant),
-    )
+    pixel_impedance: NDArray = field(repr=False, kw_only=True)
 
     def __post_init__(self):
         if not self.label:
@@ -48,12 +44,11 @@ class EITData(SelectByTime, Equivalence, ABC):
         cls,
         path: PathArg,
         vendor: Vendor | str,
-        label: str | None = None,
         framerate: float | None = None,
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, DataCollection, DataCollection]:
+    ) -> DataCollection | tuple[Self, DataCollection, DataCollection]:
         """Load sequence from path(s).
 
         Args:
@@ -85,7 +80,7 @@ class EITData(SelectByTime, Equivalence, ABC):
 
         paths = cls._ensure_path_list(path)
 
-        eit_datasets: list[EITData] = []
+        eit_datasets: list[DataCollection] = []
         continuous_datasets: list[DataCollection] = []
         sparse_datasets: list[DataCollection] = []
 
@@ -97,7 +92,6 @@ class EITData(SelectByTime, Equivalence, ABC):
         for single_path in paths:
             loaded_data = vendor_class._from_path(  # pylint: disable=protected-access
                 path=single_path,
-                label=label,
                 framerate=framerate,
                 first_frame=first_frame,
                 max_frames=max_frames,
@@ -126,13 +120,24 @@ class EITData(SelectByTime, Equivalence, ABC):
                 eit_datasets.append(loaded_data)
 
         if return_non_eit_data:
-            return (
-                reduce(cls.concatenate, eit_datasets),
-                reduce(DataCollection.concatenate, continuous_datasets),
-                reduce(DataCollection.concatenate, sparse_datasets),
+            return tuple(
+                reduce(DataCollection.concatenate, datasets)
+                for datasets in (eit_datasets, continuous_datasets, sparse_datasets)
             )
 
-        return reduce(cls.concatenate, eit_datasets)
+        return reduce(DataCollection.concatenate, eit_datasets)
+
+    @classmethod
+    @abstractmethod
+    def _from_path(  # noqa: PLR0913
+        cls: type[Self],
+        path: Path,
+        framerate: float | None = None,
+        first_frame: int | None = None,
+        max_frames: int | None = None,
+        return_non_eit_data: bool = False,
+    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
+        ...
 
     @staticmethod
     def _ensure_path_list(path: PathArg) -> list[Path]:
@@ -219,7 +224,9 @@ class EITData(SelectByTime, Equivalence, ABC):
         phases = list(filter(lambda p: start_index <= p.index < end_index, self.phases))
         events = list(filter(lambda e: start_index <= e.index < end_index, self.events))
 
-        obj = cls(
+        pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
+
+        return cls(
             path=self.path,
             nframes=nframes,
             time=time,
@@ -227,30 +234,31 @@ class EITData(SelectByTime, Equivalence, ABC):
             phases=phases,
             events=events,
             label=label,
+            pixel_impedance=pixel_impedance,
         )
 
-        for variant in self.variants.values():
-            obj.variants.add(
-                variant._sliced_copy(  # pylint: disable=protected-access
-                    start_index,
-                    end_index,
-                ),
-            )
+    def __len__(self):
+        return self.pixel_impedance.shape[0]
 
-        return obj
+    @property
+    def global_baseline(self) -> np.ndarray:
+        return np.nanmin(self.pixel_impedance)
 
-    @classmethod
-    @abstractmethod
-    def _from_path(  # pylint: disable=too-many-arguments
-        cls: type[Self],
-        path: Path,
-        label: str | None = None,
-        framerate: float | None = None,
-        first_frame: int | None = None,
-        max_frames: int | None = None,
-        return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, DataCollection, DataCollection]:
-        ...
+    @property
+    def pixel_impedance_global_offset(self) -> np.ndarray:
+        return self.pixel_impedance - self.global_baseline
+
+    @property
+    def pixel_baseline(self) -> np.ndarray:
+        return np.nanmin(self.pixel_impedance, axis=0)
+
+    @property
+    def pixel_impedance_individual_offset(self) -> np.ndarray:
+        return self.pixel_impedance - np.min(self.pixel_impedance, axis=0)
+
+    @property
+    def global_impedance(self) -> np.ndarray:
+        return np.nansum(self.pixel_impedance, axis=(1, 2))
 
 
 @dataclass(eq=False)
@@ -265,20 +273,18 @@ class EITData_(EITData):
     def from_path(  # pylint: disable=too-many-arguments,arguments-differ
         cls,
         path: PathArg,
-        label: str | None = None,
         framerate: float | None = None,
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, DataCollection, DataCollection]:
+    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
         return super().from_path(
-            path,
-            cls.vendor,
-            label,
-            framerate,
-            first_frame,
-            max_frames,
-            return_non_eit_data,
+            path=path,
+            vendor=cls.vendor,
+            framerate=framerate,
+            first_frame=first_frame,
+            max_frames=max_frames,
+            return_non_eit_data=return_non_eit_data,
         )
 
 

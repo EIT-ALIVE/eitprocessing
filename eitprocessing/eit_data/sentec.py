@@ -10,9 +10,11 @@ from typing import TYPE_CHECKING, BinaryIO
 import numpy as np
 
 from eitprocessing.binreader.reader import Reader
+from eitprocessing.continuous_data import ContinuousData
+from eitprocessing.data_collection import DataCollection
+from eitprocessing.sparse_data import SparseData
 
 from . import EITData_
-from .eit_data_variant import EITDataVariant
 from .vendor import Vendor
 
 if TYPE_CHECKING:
@@ -20,8 +22,6 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
     from typing_extensions import Self
-
-    from eitprocessing.data_collection import DataCollection
 
 
 @dataclass(eq=False)
@@ -35,15 +35,14 @@ class SentecEITData(EITData_):
     def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
         cls,
         path: Path,
-        label: str | None = None,
         framerate: float | None = 50.2,
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, DataCollection, DataCollection]:
-        with open(path, "br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
+    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
+        with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
             file_length = os.fstat(fo.fileno()).st_size
-            reader = Reader(fh, endian="little")  # type: ignore
+            reader = Reader(fh, endian="little")
             version = reader.uint8()
 
             time = []
@@ -119,22 +118,21 @@ class SentecEITData(EITData_):
         if not framerate:
             framerate = cls.framerate
 
-        obj = cls(
-            path=path,
-            framerate=framerate,
-            nframes=n_frames,
-            time=np.unwrap(np.array(time), period=np.iinfo(np.uint32).max) / 1000000,
-            label=label,
-        )
-        obj.variants.add(
-            EITDataVariant(
+        eit_data_collection = DataCollection(cls)
+        eit_data_collection.add(
+            cls(
+                path=path,
+                framerate=framerate,
+                nframes=n_frames,
+                time=np.unwrap(np.array(time), period=np.iinfo(np.uint32).max) / 1000000,
                 label="raw",
-                description="raw impedance data",
                 pixel_impedance=image,
             ),
         )
 
-        return obj
+        if return_non_eit_data:
+            return eit_data_collection, DataCollection(ContinuousData), DataCollection(SparseData)
+        return eit_data_collection
 
     @classmethod
     def _read_frame(  # pylint: disable=too-many-arguments
