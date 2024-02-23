@@ -1,10 +1,16 @@
-from dataclasses import dataclass
-from dataclasses import field
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
 import numpy as np
-from numpy.typing import NDArray
-from typing_extensions import Self
+
 from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.variants import Variant
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+    from typing_extensions import Self
 
 
 @dataclass(eq=False)
@@ -44,7 +50,8 @@ class EITDataVariant(Variant, SelectByTime):
             description=a.description,
             params=a.params,
             pixel_impedance=np.concatenate(
-                [a.pixel_impedance, b.pixel_impedance], axis=0
+                [a.pixel_impedance, b.pixel_impedance],
+                axis=0,
             ),
         )
 

@@ -37,9 +37,7 @@ class DataCollection(dict, Generic[V]):
 
         if not overwrite and key in self:
             msg = f"Item with name {key} already exists. Use `overwrite=True` to overwrite."
-            raise KeyError(
-                msg,
-            )
+            raise KeyError(msg)
 
     def get_loaded_data(self) -> dict[str, V]:
         """Return all data that was directly loaded from disk."""

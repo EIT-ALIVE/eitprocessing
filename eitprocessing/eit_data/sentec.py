@@ -1,21 +1,27 @@
+from __future__ import annotations
+
 import mmap
 import os
 import warnings
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from enum import IntEnum
-from pathlib import Path
-from typing import BinaryIO
+from typing import TYPE_CHECKING, BinaryIO
+
 import numpy as np
-from numpy.typing import NDArray
-from typing_extensions import Self
 
-from eitprocessing.data_collection import DataCollection
+from eitprocessing.binreader.reader import Reader
 
-from ..binreader.reader import Reader
 from . import EITData_
 from .eit_data_variant import EITDataVariant
 from .vendor import Vendor
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from numpy.typing import NDArray
+    from typing_extensions import Self
+
+    from eitprocessing.data_collection import DataCollection
 
 
 @dataclass(eq=False)
@@ -35,79 +41,70 @@ class SentecEITData(EITData_):
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
     ) -> Self | tuple[Self, DataCollection, DataCollection]:
-        with open(path, "br") as fo:
-            with mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
-                file_length = os.fstat(fo.fileno()).st_size
-                reader = Reader(fh, endian="little")  # type: ignore
-                version = reader.uint8()
+        with open(path, "br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
+            file_length = os.fstat(fo.fileno()).st_size
+            reader = Reader(fh, endian="little")  # type: ignore
+            version = reader.uint8()
 
-                time = []
-                max_n_images = int(file_length / 32 / 32 / 4)
-                image = np.full(shape=(max_n_images, 32, 32), fill_value=np.nan)
-                index = 0
-                n_images_added = 0
+            time = []
+            max_n_images = int(file_length / 32 / 32 / 4)
+            image = np.full(shape=(max_n_images, 32, 32), fill_value=np.nan)
+            index = 0
+            n_images_added = 0
 
-                # while there are still data to be read and the number of read data points is higher
-                # than the maximum specified, keep reading
-                while fh.tell() < file_length and (
-                    max_frames is None or len(time) < max_frames
-                ):
-                    _ = reader.uint64()  # skip timestamp reading
-                    domain_id = reader.uint8()
-                    number_data_fields = reader.uint8()
+            # while there are still data to be read and the number of read data points is higher
+            # than the maximum specified, keep reading
+            while fh.tell() < file_length and (max_frames is None or len(time) < max_frames):
+                _ = reader.uint64()  # skip timestamp reading
+                domain_id = reader.uint8()
+                number_data_fields = reader.uint8()
 
-                    for _ in range(number_data_fields):
-                        data_id = reader.uint8()
-                        payload_size = reader.uint16()
+                for _ in range(number_data_fields):
+                    data_id = reader.uint8()
+                    payload_size = reader.uint16()
 
-                        if payload_size == 0:
-                            continue
+                    if payload_size == 0:
+                        continue
 
-                        if domain_id == Domain.MEASUREMENT:
-                            if data_id == MeasurementDataID.TIMESTAMP:
-                                time_of_caption = reader.uint32()
-                                time.append(time_of_caption)
+                    if domain_id == Domain.MEASUREMENT:
+                        if data_id == MeasurementDataID.TIMESTAMP:
+                            time_of_caption = reader.uint32()
+                            time.append(time_of_caption)
 
-                            elif data_id == MeasurementDataID.ZERO_REF_IMAGE:
-                                index += 1
+                        elif data_id == MeasurementDataID.ZERO_REF_IMAGE:
+                            index += 1
 
-                                ref = cls._read_frame(
-                                    fh,  # type: ignore
-                                    version,
-                                    index,
-                                    payload_size,
-                                    reader,
-                                    first_frame,
-                                )
-
-                                if ref is not None:
-                                    image[n_images_added, :, :] = ref
-                                    n_images_added += 1
-                            else:
-                                fh.seek(payload_size, os.SEEK_CUR)
-
-                        # read the framerate from the file, if present
-                        # (domain 64 = configuration, data 5 = framerate)
-                        elif (
-                            domain_id == Domain.CONFIGURATION
-                            and data_id == ConfigurationDataID.FRAMERATE
-                        ):
-                            framerate = reader.float32()
-                            msg = (
-                                f"Framerate value found in file. The framerate value "
-                                f"will be set to {framerate:.2f}"
+                            ref = cls._read_frame(
+                                fh,  # type: ignore
+                                version,
+                                index,
+                                payload_size,
+                                reader,
+                                first_frame,
                             )
-                            warnings.warn(msg)
 
+                            if ref is not None:
+                                image[n_images_added, :, :] = ref
+                                n_images_added += 1
                         else:
                             fh.seek(payload_size, os.SEEK_CUR)
+
+                    # read the framerate from the file, if present
+                    # (domain 64 = configuration, data 5 = framerate)
+                    elif domain_id == Domain.CONFIGURATION and data_id == ConfigurationDataID.FRAMERATE:
+                        framerate = reader.float32()
+                        msg = f"Framerate value found in file. The framerate value will be set to {framerate:.2f}"
+                        warnings.warn(msg)
+
+                    else:
+                        fh.seek(payload_size, os.SEEK_CUR)
         image = image[:n_images_added, :, :]
         n_frames = len(image) if image is not None else 0
 
         if first_frame > index:
             raise ValueError(
                 f"Invalid input: `first_frame` {first_frame} is larger than the "
-                f"total number of frames in the file {index}."
+                f"total number of frames in the file {index}.",
             )
 
         if max_frames and n_frames != max_frames:
@@ -134,7 +131,7 @@ class SentecEITData(EITData_):
                 label="raw",
                 description="raw impedance data",
                 pixel_impedance=image,
-            )
+            ),
         )
 
         return obj
@@ -150,22 +147,23 @@ class SentecEITData(EITData_):
         first_frame: int = 0,
     ) -> NDArray | None:
         """
-                Read a single frame in the file. The current position of the file has to be already
-                set to the point where the image should be read (data_id 5).
-                Args:
+        Read a single frame in the file. The current position of the file has to be already set to the point where the
+        image should be read (data_id 5).
+
+        Args:
                     fh: opened file object
                     version: version of the Sentec file
                     index: current number of read frames
                     payload_size: size of the payload of the data to be read.
                     reader: bites reader object
-                    first_frame: index of first time point of sequence
+                    first_frame: index of first time point of sequence.
 
         Returns: A 32 x 32 matrix, containing the pixels values.
 
         """
         if index < first_frame:
             fh.seek(payload_size, os.SEEK_CUR)
-            return
+            return None
 
         if version > 1:
             # read quality index. We don't use it, so we skip the bytes
@@ -186,13 +184,12 @@ class SentecEITData(EITData_):
                 f"{n_pixels} which is not equal to the "
                 f"product of the width ({image_width}) and "
                 f"height ({image_height}) of the frame."
-                f"Image will not be stored"
+                f"Image will not be stored",
             )
 
             return None
 
-        ref_reshape = np.reshape(zero_ref, (image_width, image_height), order="C")
-        return ref_reshape
+        return np.reshape(zero_ref, (image_width, image_height), order="C")
 
 
 class Domain(IntEnum):

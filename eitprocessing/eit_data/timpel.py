@@ -1,17 +1,24 @@
+from __future__ import annotations
+
 import warnings
 from dataclasses import dataclass, field
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import NDArray
-from typing_extensions import Self
 
-from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData_
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.eit_data.phases import MaxValue, MinValue, QRSMark
 from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.variants.variant_collection import VariantCollection
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from numpy.typing import NDArray
+    from typing_extensions import Self
+
+    from eitprocessing.data_collection import DataCollection
 
 
 @dataclass(eq=False)
@@ -19,7 +26,7 @@ class TimpelEITData(EITData_):
     framerate: float = 50
     vendor: Vendor = field(default=Vendor.TIMPEL, init=False)
     variants: VariantCollection = field(
-        default_factory=lambda: VariantCollection(EITDataVariant)
+        default_factory=lambda: VariantCollection(EITDataVariant),
     )
 
     @classmethod
@@ -46,22 +53,22 @@ class TimpelEITData(EITData_):
                 max_rows=max_frames,
             )
         except UnicodeDecodeError as e:
-            raise OSError(
+            msg = (
                 f"File {path} could not be read as Timpel data.\n"
                 "Make sure this is a valid and uncorrupted Timpel data file.\n"
                 f"Original error message: {e}"
-            ) from e
+            )
+            raise OSError(msg) from e
 
         if data.shape[1] != COLUMN_WIDTH:
-            raise OSError(
+            msg = (
                 f"Input does not have a width of {COLUMN_WIDTH} columns.\n"
                 "Make sure this is a valid and uncorrupted Timpel data file."
             )
+            raise OSError(msg)
         if data.shape[0] == 0:
-            raise ValueError(
-                f"Invalid input: `first_frame` {first_frame} is larger than the "
-                f"total number of frames in the file."
-            )
+            msg = f"Invalid input: `first_frame` {first_frame} is larger than the total number of frames in the file."
+            raise ValueError(msg)
 
         if max_frames and data.shape[0] == max_frames:
             nframes = max_frames
@@ -71,7 +78,7 @@ class TimpelEITData(EITData_):
                     f"The number of frames requested ({max_frames}) is larger "
                     f"than the available number ({data.shape[0]}) of frames after "
                     f"the first frame selected ({first_frame}).\n"
-                    f"{data.shape[0]} frames have been loaded."
+                    f"{data.shape[0]} frames have been loaded.",
                 )
             nframes = data.shape[0]
 
@@ -121,7 +128,7 @@ class TimpelEITData(EITData_):
                 label="raw",
                 description="raw impedance data",
                 pixel_impedance=pixel_impedance,
-            )
+            ),
         )
 
         return obj

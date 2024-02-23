@@ -1,13 +1,19 @@
 from __future__ import annotations
+
 import bisect
 import copy
 import warnings
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
 import numpy as np
-from eitprocessing.continuous_data import ContinuousData
+
 from eitprocessing.eit_data import EITData
 from eitprocessing.mixins.equality import Equivalence
-from eitprocessing.sparse_data import SparseData
+
+if TYPE_CHECKING:
+    from eitprocessing.continuous_data import ContinuousData
+    from eitprocessing.sparse_data import SparseData
 
 
 @dataclass(eq=False)
@@ -105,17 +111,14 @@ class Sequence(Equivalence):
         Returns:
             Sequence: a slice of `self` based on time information given.
         """
-
         # TODO: rewrite
 
         if not any((start, end)):
             warnings.warn("No starting or end timepoint was selected.")
             return self
         if not np.all(np.sort(self.time) == self.time):
-            raise ValueError(
-                f"Time stamps for {self} are not sorted and therefor data"
-                "cannot be selected by time."
-            )
+            msg = f"Time stamps for {self} are not sorted and therefor data" "cannot be selected by time."
+            raise ValueError(msg)
 
         if start is None:
             start_index = 0
@@ -150,7 +153,6 @@ class Sequence(Equivalence):
         Returns:
             Sequence: a deep copy of self
         """
-
         # TODO: rewrite for efficiency
 
         obj = copy.deepcopy(self)

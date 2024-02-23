@@ -1,22 +1,27 @@
+from __future__ import annotations
+
 import sys
 import warnings
-from collections import namedtuple
 from dataclasses import dataclass, field
-from pathlib import Path
+from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
-from numpy.typing import NDArray
-from typing_extensions import Self
 
+from eitprocessing.binreader.reader import Reader
+from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 
-from ..binreader.reader import Reader
-from ..continuous_data import ContinuousData
 from . import EITData_
 from .eit_data_variant import EITDataVariant
 from .event import Event
 from .phases import MaxValue, MinValue
 from .vendor import Vendor
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from numpy.typing import NDArray
+    from typing_extensions import Self
 
 
 @dataclass(eq=False)
@@ -47,9 +52,7 @@ class DraegerEITData(EITData_):
                 f"{FRAME_SIZE_BYTES}.\n"
                 f"Make sure this is a valid and uncorrupted Dräger data file."
             )
-            raise OSError(
-                msg,
-            )
+            raise OSError(msg)
         total_frames = file_size // FRAME_SIZE_BYTES
 
         if first_frame > total_frames:
@@ -57,19 +60,18 @@ class DraegerEITData(EITData_):
                 f"Invalid input: `first_frame` {first_frame} is larger than the "
                 f"total number of frames in the file {total_frames}."
             )
-            raise ValueError(
-                msg,
-            )
+            raise ValueError(msg)
 
         n_frames = min(total_frames - first_frame, max_frames or sys.maxsize)
 
         if max_frames and max_frames != n_frames:
-            warnings.warn(
+            msg = (
                 f"The number of frames requested ({max_frames}) is larger "
                 f"than the available number ({n_frames}) of frames after "
                 f"the first frame selected ({first_frame}, total frames: "
                 f"{total_frames}).\n {n_frames} frames will be loaded.",
             )
+            warnings.warn(msg)
 
         # We need to load 1 frame before first actual frame to check if there
         # is an event marker. Data for the pre-first (dummy) frame will be
@@ -212,7 +214,7 @@ class DraegerEITData(EITData_):
         return event_marker
 
 
-medibus_field = namedtuple("medibus_field", ["signal_name", "unit", "continuous"])
+medibus_field = NamedTuple("medibus_field", ["signal_name", "unit", "continuous"])
 
 medibus_fields = [
     medibus_field("airway pressure", "mbar", True),
@@ -263,7 +265,11 @@ medibus_fields = [
     medibus_field("spontaneous inspiratory:expiratory ratio", "", False),
     medibus_field("elastance", "mbar/L", False),
     medibus_field("time constant", "s", False),
-    medibus_field("ratio between upper 20% pressure range and total dynamic compliance", "", False),
+    medibus_field(
+        "ratio between upper 20% pressure range and total dynamic compliance",
+        "",
+        False,
+    ),
     medibus_field("end-inspiratory pressure", "mbar", False),
     medibus_field("expiratory tidal volume", "mL", False),
     medibus_field("time at low pressure", "s", False),

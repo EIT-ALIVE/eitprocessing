@@ -4,10 +4,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import reduce
 from pathlib import Path
-from typing import TypeAlias, TypeVar
+from typing import TYPE_CHECKING, TypeAlias, TypeVar
 
 import numpy as np
-from numpy.typing import NDArray
 from typing_extensions import Self, override
 
 from eitprocessing.data_collection import DataCollection
@@ -16,6 +15,9 @@ from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.variants.variant_collection import VariantCollection
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 PathLike: TypeAlias = str | Path
 PathArg: TypeAlias = PathLike | list[PathLike]
@@ -33,7 +35,7 @@ class EITData(SelectByTime, Equivalence, ABC):
     events: list = field(default_factory=list)
     label: str | None = None
     variants: VariantCollection = field(
-        default_factory=lambda: VariantCollection(EITDataVariant)
+        default_factory=lambda: VariantCollection(EITDataVariant),
     )
 
     def __post_init__(self):
@@ -76,7 +78,6 @@ class EITData(SelectByTime, Equivalence, ABC):
         Returns:
             Sequence: a sequence containing the loaded data from all files in path
         """
-
         vendor = cls._ensure_vendor(vendor)
         vendor_class = cls._get_vendor_class(vendor)
 
@@ -150,35 +151,31 @@ class EITData(SelectByTime, Equivalence, ABC):
             Vendor.TIMPEL: TimpelEITData,
             Vendor.SENTEC: SentecEITData,
         }
-        subclass = vendor_classes[vendor]
-        return subclass
+        return vendor_classes[vendor]
 
     @staticmethod
     def _check_first_frame(first_frame):
         if first_frame is None:
             first_frame = 0
         if int(first_frame) != first_frame:
-            raise TypeError(
-                f"`first_frame` must be an int, but was given as"
-                f" {first_frame} (type: {type(first_frame)})"
-            )
+            msg = f"`first_frame` must be an int, but was given as {first_frame} (type: {type(first_frame)})"
+            raise TypeError(msg)
         if first_frame < 0:
-            raise ValueError(
-                f"`first_frame` can not be negative, but was given as {first_frame}"
-            )
-        first_frame = int(first_frame)
-        return first_frame
+            msg = f"`first_frame` can not be negative, but was given as {first_frame}"
+            raise ValueError(msg)
+        return int(first_frame)
 
     @staticmethod
     def _ensure_vendor(vendor: Vendor | str) -> Vendor:
         """Check whether vendor exists, and assure it's a Vendor object."""
         if not vendor:
-            raise NoVendorProvided()
+            raise NoVendorProvided
 
         try:
             return Vendor(vendor)
         except ValueError as e:
-            raise UnknownVendor(f"Unknown vendor {vendor}.") from e
+            msg = f"Unknown vendor {vendor}."
+            raise UnknownVendor(msg) from e
 
     @classmethod
     def concatenate(cls, a: T, b: T, label: str | None = None) -> T:
@@ -189,7 +186,8 @@ class EITData(SelectByTime, Equivalence, ABC):
         path = a_path + b_path
 
         if np.min(b.time) <= np.max(a.time):
-            raise ValueError(f"{b} (b) starts before {a} (a) ends.")
+            msg = f"{b} (b) starts before {a} (a) ends."
+            raise ValueError(msg)
         time = np.concatenate((a.time, b.time))
 
         label = label or f"Concatenation of <{a.label}> and <{b.label}>"
@@ -234,8 +232,9 @@ class EITData(SelectByTime, Equivalence, ABC):
         for variant in self.variants.values():
             obj.variants.add(
                 variant._sliced_copy(  # pylint: disable=protected-access
-                    start_index, end_index
-                )
+                    start_index,
+                    end_index,
+                ),
             )
 
         return obj
