@@ -1,4 +1,3 @@
-"""Tests for the Butterworth time domain filter"""
 from typing import Literal
 from typing import TypeAlias
 import numpy as np

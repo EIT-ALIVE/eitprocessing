@@ -19,3 +19,70 @@ skip_missing_interpreters = true
 commands = pytest
 extras = dev
 """
+
+[tool.ruff]
+line-length = 120
+select = ["ALL"]
+ignore = [
+    # Unwanted (potentially)
+    "FBT",    # Using boolean arguments
+    "ANN002", # Missing type annotation for `*args`
+    "ANN003", # Missing type annotation for `**kwargs`
+    "ANN101", # Missing type annotation for `self` in method
+    "ANN102", # Missing type annotation for `cls` in classmethod
+    "ANN204", # Missing return type annotation for special (dunder) method
+    "S105",   # Possible hardcoded password
+    "S311",   # insecure random generators
+    "PT011",  # pytest-raises-too-broad
+    "TD",     # TODOs
+    "FIX002", # Resolve TODOs
+    "B028",   # No explicit `stacklevel` keyword argument found in warning
+    # "SIM108", # Use ternary operator (not sure if we want to ignore this)
+    # Unneeded docstrings
+    "D100", # Missing module docstring
+    "D104", # Missing public package docstring
+    "D105", # Missing docstring in magic method
+    "D107", # Missing docstring in `__init__`
+    # Rules irrelevant to the Google style
+    "D203", # 1 blank line required before class docstring
+    "D204",
+    "D212", # Multi-line docstring summary should start at the first line
+    "D213", # Multi-line docstring summary should start at the second line
+    "D215",
+    "D400",
+    "D401",
+    "D404", # First word of the docstring should not be This
+    "D406",
+    "D407",
+    "D408",
+    "D409",
+    "D413",
+]
+
+# Allow autofix for all enabled rules.
+fixable = ["ALL"]
+unfixable = ["F401"] # unused imports (should not disappear while editing)
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["ERA001"] # Commented out code
+"tests/*" = [
+    "S101",   # Use of `assert` detected
+    "ANN201", # Missing return type
+    "D103",   # Missing function docstring
+]
+"docs/*" = ["ALL"]
+
+[tool.ruff.lint]
+extend-safe-fixes = [
+    "D415",   # First line should end with a period, question mark, or exclamation point
+    "D300",   # Use triple double quotes `"""`
+    "D200",   # One-line docstring should fit on one line
+    "TCH",    # Format type checking only imports
+    "ISC001", # Implicitly concatenated strings on a single line
+    "EM",     # Exception message variables
+    "RUF013", # Implicit Optional
+    "B006",   # Mutable default argument
+]
+
+[tool.ruff.isort]
+known-first-party = ["eitprocessing"]

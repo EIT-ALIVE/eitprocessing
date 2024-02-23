@@ -1,4 +1,7 @@
-def plot_waveforms(self, waveforms=None):
+from matplotlib import pyplot as plt
+
+
+def plot_waveforms(self, waveforms=None) -> None:
     if waveforms is None:
         waveforms = list(self.waveform_data.keys())
 
