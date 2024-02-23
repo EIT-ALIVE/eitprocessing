@@ -18,8 +18,8 @@ class Equivalence(ABC):
         if is_dataclass(self):
             if self.__class__ is not other.__class__:
                 return NotImplemented
-            t1 = astuple(self)
-            t2 = astuple(other)
+            t1 = vars(self).values()
+            t2 = vars(other).values()
             return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2))
         return Equivalence._array_safe_eq(self, other)
 
@@ -28,8 +28,17 @@ class Equivalence(ABC):
         """Check if a and b are equal, even if they are numpy arrays containing nans."""
         if isinstance(a, np.ndarray) and isinstance(b, np.ndarray):
             return a.shape == b.shape and np.array_equal(a, b, equal_nan=True)
+
+        if not isinstance(a, Equivalence) and not isinstance(b, Equivalence):
+            return a == b
+
+        if isinstance(a, dict) and isinstance(b, dict):
+            return dict.__eq__(a, b)
+
         try:
-            return object.__eq__(a, b)  # `a == b` could trigger an infinite loop
+            # `a == b` could trigger an infinite loop when called on an instance of Equivalence
+            # object.__eq__() works for most objects, except those implemented seperately above
+            return object.__eq__(a, b)
         except TypeError:
             return NotImplemented
 
