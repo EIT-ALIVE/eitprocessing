@@ -9,10 +9,11 @@ We welcome all contributions to this open-source project, as long as they follow
 We appreciate it if you adhere to our naming and style [conventions](#conventions) below.
 
 Please follow these steps:
-1. (**important**) announce your plan to the rest of the community *before you start working*. This announcement should be in the form of a (new) issue;
+
+1. (**important**) announce your plan to the rest of the community _before you start working_. This announcement should be in the form of a (new) issue;
 1. (**important**) wait until some kind of consensus is reached about your idea being a good idea;
 1. if needed, fork the repository to your own Github profile and create your own feature branch off of the latest master commit. While working on your feature branch, make sure to stay up to date with the master branch by pulling in changes, possibly from the 'upstream' repository (follow the instructions [here](https://help.github.com/articles/configuring-a-remote-for-a-fork/) and [here](https://help.github.com/articles/syncing-a-fork/));
-1. make sure the existing tests still work by running ``pytest`` (see also [here](#testing-locally));
+1. make sure the existing tests still work by running `pytest` (see also [here](#testing-locally));
 1. add your own tests (if necessary);
 1. update or expand the documentation;
 1. update the `CHANGELOG.md` file with change;
@@ -20,7 +21,6 @@ Please follow these steps:
 1. create the pull request, e.g. following the instructions [here](https://help.github.com/articles/creating-a-pull-request/).
 
 In case you feel like you've made a valuable contribution, but you don't know how to write or run tests for it, or how to generate the documentation: don't let this discourage you from making the pull request; we can help you! Just go ahead and submit the pull request, but keep in mind that you might be asked to append additional commits to your pull request.
-
 
 ### Conventions
 
@@ -73,9 +73,9 @@ We have set up continuous integration for linting and testing, among other thing
 that all checks pass before requesting code review.
 
 Please create a "draft PR" until your work is ready for review, as this will avoid triggering
-the CI prematurely (which uses unnecessary computing power, see [here](<https://blog.esciencecenter.nl/reduce-reuse-recycle-save-the-planet-one-github-action-at-a-time-4ab602255c3f>)).
+the CI prematurely (which uses unnecessary computing power, see [here](https://blog.esciencecenter.nl/reduce-reuse-recycle-save-the-planet-one-github-action-at-a-time-4ab602255c3f)).
 
-You can run the [tests](#testing-locally) and [linter](#linting-locally) locally before activating
+You can run the [tests](#testing-locally) and [linter](#linting-and-formatting) locally before activating
 the CI.
 
 #### Testing locally
@@ -101,26 +101,15 @@ coverage report
 
 `coverage` can also generate output in HTML and other formats; see `coverage help` for more information.
 
-#### Linting locally
+#### Linting and Formatting
 
-For linting we will use [prospector](https://pypi.org/project/prospector/).
-To sort imports we will use [isort](https://pycqa.github.io/isort/). Note that if you use VS Code,
-sorting is automated upon file saving.
+We use [ruff](https://docs.astral.sh/ruff/) for linting, sorting imports and formatting of python (notebook) files. The configurations of `ruff` are set in [pyproject.toml](pyproject.toml) file.
 
-```shell
-# linter
-prospector
+If you are using VS code, please install and activate the [Ruff extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) to automatically format and check linting.
 
-# recursively check import style for the eitprocessing module only
-isort --check-only eitprocessing
+Otherwise, please ensure check both linting (`ruff fix .`) and formatting (`ruff format .`) before requesting a review.
 
-# recursively check import style for the eitprocessing module only and show
-# any proposed changes as a diff
-isort --check-only --diff eitprocessing
-
-# recursively fix import style for the eitprocessing module only
-isort eitprocessing
-```
+We use [prettier](https://prettier.io/) for formatting most other files. If you are editing or adding non-python files and using VS code, the [Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) can be installed to auto-format these files as well.
 
 # The following sections are untested
 
