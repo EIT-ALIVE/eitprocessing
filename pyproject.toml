@@ -2,6 +2,74 @@
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "eitprocessing"
+version = "0.1.0"
+description = "Processing of lung image data from electrical impedance tomography."
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = [
+    "Mechanical lung ventilation",
+    "Electrical impedance tomography",
+    "Image/data processing",
+    "Advanced respiratory care",
+]
+authors = [
+    { name = "Dani Bodor", email = "d.bodor@esciencecenter.nl" },
+    { name = "Peter Somhorst", email = "p.somhorst@erasmusmc.nl" },
+    { name = "Walter Baccinelli", email = "w.baccinelli@esciencecenter.nl" },
+]
+license = { text = "Apache-2.0 license" }
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    # "flit >= 3.8.0",
+    "matplotlib >= 3.7.1",
+    "numpy >= 1.24.2",
+    "scipy >= 1.10.1",
+    "tqdm >= 4.65.0",
+    "strenum >= 0.4.10",
+    "ruff >= 0.1.13",
+]
+
+[project.optional-dependencies]
+# development dependency groups
+dev = [
+    "pytest >= 7.4.0",
+    "bump2version",
+    "coverage",
+    "pycodestyle",
+    "pytest-cov",
+    "pytest-runner",
+    "coveralls",
+    # "isort",
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinx-autoapi",
+    "tox",
+    "myst_parser",
+]
+notebooks = [
+    "ipykernel >= 6.15.2",
+    "ipython >= 8.4.0",
+    "jupyter >= 1.0.0",
+    "jupytext >= 1.14.5",
+    "notebook >= 6.4.12",
+]
+publishing = ["build", "twine", "wheel"]
+
+[project.urls]
+Documentation = "https://github.com/EIT-ALIVE/eitprocessing/blob/main/README.md"
+Repository = "https://github.com/EIT-ALIVE/eitprocessing/"
+Changelog = "https://github.com/EIT-ALIVE/eitprocessing/blob/main/CHANGELOG.md"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
@@ -9,6 +77,10 @@ testpaths = ["tests"]
 branch = true
 source = ["eitprocessing"]
 command_line = "-m pytest"
+
+[tool.setuptools.packages.find]
+include = ["eitprocessing*", "eitprocessing.*"]
+exclude = ["tests*", "*tests.*", "*tests"]
 
 [tool.tox]
 legacy_tox_ini = """
