@@ -75,9 +75,9 @@ classDiagram
 
 class Sequence {
     label: str
-    eit_data: EITData
-    continuous_data: ContinuousData
-    sparse_data: SparseData
+    eit_data: DataCollection
+    continuous_data: DataCollection
+    sparse_data: DataCollection
     concatenate(Sequence) Sequence
     synchronize_and_merge(Sequence) Sequence
 }
@@ -87,16 +87,25 @@ class Vendor {
     TIMPEL
     SENTEC
 }
+class DataCollection {
+    data_type: type
+    add(item)
+    _check_data(item)
+}
 class EITData {
     <<abstract>>
+    label: str
+    description: str
+    parameters: dict
     path: Path
     vendor: Vendor
     sample_frequency: float
     time: NDArray
     events: list[Event]
     phases: list[Phase]
-    variants: VariantCollection[EITDataVariant]
     from_path(Path)
+    pixel_impedance: NDArray
+    global_impedance: NDArray
 }
 
 class Event {
@@ -111,7 +120,6 @@ class ContinuousData {
     unit: str
     loaded: bool
     calculated_from: EITDataVariant | None
-    variants: VariantContainer[ContinuousDataVariant]
 }
 class PressureWaveformData {
     unit = "cmH2O"
@@ -136,49 +144,30 @@ class SentecEITData {
     sample_frequenct = 50
 }
 
-class EITDataVariant {
-    label: str
-    description: str
-    parameters: dict
-    pixel_impedance: NDArray
-    global_impedance: NDArray
-}
-
-class ContinuousDataVariant {
-    label: str
-    description: str
-    parameters: dict
-    values: NDArray
-}
 
 class SparseData {
+    label: str
+    description: str
     name: str
     unit: str
     loaded: bool
     calculated_from: ContinuousDataVariant | EITDataVariant | None
-    variants: VariantContainer[SparseDataVariant]
-}
-
-class SparseDataVariant {
-    label: str
-    description: str
     index: NDArray<int> | None
     values: NDArray<float> | None
     objects: list[object]  # e.g. list[Breath]
 }
 
 
+DataCollection "1" *-- "1" EITData
+DataCollection "1" *-- "*" SparseData
+DataCollection "1" *-- "*" ContinuousData
 
-Sequence "1" *-- "1" EITData
-Sequence "1" *-- "*" SparseData
-Sequence "1" *-- "*" ContinuousData
+Sequence "1" *-- "3" DataCollection
 
 EITData <|-- DraegerEITData
 EITData <|-- TimpelEITData
 EITData <|-- SentecEITData
 EITData --> Vendor
-
-EITData "1" *-- "*" EITDataVariant
 
 EITData "1" *-- "*" Event
 EITData "1" *-- "*" Phase
@@ -190,9 +179,7 @@ Phase <|-- QRSMark
 ContinuousData <|-- PressureWaveformData
 ContinuousData <|-- FlowWaveformData
 ContinuousData <|-- VolumeWaveformData
-ContinuousData *-- ContinuousDataVariant
 
-SparseData *-- SparseDataVariant
 ```
 :::
 
