@@ -78,6 +78,10 @@ branch = true
 source = ["eitprocessing"]
 command_line = "-m pytest"
 
+[tool.setuptools.packages.find]
+include = ["eitprocessing*", "eitprocessing.*"]
+exclude = ["tests*", "*tests.*", "*tests"]
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
