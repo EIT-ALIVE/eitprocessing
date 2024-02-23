@@ -29,8 +29,8 @@ class DataCollection(dict, Equivalence, Generic[V]):
         key: str | None = None,
         overwrite: bool = False,
     ) -> None:
-        if not isinstance(item, V):
-            msg = f"type of `data` is {type(item)}, not '{self.data_type}'"
+        if not isinstance(item, self.data_type):
+            msg = f"Type of `data` is {type(item)}, not '{self.data_type}'"
             raise TypeError(msg)
 
         if key and key != item.name:
