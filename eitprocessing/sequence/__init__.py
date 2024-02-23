@@ -28,22 +28,18 @@ class Sequence(Equivalence, SelectByTime):
     EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
 
     Args:
-        label (str): description of object for human interpretation.
-            Defaults to "Sequence_<unique_id>".
         framesets (dict[str, Frameset]): dictionary of framesets
         events (list[Event]): list of Event objects in data
         timing_errors (list[TimingError]): list of TimingError objects in data
         phases (list[PhaseIndicator]): list of PhaseIndicator objects in data
     """
 
-    label: str | None = None
     eit_data: DataCollection = field(default_factory=DataCollection(EITData))
     continuous_data: DataCollection = field(default_factory=DataCollection(ContinuousData))
     sparse_data: DataCollection = field(default_factory=DataCollection(SparseData))
 
     def __post_init__(self):
-        if self.label is None:
-            self.label = f"Sequence_{id(self)}"
+        pass
 
     def __add__(self, other: Sequence) -> Sequence:
         return self.concatenate(self, other)
@@ -53,7 +49,6 @@ class Sequence(Equivalence, SelectByTime):
         cls,
         a: Sequence,
         b: Sequence,
-        label: str | None = None,
     ) -> Sequence:
         """Create a merge of two Sequence objects."""
         # TODO: rewrite
@@ -62,11 +57,9 @@ class Sequence(Equivalence, SelectByTime):
 
         # TODO: add concatenation of other attached objects
 
-        label = label or f"Concatenation of <{a.label}> and <{b.label}>"
+        return a.__class__(eit_data=eit_data)
 
-        return a.__class__(label=label, eit_data=eit_data)
-
-    def _sliced_copy(self, start_index: int, end_index: int, label: str) -> Self:
+    def _sliced_copy(self, start_index: int, end_index: int) -> Self:
         eit_data = DataCollection(EITData)
         for key, value in self.eit_data:
             eit_data.add(key, value[start_index:end_index])
@@ -82,34 +75,8 @@ class Sequence(Equivalence, SelectByTime):
             sparse_data.add(key, value.t[start_time:end_time])
 
         return self.__class__(
-            label,
             eit_data=eit_data,
             continuous_data=continuous_data,
             sparse_data=sparse_data,
         )
 
-    def deepcopy(
-        self,
-        label: str | None = None,
-        relabel: bool | None = True,
-    ) -> Sequence:
-        """Create a deep copy of `Sequence` object.
-
-        Args:
-            label (str): Create a new `label` for the copy.
-                Defaults to None, which will trigger behavior described for relabel (below)
-            relabel (bool): If `True` (default), the label of self is re-used for the copy,
-                otherwise the following label is assigned f"Deepcopy of {self.label}".
-                Note that this setting is ignored if a label is given.
-
-        Returns:
-            Sequence: a deep copy of self
-        """
-        # TODO: rewrite for efficiency
-
-        obj = copy.deepcopy(self)
-        if label:
-            obj.label = label
-        elif relabel:
-            obj.label = f"Copy of <{self.label}>"
-        return obj
