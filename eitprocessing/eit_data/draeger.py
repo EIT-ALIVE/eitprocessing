@@ -10,6 +10,7 @@ import numpy as np
 from eitprocessing.binreader.reader import Reader
 from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
+from eitprocessing.sparse_data import SparseData
 
 from . import EITData_
 from .event import Event
@@ -109,7 +110,6 @@ class DraegerEITData(EITData_):
             phases=phases,
             events=events,
             label="raw",
-            description="raw impedance data",
             pixel_impedance=pixel_impedance,
         )
         if return_non_eit_data:
@@ -127,8 +127,8 @@ class DraegerEITData(EITData_):
         cls,
         medibus_data: NDArray,
     ) -> tuple[DataCollection, DataCollection]:
-        continuous_data_collection = DataCollection()
-        sparse_data_collection = DataCollection()
+        continuous_data_collection = DataCollection(ContinuousData)
+        sparse_data_collection = DataCollection(SparseData)
 
         for field_info, data in zip(medibus_fields, medibus_data):
             if field_info.continuous:
