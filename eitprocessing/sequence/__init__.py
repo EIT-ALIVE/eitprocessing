@@ -12,6 +12,7 @@ from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.sparse_data import SparseData
 
 if TYPE_CHECKING:
+    import numpy as np
     from typing_extensions import Self
 
 
