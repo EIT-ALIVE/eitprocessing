@@ -41,6 +41,19 @@ class Sequence(Equivalence, SelectByTime):
     def __post_init__(self):
         pass
 
+    @property
+    def time(self) -> np.ndarray:
+        if len(self.eit_data):
+            return self.eit_data["raw"].time
+        if len(self.continuous_data):
+            return next(self.continuous_data.values())
+
+        msg = "Sequence has no timed data"
+        raise AttributeError(msg)
+
+    def __len__(self):
+        return len(self.time)
+
     def __add__(self, other: Sequence) -> Sequence:
         return self.concatenate(self, other)
 
