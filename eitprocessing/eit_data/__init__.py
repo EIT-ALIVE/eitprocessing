@@ -205,7 +205,6 @@ class EITData(SelectByTime, Equivalence, ABC):
             framerate=framerate,
             nframes=nframes,
             time=time,
-            variants=variants,
         )
 
     def _sliced_copy(
