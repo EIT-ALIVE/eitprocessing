@@ -1,8 +1,9 @@
 import os
+
 import numpy as np
 import pytest
-from eitprocessing.eit_data.draeger import DraegerEITData
 
+from eitprocessing.eit_data.draeger import DraegerEITData
 
 environment = os.environ.get(
     "EIT_PROCESSING_TEST_DATA",
