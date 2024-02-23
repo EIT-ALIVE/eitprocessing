@@ -24,7 +24,7 @@ class DataCollection(dict, Equivalence, Generic[V]):
     def add(self, *item: V, overwrite: bool = False) -> None:
         for item_ in item:
             self._check_item(item_, overwrite=overwrite)
-            super().__setitem__(item_.name, item_)
+            super().__setitem__(item_.label, item_)
 
     def _check_item(
         self,
@@ -36,12 +36,12 @@ class DataCollection(dict, Equivalence, Generic[V]):
             msg = f"Type of `data` is {type(item)}, not '{self.data_type}'"
             raise TypeError(msg)
 
-        if key and key != item.name:
-            msg = f"'{key}' does not match name '{item.name}'."
+        if key and key != item.label:
+            msg = f"'{key}' does not match label '{item.label}'."
             raise KeyError(msg)
 
         if not overwrite and key in self:
-            msg = f"Item with name {key} already exists. Use `overwrite=True` to overwrite."
+            msg = f"Item with label {key} already exists. Use `overwrite=True` to overwrite."
             raise KeyError(msg)
 
     def get_loaded_data(self) -> dict[str, V]:
