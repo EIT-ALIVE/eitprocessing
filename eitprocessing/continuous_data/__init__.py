@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
@@ -27,7 +27,13 @@ class ContinuousData:
             raise ValueError(msg)
 
     def copy(
-        self, label, *, name=None, unit=None, description=None, parameters=None,
+        self,
+        label: str,
+        *,
+        name: str | None = None,
+        unit: str | None = None,
+        description: str | None = None,
+        parameters: dict | None = None,
     ) -> Self:
         return self.__class__(
             label=label,
@@ -45,7 +51,7 @@ class ContinuousData:
             values=np.copy(self.values),
         )
 
-    def derive(self, label, function, **kwargs) -> Self:
+    def derive(self, label: str, function: Callable, **kwargs) -> Self:
         copy = self.copy(label)
         copy.values = function(copy.values)
         return copy
