@@ -1,8 +1,12 @@
-from dataclasses import dataclass
-from dataclasses import field
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
 import numpy as np
-from typing_extensions import Any
-from typing_extensions import Self
+
+if TYPE_CHECKING:
+    from typing_extensions import Any, Self
 
 
 @dataclass
@@ -19,10 +23,11 @@ class ContinuousData:
 
     def __post_init__(self) -> None:
         if not self.loaded and not self.derived_from:
-            raise ValueError("Data must be loaded or calculated form another dataset.")
+            msg = "Data must be loaded or calculated form another dataset."
+            raise ValueError(msg)
 
     def copy(
-        self, label, *, name=None, unit=None, description=None, parameters=None
+        self, label, *, name=None, unit=None, description=None, parameters=None,
     ) -> Self:
         return self.__class__(
             label=label,
@@ -31,7 +36,7 @@ class ContinuousData:
             description=description or f"Derived from {self.name}",
             parameters=self.parameters | (parameters or {}),
             loaded=False,
-            derived_from=self.derived_from + [self],
+            derived_from=[*self.derived_from, self],
             category=self.category,
             # copying data can become inefficient with large datasets if the
             # data is not directly edited afer copying but overridden instead;

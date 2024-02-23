@@ -13,17 +13,20 @@ class ContinuousDataCollection(dict):
             super().__setitem__(item_.name, item_)
 
     def _check_item(
-        self, item: ContinuousData, key=None, overwrite: bool = False
+        self, item: ContinuousData, key=None, overwrite: bool = False,
     ) -> None:
         if not isinstance(item, ContinuousData):
-            raise TypeError(f"type of `data` is {type(item)}, not 'ContinuousData'")
+            msg = f"type of `data` is {type(item)}, not 'ContinuousData'"
+            raise TypeError(msg)
 
         if key and key != item.name:
-            raise KeyError(f"'{key}' does not match variant name '{item.name}'.")
+            msg = f"'{key}' does not match variant name '{item.name}'."
+            raise KeyError(msg)
 
         if not overwrite and key in self:
+            msg = f"Variant with name {key} already exists. Use `overwrite=True` to overwrite."
             raise KeyError(
-                f"Variant with name {key} already exists. Use `overwrite=True` to overwrite."
+                msg,
             )
 
     def get_loaded_data(self):
