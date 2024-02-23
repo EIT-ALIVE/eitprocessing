@@ -142,6 +142,7 @@ class DraegerEITData(EITData_):
                     unit=field_info.unit,
                     time=time,
                     loaded=True,
+                    category=field_info.unit,
                 )
                 continuous_data.variants.add(
                     ContinuousDataVariant(

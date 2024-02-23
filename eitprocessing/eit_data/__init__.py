@@ -107,7 +107,12 @@ class EITData(SelectByTime, Equivalence, ABC):
             )
 
             if return_non_eit_data:
-                eit, continuous, sparse = loaded_data
+                if type(loaded_data) is not tuple:
+                    eit = loaded_data
+                    continuous = ContinuousDataCollection()
+                    sparse = SparseDataCollection()
+                else:
+                    eit, continuous, sparse = loaded_data
 
                 # assertions for type checking
                 assert isinstance(eit, EITData)
