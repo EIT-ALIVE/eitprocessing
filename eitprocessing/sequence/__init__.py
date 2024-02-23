@@ -34,9 +34,9 @@ class Sequence(Equivalence, SelectByTime):
         phases (list[PhaseIndicator]): list of PhaseIndicator objects in data
     """
 
-    eit_data: DataCollection = field(default_factory=DataCollection(EITData))
-    continuous_data: DataCollection = field(default_factory=DataCollection(ContinuousData))
-    sparse_data: DataCollection = field(default_factory=DataCollection(SparseData))
+    eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData))
+    continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData))
+    sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData))
 
     def __post_init__(self):
         pass
