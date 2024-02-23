@@ -53,7 +53,7 @@ class ContinuousData:
 
     def derive(self, label: str, function: Callable, **kwargs) -> Self:
         copy = self.copy(label)
-        copy.values = function(copy.values)
+        copy.values = function(copy.values, **kwargs)
         return copy
 
     def lock(self) -> None:
