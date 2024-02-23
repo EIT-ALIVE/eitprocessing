@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Generic, Self, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from eitprocessing.mixins.equality import Equivalence
+
+if TYPE_CHECKING:
+    from typing_annotations import Self
 
 V = TypeVar("V")
 
