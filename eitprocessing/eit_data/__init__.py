@@ -173,8 +173,6 @@ class EITData(SelectByTime, Equivalence, ABC):
     @staticmethod
     def _ensure_vendor(vendor: Vendor | str) -> Vendor:
         """Check whether vendor exists, and assure it's a Vendor object."""
-        if not vendor:
-            raise NoVendorProvided
 
         try:
             return Vendor(vendor)
@@ -287,9 +285,6 @@ class EITData_(EITData):
             return_non_eit_data=return_non_eit_data,
         )
 
-
-class NoVendorProvided(Exception):
-    """Raised when no vendor is provided when trying to load data."""
 
 
 class UnknownVendor(Exception):
