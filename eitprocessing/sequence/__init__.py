@@ -66,7 +66,7 @@ class Sequence(Equivalence, SelectByTime):
         """Create a merge of two Sequence objects."""
         # TODO: rewrite
 
-        eit_data = EITData.concatenate(a.eit_data, b.eit_data) if a.eit_data and b.eit_data else None
+        eit_data = a.eit_data.concatenate(b.eit_data) if a.eit_data and b.eit_data else None
 
         # TODO: add concatenation of other attached objects
 
