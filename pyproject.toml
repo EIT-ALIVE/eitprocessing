@@ -26,6 +26,8 @@ select = ["ALL"]
 ignore = [
     # Unwanted (potentially)
     "FBT",    # Using boolean arguments
+    "ANN002", # Missing type annotation for `*args`
+    "ANN003", # Missing type annotation for `**kwargs`
     "ANN101", # Missing type annotation for `self` in method
     "ANN102", # Missing type annotation for `cls` in classmethod
     "ANN204", # Missing return type annotation for special (dunder) method
