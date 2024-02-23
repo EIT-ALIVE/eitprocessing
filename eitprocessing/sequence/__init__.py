@@ -74,22 +74,24 @@ class Sequence(Equivalence, SelectByTime):
 
     def _sliced_copy(self, start_index: int, end_index: int) -> Self:
         eit_data = DataCollection(EITData)
-        for key, value in self.eit_data:
-            eit_data.add(key, value[start_index:end_index])
+        for key, value in self.eit_data.items():
+            eit_data.add(value[start_index:end_index])
 
         continuous_data = DataCollection(ContinuousData)
-        for key, value in self.continuous_data:
-            continuous_data.add(key, value[start_index:end_index])
+        for key, value in self.continuous_data.items():
+            continuous_data.add(value[start_index:end_index])
 
         sparse_data = DataCollection(SparseData)
-        start_time = self.time[start_index]
-        end_time = self.time[end_index]
-        for key, value in self.sparse_data:
-            sparse_data.add(key, value.t[start_time:end_time])
+        if start_index >= len(self.time):
+            msg = "start_index larger than length of time axis"
+            raise ValueError(msg)
+
+        time = self.time[start_index:end_index]
+        for value in self.sparse_data.values():
+            sparse_data.add(value.t[time[0], time[-1]])
 
         return self.__class__(
             eit_data=eit_data,
             continuous_data=continuous_data,
             sparse_data=sparse_data,
         )
-
