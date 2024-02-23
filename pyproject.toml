@@ -2,6 +2,39 @@
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "eitprocessing"
+version = "0.1.0"
+description = "Processing of lung image data from electrical impedance tomography."
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = [
+    "Mechanical lung ventilation",
+    "Electrical impedance tomography",
+    "Image/data processing",
+    "Advanced respiratory care",
+]
+authors = [
+    { name = "Dani Bodor", email = "d.bodor@esciencecenter.nl" },
+    { name = "Peter Somhorst", email = "p.somhorst@erasmusmc.nl" },
+    { name = "Walter Baccinelli", email = "w.baccinelli@esciencecenter.nl" },
+]
+license = { text = "Apache-2.0 license" }
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+[project.urls]
+Documentation = "https://github.com/EIT-ALIVE/eitprocessing/blob/main/README.md"
+Repository = "https://github.com/EIT-ALIVE/eitprocessing/"
+Changelog = "https://github.com/EIT-ALIVE/eitprocessing/blob/main/CHANGELOG.md"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
