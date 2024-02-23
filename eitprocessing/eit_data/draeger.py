@@ -102,25 +102,28 @@ class DraegerEITData(EITData_):
         if not framerate:
             framerate = cls.framerate
 
-        obj = cls(
-            path=path,
-            framerate=framerate,
-            nframes=n_frames,
-            time=time,
-            phases=phases,
-            events=events,
-            label="raw",
-            pixel_impedance=pixel_impedance,
+        eit_data_collection = DataCollection(cls)
+        eit_data_collection.add(
+            cls(
+                path=path,
+                framerate=framerate,
+                nframes=n_frames,
+                time=time,
+                phases=phases,
+                events=events,
+                label="raw",
+                pixel_impedance=pixel_impedance,
+            ),
         )
         if return_non_eit_data:
             (
-                continuous_data_coll,
-                sparse_data_coll,
+                continuous_data_collection,
+                sparse_data_collections,
             ) = cls._convert_medibus_data(medibus_data)
 
-            return (obj, continuous_data_coll, sparse_data_coll)
+            return (eit_data_collection, continuous_data_collection, sparse_data_collections)
 
-        return obj
+        return eit_data_collection
 
     @classmethod
     def _convert_medibus_data(
