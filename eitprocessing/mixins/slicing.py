@@ -1,12 +1,16 @@
 from __future__ import annotations
+
 import bisect
 import warnings
-from abc import ABC
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
 import numpy as np
-from numpy.typing import NDArray
-from typing_extensions import Self
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+    from typing_extensions import Self
 
 
 class SelectByIndex(ABC):
@@ -23,9 +27,8 @@ class SelectByIndex(ABC):
     def __getitem__(self, key: slice | int):
         if isinstance(key, slice):
             if key.step and key.step != 1:
-                raise ValueError(
-                    f"Can't slice {self.__class__} object with steps other than 1."
-                )
+                msg = f"Can't slice {self.__class__} object with steps other than 1."
+                raise ValueError(msg)
             start_index = key.start
             end_index = key.stop
             return self.select_by_index(start_index, end_index)
@@ -33,9 +36,8 @@ class SelectByIndex(ABC):
         if isinstance(key, int):
             return self.select_by_index(start=key, end=key + 1)
 
-        raise TypeError(
-            f"Invalid slicing input. Should be `slice` or `int`, not {type(key)}."
-        )
+        msg = f"Invalid slicing input. Should be `slice` or `int`, not {type(key)}."
+        raise TypeError(msg)
 
     def select_by_index(
         self,
@@ -49,7 +51,6 @@ class SelectByIndex(ABC):
         object. Otherwise a default label describing the slice and original
         object is attached.
         """
-
         if start is None and end is None:
             warnings.warn("No starting or end timepoint was selected.")
             return self
@@ -117,19 +118,17 @@ class SelectByTime(SelectByIndex):
         Returns:
             Slice of self.
         """
-
         if "time" not in vars(self):
-            raise TypeError(f"Object {self} has no time axis.")
+            msg = f"Object {self} has no time axis."
+            raise TypeError(msg)
 
         if start_time is None and end_time is None:
             warnings.warn("No starting or end timepoint was selected.")
             return self
 
         if not np.all(np.sort(self.time) == self.time):
-            raise ValueError(
-                f"Time stamps for {self} are not sorted and therefore data"
-                "cannot be selected by time."
-            )
+            msg = f"Time stamps for {self} are not sorted and therefore data cannot be selected by time."
+            raise ValueError(msg)
 
         if start_time is None or start_time < self.time[0]:
             start_index = 0
@@ -177,12 +176,12 @@ class TimeIndexer:
     def __getitem__(self, key: slice | int | float):
         if isinstance(key, slice):
             if key.step:
-                raise ValueError("Can't slice by time using specific step sizes.")
+                msg = "Can't slice by time using specific step sizes."
+                raise ValueError(msg)
             return self.obj.select_by_time(key.start, key.stop)
 
         if isinstance(key, (int, float)):
             return self.obj.select_by_time(start=key, end=key, end_inclusive=True)
 
-        raise TypeError(
-            f"Invalid slicing input. Should be `slice` or `int` or `float`, not {type(key)}."
-        )
+        msg = f"Invalid slicing input. Should be `slice` or `int` or `float`, not {type(key)}."
+        raise TypeError(msg)
