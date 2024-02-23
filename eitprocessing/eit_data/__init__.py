@@ -48,7 +48,7 @@ class EITData(SelectByTime, Equivalence, ABC):
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> DataCollection | tuple[Self, DataCollection, DataCollection]:
+    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
         """Load sequence from path(s).
 
         Args:
@@ -108,7 +108,7 @@ class EITData(SelectByTime, Equivalence, ABC):
                     eit, continuous, sparse = loaded_data
 
                 # assertions for type checking
-                assert isinstance(eit, EITData)  # noqa: S101
+                assert isinstance(eit, DataCollection)  # noqa: S101
                 assert isinstance(continuous, DataCollection)  # noqa: S101
                 assert isinstance(sparse, DataCollection)  # noqa: S101
 
@@ -117,7 +117,7 @@ class EITData(SelectByTime, Equivalence, ABC):
                 sparse_datasets.append(sparse)
 
             else:
-                assert isinstance(loaded_data, EITData)  # noqa: S101
+                assert isinstance(loaded_data, DataCollection)  # noqa: S101
                 eit_datasets.append(loaded_data)
 
         if return_non_eit_data:
