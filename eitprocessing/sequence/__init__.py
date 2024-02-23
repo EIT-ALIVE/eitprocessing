@@ -57,10 +57,7 @@ class Sequence(Equivalence):
         """Create a merge of two Sequence objects."""
         # TODO: rewrite
 
-        if a.eit_data and b.eit_data:
-            eit_data = EITData.concatenate(a.eit_data, b.eit_data)
-        else:
-            eit_data = None
+        eit_data = EITData.concatenate(a.eit_data, b.eit_data) if a.eit_data and b.eit_data else None
 
         # TODO: add concatenation of other attached objects
 
@@ -72,7 +69,7 @@ class Sequence(Equivalence):
         self,
         indices: slice,
         label: str | None = None,
-    ):
+    ) -> None:
         ...
         # TODO: rewrite to use EITData, SparseData and ContinuousData
 
