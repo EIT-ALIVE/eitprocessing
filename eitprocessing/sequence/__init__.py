@@ -12,7 +12,7 @@ from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.sparse_data import SparseData
 
 if TYPE_CHECKING:
-    from typing_annotations import Self
+    from typing_extensions import Self
 
 
 @dataclass(eq=False)

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 from eitprocessing.mixins.equality import Equivalence
 
 if TYPE_CHECKING:
-    from typing_annotations import Self
+    from typing_extensions import Self
 
 V = TypeVar("V")
 
