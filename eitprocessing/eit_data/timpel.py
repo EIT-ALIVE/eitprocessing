@@ -6,14 +6,11 @@ import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
 
-from eitprocessing.continuous_data.continuous_data_collection import (
-    ContinuousDataCollection,
-)
+from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData_
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.eit_data.phases import MaxValue, MinValue, QRSMark
 from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from eitprocessing.variants.variant_collection import VariantCollection
 
 
@@ -34,7 +31,7 @@ class TimpelEITData(EITData_):
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
+    ) -> Self | tuple[Self, DataCollection, DataCollection]:
         COLUMN_WIDTH = 1030
 
         if not framerate:

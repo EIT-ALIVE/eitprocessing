@@ -9,10 +9,9 @@ from typing import BinaryIO
 import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
-from eitprocessing.continuous_data.continuous_data_collection import (
-    ContinuousDataCollection,
-)
-from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
+
+from eitprocessing.data_collection import DataCollection
+
 from ..binreader.reader import Reader
 from . import EITData_
 from .eit_data_variant import EITDataVariant
@@ -35,7 +34,7 @@ class SentecEITData(EITData_):
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
+    ) -> Self | tuple[Self, DataCollection, DataCollection]:
         with open(path, "br") as fo:
             with mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
                 file_length = os.fstat(fo.fileno()).st_size

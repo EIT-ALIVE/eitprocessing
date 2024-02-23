@@ -10,14 +10,11 @@ import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self, override
 
-from eitprocessing.continuous_data.continuous_data_collection import (
-    ContinuousDataCollection,
-)
+from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
-from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
 from eitprocessing.variants.variant_collection import VariantCollection
 
 PathLike: TypeAlias = str | Path
@@ -54,8 +51,8 @@ class EITData(SelectByTime, Equivalence, ABC):
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
-        """Load sequence from path(s)
+    ) -> Self | tuple[Self, DataCollection, DataCollection]:
+        """Load sequence from path(s).
 
         Args:
             path (Path | str | list[Path | str]): path(s) to data file.
@@ -88,8 +85,8 @@ class EITData(SelectByTime, Equivalence, ABC):
         paths = cls._ensure_path_list(path)
 
         eit_datasets: list[EITData] = []
-        continuous_datasets: list[ContinuousDataCollection] = []
-        sparse_datasets: list[SparseDataCollection] = []
+        continuous_datasets: list[DataCollection] = []
+        sparse_datasets: list[DataCollection] = []
 
         for single_path in paths:
             # this checks whether each path exists before any path is loaded to
@@ -116,8 +113,8 @@ class EITData(SelectByTime, Equivalence, ABC):
 
                 # assertions for type checking
                 assert isinstance(eit, EITData)
-                assert isinstance(continuous, ContinuousDataCollection)
-                assert isinstance(sparse, SparseDataCollection)
+                assert isinstance(continuous, DataCollection)
+                assert isinstance(sparse, DataCollection)
 
                 eit_datasets.append(eit)
                 continuous_datasets.append(continuous)
@@ -130,8 +127,8 @@ class EITData(SelectByTime, Equivalence, ABC):
         if return_non_eit_data:
             return (
                 reduce(cls.concatenate, eit_datasets),
-                reduce(ContinuousDataCollection.concatenate, continuous_datasets),
-                reduce(SparseDataCollection.concatenate, sparse_datasets),
+                reduce(DataCollection.concatenate, continuous_datasets),
+                reduce(DataCollection.concatenate, sparse_datasets),
             )
 
         return reduce(cls.concatenate, eit_datasets)
@@ -253,7 +250,7 @@ class EITData(SelectByTime, Equivalence, ABC):
         first_frame: int | None = None,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
+    ) -> Self | tuple[Self, DataCollection, DataCollection]:
         ...
 
 
@@ -274,7 +271,7 @@ class EITData_(EITData):
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
+    ) -> Self | tuple[Self, DataCollection, DataCollection]:
         return super().from_path(
             path,
             cls.vendor,

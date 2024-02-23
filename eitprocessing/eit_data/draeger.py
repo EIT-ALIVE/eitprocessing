@@ -8,10 +8,7 @@ import numpy as np
 from numpy.typing import NDArray
 from typing_extensions import Self
 
-from eitprocessing.continuous_data.continuous_data_collection import (
-    ContinuousDataCollection,
-)
-from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
+from eitprocessing.data_collection import DataCollection
 
 from ..binreader.reader import Reader
 from ..continuous_data import ContinuousData
@@ -38,7 +35,7 @@ class DraegerEITData(EITData_):
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
+    ) -> Self | tuple[Self, DataCollection, DataCollection]:
         """"""
 
         FRAME_SIZE_BYTES = 4358
@@ -134,9 +131,12 @@ class DraegerEITData(EITData_):
         return obj
 
     @classmethod
-    def _convert_medibus_data(cls, medibus_data: NDArray) -> tuple[ContinuousDataCollection, SparseDataCollection]:
-        continuous_data_collection = ContinuousDataCollection()
-        sparse_data_collection = SparseDataCollection()
+    def _convert_medibus_data(
+        cls,
+        medibus_data: NDArray,
+    ) -> tuple[DataCollection, DataCollection]:
+        continuous_data_collection = DataCollection()
+        sparse_data_collection = DataCollection()
 
         for field_info, data in zip(medibus_fields, medibus_data):
             if field_info.continuous:
