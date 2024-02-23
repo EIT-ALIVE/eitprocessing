@@ -3,17 +3,15 @@ from __future__ import annotations
 import bisect
 import copy
 import warnings
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from dataclasses import dataclass, field
 
 import numpy as np
 
+from eitprocessing.continuous_data import ContinuousData
+from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData
 from eitprocessing.mixins.equality import Equivalence
-
-if TYPE_CHECKING:
-    from eitprocessing.continuous_data import ContinuousData
-    from eitprocessing.sparse_data import SparseData
+from eitprocessing.sparse_data import SparseData
 
 
 @dataclass(eq=False)
@@ -38,9 +36,9 @@ class Sequence(Equivalence):
     """
 
     label: str | None = None
-    continuous_data: ContinuousData | None = None
-    eit_data: EITData | None = None
-    sparse_data: SparseData | None = None
+    continuous_data: DataCollection = field(default_factory=DataCollection(ContinuousData))
+    eit_data: DataCollection = field(default_factory=DataCollection(EITData))
+    sparse_data: DataCollection = field(default_factory=DataCollection(SparseData))
 
     def __post_init__(self):
         if self.label is None:
@@ -90,8 +88,7 @@ class Sequence(Equivalence):
         end_inclusive: bool = False,
         label: str | None = None,
     ) -> Sequence:
-        """Select subset of sequence by the `Sequence.time` information (i.e.
-        based on the time stamp).
+        """Select subset of sequence by the `Sequence.time` information (i.e. based on the time stamp).
 
         Args:
             start (float | int | None, optional): starting time point.
@@ -117,7 +114,7 @@ class Sequence(Equivalence):
             warnings.warn("No starting or end timepoint was selected.")
             return self
         if not np.all(np.sort(self.time) == self.time):
-            msg = f"Time stamps for {self} are not sorted and therefor data" "cannot be selected by time."
+            msg = f"Time stamps for {self} are not sorted and therefor data cannot be selected by time."
             raise ValueError(msg)
 
         if start is None:
