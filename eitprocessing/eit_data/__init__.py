@@ -36,8 +36,6 @@ class EITData(SelectByTime, Addition, Equivalence, ABC):
     pixel_impedance: NDArray = field(repr=False, kw_only=True)
 
     def __post_init__(self):
-        if not self.label:
-            self.label = f"{self.__class__.__name__}_{id(self)}"
         self._check_equivalence = ["vendor", "framerate"]
 
     @classmethod
