@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData
-from eitprocessing.mixins.equality import Equivalence
+from eitprocessing.mixins.addition import Addition
 from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.sparse_data import SparseData
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(eq=False)
-class Sequence(Equivalence, SelectByTime):
+class Sequence(Addition, SelectByTime):
     """Sequence of timepoints containing EIT and/or waveform data.
 
     A Sequence is a representation of a continuous set of data points, either EIT frames,
@@ -40,7 +40,7 @@ class Sequence(Equivalence, SelectByTime):
     sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData))
 
     def __post_init__(self):
-        pass
+        self._check_equivalence = []
 
     @property
     def time(self) -> np.ndarray:
