@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from functools import reduce
+from functools import partial, reduce
 from pathlib import Path
 from typing import TYPE_CHECKING, TypeAlias, TypeVar
 
@@ -47,6 +47,7 @@ class EITData(SelectByTime, Addition, Equivalence, ABC):
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
+        check_time_consistency: bool = True,
     ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
         """Load sequence from path(s).
 
@@ -119,13 +120,13 @@ class EITData(SelectByTime, Addition, Equivalence, ABC):
                 assert isinstance(loaded_data, DataCollection)  # noqa: S101
                 eit_datasets.append(loaded_data)
 
+        partial_fun = lambda x, y: DataCollection.concatenate(x, y, check_time_consistency=check_time_consistency)
         if return_non_eit_data:
             return tuple(
-                reduce(DataCollection.concatenate, datasets)
-                for datasets in (eit_datasets, continuous_datasets, sparse_datasets)
+                reduce(partial_fun, datasets) for datasets in (eit_datasets, continuous_datasets, sparse_datasets)
             )
 
-        return reduce(DataCollection.concatenate, eit_datasets)
+        return reduce(partial_fun, eit_datasets)
 
     @classmethod
     @abstractmethod
