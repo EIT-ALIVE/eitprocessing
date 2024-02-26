@@ -33,7 +33,7 @@ def draeger_data2():
 
 @pytest.fixture(scope="module")
 def draeger_data_both():
-    return Sequence(EITData.from_path([draeger_file2, draeger_file1], vendor="draeger"))
+    return Sequence(EITData.from_path([draeger_file2, draeger_file1], vendor="draeger", check_time_consistency=False))
 
 
 @pytest.fixture(scope="module")
@@ -43,7 +43,7 @@ def timpel_data():
 
 @pytest.fixture()
 def timpel_data_double():
-    return Sequence(EITData.from_path([timpel_file, timpel_file], vendor="timpel"))
+    return Sequence(EITData.from_path([timpel_file, timpel_file], vendor="timpel", check_time_consistency=False))
 
 
 def test_from_path_draeger(
@@ -64,21 +64,21 @@ def test_from_path_draeger(
         draeger_data2.eit_data["raw"],
     )
 
-    # draeger_inverted = Sequence(
-    #     "",
-    #     EITData.from_path(
-    #         path=[draeger_file2, draeger_file1],
-    #         vendor="draeger",
-    #     ),
-    # )
-    # assert len(draeger_data_both) == len(draeger_inverted)
-    # assert draeger_data_both != draeger_inverted
+    draeger_inverted = Sequence(
+        EITData.from_path(
+            path=[draeger_file1, draeger_file2],
+            vendor="draeger",
+            check_time_consistency=False,
+        ),
+    )
+    assert len(draeger_data_both) == len(draeger_inverted)
+    assert draeger_data_both != draeger_inverted
 
 
 def test_from_path_timpel(
     draeger_data1: Sequence,
     timpel_data: Sequence,
-    # timpel_data_double: Sequence,  # does not currently work, because it won't load due to the time axes overlapping
+    timpel_data_double: Sequence,  # does not currently work, because it won't load due to the time axes overlapping
 ):
     using_vendor = Sequence(EITData.from_path(timpel_file, vendor=Vendor.TIMPEL))
     assert timpel_data == using_vendor
@@ -87,8 +87,8 @@ def test_from_path_timpel(
     assert timpel_data.eit_data["raw"].vendor != draeger_data1.eit_data["raw"].vendor
 
     # Load multiple
-    # assert isinstance(timpel_data_double, Sequence)
-    # assert len(timpel_data_double) == 2 * len(timpel_data)
+    assert isinstance(timpel_data_double, Sequence)
+    assert len(timpel_data_double) == 2 * len(timpel_data)
 
 
 def test_illegal_from_path():
@@ -109,54 +109,58 @@ def test_merge(  # pylint: disable=too-many-locals
     draeger_data2: Sequence,
     draeger_data_both: Sequence,
     timpel_data: Sequence,
-    # timpel_data_double: Sequence,
+    timpel_data_double: Sequence,
 ):
     merged_draeger = Sequence.concatenate(draeger_data2, draeger_data1)
     assert len(merged_draeger.eit_data["raw"]) == len(draeger_data2.eit_data["raw"]) + len(
         draeger_data1.eit_data["raw"],
     )
     assert merged_draeger == draeger_data_both
+    merged_draeger2 = Sequence.concatenate(draeger_data2, draeger_data1)
+    assert merged_draeger == merged_draeger2
     added_draeger = draeger_data2 + draeger_data1
     assert added_draeger == merged_draeger
 
-    draeger_load_double = Sequence(EITData.from_path([draeger_file1, draeger_file1], "draeger"))
-    draeger_merge_double = Sequence.merge(draeger_data1, draeger_data1)
+    draeger_load_double = Sequence(
+        EITData.from_path([draeger_file1, draeger_file1], "draeger", check_time_consistency=False),
+    )
+    draeger_merge_double = Sequence.concatenate(draeger_data1, draeger_data1, check_time_consistency=False)
     assert draeger_load_double == draeger_merge_double
-    added_draeger_double = draeger_data1 + draeger_data1
-    assert added_draeger_double == draeger_merge_double
+    with pytest.raises(ValueError):
+        _ = draeger_data1 + draeger_data1
 
-    draeger_merged_twice = Sequence.merge(draeger_merge_double, draeger_merge_double)
-    draeger_load_four_times = Sequence(EITData.from_path([draeger_file1] * 4, "draeger"))
-    assert isinstance(draeger_merged_twice.path, list)
-    assert len(draeger_merged_twice.path) == 4  # noqa: PLR2004
+    draeger_merged_twice = Sequence.concatenate(
+        draeger_merge_double,
+        draeger_merge_double,
+        check_time_consistency=False,
+    )
+    draeger_load_four_times = Sequence(EITData.from_path([draeger_file1] * 4, "draeger", check_time_consistency=False))
+    assert isinstance(draeger_merged_twice.eit_data["raw"].path, list)
+    assert len(draeger_merged_twice.eit_data["raw"].path) == 4  # noqa: PLR2004
     assert draeger_merged_twice == draeger_load_four_times
 
-    draeger_merge_thrice = Sequence.merge(draeger_merge_double, draeger_data1)
-    draeger_load_thrice = Sequence(EITData.from_path([draeger_file1] * 3, "draeger"))
-    assert isinstance(draeger_merge_thrice.path, list)
-    assert len(draeger_merge_thrice.path) == 3  # noqa: PLR2004
+    draeger_merge_thrice = Sequence.concatenate(draeger_merge_double, draeger_data1, check_time_consistency=False)
+    draeger_load_thrice = Sequence(EITData.from_path([draeger_file1] * 3, "draeger", check_time_consistency=False))
+    assert isinstance(draeger_merge_thrice.eit_data["raw"].path, list)
+    assert len(draeger_merge_thrice.eit_data["raw"].path) == 3  # noqa: PLR2004
     assert draeger_merge_thrice == draeger_load_thrice
-    added_draeger_triple = draeger_data1 + draeger_data1 + draeger_data1
-    assert draeger_merge_thrice == added_draeger_triple
 
-    merged_timpel = Sequence.merge(timpel_data, timpel_data)
+    merged_timpel = Sequence.concatenate(timpel_data, timpel_data, check_time_consistency=False)
     assert len(merged_timpel) == 2 * len(timpel_data)
     assert timpel_data_double == merged_timpel
-    added_timpel = timpel_data + timpel_data
-    assert added_timpel == merged_timpel
 
     with pytest.raises(TypeError):
-        _ = Sequence.merge(timpel_data, draeger_data1)
+        _ = Sequence.concatenate(timpel_data, draeger_data1)
 
     draeger_data1.framerate = 50
     with pytest.raises(ValueError):
-        _ = Sequence.merge(draeger_data1, draeger_data2)
+        _ = Sequence.concatenate(draeger_data1, draeger_data2)
 
     draeger_data1.vendor = Vendor.TIMPEL
     with pytest.raises(ValueError):
         # TODO (#77): update this to AttributeError, once equivalence check for
         # framesets is implemented.
-        _ = Sequence.merge(draeger_data1, timpel_data)
+        _ = Sequence.concatenate(draeger_data1, timpel_data)
 
 
 def test_copy(
