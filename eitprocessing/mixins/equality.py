@@ -79,7 +79,7 @@ class Equivalence(ABC):
                     raise EquivalenceError(msg)
 
                 for key in self:
-                    if not self[key].isequivalent(other[key], False):
+                    if not self[key].isequivalent(other[key], raise_=False):
                         msg = f"Data in {key} doesn't match: {self[key]}, {other[key]}"
                         raise EquivalenceError(msg)
 
