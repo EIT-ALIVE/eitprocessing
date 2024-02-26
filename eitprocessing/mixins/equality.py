@@ -88,7 +88,8 @@ class Equivalence(ABC):
                 self._check_equivalence: list[str]
                 for attr in self._check_equivalence:
                     if (s := getattr(self, attr)) != (o := getattr(other, attr)):
-                        raise f"{attr.capitalize()}s don't match: {s}, {o}"
+                        msg = f"{attr.capitalize()}s don't match: {s}, {o}"
+                        raise ValueError(msg)
 
         # raise or return if a check fails
         except EquivalenceError:
