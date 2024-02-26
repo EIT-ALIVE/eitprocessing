@@ -15,6 +15,7 @@ from eitprocessing.continuous_data.continuous_data_collection import (
 )
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.eit_data.vendor import Vendor
+from eitprocessing.mixins.addition import Addition
 from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
@@ -26,7 +27,7 @@ T = TypeVar("T", bound="EITData")
 
 
 @dataclass(eq=False)
-class EITData(SelectByTime, Equivalence, ABC):
+class EITData(SelectByTime, Addition, Equivalence, ABC):
     path: Path | list[Path]
     nframes: int
     time: NDArray
@@ -184,7 +185,12 @@ class EITData(SelectByTime, Equivalence, ABC):
             raise UnknownVendor(f"Unknown vendor {vendor}.") from e
 
     @classmethod
-    def concatenate(cls, a: T, b: T, label: str | None = None) -> T:
+    def concatenate(
+        cls,
+        a: T,
+        b: T,
+        label: str | None = None,
+    ) -> T:
         cls.isequivalent(a, b, raise_=True)
 
         a_path = cls._ensure_path_list(a.path)
@@ -256,13 +262,14 @@ class EITData(SelectByTime, Equivalence, ABC):
     ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
         ...
 
+    @property
+    def _data_storage(self) -> tuple(str):
+        return ("time", "pixel_impedance")
+
 
 @dataclass(eq=False)
 class EITData_(EITData):
     vendor: Vendor = field(init=False)
-
-    def __add__(self: T, other: T) -> T:
-        return self.concatenate(self, other)
 
     @override  # remove vendor as argument
     @classmethod
