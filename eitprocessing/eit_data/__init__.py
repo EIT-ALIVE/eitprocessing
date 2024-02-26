@@ -181,44 +181,6 @@ class EITData(SelectByTime, Addition, Equivalence, ABC):
             msg = f"Unknown vendor {vendor}."
             raise UnknownVendorError(msg) from e
 
-    def concatenate(self: T, other: T, label: str | None = None) -> T:
-        cls = self.__class__
-        self.isequivalent(other, raise_=True)
-
-        a_path = cls._ensure_path_list(self.path)
-        b_path = cls._ensure_path_list(other.path)
-        path = a_path + b_path
-
-        if np.min(other.time) <= np.max(self.time):
-            msg = f"{other} (b) starts before {self} (a) ends."
-            raise ValueError(msg)
-        time = np.concatenate((self.time, other.time))
-
-        pixel_impedance = np.concatenate((self.pixel_impedance, other.pixel_impedance), axis=0)
-
-        if self.label != other.label:
-            raise ValueError("Can't concatenate data with different labels.")
-
-        label = self.label
-        framerate = self.framerate
-        nframes = self.nframes + other.nframes
-
-        cls_ = cls._get_vendor_class(self.vendor)
-
-        phases = self.phases + other.phases
-        events = self.events + other.events
-
-        return cls_(
-            path=path,
-            label=label,
-            framerate=framerate,
-            nframes=nframes,
-            time=time,
-            pixel_impedance=pixel_impedance,
-            phases=phases,
-            events=events,
-        )
-
     def _sliced_copy(
         self,
         start_index: int,

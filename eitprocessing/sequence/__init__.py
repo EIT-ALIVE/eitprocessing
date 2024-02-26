@@ -55,24 +55,6 @@ class Sequence(Equivalence, SelectByTime):
     def __len__(self):
         return len(self.time)
 
-    def __add__(self, other: Sequence) -> Sequence:
-        return self.concatenate(self, other)
-
-    @classmethod
-    def concatenate(
-        cls,
-        a: Sequence,
-        b: Sequence,
-    ) -> Sequence:
-        """Create a merge of two Sequence objects."""
-        # TODO: rewrite
-
-        eit_data = a.eit_data.concatenate(b.eit_data) if a.eit_data and b.eit_data else None
-
-        # TODO: add concatenation of other attached objects
-
-        return a.__class__(eit_data=eit_data)
-
     def _sliced_copy(self, start_index: int, end_index: int) -> Self:
         eit_data = DataCollection(EITData)
         for key, value in self.eit_data.items():
