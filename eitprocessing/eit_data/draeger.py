@@ -30,7 +30,7 @@ class DraegerEITData(EITData_):
     """Container for EIT data recorded using the Dräger Pulmovista PV500."""
 
     vendor: Vendor = field(default=Vendor.DRAEGER, init=False)
-    framerate: float = 20
+    framerate: float = field(default=20, metadata={"check_equivalence_equals": True, "concatenate": "first"})
 
     @classmethod
     def _from_path(  # pylint: disable=too-many-arguments,too-many-locals

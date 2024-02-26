@@ -25,7 +25,7 @@ _NAN_VALUE = -1000
 
 @dataclass(eq=False)
 class TimpelEITData(EITData_):
-    framerate: float = 50
+    framerate: float = field(default=50, metadata={"check_equivalence_equals": True, "concatenate": "first"})
     vendor: Vendor = field(default=Vendor.TIMPEL, init=False)
 
     @classmethod

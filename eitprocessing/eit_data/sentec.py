@@ -28,7 +28,7 @@ class SentecEITData(EITData_):
     """Container for EIT data recorded using the Sentec."""  # TODO: which model?
 
     vendor: Vendor = field(default=Vendor.SENTEC, init=False)
-    framerate: float = 50.2
+    framerate: float = field(default=50.2, metadata={"check_equivalence_equals": True, "concatenate": "first"})
 
     @classmethod
     def _from_path(  # noqa: C901, PLR0913
