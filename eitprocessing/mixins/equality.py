@@ -20,7 +20,9 @@ class Equivalence(ABC):
                 return NotImplemented
             t1 = vars(self).values()
             t2 = vars(other).values()
-            return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2))
+            if len(t1) != len(t2):
+                return False
+            return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2, strict=False))
         return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
