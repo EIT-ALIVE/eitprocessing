@@ -13,6 +13,19 @@ if TYPE_CHECKING:
 
 @dataclass
 class ContinuousData:
+    """Data class for (non-EIT) data with a continuous time axis.
+
+    Args:
+        label: Computer readable naming of the instance.
+        name: Human readable naming of the instance.
+        unit: Unit for the data.
+        description: Human readible extended description of the data.
+        parameters: ???
+        loaded: True if raw data was loaded directly from source. False if the data was derived.
+        derived_from: Traceback of intermediates from which the current data was derived.
+        values: Data points.
+    """
+
     label: str
     name: str
     unit: str
