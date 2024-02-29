@@ -155,6 +155,7 @@ extend-safe-fixes = [
     "RUF013", # Implicit Optional
     "B006",   # Mutable default argument
 ]
+pylint.max-args = 7
 
 [tool.ruff.isort]
 known-first-party = ["eitprocessing"]

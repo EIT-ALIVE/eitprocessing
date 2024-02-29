@@ -29,7 +29,7 @@ class TimpelEITData(EITData_):
     vendor: Vendor = field(default=Vendor.TIMPEL, init=False)
 
     @classmethod
-    def _from_path(  # noqa: C901, PLR0913
+    def _from_path(  # noqa: C901
         cls,
         path: Path,
         framerate: float | None = 20,

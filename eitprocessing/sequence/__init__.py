@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
@@ -75,11 +74,11 @@ class Sequence(Equivalence, SelectByTime):
 
     def _sliced_copy(self, start_index: int, end_index: int) -> Self:
         eit_data = DataCollection(EITData)
-        for key, value in self.eit_data.items():
+        for value in self.eit_data.values():
             eit_data.add(value[start_index:end_index])
 
         continuous_data = DataCollection(ContinuousData)
-        for key, value in self.continuous_data.items():
+        for value in self.continuous_data.values():
             continuous_data.add(value[start_index:end_index])
 
         sparse_data = DataCollection(SparseData)

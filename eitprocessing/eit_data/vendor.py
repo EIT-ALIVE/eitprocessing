@@ -10,4 +10,4 @@ class Vendor(LowercaseStrEnum):
     TIMPEL = auto()
     SENTEC = auto()
     DRAGER = DRAEGER
-    DRÄGER = DRAEGER  # pylint: disable = non-ascii-name
+    DRÄGER = DRAEGER

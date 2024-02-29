@@ -9,6 +9,6 @@ def plot_waveforms(self, waveforms=None) -> None:
     fig, axes = plt.subplots(n_waveforms, 1, sharex=True, figsize=(8, 3 * n_waveforms))
     fig.tight_layout()
 
-    for ax, key in zip(axes, waveforms):
+    for ax, key in zip(axes, waveforms, strict=False):
         ax.plot(self.waveform_data[key])
         ax.set_title(key)

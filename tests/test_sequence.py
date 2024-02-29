@@ -7,7 +7,6 @@ import pytest
 from eitprocessing.eit_data import EITData, Vendor
 from eitprocessing.eit_data.draeger import DraegerEITData
 from eitprocessing.eit_data.timpel import TimpelEITData
-from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.sequence import Sequence
 
 environment = os.environ.get(
@@ -104,7 +103,7 @@ def test_illegal_from_path():
         _ = Sequence(EITData.from_path(timpel_file, vendor="draeger"))
 
 
-def test_merge(  # pylint: disable=too-many-locals
+def test_merge(
     draeger_data1: Sequence,
     draeger_data2: Sequence,
     draeger_data_both: Sequence,

@@ -33,7 +33,7 @@ class DraegerEITData(EITData_):
     framerate: float = 20
 
     @classmethod
-    def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
+    def _from_path(
         cls,
         path: Path,
         framerate: float | None = 20,
@@ -133,7 +133,7 @@ class DraegerEITData(EITData_):
         continuous_data_collection = DataCollection(ContinuousData)
         sparse_data_collection = DataCollection(SparseData)
 
-        for field_info, data in zip(medibus_fields, medibus_data):
+        for field_info, data in zip(medibus_fields, medibus_data, strict=False):
             if field_info.continuous:
                 continuous_data = ContinuousData(
                     label=field_info.signal_name,
@@ -154,7 +154,7 @@ class DraegerEITData(EITData_):
         return continuous_data_collection, sparse_data_collection
 
     @classmethod
-    def _read_frame(  # pylint: disable=too-many-arguments,too-many-locals
+    def _read_frame(
         cls,
         reader: Reader,
         index: int,

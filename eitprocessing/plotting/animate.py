@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
+
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 
 
@@ -8,7 +9,7 @@ def animate_EITDataVariant(
     cmap: str = "plasma",
     show_progress: bool | str = "notebook",
     waveforms: bool | list[str] = False,
-):  # pylint: disable = too-many-locals
+) -> None:
     # TODO: find other way to couple waveform data
     if waveforms is True:
         waveforms = list(eit_data_variant.waveform_data.keys())
@@ -50,11 +51,11 @@ def animate_EITDataVariant(
             progress_bar = tqdm(total=len(eit_data_variant))
         progress_bar.update(1)
 
-    def update(i):
+    def update(i) -> None:
         im.set(data=array[i, :, :])
 
         if waveforms:
-            for key, line in zip(waveforms, wf_lines):
+            for key, line in zip(waveforms, wf_lines, strict=False):
                 line[0].set_xdata(range(i))
                 line[0].set_ydata(eit_data_variant.waveform_data[key][: i + 1])
 
@@ -62,7 +63,10 @@ def animate_EITDataVariant(
             progress_bar.update(1)
 
     anim = animation.FuncAnimation(
-        fig, update, frames=range(1, len(eit_data_variant)), repeat=False
+        fig,
+        update,
+        frames=range(1, len(eit_data_variant)),
+        repeat=False,
     )
     display(HTML(anim.to_jshtml(eit_data_variant.params["framerate"])))
 

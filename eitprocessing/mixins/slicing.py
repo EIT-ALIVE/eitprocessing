@@ -80,9 +80,11 @@ class SelectByIndex(ABC):
 
 
 class SelectByTime(SelectByIndex):
+    """Adds methods for slicing by time rather than index."""
+
     time: NDArray
 
-    def select_by_time(  # pylint: disable=too-many-arguments
+    def select_by_time(  # noqa:D417
         self,
         start_time: float | None = None,
         end_time: float | None = None,
@@ -146,7 +148,7 @@ class SelectByTime(SelectByIndex):
         )
 
     @property
-    def t(self) -> TimeIndexer:
+    def t(self) -> TimeIndexer:  # noqa:D102
         return TimeIndexer(self)
 
 
@@ -175,7 +177,7 @@ class TimeIndexer:
                 raise ValueError(msg)
             return self.obj.select_by_time(key.start, key.stop)
 
-        if isinstance(key, (int, float)):
+        if isinstance(key, int | float):
             return self.obj.select_by_time(start=key, end=key, end_inclusive=True)
 
         msg = f"Invalid slicing input. Should be `slice` or `int` or `float`, not {type(key)}."

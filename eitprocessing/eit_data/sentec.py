@@ -31,7 +31,7 @@ class SentecEITData(EITData_):
     framerate: float = 50.2
 
     @classmethod
-    def _from_path(  # noqa: C901, PLR0913
+    def _from_path(  # noqa: C901
         cls,
         path: Path,
         framerate: float | None = 50.2,
@@ -135,7 +135,7 @@ class SentecEITData(EITData_):
         return eit_data_collection
 
     @classmethod
-    def _read_frame(  # noqa: PLR0913
+    def _read_frame(
         cls,
         fh: BinaryIO,
         version: int,

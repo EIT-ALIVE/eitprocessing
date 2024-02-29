@@ -40,7 +40,7 @@ class EITData(SelectByTime, Equivalence, ABC):
         self._check_equivalence = ["vendor", "framerate"]
 
     @classmethod
-    def from_path(  # noqa: PLR0913
+    def from_path(
         cls,
         path: PathArg,
         vendor: Vendor | str,
@@ -130,7 +130,7 @@ class EITData(SelectByTime, Equivalence, ABC):
 
     @classmethod
     @abstractmethod
-    def _from_path(  # noqa: PLR0913
+    def _from_path(
         cls: type[Self],
         path: Path,
         framerate: float | None = None,
@@ -148,9 +148,9 @@ class EITData(SelectByTime, Equivalence, ABC):
 
     @staticmethod
     def _get_vendor_class(vendor: Vendor) -> type[EITData_]:
-        from .draeger import DraegerEITData  # pylint: disable=import-outside-toplevel
-        from .sentec import SentecEITData  # pylint: disable=import-outside-toplevel
-        from .timpel import TimpelEITData  # pylint: disable=import-outside-toplevel
+        from .draeger import DraegerEITData
+        from .sentec import SentecEITData
+        from .timpel import TimpelEITData
 
         vendor_classes: dict[Vendor, type[EITData_]] = {
             Vendor.DRAEGER: DraegerEITData,
@@ -196,7 +196,8 @@ class EITData(SelectByTime, Equivalence, ABC):
         pixel_impedance = np.concatenate((self.pixel_impedance, other.pixel_impedance), axis=0)
 
         if self.label != other.label:
-            raise ValueError("Can't concatenate data with different labels.")
+            msg = "Can't concatenate data with different labels."
+            raise ValueError(msg)
 
         label = self.label
         framerate = self.framerate
@@ -277,7 +278,7 @@ class EITData_(EITData):  # noqa: N801
 
     @override  # remove vendor as argument
     @classmethod
-    def from_path(  # pylint: disable=too-many-arguments,arguments-differ
+    def from_path(
         cls,
         path: PathArg,
         framerate: float | None = None,

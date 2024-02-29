@@ -185,7 +185,7 @@ def test_specified_butterworth_equivalence(filter_arguments):
     assert filter7 == filter8
 
 
-def test_butterworth_functionality():  # pylint: disable=too-many-locals
+def test_butterworth_functionality():
     """Tests the functionality of the Butterworth filters.
 
     This function tests whether a filter created by initializing a ButterworthFilter does the same
@@ -221,7 +221,7 @@ def test_butterworth_functionality():  # pylint: disable=too-many-locals
         class_: SpecifiedFilter,
         data: np.ndarray,
         axis: int,
-    ):
+    ) -> None:
         """Compare filters created using ButterworthFilter to filters created using the
         corresponding subclass.
 
