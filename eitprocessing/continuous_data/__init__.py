@@ -19,8 +19,9 @@ class ContinuousData:
         label: Computer readable naming of the instance.
         name: Human readable naming of the instance.
         unit: Unit for the data.
+        category: Category the data falls into, e.g. 'airway pressure'.
         description: Human readible extended description of the data.
-        parameters: ???
+        parameters: Parameters used to derive this data.
         loaded: True if raw data was loaded directly from source. False if the data was derived.
         derived_from: Traceback of intermediates from which the current data was derived.
         values: Data points.
