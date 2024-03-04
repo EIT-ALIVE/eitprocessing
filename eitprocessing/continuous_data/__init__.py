@@ -43,6 +43,13 @@ class ContinuousData:
 
         if self.loaded:
             self.lock()
+
+    def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
+        if attr == "values" and self.locked:
+            msg = "Attribute 'values' is locked and can't be overwritten."
+            raise AttributeError(msg)
+        super().__setattr__(self, attr, value)
+
     def copy(
         self,
         label: str,
