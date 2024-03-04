@@ -59,7 +59,7 @@ class ContinuousData:
         description: str | None = None,
         parameters: dict | None = None,
     ) -> Self:
-        return self.__class__(
+        obj = self.__class__(
             label=label,
             name=name or label,
             unit=unit or self.unit,
@@ -74,6 +74,8 @@ class ContinuousData:
             # make a copy if they want to edit the data directly
             values=np.copy(self.values),
         )
+        obj.unlock()
+        return obj
 
     def derive(self, label: str, function: Callable, **kwargs) -> Self:
         copy = self.copy(label)
