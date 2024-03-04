@@ -77,9 +77,9 @@ class ContinuousData:
         obj.unlock()
         return obj
 
-    def derive(self, label: str, function: Callable, **kwargs) -> Self:
-        copy = self.copy(label)
-        copy.values = function(copy.values, **kwargs)
+    def derive(self, label: str, function: Callable, func_args: dict, **kwargs) -> Self:
+        copy = self.copy(label, **kwargs)
+        copy.values = function(copy.values, **func_args)
         return copy
 
     def lock(self) -> None:
