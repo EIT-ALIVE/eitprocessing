@@ -41,6 +41,8 @@ class ContinuousData:
             msg = "Data must be loaded or calculated form another dataset."
             raise ValueError(msg)
 
+        if self.loaded:
+            self.lock()
     def copy(
         self,
         label: str,
