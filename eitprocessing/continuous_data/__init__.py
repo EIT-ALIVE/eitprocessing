@@ -60,6 +60,10 @@ class ContinuousData:
         description: str | None = None,
         parameters: dict | None = None,
     ) -> Self:
+        """Create a copy.
+
+        Whenever data is altered, it should probably be copied first. The alterations should then be made in the copy.
+        """
         obj = self.__class__(
             label=label,
             name=name or label,
@@ -79,16 +83,60 @@ class ContinuousData:
         return obj
 
     def derive(self, label: str, function: Callable, func_args: dict, **kwargs) -> Self:
+        """Create a copy deriving data from values attribute.
+
+        Args:
+            label: New label for the derived object.
+            function: Function that takes the values and returns the derived values.
+            func_args: Arguments to pass to function.
+            **kwargs: New values for attributes of
+
+        Example:
+        ```
+        def convert_data(x, add=None, subtract=None, multiply=None, divide=None):
+            if add:
+                x += add
+            if subtract:
+                x -= subtract
+            if multiply:
+                x *= multiply
+            if divide:
+                x /= divide
+            return x
+
+
+        data = ContinuousData(
+            name="Lung volume (in mL)", label="volume_mL", unit="mL", category="volume", values=some_loaded_data
+        )
+        derived = data.derive("volume_L", convert_data, {"divide": 1000}, name="Lung volume (in L)", unit="L")
+        ```
+        """
         copy = self.copy(label, **kwargs)
         copy.values = function(copy.values, **func_args)
         return copy
 
     def lock(self) -> None:
+        """Lock the values attribute.
+
+        When the values attribute is locked, it cannot be replaced or changed.
+        `data.values = [1, 2, 3]` will result in an AttributeError being raised.
+        `data.values[0] = 1` will result in a RuntimeError being raised.
+
+        The values can be unlocked using `unlock()`.
+        """
         self.values.flags["WRITEABLE"] = False
 
     def unlock(self) -> None:
+        """Unlocks the values attribute.
+
+        See lock().
+        """
         self.values.flags["WRITEABLE"] = True
 
     @property
     def locked(self) -> bool:
+        """Return whether the values attribute is locked.
+
+        See lock().
+        """
         return not self.values.flags["WRITEABLE"]
