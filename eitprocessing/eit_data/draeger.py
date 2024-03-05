@@ -10,12 +10,11 @@ import numpy as np
 from eitprocessing.binreader.reader import Reader
 from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
+from eitprocessing.eit_data import EITData_
+from eitprocessing.eit_data.event import Event
+from eitprocessing.eit_data.phases import MaxValue, MinValue
+from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.sparse_data import SparseData
-
-from . import EITData_
-from .event import Event
-from .phases import MaxValue, MinValue
-from .vendor import Vendor
 
 if TYPE_CHECKING:
     from pathlib import Path

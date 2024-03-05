@@ -12,10 +12,9 @@ import numpy as np
 from eitprocessing.binreader.reader import Reader
 from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
+from eitprocessing.eit_data import EITData_
+from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.sparse_data import SparseData
-
-from . import EITData_
-from .vendor import Vendor
 
 if TYPE_CHECKING:
     from pathlib import Path

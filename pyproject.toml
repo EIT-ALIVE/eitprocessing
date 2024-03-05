@@ -154,8 +154,13 @@ extend-safe-fixes = [
     "EM",     # Exception message variables
     "RUF013", # Implicit Optional
     "B006",   # Mutable default argument
+    "TID252", # Absolute imports over relative imports
 ]
 pylint.max-args = 7
 
 [tool.ruff.isort]
 known-first-party = ["eitprocessing"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+# Disallow all relative imports.
+ban-relative-imports = "all"
