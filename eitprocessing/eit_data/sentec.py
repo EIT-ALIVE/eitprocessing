@@ -98,11 +98,8 @@ class SentecEITData(EITData_):
         image = image[:n_images_added, :, :]
         n_frames = len(image) if image is not None else 0
 
-        if first_frame > index:
-            msg = (
-                f"Invalid input: `first_frame` {first_frame} is larger than the "
-                f"total number of frames in the file {index}.",
-            )
+        if (f0 := first_frame) > (fn := index):
+            msg = f"Invalid input: `first_frame` ({f0}) is larger than the total number of frames in the file ({fn})."
             raise ValueError(msg)
 
         if max_frames and n_frames != max_frames:
@@ -182,6 +179,7 @@ class SentecEITData(EITData_):
                 f"{n_pixels} which is not equal to the "
                 f"product of the width ({image_width}) and "
                 f"height ({image_height}) of the frame."
+                f"Image will not be stored."
             )
             raise OSError(msg)
 

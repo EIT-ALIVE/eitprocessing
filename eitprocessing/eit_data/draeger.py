@@ -43,18 +43,14 @@ class DraegerEITData(EITData_):
         file_size = path.stat().st_size
         if file_size % _FRAME_SIZE_BYTES:
             msg = (
-                f"File size {file_size} of file {path!s} not divisible by "
-                f"{_FRAME_SIZE_BYTES}.\n"
+                f"File size {file_size} of file {path!s} not divisible by {_FRAME_SIZE_BYTES}.\n"
                 f"Make sure this is a valid and uncorrupted Dräger data file."
             )
             raise OSError(msg)
         total_frames = file_size // _FRAME_SIZE_BYTES
 
-        if first_frame > total_frames:
-            msg = (
-                f"Invalid input: `first_frame` {first_frame} is larger than the "
-                f"total number of frames in the file {total_frames}."
-            )
+        if (f0 := first_frame) > (fn := total_frames):
+            msg = f"Invalid input: `first_frame` ({f0}) is larger than the total number of frames in the file ({fn})."
             raise ValueError(msg)
 
         n_frames = min(total_frames - first_frame, max_frames or sys.maxsize)
@@ -64,13 +60,12 @@ class DraegerEITData(EITData_):
                 f"The number of frames requested ({max_frames}) is larger "
                 f"than the available number ({n_frames}) of frames after "
                 f"the first frame selected ({first_frame}, total frames: "
-                f"{total_frames}).\n {n_frames} frames will be loaded.",
+                f"{total_frames}).\n {n_frames} frames will be loaded."
             )
             warnings.warn(msg)
 
-        # We need to load 1 frame before first actual frame to check if there
-        # is an event marker. Data for the pre-first (dummy) frame will be
-        # removed from self at the end of this function.
+        # We need to load 1 frame before first actual frame to check if there is an event marker. Data for the pre-first
+        # (dummy) frame will be removed from self at the end of this function.
         load_dummy_frame = first_frame > 0
         first_frame_to_load = first_frame - 1 if load_dummy_frame else 0
 
@@ -80,7 +75,7 @@ class DraegerEITData(EITData_):
         phases = []
         medibus_data = np.zeros((52, n_frames))
 
-        with open(path, "br") as fh:
+        with path.open("br") as fh:
             fh.seek(first_frame_to_load * _FRAME_SIZE_BYTES)
             reader = Reader(fh)
             previous_marker = None
@@ -120,7 +115,11 @@ class DraegerEITData(EITData_):
                 sparse_data_collections,
             ) = cls._convert_medibus_data(medibus_data)
 
-            return (eit_data_collection, continuous_data_collection, sparse_data_collections)
+            return (
+                eit_data_collection,
+                continuous_data_collection,
+                sparse_data_collections,
+            )
 
         return eit_data_collection
 
@@ -132,7 +131,7 @@ class DraegerEITData(EITData_):
         continuous_data_collection = DataCollection(ContinuousData)
         sparse_data_collection = DataCollection(SparseData)
 
-        for field_info, data in zip(medibus_fields, medibus_data, strict=False):
+        for field_info, data in zip(medibus_fields, medibus_data, strict=True):
             if field_info.continuous:
                 continuous_data = ContinuousData(
                     label=field_info.signal_name,
@@ -153,7 +152,7 @@ class DraegerEITData(EITData_):
         return continuous_data_collection, sparse_data_collection
 
     @classmethod
-    def _read_frame(
+    def _read_frame(  # noqa: PLR0913
         cls,
         reader: Reader,
         index: int,
