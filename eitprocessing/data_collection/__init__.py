@@ -15,6 +15,22 @@ V = TypeVar("V", bound=(EITData, ContinuousData, SparseData))
 
 
 class DataCollection(dict, Equivalence, Generic[V]):
+    """A collection of a single type of data with unique labels.
+
+    This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
+    ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects
+    added to the collection need to have a `label` attribute and a `concatenate()` method.
+
+    When adding an item to the collection, the type of the value has to match the data type of the collection.
+    Furthermore, the key has to match the attribute 'label' attached to the value.
+
+    The convenience method `add()` adds an item by setting the key to `value.label`.
+
+    Args:
+      - data_type: the type of data stored in this collection. Expected to be one of EITData,
+    ContinuousData or SparseData.
+    """
+
     data_type: type
 
     def __init__(self, data_type: type[V], *args, **kwargs):
@@ -28,6 +44,7 @@ class DataCollection(dict, Equivalence, Generic[V]):
         return super().__setitem__(__key, __value)
 
     def add(self, *item: V, overwrite: bool = False) -> None:
+        """Add one or multiple item(s) to the collection."""
         for item_ in item:
             self._check_item(item_, overwrite=overwrite)
             super().__setitem__(item_.label, item_)
@@ -63,6 +80,10 @@ class DataCollection(dict, Equivalence, Generic[V]):
         return {k: v for k, v in self.items() if len(v.derived_from) >= 1}
 
     def concatenate(self: Self[V], other: Self[V]) -> Self[V]:
+        """Concatenate this collection with an equivalent collection.
+
+        Each item of self of concatenated with the item of other with the same key.
+        """
         self.isequivalent(other, raise_=True)
 
         concatenated = self.__class__(self.data_type)
