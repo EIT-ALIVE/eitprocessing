@@ -178,15 +178,13 @@ class SentecEITData(EITData_):
         zero_ref = -reader.npfloat32(n_pixels)
 
         if image_width * image_height != n_pixels:
-            warnings.warn(
+            msg = (
                 f"The length of image array is "
                 f"{n_pixels} which is not equal to the "
                 f"product of the width ({image_width}) and "
                 f"height ({image_height}) of the frame."
-                f"Image will not be stored",
             )
-
-            return None
+            raise OSError(msg)
 
         return np.reshape(zero_ref, (image_width, image_height), order="C")
 
