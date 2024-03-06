@@ -84,7 +84,7 @@ class SelectByTime(SelectByIndex):
 
     time: NDArray
 
-    def select_by_time(  # noqa:D417
+    def select_by_time(
         self,
         start_time: float | None = None,
         end_time: float | None = None,
@@ -148,7 +148,8 @@ class SelectByTime(SelectByIndex):
         )
 
     @property
-    def t(self) -> TimeIndexer:  # noqa:D102
+    def t(self) -> TimeIndexer:
+        """Time Indexer property."""  # TODO: add a short explanation of what this is used for.
         return TimeIndexer(self)
 
 

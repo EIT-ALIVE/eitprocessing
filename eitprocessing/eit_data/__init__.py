@@ -86,9 +86,7 @@ class EITData(SelectByTime, Equivalence, ABC):
         sparse_datasets: list[DataCollection] = []
 
         for single_path in paths:
-            # this checks whether each path exists before any path is loaded to
-            # prevent unneccesary loading
-            single_path.resolve(strict=True)  # raises if file does not exists
+            single_path.resolve(strict=True)  # raise error if any file does not exist
 
         for single_path in paths:
             loaded_data = vendor_class._from_path(  # noqa: SLF001

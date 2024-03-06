@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import is_dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -23,11 +23,11 @@ class Equivalence:
             t2 = vars(other).values()
             if len(t1) != len(t2):
                 return False
-            return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2, strict=False))
+            return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2, strict=True))
         return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
-    def _array_safe_eq(a, b) -> bool:  # noqa: ANN001
+    def _array_safe_eq(a: Any, b: Any) -> bool:  # noqa: ANN401
         """Check if a and b are equal, even if they are numpy arrays containing nans."""
         if isinstance(a, np.ndarray) and isinstance(b, np.ndarray):
             return a.shape == b.shape and np.array_equal(a, b, equal_nan=True)

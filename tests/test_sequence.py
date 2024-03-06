@@ -63,15 +63,9 @@ def test_from_path_draeger(
         draeger_data2.eit_data["raw"],
     )
 
-    # draeger_inverted = Sequence(
-    #     "",
-    #     EITData.from_path(
-    #         path=[draeger_file2, draeger_file1],
-    #         vendor="draeger",
-    #     ),
-    # )
-    # assert len(draeger_data_both) == len(draeger_inverted)
-    # assert draeger_data_both != draeger_inverted
+    # draeger_inverted = Sequence(EITData.from_path([draeger_file1, draeger_file2], vendor="draeger"))  #noqa: ERA001
+    # assert len(draeger_data_both) == len(draeger_inverted)  #noqa: ERA001
+    # assert draeger_data_both != draeger_inverted  #noqa: ERA001
 
 
 def test_from_path_timpel(
@@ -86,8 +80,8 @@ def test_from_path_timpel(
     assert timpel_data.eit_data["raw"].vendor != draeger_data1.eit_data["raw"].vendor
 
     # Load multiple
-    # assert isinstance(timpel_data_double, Sequence)
-    # assert len(timpel_data_double) == 2 * len(timpel_data)
+    # assert isinstance(timpel_data_double, Sequence)  #noqa: ERA001
+    # assert len(timpel_data_double) == 2 * len(timpel_data)  #noqa: ERA001
 
 
 def test_illegal_from_path():

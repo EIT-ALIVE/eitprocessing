@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 from scipy import signal
 
-from . import TimeDomainFilter
+from eitprocessing.filters import TimeDomainFilter
 
 
 @dataclass(kw_only=True)
