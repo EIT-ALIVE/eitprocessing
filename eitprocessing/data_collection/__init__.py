@@ -1,19 +1,25 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Generic, TypeVar
 
+from eitprocessing.continuous_data import ContinuousData
+from eitprocessing.eit_data import EITData
 from eitprocessing.mixins.equality import Equivalence
+from eitprocessing.sparse_data import SparseData
 
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-V = TypeVar("V")
+V = TypeVar("V", bound=(EITData, ContinuousData, SparseData))
 
 
 class DataCollection(dict, Equivalence, Generic[V]):
     data_type: type
 
     def __init__(self, data_type: type[V], *args, **kwargs):
+        if data_type not in (EITData, ContinuousData, SparseData):
+            warnings.warn(f"Type {data_type} not expected to be stored in a DataCollection.")
         self.data_type = data_type
         super().__init__(*args, **kwargs)
 
