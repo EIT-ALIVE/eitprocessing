@@ -108,7 +108,7 @@ class ContinuousData:
         copy.values = function(copy.values, **func_args)
         return copy
 
-    def lock(self) -> None:
+    def lock(self, attr: str = "values") -> None:
         """Lock the values attribute.
 
         When the values attribute is locked, it cannot be replaced or changed.
@@ -117,14 +117,14 @@ class ContinuousData:
 
         The values can be unlocked using `unlock()`.
         """
-        self.values.flags["WRITEABLE"] = False
+        getattr(self, attr).flags["WRITEABLE"] = False
 
-    def unlock(self) -> None:
+    def unlock(self, attr: str = "values") -> None:
         """Unlocks the values attribute.
 
         See lock().
         """
-        self.values.flags["WRITEABLE"] = True
+        getattr(self, attr).flags["WRITEABLE"] = True
 
     @property
     def locked(self) -> bool:
