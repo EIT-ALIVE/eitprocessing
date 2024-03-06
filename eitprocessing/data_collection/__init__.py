@@ -80,7 +80,7 @@ class DataCollection(dict, Equivalence, Generic[V]):
 
     def get_derived_data(self) -> dict[str, V]:
         """Return all data that was derived from any source."""
-        return {k: v for k, v in self.items() if len(v.derived_from) >= 1}
+        return {k: v for k, v in self.items() if v.derived_from}
 
     def concatenate(self: Self[V], other: Self[V]) -> Self[V]:
         """Concatenate this collection with an equivalent collection.
