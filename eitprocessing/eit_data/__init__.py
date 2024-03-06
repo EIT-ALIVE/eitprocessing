@@ -298,5 +298,5 @@ class EITData_(EITData):  # noqa: N801
         )
 
 
-class UnknownVendorError(Exception):
+class UnknownVendorError(ValueError):
     """Raised when an unknown vendor is provided when trying to load data."""
