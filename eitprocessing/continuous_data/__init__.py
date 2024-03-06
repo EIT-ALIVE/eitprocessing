@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from eitprocessing.mixins.equality import Equivalence
+from eitprocessing.mixins.slicing import SelectByTime
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -12,7 +15,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class ContinuousData:
+class ContinuousData(Equivalence, SelectByTime):
     """Data class for (non-EIT) data with a continuous time axis.
 
     Args:
@@ -33,11 +36,13 @@ class ContinuousData:
     description: str = ""
     parameters: dict[str, Any] = field(default_factory=dict)
     derived_from: Any | list[Any] = field(default_factory=list)
+    time: np.ndarray = field(kw_only=True)
     values: np.ndarray = field(kw_only=True)
 
     def __post_init__(self) -> None:
         if self.loaded:
             self.lock()
+        self.lock("time")
 
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
         if attr == "values" and self.locked:
@@ -70,6 +75,7 @@ class ContinuousData:
             # data is not directly edited afer copying but overridden instead;
             # consider creating a view and locking it, requiring the user to
             # make a copy if they want to edit the data directly
+            time=np.copy(self.time),
             values=np.copy(self.values),
         )
         obj.unlock()
