@@ -60,10 +60,13 @@ class DataCollection(dict, Equivalence, Generic[V]):
             raise TypeError(msg)
 
         if key and key != item.label:
+            # It is expected that an item in this collection has a key equal to the label of the value.
             msg = f"'{key}' does not match label '{item.label}'."
             raise KeyError(msg)
 
         if not overwrite and key in self:
+            # Generally it is not expected one would want to overwrite existing data with different/derived data. One
+            # should probably change the label instead over overwriting existing data.
             msg = f"Item with label {key} already exists. Use `overwrite=True` to overwrite."
             raise KeyError(msg)
 
