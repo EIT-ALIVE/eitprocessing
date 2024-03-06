@@ -19,8 +19,6 @@ from eitprocessing.sparse_data import SparseData
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-PathLike: TypeAlias = str | Path
-PathArg: TypeAlias = PathLike | list[PathLike]
 T = TypeVar("T", bound="EITData")
 
 
@@ -44,7 +42,7 @@ class EITData(SelectByTime, Equivalence, ABC):
     @classmethod
     def from_path(
         cls,
-        path: PathArg,
+        path: str | Path | list[str | Path],
         vendor: Vendor | str,
         framerate: float | None = None,
         first_frame: int = 0,
@@ -145,7 +143,7 @@ class EITData(SelectByTime, Equivalence, ABC):
         ...
 
     @staticmethod
-    def _ensure_path_list(path: PathArg) -> list[Path]:
+    def _ensure_path_list(path: str | Path | list[str | Path]) -> list[Path]:
         if isinstance(path, list):
             return [Path(p) for p in path]
         return [Path(path)]
@@ -284,7 +282,7 @@ class EITData_(EITData):  # noqa: N801
     @classmethod
     def from_path(
         cls,
-        path: PathArg,
+        path: str | Path | list[str | Path],
         framerate: float | None = None,
         first_frame: int = 0,
         max_frames: int | None = None,
