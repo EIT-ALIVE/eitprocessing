@@ -106,12 +106,9 @@ class EITData(SelectByTime, Equivalence, ABC):
                 else:
                     eit, continuous, sparse = loaded_data
 
-                if TYPE_CHECKING:
-                    # These asserts tells the type checker they can assume these are the types of these variables.
-                    # Required due to multiple return types for _from_path().
-                    assert isinstance(eit, DataCollection)
-                    assert isinstance(continuous, DataCollection)
-                    assert isinstance(sparse, DataCollection)
+                eit: DataCollection
+                continuous: DataCollection
+                sparse: DataCollection
 
                 eit_datasets.append(eit)
                 continuous_datasets.append(continuous)
