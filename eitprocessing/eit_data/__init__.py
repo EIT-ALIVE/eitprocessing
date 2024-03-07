@@ -22,6 +22,19 @@ T = TypeVar("T", bound="EITData")
 
 @dataclass(eq=False)
 class EITData(SelectByTime, Equivalence, ABC):
+    """Container for EIT data.
+
+    This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
+    class is meant to hold data from (part of) a singular continuous measurement.
+
+    This class can't be initialized directly. Instead, use `EITData.from_path(...)` to load data from disk.
+    Currently, loading data from three vendors is supported. You can either pass the vendor when using
+    `EITData.from_path(..., vendor="timpel")`, or use one of the available subclasses of EITData:
+    `SentecEITData.from_path(...)`.
+
+    Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
+    """
+
     path: Path | list[Path]
     nframes: int
     time: NDArray
@@ -50,27 +63,27 @@ class EITData(SelectByTime, Equivalence, ABC):
         """Load sequence from path(s).
 
         Args:
-            path (Path | str | list[Path | str]): path(s) to data file.
+            path (Path | str | list[Path | str]): relative or absolute path(s) to data file.
             vendor (Vendor | str): vendor indicating the device used.
             label (str): description of object for human interpretation.
                 Defaults to "Sequence_<unique_id>".
             framerate (int, optional): framerate at which the data was recorded.
                 Default for Draeger: 20
                 Default for Timpel: 50
-            first_frame (int, optional): index of first time point of sequence
-                (i.e. NOT the timestamp).
+                Default for Sentec: 50.2
+            first_frame (int, optional): index of first frame to load.
                 Defaults to 0.
             max_frames (int, optional): maximum number of frames to load.
                 The actual number of frames can be lower than this if this
                 would surpass the final frame.
-            return_non_eit_data (bool): whether to load continuous and sparse data.
+            return_non_eit_data (bool): whether to load available continuous and sparse data.
 
         Raises:
             NotImplementedError: is raised when there is no loading method for
             the given vendor.
 
         Returns:
-            Sequence: a sequence containing the loaded data from all files in path
+            EITData: container for the loaded data and metadata from all files in path.
         """
         vendor = cls._ensure_vendor(vendor)
         vendor_class = cls._get_vendor_class(vendor)
@@ -247,27 +260,38 @@ class EITData(SelectByTime, Equivalence, ABC):
 
     @property
     def global_baseline(self) -> np.ndarray:
+        """Return the global baseline, i.e. the minimum pixel impedance across all pixels."""
         return np.nanmin(self.pixel_impedance)
 
     @property
     def pixel_impedance_global_offset(self) -> np.ndarray:
+        """Return the pixel impedance with the global baseline removed.
+
+        In the resulting array the minimum impedance across all pixels is set to 0.
+        """
         return self.pixel_impedance - self.global_baseline
 
     @property
     def pixel_baseline(self) -> np.ndarray:
+        """Return the lowest value in each individual pixel over time."""
         return np.nanmin(self.pixel_impedance, axis=0)
 
     @property
     def pixel_impedance_individual_offset(self) -> np.ndarray:
-        return self.pixel_impedance - np.min(self.pixel_impedance, axis=0)
+        """Return the pixel impedance with the baseline of each individual pixel removed.
+
+        Each pixel in the resulting array has a minimum value of 0.
+        """
+        return self.pixel_impedance - self.pixel_baseline
 
     @property
     def global_impedance(self) -> np.ndarray:
+        """Return the global impedance, i.e. the sum of all pixels at each frame."""
         return np.nansum(self.pixel_impedance, axis=(1, 2))
 
 
 @dataclass(eq=False)
-class EITData_(EITData):  # noqa: N801
+class EITData_(EITData):  # noqa: N801, D101
     vendor: Vendor = field(init=False)
 
     def __add__(self: T, other: T) -> T:

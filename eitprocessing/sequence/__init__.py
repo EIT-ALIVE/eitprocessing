@@ -43,6 +43,7 @@ class Sequence(Equivalence, SelectByTime):
 
     @property
     def time(self) -> np.ndarray:
+        """Time axis from either EITData or ContinuousData."""
         if len(self.eit_data):
             return self.eit_data["raw"].time
         if len(self.continuous_data):

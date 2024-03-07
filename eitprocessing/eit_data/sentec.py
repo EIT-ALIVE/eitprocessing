@@ -187,14 +187,20 @@ class SentecEITData(EITData_):
 
 
 class Domain(IntEnum):
+    """Domain loaded data falls in."""
+
     MEASUREMENT = 16
     CONFIGURATION = 64
 
 
 class MeasurementDataID(IntEnum):
+    """ID of measured data."""
+
     TIMESTAMP = 0
     ZERO_REF_IMAGE = 5
 
 
 class ConfigurationDataID(IntEnum):
+    """ID of configuration data."""
+
     FRAMERATE = 1

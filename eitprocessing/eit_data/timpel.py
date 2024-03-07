@@ -25,6 +25,8 @@ _NAN_VALUE = -1000
 
 @dataclass(eq=False)
 class TimpelEITData(EITData_):
+    """Container for data measured by Timpel EIT device."""
+
     framerate: float = 50
     vendor: Vendor = field(default=Vendor.TIMPEL, init=False)
 
