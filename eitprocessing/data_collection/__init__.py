@@ -11,7 +11,7 @@ from eitprocessing.sparse_data import SparseData
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-V = TypeVar("V", bound=(EITData, ContinuousData, SparseData))
+V = TypeVar("V", EITData, ContinuousData, SparseData))
 
 
 class DataCollection(dict, Equivalence, Generic[V]):
