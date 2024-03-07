@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 from eitprocessing.continuous_data import ContinuousData
@@ -11,7 +10,7 @@ from eitprocessing.sparse_data import SparseData
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-V = TypeVar("V", EITData, ContinuousData, SparseData))
+V = TypeVar("V", EITData, ContinuousData, SparseData)
 
 
 class DataCollection(dict, Equivalence, Generic[V]):
