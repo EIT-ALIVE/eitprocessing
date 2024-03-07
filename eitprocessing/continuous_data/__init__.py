@@ -114,7 +114,7 @@ class ContinuousData(Equivalence, SelectByTime):
         copy.values = function(copy.values, **func_args)
         return copy
 
-    def lock(self, attr: str = "values") -> None:
+    def lock(self, *attr: str) -> None:
         """Lock the values attribute.
 
         When the values attribute is locked, it cannot be replaced or changed.
@@ -123,14 +123,22 @@ class ContinuousData(Equivalence, SelectByTime):
 
         The values can be unlocked using `unlock()`.
         """
-        getattr(self, attr).flags["WRITEABLE"] = False
+        if not len(attr):
+            # default values are not allowed when using *attr, so set a default here if none is supplied
+            attr = ["values"]
+        for attr_ in attr:
+            getattr(self, attr_).flags["WRITEABLE"] = False
 
-    def unlock(self, attr: str = "values") -> None:
+    def unlock(self, *attr: str) -> None:
         """Unlocks the values attribute.
 
         See lock().
         """
-        getattr(self, attr).flags["WRITEABLE"] = True
+        if not len(attr):
+            # default values are not allowed when using *attr, so set a default here if none is supplied
+            attr = ["values"]
+        for attr_ in attr:
+            getattr(self, attr_).flags["WRITEABLE"] = True
 
     @property
     def locked(self) -> bool:
