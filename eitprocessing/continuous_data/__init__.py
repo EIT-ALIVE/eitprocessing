@@ -115,13 +115,18 @@ class ContinuousData(Equivalence, SelectByTime):
         return copy
 
     def lock(self, *attr: str) -> None:
-        """Lock the values attribute.
+        """Lock attributes, essentially rendering them read-only.
 
-        When the values attribute is locked, it cannot be replaced or changed.
-        `data.values = [1, 2, 3]` will result in an AttributeError being raised.
-        `data.values[0] = 1` will result in a RuntimeError being raised.
+        Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.
 
-        The values can be unlocked using `unlock()`.
+        Args:
+            *attr: any number of attributes can be passed here, all of which will be locked. Defaults to "values".
+
+        Examples:
+            >>> # lock the `values` attribute of `data`
+            >>> data.lock()
+            >>> data.values = [1, 2, 3] # will result in an AttributeError
+            >>> data.values[0] = 1      # will result in a RuntimeError
         """
         if not len(attr):
             # default values are not allowed when using *attr, so set a default here if none is supplied
@@ -130,9 +135,25 @@ class ContinuousData(Equivalence, SelectByTime):
             getattr(self, attr_).flags["WRITEABLE"] = False
 
     def unlock(self, *attr: str) -> None:
-        """Unlocks the values attribute.
+        """Unlock attributes, rendering them editable.
 
-        See lock().
+        Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.
+
+        Args:
+            *attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to "values".
+
+        Examples:
+            >>> # lock the `values` attribute of `data`
+            >>> data.lock()
+            >>> data.values = [1, 2, 3] # will result in an AttributeError
+            >>> data.values[0] = 1      # will result in a RuntimeError
+            >>> data.unlock()
+            >>> data.values = [1, 2, 3]
+            >>> print(data.values)
+            [1,2,3]
+            >>> data.values[0] = 1      # will result in a RuntimeError
+            >>> print(data.values)
+            1
         """
         if not len(attr):
             # default values are not allowed when using *attr, so set a default here if none is supplied
