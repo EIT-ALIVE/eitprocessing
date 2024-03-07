@@ -63,20 +63,20 @@ class EITData(SelectByTime, Equivalence, ABC):
         """Load sequence from path(s).
 
         Args:
-            path (Path | str | list[Path | str]): relative or absolute path(s) to data file.
-            vendor (Vendor | str): vendor indicating the device used.
-            label (str): description of object for human interpretation.
+            path: relative or absolute path(s) to data file.
+            vendor: vendor indicating the device used.
+            label: description of object for human interpretation.
                 Defaults to "Sequence_<unique_id>".
-            framerate (int, optional): framerate at which the data was recorded.
+            framerate: framerate at which the data was recorded.
                 Default for Draeger: 20
                 Default for Timpel: 50
                 Default for Sentec: 50.2
-            first_frame (int, optional): index of first frame to load.
+            first_frame: index of first frame to load.
                 Defaults to 0.
-            max_frames (int, optional): maximum number of frames to load.
+            max_frames: maximum number of frames to load.
                 The actual number of frames can be lower than this if this
                 would surpass the final frame.
-            return_non_eit_data (bool): whether to load available continuous and sparse data.
+            return_non_eit_data: whether to load available continuous and sparse data.
 
         Raises:
             NotImplementedError: is raised when there is no loading method for
@@ -148,7 +148,8 @@ class EITData(SelectByTime, Equivalence, ABC):
         first_frame: int | None = None,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]: ...
+    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
+        ...
 
     @staticmethod
     def _ensure_path_list(path: str | Path | list[str | Path]) -> list[Path]:

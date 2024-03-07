@@ -26,8 +26,8 @@ class DataCollection(dict, Equivalence, Generic[V]):
     The convenience method `add()` adds an item by setting the key to `value.label`.
 
     Args:
-      - data_type: the type of data stored in this collection. Expected to be one of EITData,
-    ContinuousData or SparseData.
+        data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or
+        SparseData.
     """
 
     data_type: type
