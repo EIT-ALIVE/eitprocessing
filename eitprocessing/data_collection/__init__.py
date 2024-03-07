@@ -55,6 +55,23 @@ class DataCollection(dict, Equivalence, Generic[V]):
         key: str | None = None,
         overwrite: bool = False,
     ) -> None:
+        """Check whether the item can be added to the collection.
+
+        In order to be added to the collection, the data type of the item has to match the data type set in the
+        collection. They key that is used to store the item in the collection has to match the label of the item itself.
+        By default, existing keys can not be overridden.
+
+        Args:
+            item: Object to be added to the collection.
+            key: Key of the item. Has to match `item.label`.
+            overwrite: If False, the key can not already exist in the collection. Set to True to allow overwriting an
+            existing object in the collection.
+
+        Raises:
+            TypeError: If the type of the item does not match the type set in the collection.
+            KeyError: If the key does not match `item.label`, or when the key already exists in de collection and
+            overwrite is set to False.
+        """
         if not isinstance(item, self.data_type):
             msg = f"Type of `data` is {type(item)}, not '{self.data_type}'"
             raise TypeError(msg)
