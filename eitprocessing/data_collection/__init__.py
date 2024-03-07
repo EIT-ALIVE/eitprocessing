@@ -34,8 +34,9 @@ class DataCollection(dict, Equivalence, Generic[V]):
     data_type: type
 
     def __init__(self, data_type: type[V], *args, **kwargs):
-        if data_type not in (EITData, ContinuousData, SparseData):
-            warnings.warn(f"Type {data_type} not expected to be stored in a DataCollection.")
+        if data_type not in (V.__constraints__):
+            msg = f"Type {data_type} not expected to be stored in a DataCollection."
+            raise ValueError(msg)
         self.data_type = data_type
         super().__init__(*args, **kwargs)
 
