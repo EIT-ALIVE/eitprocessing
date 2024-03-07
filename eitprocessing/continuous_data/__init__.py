@@ -45,8 +45,9 @@ class ContinuousData(Equivalence, SelectByTime):
         self.lock("time")
 
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
-        if attr == "values" and self.locked:
-            msg = "Attribute 'values' is locked and can't be overwritten."
+        old_value = getattr(self, attr)
+        if isinstance(old_value, np.ndarray) and old_value.flags["WRITEABLE"] is False:
+            msg = f"Attribute '{attr}' is locked and can't be overwritten."
             raise AttributeError(msg)
         super().__setattr__(self, attr, value)
 
