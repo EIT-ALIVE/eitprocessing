@@ -33,7 +33,7 @@ class DataCollection(dict, Equivalence, Generic[V]):
     data_type: type
 
     def __init__(self, data_type: type[V], *args, **kwargs):
-        if data_type not in (V.__constraints__):
+        if not any(issubclass(data_type, cls) for cls in V.__constraints__):
             msg = f"Type {data_type} not expected to be stored in a DataCollection."
             raise ValueError(msg)
         self.data_type = data_type
