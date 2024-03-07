@@ -9,12 +9,10 @@ from typing import TYPE_CHECKING, TypeAlias, TypeVar
 import numpy as np
 from typing_extensions import Self, override
 
-from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
-from eitprocessing.sparse_data import SparseData
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -98,6 +96,9 @@ class EITData(SelectByTime, Equivalence, ABC):
             )
 
             if return_non_eit_data:
+                from eitprocessing.continuous_data import ContinuousData
+                from eitprocessing.sparse_data import SparseData
+
                 if type(loaded_data) is not tuple:
                     eit = loaded_data
                     continuous = DataCollection(ContinuousData)
