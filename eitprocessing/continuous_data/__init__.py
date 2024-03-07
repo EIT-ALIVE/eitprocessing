@@ -174,3 +174,26 @@ class ContinuousData(Equivalence, SelectByTime):
     def loaded(self) -> bool:
         """Return whether the data was loaded from disk, or derived from elsewhere."""
         return len(self.derived_from) == 0
+
+    def _sliced_copy(
+        self,
+        start_index: int,
+        end_index: int,
+        label: str,
+    ) -> Self:
+        # TODO: check correct implementation
+        cls = self.__class__
+        time = self.time[start_index:end_index]
+        values = self.values[start_index:end_index]
+        description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
+
+        return cls(
+            label=label,
+            name=self.name,
+            unit=self.unit,
+            category=self.category,
+            description=description,
+            derived_from=[*self.derived_from, self],
+            time=time,
+            values=values,
+        )
