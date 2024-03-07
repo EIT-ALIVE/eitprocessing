@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import reduce
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 from typing_extensions import Self, override
@@ -190,7 +190,7 @@ class EITData(SelectByTime, Equivalence, ABC):
             msg = f"Unknown vendor {vendor}."
             raise UnknownVendorError(msg) from e
 
-    def concatenate(self: T, other: T, label: str | None = None) -> T:
+    def concatenate(self: T, other: T, label: str | None = None) -> T:  # noqa: D102, will be removed soon
         cls = self.__class__
         self.isequivalent(other, raise_=True)
 
