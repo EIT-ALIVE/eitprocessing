@@ -1,11 +1,17 @@
-from abc import ABC
-from dataclasses import astuple, is_dataclass
+from __future__ import annotations
+
+from dataclasses import is_dataclass
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from typing_extensions import Self
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 
-class Equivalence(ABC):
+class Equivalence:
+    """Mixin class that adds an equality and equivalence check."""
+
     # inspired by: https://stackoverflow.com/a/51743960/5170442
     def __eq__(self, other: Self):
         if self is other:
@@ -13,23 +19,34 @@ class Equivalence(ABC):
         if is_dataclass(self):
             if self.__class__ is not other.__class__:
                 return NotImplemented
-            t1 = astuple(self)
-            t2 = astuple(other)
-            return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2))
+            t1 = vars(self).values()
+            t2 = vars(other).values()
+            if len(t1) != len(t2):
+                return False
+            return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2, strict=True))
         return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
-    def _array_safe_eq(a, b) -> bool:
+    def _array_safe_eq(a: Any, b: Any) -> bool:  # noqa: ANN401
         """Check if a and b are equal, even if they are numpy arrays containing nans."""
-
         if isinstance(a, np.ndarray) and isinstance(b, np.ndarray):
             return a.shape == b.shape and np.array_equal(a, b, equal_nan=True)
+
+        if not isinstance(a, Equivalence) and not isinstance(b, Equivalence):
+            return a == b
+
+        if isinstance(a, dict) and isinstance(b, dict):
+            return dict.__eq__(a, b)
+
         try:
-            return object.__eq__(a, b)  # `a == b` could trigger an infinite loop
+            # `a == b` could trigger an infinite loop when called on an instance of Equivalence
+            # object.__eq__() works for most objects, except those implemented seperately above
+            return object.__eq__(a, b)
+
         except TypeError:
             return NotImplemented
 
-    def isequivalent(self, other: Self, raise_: bool = False) -> bool:
+    def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901
         """Test whether the data structure between two objects are equivalent.
 
         Equivalence, in this case means that objects are compatible e.g. to be
@@ -50,29 +67,25 @@ class Equivalence(ABC):
         Returns:
             bool describing result of equivalence comparison.
         """
-
         if self == other:
             return True
 
         try:
             # check whether types match
             if type(self) is not type(other):
-                raise EquivalenceError(
-                    f"Types don't match: {type(self)}, {type(other)}"
-                )
+                msg = f"Types don't match: {type(self)}, {type(other)}"
+                raise EquivalenceError(msg)  # noqa: TRY301
 
             # check keys in collection
             if isinstance(self, dict):
                 if set(self.keys()) != set(other.keys()):
-                    raise EquivalenceError(
-                        f"Keys don't match:\n\t{self.keys()},\n\t{other.keys()}"
-                    )
+                    msg = f"Keys don't match:\n\t{self.keys()},\n\t{other.keys()}"
+                    raise EquivalenceError(msg)  # noqa: TRY301
 
                 for key in self:
                     if not self[key].isequivalent(other[key], False):
-                        raise EquivalenceError(
-                            f"Data in {key} doesn't match: {self[key]}, {other[key]}"
-                        )
+                        msg = f"Data in {key} doesn't match: {self[key]}, {other[key]}"
+                        raise EquivalenceError(msg)  # noqa: TRY301
 
             # check attributes of data
             else:
@@ -82,9 +95,9 @@ class Equivalence(ABC):
                         raise f"{attr.capitalize()}s don't match: {s}, {o}"
 
         # raise or return if a check fails
-        except EquivalenceError as e:
+        except EquivalenceError:
             if raise_:
-                raise e
+                raise
             return False
 
         # if all checks pass

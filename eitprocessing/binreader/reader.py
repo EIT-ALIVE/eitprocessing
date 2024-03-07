@@ -1,11 +1,10 @@
 import io
 import struct
 from dataclasses import dataclass
-from typing import Any
-from typing import TypeVar
+from typing import Any, TypeVar
+
 import numpy as np
 from numpy.typing import NDArray
-
 
 T = TypeVar("T")
 N = TypeVar("N", bound=np.number)
@@ -23,8 +22,7 @@ class Reader:
     def read_list(self, type_code: str, cast: type[T], length: int) -> list[T]:
         full_type_code = f"{length}{type_code}"
         data = self._read_full_type_code(full_type_code)
-        data = [cast(d) for d in data]
-        return data
+        return [cast(d) for d in data]
 
     def read_array(
         self,
@@ -39,24 +37,20 @@ class Reader:
     def read_string(self, length=1):
         full_type_code = f"{length}s"
         data = self._read_full_type_code(full_type_code)
-        data = data[0].decode().rstrip()
-        return data
+        return data[0].decode().rstrip()
 
     def _read_full_type_code(self, full_type_code) -> tuple[Any, ...]:
         if self.endian:
             if self.endian not in ["little", "big"]:
-                raise ValueError(
-                    f"Endian type '{self.endian}' not recognized. "
-                    f"Allowed values are 'little' and 'big'."
-                )
+                msg = f"Endian type '{self.endian}' not recognized. Allowed values are 'little' and 'big'."
+                raise ValueError(msg)
 
             prefix = "<" if self.endian == "little" else ">"
             full_type_code = prefix + full_type_code
 
         data_size = struct.calcsize(full_type_code)
         packed_data = self.file_handle.read(data_size)
-        data = struct.unpack(full_type_code, packed_data)
-        return data
+        return struct.unpack(full_type_code, packed_data)
 
     def float32(self) -> float:
         return self.read_single(type_code="f", cast=float)

@@ -1,42 +1,44 @@
+from __future__ import annotations
+
 import warnings
 from dataclasses import dataclass, field
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import NDArray
-from typing_extensions import Self
 
-from eitprocessing.continuous_data.continuous_data_collection import (
-    ContinuousDataCollection,
-)
+from eitprocessing.continuous_data import ContinuousData
+from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData_
-from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 from eitprocessing.eit_data.phases import MaxValue, MinValue, QRSMark
 from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.sparse_data.sparse_data_collection import SparseDataCollection
-from eitprocessing.variants.variant_collection import VariantCollection
+from eitprocessing.sparse_data import SparseData
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from numpy.typing import NDArray
+
+
+_COLUMN_WIDTH = 1030
+_NAN_VALUE = -1000
 
 
 @dataclass(eq=False)
 class TimpelEITData(EITData_):
+    """Container for data measured by Timpel EIT device."""
+
     framerate: float = 50
     vendor: Vendor = field(default=Vendor.TIMPEL, init=False)
-    variants: VariantCollection = field(
-        default_factory=lambda: VariantCollection(EITDataVariant)
-    )
 
     @classmethod
-    def _from_path(  # pylint: disable=too-many-arguments,too-many-locals
+    def _from_path(  # noqa: C901
         cls,
         path: Path,
-        label: str | None = None,
         framerate: float | None = 20,
         first_frame: int = 0,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> Self | tuple[Self, ContinuousDataCollection, SparseDataCollection]:
-        COLUMN_WIDTH = 1030
-
+    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
         if not framerate:
             framerate = cls.framerate
 
@@ -49,22 +51,22 @@ class TimpelEITData(EITData_):
                 max_rows=max_frames,
             )
         except UnicodeDecodeError as e:
-            raise OSError(
+            msg = (
                 f"File {path} could not be read as Timpel data.\n"
                 "Make sure this is a valid and uncorrupted Timpel data file.\n"
                 f"Original error message: {e}"
-            ) from e
+            )
+            raise OSError(msg) from e
 
-        if data.shape[1] != COLUMN_WIDTH:
-            raise OSError(
-                f"Input does not have a width of {COLUMN_WIDTH} columns.\n"
+        if data.shape[1] != _COLUMN_WIDTH:
+            msg = (
+                f"Input does not have a width of {_COLUMN_WIDTH} columns.\n"
                 "Make sure this is a valid and uncorrupted Timpel data file."
             )
+            raise OSError(msg)
         if data.shape[0] == 0:
-            raise ValueError(
-                f"Invalid input: `first_frame` {first_frame} is larger than the "
-                f"total number of frames in the file."
-            )
+            msg = f"Invalid input: `first_frame` {first_frame} is larger than the total number of frames in the file."
+            raise ValueError(msg)
 
         if max_frames and data.shape[0] == max_frames:
             nframes = max_frames
@@ -74,7 +76,7 @@ class TimpelEITData(EITData_):
                     f"The number of frames requested ({max_frames}) is larger "
                     f"than the available number ({data.shape[0]}) of frames after "
                     f"the first frame selected ({first_frame}).\n"
-                    f"{data.shape[0]} frames have been loaded."
+                    f"{data.shape[0]} frames have been loaded.",
                 )
             nframes = data.shape[0]
 
@@ -88,43 +90,76 @@ class TimpelEITData(EITData_):
 
         pixel_impedance = data[:, :1024]
         pixel_impedance = np.reshape(pixel_impedance, newshape=(-1, 32, 32), order="C")
-        pixel_impedance = np.where(pixel_impedance == -1000, np.nan, pixel_impedance)
+
+        pixel_impedance = np.where(pixel_impedance == _NAN_VALUE, np.nan, pixel_impedance)
 
         # extract waveform data
         # TODO: properly export waveform data
-        waveform_data = {  # noqa
-            "airway_pressure": data[:, 1024],
-            "flow": data[:, 1025],
-            "volume": data[:, 1026],
-        }
+
+        continuous_data_collection = DataCollection(ContinuousData)
+        continuous_data_collection.add(
+            ContinuousData(
+                "airway_pressure_(timpel)",
+                "Airway pressure",
+                "cmH2O",
+                "pressure",
+                "Airway pressure measured by Timpel device",
+                loaded=True,
+                values=data[:, 1024],
+            ),
+        )
+
+        continuous_data_collection.add(
+            ContinuousData(
+                "flow_(timpel)",
+                "Flow",
+                "L/s",
+                "flow",
+                "FLow measures by Timpel device",
+                loaded=True,
+                values=data[:, 1025],
+            ),
+        )
+
+        continuous_data_collection.add(
+            ContinuousData(
+                "volume_(timpel)",
+                "Volume",
+                "L",
+                "volume",
+                "Volume measured by Timpel device",
+                loaded=True,
+                values=data[:, 1026],
+            ),
+        )
 
         # extract breath start, breath end and QRS marks
         phases = []
         for index in np.flatnonzero(data[:, 1027] == 1):
-            phases.append(MinValue(index, time[int(index)]))
+            phases.append(MinValue(index, time[int(index)]))  # noqa: PERF401
 
         for index in np.flatnonzero(data[:, 1028] == 1):
-            phases.append(MaxValue(index, time[int(index)]))
+            phases.append(MaxValue(index, time[int(index)]))  # noqa: PERF401
 
         for index in np.flatnonzero(data[:, 1029] == 1):
-            phases.append(QRSMark(index, time[int(index)]))
+            phases.append(QRSMark(index, time[int(index)]))  # noqa: PERF401
 
         phases.sort(key=lambda x: x.index)
 
-        obj = cls(
-            path=path,
-            nframes=nframes,
-            time=time,
-            framerate=framerate,
-            phases=phases,
-            label=label,
-        )
-        obj.variants.add(
-            EITDataVariant(
+        eit_data_collection = DataCollection(cls)
+        eit_data_collection.add(
+            cls(
                 label="raw",
-                description="raw impedance data",
+                path=path,
+                nframes=nframes,
+                time=time,
+                framerate=framerate,
+                phases=phases,
                 pixel_impedance=pixel_impedance,
-            )
+            ),
         )
 
-        return obj
+        if return_non_eit_data:
+            return eit_data_collection, continuous_data_collection, DataCollection(SparseData)
+
+        return eit_data_collection
