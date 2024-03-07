@@ -9,13 +9,14 @@ from typing import TYPE_CHECKING, TypeVar
 import numpy as np
 from typing_extensions import Self, override
 
-from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+
+    from eitprocessing.data_collection import DataCollection
 
 T = TypeVar("T", bound="EITData")
 
@@ -85,6 +86,8 @@ class EITData(SelectByTime, Equivalence, ABC):
         Returns:
             EITData: container for the loaded data and metadata from all files in path.
         """
+        from eitprocessing.data_collection import DataCollection
+
         vendor = cls._ensure_vendor(vendor)
         vendor_class = cls._get_vendor_class(vendor)
 
@@ -148,8 +151,7 @@ class EITData(SelectByTime, Equivalence, ABC):
         first_frame: int | None = None,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
-        ...
+    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]: ...
 
     @staticmethod
     def _ensure_path_list(path: str | Path | list[str | Path]) -> list[Path]:
