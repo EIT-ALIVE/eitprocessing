@@ -113,7 +113,7 @@ class DraegerEITData(EITData_):
             (
                 continuous_data_collection,
                 sparse_data_collections,
-            ) = cls._convert_medibus_data(medibus_data)
+            ) = cls._convert_medibus_data(medibus_data, time)
 
             return (
                 eit_data_collection,
@@ -127,6 +127,7 @@ class DraegerEITData(EITData_):
     def _convert_medibus_data(
         cls,
         medibus_data: NDArray,
+        time: NDArray,
     ) -> tuple[DataCollection, DataCollection]:
         continuous_data_collection = DataCollection(ContinuousData)
         sparse_data_collection = DataCollection(SparseData)
@@ -138,7 +139,7 @@ class DraegerEITData(EITData_):
                     name=field_info.signal_name,
                     description=f"Continuous {field_info.signal_name} data loaded from file",
                     unit=field_info.unit,
-                    loaded=True,
+                    time=time,
                     values=data,
                     category=field_info.signal_name,
                 )
