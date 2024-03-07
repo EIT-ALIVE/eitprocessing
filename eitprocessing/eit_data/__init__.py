@@ -145,9 +145,9 @@ class EITData(SelectByTime, Equivalence, ABC):
 
     @staticmethod
     def _get_vendor_class(vendor: Vendor) -> type[EITData_]:
-        from .draeger import DraegerEITData
-        from .sentec import SentecEITData
-        from .timpel import TimpelEITData
+        from eitprocessing.eit_data.draeger import DraegerEITData
+        from eitprocessing.eit_data.sentec import SentecEITData
+        from eitprocessing.eit_data.timpel import TimpelEITData
 
         vendor_classes: dict[Vendor, type[EITData_]] = {
             Vendor.DRAEGER: DraegerEITData,
