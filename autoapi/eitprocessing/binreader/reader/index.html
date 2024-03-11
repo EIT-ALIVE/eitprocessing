@@ -54,7 +54,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.binreader.reader.Reader" title="eitprocessing.binreader.reader.Reader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reader</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Helper class for reading binary files from disk.</p></td>
 </tr>
 </tbody>
 </table>
@@ -84,95 +84,151 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.binreader.reader.</span></span><span class="sig-name descname"><span class="pre">Reader</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader" title="Link to this definition">¶</a></dt>
-<dd><dl class="py attribute">
+<dd><p>Helper class for reading binary files from disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_handle</strong> – a buffered reader handle, e.g. the result of the <cite>open()</cite> function.</p></li>
+<li><p><strong>endian</strong> – the endianness of the binary data. Either ‘little’ or ‘big’, or None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.file_handle">
 <span class="sig-name descname"><span class="pre">file_handle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedReader" title="(in Python v3.12)"><span class="pre">io.BufferedReader</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.file_handle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.file_handle" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.endian">
-<span class="sig-name descname"><span class="pre">endian</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.endian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.endian" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">endian</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="pre">little</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">big</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.endian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.endian" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.string">
+<span class="sig-name descname"><span class="pre">string</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.string" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.read_single">
 <span class="sig-name descname"><span class="pre">read_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cast</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.12)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.read_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.read_single" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read and return a single unit of the given type code.</p>
+<p>The type of data to be read should be provided as a single typ code. See
+<a class="reference external" href="https://docs.python.org/3.10/library/struct.html#byte-order-size-and-alignment">https://docs.python.org/3.10/library/struct.html#byte-order-size-and-alignment</a> for a list of available type
+codes.</p>
+<p>A unit returns a single value, and can be one or more bytes of data. E.g. requesting a signed 32-bit integer
+(‘q’) will result in reading 8 bytes of data.</p>
+<p><cite>cast</cite> should be a type, e.g. <cite>int</cite> or <cite>float</cite> used to cast the value to the proper type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type_code</strong> – singular type code.</p></li>
+<li><p><strong>cast</strong> – the associated type.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.read_list">
 <span class="sig-name descname"><span class="pre">read_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cast</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.12)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.read_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.read_list" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read multiple values of the same type and return as list.</p>
+<p>See <cite>read_single()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type_code</strong> – singular type code.</p></li>
+<li><p><strong>cast</strong> – the associated type.</p></li>
+<li><p><strong>length</strong> – number of values to be read.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.read_array">
 <span class="sig-name descname"><span class="pre">read_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cast</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.12)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><span class="pre">N</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">N</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.read_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.read_array" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read multiple values of the same type and return as NumPy array.</p>
+<p>See <cite>read_list()</cite>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.read_string">
-<span class="sig-name descname"><span class="pre">read_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.read_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.read_string" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">read_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.read_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.read_string" title="Link to this definition">¶</a></dt>
+<dd><p>Read and return a string with a given length.</p>
+<p>Reads <cite>length</cite> characters of type code ‘s’ and returns as a string. When length is not provided, a single
+character is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>length</strong> – number of characters.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader._read_full_type_code">
-<span class="sig-name descname"><span class="pre">_read_full_type_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_type_code</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ellipsis</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader._read_full_type_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader._read_full_type_code" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">_read_full_type_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_type_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ellipsis</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader._read_full_type_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader._read_full_type_code" title="Link to this definition">¶</a></dt>
+<dd><p>Read the data associated with the type code.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.float32">
 <span class="sig-name descname"><span class="pre">float32</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.float32"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.float32" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read and return a single signed 32-bit floating point value.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.float64">
 <span class="sig-name descname"><span class="pre">float64</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.float64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.float64" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read and return a single signed 64-bit floating point value.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.npfloat32">
-<span class="sig-name descname"><span class="pre">npfloat32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float32</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.npfloat32"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.npfloat32" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">npfloat32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float32</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.npfloat32"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.npfloat32" title="Link to this definition">¶</a></dt>
+<dd><p>Read and return an array of signed 32-bit floating point values.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.npfloat64">
-<span class="sig-name descname"><span class="pre">npfloat64</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.npfloat64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.npfloat64" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">npfloat64</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.npfloat64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.npfloat64" title="Link to this definition">¶</a></dt>
+<dd><p>Read and return an array of signed 64-bit floating point values.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.int32">
 <span class="sig-name descname"><span class="pre">int32</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.int32"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.int32" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read and return a single signed 32-bit integer value.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.npint32">
-<span class="sig-name descname"><span class="pre">npint32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.int32</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.npint32"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.npint32" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.string">
-<span class="sig-name descname"><span class="pre">string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.string" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">npint32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.int32</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.npint32"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.npint32" title="Link to this definition">¶</a></dt>
+<dd><p>Read and return an array of signed 32-bit integer values.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.uint8">
 <span class="sig-name descname"><span class="pre">uint8</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.uint8"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.uint8" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read and return a single unsigned 8-bit integer value.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.uint16">
 <span class="sig-name descname"><span class="pre">uint16</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.uint16"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.uint16" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read and return a single unsigned 16-bit integer value.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.uint32">
 <span class="sig-name descname"><span class="pre">uint32</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.uint32"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.uint32" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read and return a single unsigned 32-bit integer value.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.binreader.reader.Reader.uint64">
 <span class="sig-name descname"><span class="pre">uint64</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/binreader/reader.html#Reader.uint64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.binreader.reader.Reader.uint64" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Read and return a single unsigned 64-bit integer value.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -199,6 +255,7 @@
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.file_handle"><code class="docutils literal notranslate"><span class="pre">Reader.file_handle</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.endian"><code class="docutils literal notranslate"><span class="pre">Reader.endian</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.string"><code class="docutils literal notranslate"><span class="pre">Reader.string</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.read_single"><code class="docutils literal notranslate"><span class="pre">Reader.read_single()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.read_list"><code class="docutils literal notranslate"><span class="pre">Reader.read_list()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.read_array"><code class="docutils literal notranslate"><span class="pre">Reader.read_array()</span></code></a></li>
@@ -210,7 +267,6 @@
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.npfloat64"><code class="docutils literal notranslate"><span class="pre">Reader.npfloat64()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.int32"><code class="docutils literal notranslate"><span class="pre">Reader.int32()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.npint32"><code class="docutils literal notranslate"><span class="pre">Reader.npint32()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.string"><code class="docutils literal notranslate"><span class="pre">Reader.string()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.uint8"><code class="docutils literal notranslate"><span class="pre">Reader.uint8()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.uint16"><code class="docutils literal notranslate"><span class="pre">Reader.uint16()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.binreader.reader.Reader.uint32"><code class="docutils literal notranslate"><span class="pre">Reader.uint32()</span></code></a></li>

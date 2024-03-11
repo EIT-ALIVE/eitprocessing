@@ -16,16 +16,8 @@ Subpackages
    eit_data/index.rst
    filters/index.rst
    mixins/index.rst
+   plotting/index.rst
    sequence/index.rst
    sparse_data/index.rst
-
-
-Submodules
-----------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 1
-
-   helper/index.rst
 
 

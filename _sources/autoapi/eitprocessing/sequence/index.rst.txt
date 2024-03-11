@@ -508,6 +508,8 @@ Classes
 .. py:class:: SparseData
 
 
+   SparseData.
+
 
 .. py:class:: Sequence
 

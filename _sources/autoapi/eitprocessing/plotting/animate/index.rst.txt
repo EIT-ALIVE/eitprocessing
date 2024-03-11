@@ -1,7 +1,7 @@
-:py:mod:`animate`
-=================
+:py:mod:`eitprocessing.plotting.animate`
+========================================
 
-.. py:module:: animate
+.. py:module:: eitprocessing.plotting.animate
 
 
 Module Contents
@@ -13,7 +13,7 @@ Functions
 
 .. autoapisummary::
 
-   animate.animate_EITDataVariant
+   eitprocessing.plotting.animate.animate_EITDataVariant
 
 
 

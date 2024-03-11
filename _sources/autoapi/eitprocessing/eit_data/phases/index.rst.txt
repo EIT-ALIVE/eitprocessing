@@ -23,6 +23,8 @@ Classes
 .. py:class:: PhaseIndicator
 
 
+   Parent class for phase indications.
+
    .. py:attribute:: index
       :type: int
 
@@ -39,16 +41,22 @@ Classes
 
    Bases: :py:obj:`PhaseIndicator`
 
+   Automatically registered local minimum of an EIT measurement.
+
 
 .. py:class:: MaxValue
 
 
    Bases: :py:obj:`PhaseIndicator`
 
+   Automatically registered local maximum of an EIT measurement.
+
 
 .. py:class:: QRSMark
 
 
    Bases: :py:obj:`PhaseIndicator`
+
+   Automatically registered QRS mark an EIT measurement from a Timpel device.
 
 

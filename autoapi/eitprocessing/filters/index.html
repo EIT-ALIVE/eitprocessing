@@ -61,22 +61,25 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.filters.TimeDomainFilter" title="eitprocessing.filters.TimeDomainFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeDomainFilter</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Parent class for time domain filters.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.filters.TimeDomainFilter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.filters.</span></span><span class="sig-name descname"><span class="pre">TimeDomainFilter</span></span><a class="reference internal" href="../../../_modules/eitprocessing/filters.html#TimeDomainFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.TimeDomainFilter" title="Link to this definition">¶</a></dt>
-<dd><dl class="py attribute">
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>Parent class for time domain filters.</p>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.filters.TimeDomainFilter.available_in_gui">
 <span class="sig-name descname"><span class="pre">available_in_gui</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../_modules/eitprocessing/filters.html#TimeDomainFilter.available_in_gui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.TimeDomainFilter.available_in_gui" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.filters.TimeDomainFilter.apply_filter">
-<span class="sig-name descname"><span class="pre">apply_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="reference internal" href="../../../_modules/eitprocessing/filters.html#TimeDomainFilter.apply_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.TimeDomainFilter.apply_filter" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">apply_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.typing.ArrayLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="reference internal" href="../../../_modules/eitprocessing/filters.html#TimeDomainFilter.apply_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.TimeDomainFilter.apply_filter" title="Link to this definition">¶</a></dt>
+<dd><p>Apply the filter to the input data.</p>
+</dd></dl>
 
 </dd></dl>
 

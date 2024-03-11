@@ -398,6 +398,8 @@ Attributes
 .. py:class:: SparseData
 
 
+   SparseData.
+
 
 .. py:data:: V
 

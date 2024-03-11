@@ -20,4 +20,6 @@ Classes
 .. py:class:: SparseData
 
 
+   SparseData.
+
 
