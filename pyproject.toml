@@ -36,7 +36,7 @@ dependencies = [
     "scipy >= 1.10.1",
     "tqdm >= 4.65.0",
     "strenum >= 0.4.10",
-    "ruff >= 0.1.13",
+    "ruff >= 0.3",
 ]
 
 [project.optional-dependencies]
@@ -94,6 +94,8 @@ extras = dev
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
 select = ["ALL"]
 ignore = [
     # Unwanted (potentially)
@@ -131,20 +133,9 @@ ignore = [
     "D413",
 ]
 
-# Allow autofix for all enabled rules.
+# Set autofixing.
 fixable = ["ALL"]
 unfixable = ["F401"] # unused imports (should not disappear while editing)
-
-[tool.ruff.lint.per-file-ignores]
-"*.ipynb" = ["ERA001"] # Commented out code
-"tests/*" = [
-    "S101",   # Use of `assert` detected
-    "ANN201", # Missing return type
-    "D103",   # Missing function docstring
-]
-"docs/*" = ["ALL"]
-
-[tool.ruff.lint]
 extend-safe-fixes = [
     "D415",   # First line should end with a period, question mark, or exclamation point
     "D300",   # Use triple double quotes `"""`
@@ -156,11 +147,17 @@ extend-safe-fixes = [
     "B006",   # Mutable default argument
     "TID252", # Absolute imports over relative imports
 ]
+
+# Override default settings for specific rules
 pylint.max-args = 7
+flake8-tidy-imports.ban-relative-imports = "all" # Disallow all relative imports.
+isort.known-first-party = ["eitprocessing"]
 
-[tool.ruff.isort]
-known-first-party = ["eitprocessing"]
-
-[tool.ruff.lint.flake8-tidy-imports]
-# Disallow all relative imports.
-ban-relative-imports = "all"
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["ERA001"] # Commented out code
+"tests/*" = [
+    "S101",   # Use of `assert` detected
+    "ANN201", # Missing return type
+    "D103",   # Missing function docstring
+]
+"docs/*" = ["ALL"]
