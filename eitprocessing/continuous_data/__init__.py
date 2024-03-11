@@ -179,6 +179,9 @@ class ContinuousData(Equivalence, SelectByTime):
         """Return whether the data was loaded from disk, or derived from elsewhere."""
         return len(self.derived_from) == 0
 
+    def __len__(self):
+        return len(self.time)
+
     def _sliced_copy(
         self,
         start_index: int,
