@@ -20,7 +20,7 @@ Classes
 .. py:class:: Event
 
 
-   Single time point event registered during an EIT measurement on a Draeger machine.
+   Single time point event registered during an EIT measurement.
 
    .. py:attribute:: index
       :type: int
