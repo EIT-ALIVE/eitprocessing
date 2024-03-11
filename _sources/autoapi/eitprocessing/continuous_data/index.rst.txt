@@ -4,16 +4,6 @@
 .. py:module:: eitprocessing.continuous_data
 
 
-Submodules
-----------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 1
-
-   continuous_data_collection/index.rst
-   continuous_data_variant/index.rst
-
-
 Package Contents
 ----------------
 
@@ -22,77 +12,24 @@ Classes
 
 .. autoapisummary::
 
-   eitprocessing.continuous_data.ContinuousDataVariant
    eitprocessing.continuous_data.Equivalence
-   eitprocessing.continuous_data.VariantCollection
+   eitprocessing.continuous_data.SelectByTime
    eitprocessing.continuous_data.ContinuousData
 
-
-
-
-.. py:class:: ContinuousDataVariant
-
-
-   Bases: :py:obj:`eitprocessing.variants.Variant`
-
-   Contains a single variant of a dataset.
-
-   A variant of a dataset is defined as either the raw data, or an edited
-   version of that raw data. For example, EIT data can contain a "raw"
-   versions and a "filtered" version. Both variants share the same time axis.
-
-   The actual data of a variant is contained in a variable that must be set by
-   a subclass inheriting from this class.
-
-   Attributes:
-   - label (str): a short descriptor for the variant, that is used to access
-     the variant
-   - description (str): a longer description of the variant
-   - params (dict): contains information on how to reproduce the variant, e.g.
-     which filters and filters settigs were used
-
-   .. py:attribute:: values
-      :type: numpy.typing.NDArray
-
-      
-
-   .. py:method:: __len__() -> int
-
-
-   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
-      :classmethod:
-
-      Concatenates two variants
-
-      Concatenating two variants results in a single variant with the
-      combined length of both variants.
-
-      To merge more than two variants, use
-      `functools.reduce(Variant.concatenate, list_of_variants)`.
-
-      Args:
-      - a (Variant)
-      - b (Variant)
-
-      Raises:
-      - EquivalenceError if a and b are not equivalent and can't be merged
 
 
 
 .. py:class:: Equivalence
 
 
-   Bases: :py:obj:`abc.ABC`
-
-   Helper class that provides a standard way to create an ABC using
-   inheritance.
+   Mixin class that adds an equality and equivalence check.
 
    .. py:method:: __eq__(other: typing_extensions.Self)
 
       Return self==value.
 
 
-   .. py:method:: _array_safe_eq(a, b) -> bool
+   .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
       :staticmethod:
 
       Check if a and b are equal, even if they are numpy arrays containing nans.
@@ -119,97 +56,79 @@ Classes
 
 
 
-.. py:class:: VariantCollection(variant_type: type[V], *args, **kwargs)
+.. py:class:: SelectByTime
 
 
-   Bases: :py:obj:`dict`, :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
+   Bases: :py:obj:`SelectByIndex`
 
-   A collection of variants of a single type
+   Adds methods for slicing by time rather than index.
 
-   A VariantCollection is a dictionary with some added features.
+   .. py:property:: t
+      :type: TimeIndexer
 
-   A VariantCollection can only contain variants (of a certain type). When
-   initializing VariantCollection a subclass of Variant (or Variant itself to
-   allow diverse types )must be passed as the first argument (`variant_type`),
-   limiting the type of variant that is allowed to be added to the collection.
-   During initialization, other arguments can be passed as if initializing a
-   normal dictionary.
+      Time Indexer property.
 
-   When adding a variant, the key of the item in the dictionary must equal the
-   label of the variant. The method `add()` can be used instead, which
-   automatically sets the variant label as the key.
-
-   Thirdly, when setting a variant with a label that already exists, the
-   default behaviour is to raise an exception. This prevents overwriting
-   existing variants. This behaviour can be overridden using `add(variant,
-   overwrite=True)`.
-
-
-   The `add()` method
-
-   Examples:
-   ```
-   >>> variant_a = EITDataVariant(label="raw", ...)
-   >>> vc = VariantCollection(EITDataVariant, raw=variant_a)
-   >>> variant_b = EITDataVariant(label="filtered", ...)
-   >>> vc.add(variant_b)  # equals vc["filtered"] = variant
-   ```
-
-   ```
-   >>> vc = VariantCollection(EITDataVariant)
-   >>> variant_c = SomeOtherVariant(label="offset", ...)
-   >>> vc.add(variant_c)  # raises InvalidVariantType() exception
-   ```
-
-
-   .. py:attribute:: variant_type
-      :type: type[V]
+   .. py:attribute:: time
+      :type: numpy.typing.NDArray
 
       
 
-   .. py:method:: __eq__(other: typing_extensions.Self)
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
 
-      Return self==value.
+      Get a slice from start to end time stamps.
 
+      Given a start and end time stamp (i.e. its value, not its index),
+      return a slice of the original object, which must contain a time axis.
 
-   .. py:method:: __setitem__(__key: str, __value: V) -> None
+      :param start_time: first time point to include. Defaults to first frame of sequence.
+      :param end_time: last time point. Defaults to last frame of sequence.
+      :param start_inclusive (default: `True`), end_inclusive (default `False`):
+                                       these arguments control the behavior if the given time stamp
+                                       does not match exactly with an existing time stamp of the input.
+                                       if `True`: the given time stamp will be inside the sliced object.
+                                       if `False`: the given time stamp will be outside the sliced object.
+      :param label: Description. Defaults to None, which will create a label based
+                    on the original object label and the frames by which it is sliced.
 
-      Set self[key] to value.
+      :raises TypeError: if `self` does not contain a `time` attribute.
+      :raises ValueError: if time stamps are not sorted.
 
-
-   .. py:method:: add(*variant: V, overwrite: bool = False) -> None
-
-      Add one or multiple variants to the dictionary
-
-      This method automatically sets the key of the item to the label of the
-      variant. By default, overwriting variants with the same label is
-      prevented. Trying to do so will result in a DuplicateVariantLabel
-      exception being raised. Set `overwrite` to `True` to allow overwriting.
-
-      Args:
-      - variant (Variant): the variant to be added. Multiple variants can be
-      added at once.
-
-      Raises:
-      - DuplicateVariantLabel if one attempts to add a variant with a label
-      that already exists as key.
-
-
-   .. py:method:: _check_variant(variant: V, key=None, overwrite: bool = False) -> None
-
-
-   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
-      :classmethod:
+      :returns: Slice of self.
 
 
 
 .. py:class:: ContinuousData
 
 
-   Bases: :py:obj:`eitprocessing.mixins.equality.Equivalence`
+   Bases: :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`eitprocessing.mixins.slicing.SelectByTime`
 
-   Helper class that provides a standard way to create an ABC using
-   inheritance.
+   Data class for (non-EIT) data with a continuous time axis.
+
+   :param label: Computer readable naming of the instance.
+   :param name: Human readable naming of the instance.
+   :param unit: Unit for the data.
+   :param category: Category the data falls into, e.g. 'airway pressure'.
+   :param description: Human readable extended description of the data.
+   :param parameters: Parameters used to derive this data.
+   :param derived_from: Traceback of intermediates from which the current data was derived.
+   :param values: Data points.
+
+   .. py:property:: locked
+      :type: bool
+
+      Return whether the values attribute is locked.
+
+      See lock().
+
+   .. py:property:: loaded
+      :type: bool
+
+      Return whether the data was loaded from disk, or derived from elsewhere.
+
+   .. py:attribute:: label
+      :type: str
+
+      
 
    .. py:attribute:: name
       :type: str
@@ -221,49 +140,130 @@ Classes
 
       
 
-   .. py:attribute:: description
-      :type: str
-
-      
-
    .. py:attribute:: category
       :type: str
 
       
 
+   .. py:attribute:: description
+      :type: str
+      :value: ''
+
+      
+
+   .. py:attribute:: parameters
+      :type: dict[str, typing_extensions.Any]
+
+      
+
+   .. py:attribute:: derived_from
+      :type: typing_extensions.Any | list[typing_extensions.Any]
+
+      
+
    .. py:attribute:: time
-      :type: numpy.typing.NDArray
+      :type: numpy.ndarray
 
       
 
-   .. py:attribute:: loaded
-      :type: bool
+   .. py:attribute:: values
+      :type: numpy.ndarray
 
       
 
-   .. py:attribute:: calculated_from
-      :type: Any | list[Any] | None
-
-      
-
-   .. py:attribute:: variants
-      :type: eitprocessing.variants.variant_collection.VariantCollection
-
-      
-
-   .. py:method:: __post_init__()
+   .. py:method:: __post_init__() -> None
 
 
-   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
-      :classmethod:
+   .. py:method:: __setattr__(attr: str, value: typing_extensions.Any)
+
+      Implement setattr(self, name, value).
 
 
+   .. py:method:: copy(label: str, *, name: str | None = None, unit: str | None = None, description: str | None = None, parameters: dict | None = None) -> typing_extensions.Self
 
-.. py:exception:: DataSourceUnknown
+      Create a copy.
+
+      Whenever data is altered, it should probably be copied first. The alterations should then be made in the copy.
 
 
-   Bases: :py:obj:`Exception`
+   .. py:method:: derive(label: str, function: collections.abc.Callable, func_args: dict, **kwargs) -> typing_extensions.Self
 
-   Raised when the source of data is unknown.
+      Create a copy deriving data from values attribute.
+
+      :param label: New label for the derived object.
+      :param function: Function that takes the values and returns the derived values.
+      :param func_args: Arguments to pass to function.
+      :param \*\*kwargs: New values for attributes of
+
+      Example:
+      ```
+      def convert_data(x, add=None, subtract=None, multiply=None, divide=None):
+          if add:
+              x += add
+          if subtract:
+              x -= subtract
+          if multiply:
+              x *= multiply
+          if divide:
+              x /= divide
+          return x
+
+
+      data = ContinuousData(
+          name="Lung volume (in mL)", label="volume_mL", unit="mL", category="volume", values=some_loaded_data
+      )
+      derived = data.derive("volume_L", convert_data, {"divide": 1000}, name="Lung volume (in L)", unit="L")
+      ```
+
+
+   .. py:method:: lock(*attr: str) -> None
+
+      Lock attributes, essentially rendering them read-only.
+
+      Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.
+
+      :param \*attr: any number of attributes can be passed here, all of which will be locked. Defaults to "values".
+
+      .. rubric:: Examples
+
+      >>> # lock the `values` attribute of `data`
+      >>> data.lock()
+      >>> data.values = [1, 2, 3] # will result in an AttributeError
+      >>> data.values[0] = 1      # will result in a RuntimeError
+
+
+   .. py:method:: unlock(*attr: str) -> None
+
+      Unlock attributes, rendering them editable.
+
+      Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.
+
+      :param \*attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to "values".
+
+      .. rubric:: Examples
+
+      >>> # lock the `values` attribute of `data`
+      >>> data.lock()
+      >>> data.values = [1, 2, 3] # will result in an AttributeError
+      >>> data.values[0] = 1      # will result in a RuntimeError
+      >>> data.unlock()
+      >>> data.values = [1, 2, 3]
+      >>> print(data.values)
+      [1,2,3]
+      >>> data.values[0] = 1      # will result in a RuntimeError
+      >>> print(data.values)
+      1
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
 
 

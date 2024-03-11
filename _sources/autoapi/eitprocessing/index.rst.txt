@@ -12,12 +12,12 @@ Subpackages
 
    binreader/index.rst
    continuous_data/index.rst
+   data_collection/index.rst
    eit_data/index.rst
    filters/index.rst
    mixins/index.rst
    sequence/index.rst
    sparse_data/index.rst
-   variants/index.rst
 
 
 Submodules

@@ -20,17 +20,14 @@ Classes
 .. py:class:: Equivalence
 
 
-   Bases: :py:obj:`abc.ABC`
-
-   Helper class that provides a standard way to create an ABC using
-   inheritance.
+   Mixin class that adds an equality and equivalence check.
 
    .. py:method:: __eq__(other: typing_extensions.Self)
 
       Return self==value.
 
 
-   .. py:method:: _array_safe_eq(a, b) -> bool
+   .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
       :staticmethod:
 
       Check if a and b are equal, even if they are numpy arrays containing nans.

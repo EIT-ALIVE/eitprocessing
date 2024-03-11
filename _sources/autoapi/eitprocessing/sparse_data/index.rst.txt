@@ -4,15 +4,6 @@
 .. py:module:: eitprocessing.sparse_data
 
 
-Submodules
-----------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 1
-
-   sparse_data_collection/index.rst
-
-
 Package Contents
 ----------------
 

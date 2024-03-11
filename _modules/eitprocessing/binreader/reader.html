@@ -38,11 +38,10 @@
 <span></span><span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypeVar</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeVar</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
-
 
 <div class="viewcode-block" id="T">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/binreader/reader/index.html#eitprocessing.binreader.reader.T">[docs]</a>
@@ -79,8 +78,7 @@
     <span class="k">def</span> <span class="nf">read_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cast</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
         <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}{</span><span class="n">type_code</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">data</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="Reader.read_array">
@@ -101,8 +99,7 @@
     <span class="k">def</span> <span class="nf">read_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2">s&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">data</span></div>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="Reader._read_full_type_code">
@@ -110,18 +107,15 @@
     <span class="k">def</span> <span class="nf">_read_full_type_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_type_code</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;little&quot;</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Endian type &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endian</span><span class="si">}</span><span class="s2">&#39; not recognized. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Allowed values are &#39;little&#39; and &#39;big&#39;.&quot;</span>
-                <span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Endian type &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endian</span><span class="si">}</span><span class="s2">&#39; not recognized. Allowed values are &#39;little&#39; and &#39;big&#39;.&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
             <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;&lt;&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">==</span> <span class="s2">&quot;little&quot;</span> <span class="k">else</span> <span class="s2">&quot;&gt;&quot;</span>
             <span class="n">full_type_code</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">full_type_code</span>
 
         <span class="n">data_size</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
         <span class="n">packed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data_size</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">,</span> <span class="n">packed_data</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span></div>
+        <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">,</span> <span class="n">packed_data</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Reader.float32">

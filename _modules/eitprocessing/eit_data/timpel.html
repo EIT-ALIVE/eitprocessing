@@ -36,29 +36,43 @@
           <div class="body" role="main">
             
   <h1>Source code for eitprocessing.eit_data.timpel</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
-<span class="kn">from</span> <span class="nn">eitprocessing.continuous_data.continuous_data_collection</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ContinuousDataCollection</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.continuous_data</span> <span class="kn">import</span> <span class="n">ContinuousData</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.data_collection</span> <span class="kn">import</span> <span class="n">DataCollection</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.eit_data</span> <span class="kn">import</span> <span class="n">EITData_</span>
-<span class="kn">from</span> <span class="nn">eitprocessing.eit_data.eit_data_variant</span> <span class="kn">import</span> <span class="n">EITDataVariant</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.eit_data.phases</span> <span class="kn">import</span> <span class="n">MaxValue</span><span class="p">,</span> <span class="n">MinValue</span><span class="p">,</span> <span class="n">QRSMark</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.eit_data.vendor</span> <span class="kn">import</span> <span class="n">Vendor</span>
-<span class="kn">from</span> <span class="nn">eitprocessing.sparse_data.sparse_data_collection</span> <span class="kn">import</span> <span class="n">SparseDataCollection</span>
-<span class="kn">from</span> <span class="nn">eitprocessing.variants.variant_collection</span> <span class="kn">import</span> <span class="n">VariantCollection</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.sparse_data</span> <span class="kn">import</span> <span class="n">SparseData</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+    <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
+
+
+<div class="viewcode-block" id="_COLUMN_WIDTH">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/eit_data/timpel/index.html#eitprocessing.eit_data.timpel._COLUMN_WIDTH">[docs]</a>
+<span class="n">_COLUMN_WIDTH</span> <span class="o">=</span> <span class="mi">1030</span></div>
+
+<div class="viewcode-block" id="_NAN_VALUE">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/eit_data/timpel/index.html#eitprocessing.eit_data.timpel._NAN_VALUE">[docs]</a>
+<span class="n">_NAN_VALUE</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1000</span></div>
+
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <div class="viewcode-block" id="TimpelEITData">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/eit_data/timpel/index.html#eitprocessing.eit_data.timpel.TimpelEITData">[docs]</a>
 <span class="k">class</span> <span class="nc">TimpelEITData</span><span class="p">(</span><span class="n">EITData_</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for data measured by Timpel EIT device.&quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="TimpelEITData.framerate">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/eit_data/timpel/index.html#eitprocessing.eit_data.timpel.TimpelEITData.framerate">[docs]</a>
     <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">50</span></div>
@@ -67,27 +81,18 @@
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/eit_data/timpel/index.html#eitprocessing.eit_data.timpel.TimpelEITData.vendor">[docs]</a>
     <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">Vendor</span><span class="o">.</span><span class="n">TIMPEL</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TimpelEITData.variants">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/eit_data/timpel/index.html#eitprocessing.eit_data.timpel.TimpelEITData.variants">[docs]</a>
-    <span class="n">variants</span><span class="p">:</span> <span class="n">VariantCollection</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">VariantCollection</span><span class="p">(</span><span class="n">EITDataVariant</span><span class="p">)</span>
-    <span class="p">)</span></div>
-
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="TimpelEITData._from_path">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/eit_data/timpel/index.html#eitprocessing.eit_data.timpel.TimpelEITData._from_path">[docs]</a>
-    <span class="k">def</span> <span class="nf">_from_path</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments,too-many-locals</span>
+    <span class="k">def</span> <span class="nf">_from_path</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
         <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">return_non_eit_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Self</span><span class="p">,</span> <span class="n">ContinuousDataCollection</span><span class="p">,</span> <span class="n">SparseDataCollection</span><span class="p">]:</span>
-        <span class="n">COLUMN_WIDTH</span> <span class="o">=</span> <span class="mi">1030</span>
-
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataCollection</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">framerate</span><span class="p">:</span>
             <span class="n">framerate</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">framerate</span>
 
@@ -100,22 +105,22 @@
                 <span class="n">max_rows</span><span class="o">=</span><span class="n">max_frames</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">UnicodeDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> could not be read as Timpel data.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;Make sure this is a valid and uncorrupted Timpel data file.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Original error message: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">COLUMN_WIDTH</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Input does not have a width of </span><span class="si">{</span><span class="n">COLUMN_WIDTH</span><span class="si">}</span><span class="s2"> columns.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_COLUMN_WIDTH</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Input does not have a width of </span><span class="si">{</span><span class="n">_COLUMN_WIDTH</span><span class="si">}</span><span class="s2"> columns.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;Make sure this is a valid and uncorrupted Timpel data file.&quot;</span>
             <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Invalid input: `first_frame` </span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s2"> is larger than the &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;total number of frames in the file.&quot;</span>
-            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid input: `first_frame` </span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s2"> is larger than the total number of frames in the file.&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">max_frames</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">max_frames</span><span class="p">:</span>
             <span class="n">nframes</span> <span class="o">=</span> <span class="n">max_frames</span>
@@ -125,7 +130,7 @@
                     <span class="sa">f</span><span class="s2">&quot;The number of frames requested (</span><span class="si">{</span><span class="n">max_frames</span><span class="si">}</span><span class="s2">) is larger &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;than the available number (</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) of frames after &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;the first frame selected (</span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s2">).</span><span class="se">\n</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> frames have been loaded.&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> frames have been loaded.&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="n">nframes</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -139,46 +144,79 @@
 
         <span class="n">pixel_impedance</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1024</span><span class="p">]</span>
         <span class="n">pixel_impedance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">pixel_impedance</span><span class="p">,</span> <span class="n">newshape</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
-        <span class="n">pixel_impedance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pixel_impedance</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1000</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">pixel_impedance</span><span class="p">)</span>
+
+        <span class="n">pixel_impedance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pixel_impedance</span> <span class="o">==</span> <span class="n">_NAN_VALUE</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">pixel_impedance</span><span class="p">)</span>
 
         <span class="c1"># extract waveform data</span>
         <span class="c1"># TODO: properly export waveform data</span>
-        <span class="n">waveform_data</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># noqa</span>
-            <span class="s2">&quot;airway_pressure&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1024</span><span class="p">],</span>
-            <span class="s2">&quot;flow&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1025</span><span class="p">],</span>
-            <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1026</span><span class="p">],</span>
-        <span class="p">}</span>
+
+        <span class="n">continuous_data_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">ContinuousData</span><span class="p">)</span>
+        <span class="n">continuous_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ContinuousData</span><span class="p">(</span>
+                <span class="s2">&quot;airway_pressure_(timpel)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Airway pressure&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;cmH2O&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;pressure&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Airway pressure measured by Timpel device&quot;</span><span class="p">,</span>
+                <span class="n">loaded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">values</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1024</span><span class="p">],</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">continuous_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ContinuousData</span><span class="p">(</span>
+                <span class="s2">&quot;flow_(timpel)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Flow&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;L/s&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;flow&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;FLow measures by Timpel device&quot;</span><span class="p">,</span>
+                <span class="n">loaded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">values</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1025</span><span class="p">],</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">continuous_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ContinuousData</span><span class="p">(</span>
+                <span class="s2">&quot;volume_(timpel)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Volume&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;L&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;volume&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Volume measured by Timpel device&quot;</span><span class="p">,</span>
+                <span class="n">loaded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">values</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1026</span><span class="p">],</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
 
         <span class="c1"># extract breath start, breath end and QRS marks</span>
         <span class="n">phases</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1027</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MinValue</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">time</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)]))</span>
+            <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MinValue</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">time</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)]))</span>  <span class="c1"># noqa: PERF401</span>
 
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1028</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MaxValue</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">time</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)]))</span>
+            <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MaxValue</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">time</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)]))</span>  <span class="c1"># noqa: PERF401</span>
 
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1029</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QRSMark</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">time</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)]))</span>
+            <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QRSMark</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">time</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)]))</span>  <span class="c1"># noqa: PERF401</span>
 
         <span class="n">phases</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-            <span class="n">nframes</span><span class="o">=</span><span class="n">nframes</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
-            <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">obj</span><span class="o">.</span><span class="n">variants</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-            <span class="n">EITDataVariant</span><span class="p">(</span>
+        <span class="n">eit_data_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">eit_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">(</span>
                 <span class="n">label</span><span class="o">=</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;raw impedance data&quot;</span><span class="p">,</span>
+                <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+                <span class="n">nframes</span><span class="o">=</span><span class="n">nframes</span><span class="p">,</span>
+                <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
+                <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
+                <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span>
                 <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">pixel_impedance</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="p">),</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">obj</span></div>
+        <span class="k">if</span> <span class="n">return_non_eit_data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">eit_data_collection</span><span class="p">,</span> <span class="n">continuous_data_collection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">SparseData</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">eit_data_collection</span></div>
 </div>
 
 </pre></div>

@@ -54,16 +54,14 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.mixins.equality.Equivalence" title="eitprocessing.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Equivalence</span></code></a></p></td>
-<td><p>Helper class that provides a standard way to create an ABC using</p></td>
+<td><p>Mixin class that adds an equality and equivalence check.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.mixins.equality.Equivalence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.mixins.equality.</span></span><span class="sig-name descname"><span class="pre">Equivalence</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/mixins/equality.html#Equivalence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.mixins.equality.Equivalence" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
-<p>Helper class that provides a standard way to create an ABC using
-inheritance.</p>
+<dd><p>Mixin class that adds an equality and equivalence check.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.mixins.equality.Equivalence.__eq__">
 <span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/mixins/equality.html#Equivalence.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.mixins.equality.Equivalence.__eq__" title="Link to this definition">¶</a></dt>
@@ -72,7 +70,7 @@ inheritance.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.mixins.equality.Equivalence._array_safe_eq">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_array_safe_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/mixins/equality.html#Equivalence._array_safe_eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.mixins.equality.Equivalence._array_safe_eq" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_array_safe_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/mixins/equality.html#Equivalence._array_safe_eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.mixins.equality.Equivalence._array_safe_eq" title="Link to this definition">¶</a></dt>
 <dd><p>Check if a and b are equal, even if they are numpy arrays containing nans.</p>
 </dd></dl>
 

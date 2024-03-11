@@ -35,18 +35,22 @@
           <div class="body" role="main">
             
   <h1>Source code for eitprocessing.filters</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">NoReturn</span>
+
+
 <div class="viewcode-block" id="TimeDomainFilter">
 <a class="viewcode-back" href="../../autoapi/eitprocessing/filters/index.html#eitprocessing.filters.TimeDomainFilter">[docs]</a>
-<span></span><span class="k">class</span> <span class="nc">TimeDomainFilter</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">TimeDomainFilter</span><span class="p">:</span>
 <div class="viewcode-block" id="TimeDomainFilter.available_in_gui">
 <a class="viewcode-back" href="../../autoapi/eitprocessing/filters/index.html#eitprocessing.filters.TimeDomainFilter.available_in_gui">[docs]</a>
     <span class="n">available_in_gui</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-    
+
 <div class="viewcode-block" id="TimeDomainFilter.apply_filter">
 <a class="viewcode-back" href="../../autoapi/eitprocessing/filters/index.html#eitprocessing.filters.TimeDomainFilter.apply_filter">[docs]</a>
-    <span class="k">def</span> <span class="nf">apply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Implement in subclass&quot;</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">apply_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Implement in subclass&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

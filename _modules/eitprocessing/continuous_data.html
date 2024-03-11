@@ -35,22 +35,43 @@
           <div class="body" role="main">
             
   <h1>Source code for eitprocessing.continuous_data</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
-<span class="kn">from</span> <span class="nn">eitprocessing.continuous_data.continuous_data_variant</span> <span class="kn">import</span> <span class="n">ContinuousDataVariant</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.mixins.equality</span> <span class="kn">import</span> <span class="n">Equivalence</span>
-<span class="kn">from</span> <span class="nn">eitprocessing.variants.variant_collection</span> <span class="kn">import</span> <span class="n">VariantCollection</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.mixins.slicing</span> <span class="kn">import</span> <span class="n">SelectByTime</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span>
+
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Self</span>
 
 
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nd">@dataclass</span>
 <div class="viewcode-block" id="ContinuousData">
 <a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.ContinuousData">[docs]</a>
-<span class="k">class</span> <span class="nc">ContinuousData</span><span class="p">(</span><span class="n">Equivalence</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ContinuousData</span><span class="p">(</span><span class="n">Equivalence</span><span class="p">,</span> <span class="n">SelectByTime</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Data class for (non-EIT) data with a continuous time axis.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        label: Computer readable naming of the instance.</span>
+<span class="sd">        name: Human readable naming of the instance.</span>
+<span class="sd">        unit: Unit for the data.</span>
+<span class="sd">        category: Category the data falls into, e.g. &#39;airway pressure&#39;.</span>
+<span class="sd">        description: Human readable extended description of the data.</span>
+<span class="sd">        parameters: Parameters used to derive this data.</span>
+<span class="sd">        derived_from: Traceback of intermediates from which the current data was derived.</span>
+<span class="sd">        values: Data points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ContinuousData.label">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.label">[docs]</a>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span></div>
+
 <div class="viewcode-block" id="ContinuousData.name">
 <a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.name">[docs]</a>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
@@ -59,71 +80,226 @@
 <a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.unit">[docs]</a>
     <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span></div>
 
-<div class="viewcode-block" id="ContinuousData.description">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.description">[docs]</a>
-    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span></div>
-
 <div class="viewcode-block" id="ContinuousData.category">
 <a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.category">[docs]</a>
     <span class="n">category</span><span class="p">:</span> <span class="nb">str</span></div>
 
+<div class="viewcode-block" id="ContinuousData.description">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.description">[docs]</a>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="ContinuousData.parameters">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.parameters">[docs]</a>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ContinuousData.derived_from">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.derived_from">[docs]</a>
+    <span class="n">derived_from</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="ContinuousData.time">
 <a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.time">[docs]</a>
-    <span class="n">time</span><span class="p">:</span> <span class="n">NDArray</span></div>
+    <span class="n">time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ContinuousData.loaded">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.loaded">[docs]</a>
-    <span class="n">loaded</span><span class="p">:</span> <span class="nb">bool</span></div>
-
-<div class="viewcode-block" id="ContinuousData.calculated_from">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.calculated_from">[docs]</a>
-    <span class="n">calculated_from</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="ContinuousData.variants">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.variants">[docs]</a>
-    <span class="n">variants</span><span class="p">:</span> <span class="n">VariantCollection</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
-        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">VariantCollection</span><span class="p">(</span><span class="n">ContinuousDataVariant</span><span class="p">)</span>
-    <span class="p">)</span></div>
+<div class="viewcode-block" id="ContinuousData.values">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.values">[docs]</a>
+    <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ContinuousData.__post_init__">
 <a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.ContinuousData.__post_init__">[docs]</a>
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculated_from</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">DataSourceUnknown</span><span class="p">(</span>
-                <span class="s2">&quot;Data must be loaded or calculated form another dataset.&quot;</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_equivalence</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;category&quot;</span><span class="p">]</span></div>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span></div>
 
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ContinuousData.concatenate">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.ContinuousData.concatenate">[docs]</a>
-    <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">isequivalent</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">raise_</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="ContinuousData.__setattr__">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.ContinuousData.__setattr__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>  <span class="c1"># noqa: ANN401</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">old_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">old_value</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Attribute &#39;</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2">&#39; is locked and can&#39;t be overwritten.&quot;</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
-        <span class="n">calculcated_from</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">loaded</span> <span class="k">else</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">calculated_from</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">calculated_from</span><span class="p">]</span>
 
-        <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">time</span><span class="p">])</span>
+<div class="viewcode-block" id="ContinuousData.copy">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.ContinuousData.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a copy.</span>
 
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">unit</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
-            <span class="n">description</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">loaded</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">loaded</span><span class="p">,</span>
-            <span class="n">calculated_from</span><span class="o">=</span><span class="n">calculcated_from</span><span class="p">,</span>
-            <span class="n">variants</span><span class="o">=</span><span class="n">VariantCollection</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">variants</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">variants</span><span class="p">),</span>
+<span class="sd">        Whenever data is altered, it should probably be copied first. The alterations should then be made in the copy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="ow">or</span> <span class="n">label</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="n">unit</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">description</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;Derived from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">|</span> <span class="p">(</span><span class="n">parameters</span> <span class="ow">or</span> <span class="p">{}),</span>
+            <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">derived_from</span><span class="p">,</span> <span class="bp">self</span><span class="p">],</span>
+            <span class="n">category</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span>
+            <span class="c1"># copying data can become inefficient with large datasets if the</span>
+            <span class="c1"># data is not directly edited afer copying but overridden instead;</span>
+            <span class="c1"># consider creating a view and locking it, requiring the user to</span>
+            <span class="c1"># make a copy if they want to edit the data directly</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
+            <span class="n">values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
         <span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="ContinuousData.derive">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.ContinuousData.derive">[docs]</a>
+    <span class="k">def</span> <span class="nf">derive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">func_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a copy deriving data from values attribute.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            label: New label for the derived object.</span>
+<span class="sd">            function: Function that takes the values and returns the derived values.</span>
+<span class="sd">            func_args: Arguments to pass to function.</span>
+<span class="sd">            **kwargs: New values for attributes of</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">        ```</span>
+<span class="sd">        def convert_data(x, add=None, subtract=None, multiply=None, divide=None):</span>
+<span class="sd">            if add:</span>
+<span class="sd">                x += add</span>
+<span class="sd">            if subtract:</span>
+<span class="sd">                x -= subtract</span>
+<span class="sd">            if multiply:</span>
+<span class="sd">                x *= multiply</span>
+<span class="sd">            if divide:</span>
+<span class="sd">                x /= divide</span>
+<span class="sd">            return x</span>
+
+
+<span class="sd">        data = ContinuousData(</span>
+<span class="sd">            name=&quot;Lung volume (in mL)&quot;, label=&quot;volume_mL&quot;, unit=&quot;mL&quot;, category=&quot;volume&quot;, values=some_loaded_data</span>
+<span class="sd">        )</span>
+<span class="sd">        derived = data.derive(&quot;volume_L&quot;, convert_data, {&quot;divide&quot;: 1000}, name=&quot;Lung volume (in L)&quot;, unit=&quot;L&quot;)</span>
+<span class="sd">        ```</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">copy</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">func_args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">copy</span></div>
+
+
+<div class="viewcode-block" id="ContinuousData.lock">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.ContinuousData.lock">[docs]</a>
+    <span class="k">def</span> <span class="nf">lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lock attributes, essentially rendering them read-only.</span>
+
+<span class="sd">        Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *attr: any number of attributes can be passed here, all of which will be locked. Defaults to &quot;values&quot;.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # lock the `values` attribute of `data`</span>
+<span class="sd">            &gt;&gt;&gt; data.lock()</span>
+<span class="sd">            &gt;&gt;&gt; data.values = [1, 2, 3] # will result in an AttributeError</span>
+<span class="sd">            &gt;&gt;&gt; data.values[0] = 1      # will result in a RuntimeError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+            <span class="c1"># default values are not allowed when using *attr, so set a default here if none is supplied</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">attr_</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_</span><span class="p">)</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ContinuousData.unlock">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.ContinuousData.unlock">[docs]</a>
+    <span class="k">def</span> <span class="nf">unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unlock attributes, rendering them editable.</span>
+
+<span class="sd">        Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to &quot;values&quot;.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # lock the `values` attribute of `data`</span>
+<span class="sd">            &gt;&gt;&gt; data.lock()</span>
+<span class="sd">            &gt;&gt;&gt; data.values = [1, 2, 3] # will result in an AttributeError</span>
+<span class="sd">            &gt;&gt;&gt; data.values[0] = 1      # will result in a RuntimeError</span>
+<span class="sd">            &gt;&gt;&gt; data.unlock()</span>
+<span class="sd">            &gt;&gt;&gt; data.values = [1, 2, 3]</span>
+<span class="sd">            &gt;&gt;&gt; print(data.values)</span>
+<span class="sd">            [1,2,3]</span>
+<span class="sd">            &gt;&gt;&gt; data.values[0] = 1      # will result in a RuntimeError</span>
+<span class="sd">            &gt;&gt;&gt; print(data.values)</span>
+<span class="sd">            1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+            <span class="c1"># default values are not allowed when using *attr, so set a default here if none is supplied</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">attr_</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_</span><span class="p">)</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="ContinuousData.locked">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.locked">[docs]</a>
+    <span class="k">def</span> <span class="nf">locked</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether the values attribute is locked.</span>
+
+<span class="sd">        See lock().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span></div>
+
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="ContinuousData.loaded">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.ContinuousData.loaded">[docs]</a>
+    <span class="k">def</span> <span class="nf">loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether the data was loaded from disk, or derived from elsewhere.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">derived_from</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="ContinuousData.__len__">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.ContinuousData.__len__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ContinuousData._sliced_copy">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.ContinuousData._sliced_copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">_sliced_copy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">start_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">end_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+        <span class="c1"># TODO: check correct implementation</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Slice (</span><span class="si">{</span><span class="n">start_index</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end_index</span><span class="si">}</span><span class="s2">) of &lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+            <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">derived_from</span><span class="p">,</span> <span class="bp">self</span><span class="p">],</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+        <span class="p">)</span></div>
 </div>
-
-
-
-<div class="viewcode-block" id="DataSourceUnknown">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/continuous_data/index.html#eitprocessing.continuous_data.DataSourceUnknown">[docs]</a>
-<span class="k">class</span> <span class="nc">DataSourceUnknown</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the source of data is unknown.&quot;&quot;&quot;</span></div>
 
 </pre></div>
 

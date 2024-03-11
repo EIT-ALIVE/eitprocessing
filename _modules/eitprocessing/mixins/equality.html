@@ -35,48 +35,65 @@
           <div class="body" role="main">
             
   <h1>Source code for eitprocessing.mixins.equality</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">astuple</span><span class="p">,</span> <span class="n">is_dataclass</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">is_dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
 
 <div class="viewcode-block" id="Equivalence">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/variants/index.html#eitprocessing.continuous_data.Equivalence">[docs]</a>
-<span class="k">class</span> <span class="nc">Equivalence</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.Equivalence">[docs]</a>
+<span class="k">class</span> <span class="nc">Equivalence</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class that adds an equality and equivalence check.&quot;&quot;&quot;</span>
+
     <span class="c1"># inspired by: https://stackoverflow.com/a/51743960/5170442</span>
 <div class="viewcode-block" id="Equivalence.__eq__">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/variants/index.html#eitprocessing.continuous_data.Equivalence.__eq__">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.Equivalence.__eq__">[docs]</a>
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">NotImplemented</span>
-            <span class="n">t1</span> <span class="o">=</span> <span class="n">astuple</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-            <span class="n">t2</span> <span class="o">=</span> <span class="n">astuple</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-            <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">Equivalence</span><span class="o">.</span><span class="n">_array_safe_eq</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="k">for</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">))</span>
+            <span class="n">t1</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="n">t2</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t2</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">Equivalence</span><span class="o">.</span><span class="n">_array_safe_eq</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="k">for</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">Equivalence</span><span class="o">.</span><span class="n">_array_safe_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span></div>
 
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="Equivalence._array_safe_eq">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/variants/index.html#eitprocessing.continuous_data.Equivalence._array_safe_eq">[docs]</a>
-    <span class="k">def</span> <span class="nf">_array_safe_eq</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.Equivalence._array_safe_eq">[docs]</a>
+    <span class="k">def</span> <span class="nf">_array_safe_eq</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: ANN401</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a and b are equal, even if they are numpy arrays containing nans.&quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">equal_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">Equivalence</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">Equivalence</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>  <span class="c1"># `a == b` could trigger an infinite loop</span>
+            <span class="c1"># `a == b` could trigger an infinite loop when called on an instance of Equivalence</span>
+            <span class="c1"># object.__eq__() works for most objects, except those implemented seperately above</span>
+            <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span></div>
 
 
 <div class="viewcode-block" id="Equivalence.isequivalent">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/variants/index.html#eitprocessing.continuous_data.Equivalence.isequivalent">[docs]</a>
-    <span class="k">def</span> <span class="nf">isequivalent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">raise_</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.Equivalence.isequivalent">[docs]</a>
+    <span class="k">def</span> <span class="nf">isequivalent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">raise_</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Test whether the data structure between two objects are equivalent.</span>
 
 <span class="sd">        Equivalence, in this case means that objects are compatible e.g. to be</span>
@@ -97,29 +114,25 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            bool describing result of equivalence comparison.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># check whether types match</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">EquivalenceError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Types don&#39;t match: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Types don&#39;t match: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="n">EquivalenceError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># noqa: TRY301</span>
 
             <span class="c1"># check keys in collection</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-                    <span class="k">raise</span> <span class="n">EquivalenceError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Keys don&#39;t match:</span><span class="se">\n\t</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">,</span><span class="se">\n\t</span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="p">)</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Keys don&#39;t match:</span><span class="se">\n\t</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">,</span><span class="se">\n\t</span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">raise</span> <span class="n">EquivalenceError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># noqa: TRY301</span>
 
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">isequivalent</span><span class="p">(</span><span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="kc">False</span><span class="p">):</span>
-                        <span class="k">raise</span> <span class="n">EquivalenceError</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;Data in </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> doesn&#39;t match: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-                        <span class="p">)</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Data in </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> doesn&#39;t match: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">raise</span> <span class="n">EquivalenceError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># noqa: TRY301</span>
 
             <span class="c1"># check attributes of data</span>
             <span class="k">else</span><span class="p">:</span>
@@ -129,9 +142,9 @@
                         <span class="k">raise</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attr</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">s don&#39;t match: </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">o</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="c1"># raise or return if a check fails</span>
-        <span class="k">except</span> <span class="n">EquivalenceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">EquivalenceError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">raise_</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">e</span>
+                <span class="k">raise</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># if all checks pass</span>

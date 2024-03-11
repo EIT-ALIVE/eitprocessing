@@ -1,7 +1,7 @@
-:py:mod:`eitprocessing.sequence`
-================================
+:py:mod:`eitprocessing.data_collection`
+=======================================
 
-.. py:module:: eitprocessing.sequence
+.. py:module:: eitprocessing.data_collection
 
 
 Package Contents
@@ -12,15 +12,21 @@ Classes
 
 .. autoapisummary::
 
-   eitprocessing.sequence.ContinuousData
-   eitprocessing.sequence.DataCollection
-   eitprocessing.sequence.EITData
-   eitprocessing.sequence.Equivalence
-   eitprocessing.sequence.SelectByTime
-   eitprocessing.sequence.SparseData
-   eitprocessing.sequence.Sequence
+   eitprocessing.data_collection.ContinuousData
+   eitprocessing.data_collection.EITData
+   eitprocessing.data_collection.Equivalence
+   eitprocessing.data_collection.SparseData
+   eitprocessing.data_collection.DataCollection
 
 
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.data_collection.V
 
 
 .. py:class:: ContinuousData
@@ -190,81 +196,6 @@ Classes
 
       Must return a copy of self object with all attached data within selected
       indices.
-
-
-
-.. py:class:: DataCollection(data_type: type[V], *args, **kwargs)
-
-
-   Bases: :py:obj:`dict`, :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
-
-   A collection of a single type of data with unique labels.
-
-   This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
-   ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects
-   added to the collection need to have a `label` attribute and a `concatenate()` method.
-
-   When adding an item to the collection, the type of the value has to match the data type of the collection.
-   Furthermore, the key has to match the attribute 'label' attached to the value.
-
-   The convenience method `add()` adds an item by setting the key to `value.label`.
-
-   :param data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or
-   :param SparseData.:
-
-   .. py:attribute:: data_type
-      :type: type
-
-      
-
-   .. py:method:: __setitem__(__key: str, __value: V) -> None
-
-      Set self[key] to value.
-
-
-   .. py:method:: add(*item: V, overwrite: bool = False) -> None
-
-      Add one or multiple item(s) to the collection.
-
-
-   .. py:method:: _check_item(item: V, key: str | None = None, overwrite: bool = False) -> None
-
-      Check whether the item can be added to the collection.
-
-      In order to be added to the collection, the data type of the item has to match the data type set in the
-      collection. They key that is used to store the item in the collection has to match the label of the item itself.
-      By default, existing keys can not be overridden.
-
-      :param item: Object to be added to the collection.
-      :param key: Key of the item. Has to match `item.label`.
-      :param overwrite: If False, the key can not already exist in the collection. Set to True to allow overwriting an
-      :param existing object in the collection.:
-
-      :raises TypeError: If the type of the item does not match the type set in the collection.
-      :raises KeyError: If the key does not match `item.label`, or when the key already exists in de collection and
-      :raises overwrite is set to False.:
-
-
-   .. py:method:: get_loaded_data() -> dict[str, V]
-
-      Return all data that was directly loaded from disk.
-
-
-   .. py:method:: get_data_derived_from(obj: V) -> dict[str, V]
-
-      Return all data that was derived from a specific source.
-
-
-   .. py:method:: get_derived_data() -> dict[str, V]
-
-      Return all data that was derived from any source.
-
-
-   .. py:method:: concatenate(other: typing_extensions.Self[V]) -> typing_extensions.Self[V]
-
-      Concatenate this collection with an equivalent collection.
-
-      Each item of self of concatenated with the item of other with the same key.
 
 
 
@@ -464,133 +395,86 @@ Classes
 
 
 
-.. py:class:: SelectByTime
-
-
-   Bases: :py:obj:`SelectByIndex`
-
-   Adds methods for slicing by time rather than index.
-
-   .. py:property:: t
-      :type: TimeIndexer
-
-      Time Indexer property.
-
-   .. py:attribute:: time
-      :type: numpy.typing.NDArray
-
-      
-
-   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
-
-      Get a slice from start to end time stamps.
-
-      Given a start and end time stamp (i.e. its value, not its index),
-      return a slice of the original object, which must contain a time axis.
-
-      :param start_time: first time point to include. Defaults to first frame of sequence.
-      :param end_time: last time point. Defaults to last frame of sequence.
-      :param start_inclusive (default: `True`), end_inclusive (default `False`):
-                                       these arguments control the behavior if the given time stamp
-                                       does not match exactly with an existing time stamp of the input.
-                                       if `True`: the given time stamp will be inside the sliced object.
-                                       if `False`: the given time stamp will be outside the sliced object.
-      :param label: Description. Defaults to None, which will create a label based
-                    on the original object label and the frames by which it is sliced.
-
-      :raises TypeError: if `self` does not contain a `time` attribute.
-      :raises ValueError: if time stamps are not sorted.
-
-      :returns: Slice of self.
-
-
-
 .. py:class:: SparseData
 
 
 
-.. py:class:: Sequence
+.. py:data:: V
+
+   
+
+.. py:class:: DataCollection(data_type: type[V], *args, **kwargs)
 
 
-   Bases: :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`eitprocessing.mixins.slicing.SelectByTime`
+   Bases: :py:obj:`dict`, :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
 
-   Sequence of timepoints containing respiratory data.
+   A collection of a single type of data with unique labels.
 
-   A Sequence object is a representation of data points over time. These data can consist of any combination of EIT
-   frames (`EITData`), waveform data (`ContinuousData`) from different sources, or individual events (`SparseData`)
-   occurring at any given timepoint.
-   A Sequence can consist of an entire measurement, a section of a measurement, a single breath, or even a portion of a
-   breath. A Sequence can consist of multiple sets of each type of data from the same time-points or can be a single
-   measurement from just one source.
+   This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
+   ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects
+   added to the collection need to have a `label` attribute and a `concatenate()` method.
 
-   A Sequence can be split up into separate sections of a measurement or multiple (similar) Sequence objects can be
-   merged together to form a single Sequence.
+   When adding an item to the collection, the type of the value has to match the data type of the collection.
+   Furthermore, the key has to match the attribute 'label' attached to the value.
 
-   :param label: Computer readable naming of the instance.
-   :param name: Human readable naming of the instance.
-   :param description: Human readable extended description of the data.
-   :param eit_data: Collection of one or more sets of EIT data frames.
-   :param continuous_data: Collection of one or more sets of continuous data points.
-   :param sparse_data: Collection of one or more sets of individual data points.
+   The convenience method `add()` adds an item by setting the key to `value.label`.
 
-   .. py:property:: time
-      :type: numpy.ndarray
+   :param data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or
+   :param SparseData.:
 
-      Time axis from either EITData or ContinuousData.
-
-   .. py:attribute:: label
-      :type: str
+   .. py:attribute:: data_type
+      :type: type
 
       
 
-   .. py:attribute:: name
-      :type: str
-      :value: ''
+   .. py:method:: __setitem__(__key: str, __value: V) -> None
 
-      
-
-   .. py:attribute:: description
-      :type: str
-      :value: ''
-
-      
-
-   .. py:attribute:: eit_data
-      :type: eitprocessing.data_collection.DataCollection
-
-      
-
-   .. py:attribute:: continuous_data
-      :type: eitprocessing.data_collection.DataCollection
-
-      
-
-   .. py:attribute:: sparse_data
-      :type: eitprocessing.data_collection.DataCollection
-
-      
-
-   .. py:method:: __post_init__()
+      Set self[key] to value.
 
 
-   .. py:method:: __len__()
+   .. py:method:: add(*item: V, overwrite: bool = False) -> None
+
+      Add one or multiple item(s) to the collection.
 
 
-   .. py:method:: __add__(other: Sequence) -> Sequence
+   .. py:method:: _check_item(item: V, key: str | None = None, overwrite: bool = False) -> None
+
+      Check whether the item can be added to the collection.
+
+      In order to be added to the collection, the data type of the item has to match the data type set in the
+      collection. They key that is used to store the item in the collection has to match the label of the item itself.
+      By default, existing keys can not be overridden.
+
+      :param item: Object to be added to the collection.
+      :param key: Key of the item. Has to match `item.label`.
+      :param overwrite: If False, the key can not already exist in the collection. Set to True to allow overwriting an
+      :param existing object in the collection.:
+
+      :raises TypeError: If the type of the item does not match the type set in the collection.
+      :raises KeyError: If the key does not match `item.label`, or when the key already exists in de collection and
+      :raises overwrite is set to False.:
 
 
-   .. py:method:: concatenate(a: Sequence, b: Sequence) -> Sequence
-      :classmethod:
+   .. py:method:: get_loaded_data() -> dict[str, V]
 
-      Create a merge of two Sequence objects.
+      Return all data that was directly loaded from disk.
 
 
-   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
+   .. py:method:: get_data_derived_from(obj: V) -> dict[str, V]
 
-      Slicing method that must be implemented by all subclasses.
+      Return all data that was derived from a specific source.
 
-      Must return a copy of self object with all attached data within selected
-      indices.
+
+   .. py:method:: get_derived_data() -> dict[str, V]
+
+      Return all data that was derived from any source.
+
+
+   .. py:method:: concatenate(other: typing_extensions.Self[V]) -> typing_extensions.Self[V]
+
+      Concatenate this collection with an equivalent collection.
+
+      Each item of self of concatenated with the item of other with the same key.
 
 
 

@@ -11,7 +11,6 @@ Submodules
    :maxdepth: 1
 
    draeger/index.rst
-   eit_data_variant/index.rst
    event/index.rst
    phases/index.rst
    sentec/index.rst
@@ -27,13 +26,9 @@ Classes
 
 .. autoapisummary::
 
-   eitprocessing.eit_data.ContinuousDataCollection
-   eitprocessing.eit_data.EITDataVariant
    eitprocessing.eit_data.Vendor
    eitprocessing.eit_data.Equivalence
    eitprocessing.eit_data.SelectByTime
-   eitprocessing.eit_data.SparseDataCollection
-   eitprocessing.eit_data.VariantCollection
    eitprocessing.eit_data.EITData
    eitprocessing.eit_data.EITData_
 
@@ -45,121 +40,7 @@ Attributes
 
 .. autoapisummary::
 
-   eitprocessing.eit_data.PathLike
-   eitprocessing.eit_data.PathArg
    eitprocessing.eit_data.T
-
-
-.. py:class:: ContinuousDataCollection
-
-
-   Bases: :py:obj:`dict`, :py:obj:`eitprocessing.mixins.equality.Equivalence`
-
-   dict() -> new empty dictionary
-   dict(mapping) -> new dictionary initialized from a mapping object's
-       (key, value) pairs
-   dict(iterable) -> new dictionary initialized as if via:
-       d = {}
-       for k, v in iterable:
-           d[k] = v
-   dict(**kwargs) -> new dictionary initialized with the name=value pairs
-       in the keyword argument list.  For example:  dict(one=1, two=2)
-
-   .. py:method:: __setitem__(__key: Any, __value: Any) -> None
-
-      Set self[key] to value.
-
-
-   .. py:method:: add(data: eitprocessing.continuous_data.ContinuousData, overwrite: bool = False) -> None
-
-
-   .. py:method:: _check_data(data: eitprocessing.continuous_data.ContinuousData, key=None, overwrite: bool = False) -> None
-
-
-   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
-      :classmethod:
-
-
-
-.. py:class:: EITDataVariant
-
-
-   Bases: :py:obj:`eitprocessing.variants.Variant`, :py:obj:`eitprocessing.mixins.slicing.SelectByTime`
-
-   Contains a single variant of a dataset.
-
-   A variant of a dataset is defined as either the raw data, or an edited
-   version of that raw data. For example, EIT data can contain a "raw"
-   versions and a "filtered" version. Both variants share the same time axis.
-
-   The actual data of a variant is contained in a variable that must be set by
-   a subclass inheriting from this class.
-
-   Attributes:
-   - label (str): a short descriptor for the variant, that is used to access
-     the variant
-   - description (str): a longer description of the variant
-   - params (dict): contains information on how to reproduce the variant, e.g.
-     which filters and filters settigs were used
-
-   .. py:property:: global_baseline
-
-
-   .. py:property:: pixel_impedance_global_offset
-
-
-   .. py:property:: pixel_baseline
-
-
-   .. py:property:: pixel_impedance_individual_offset
-
-
-   .. py:property:: global_impedance
-
-
-   .. py:attribute:: _data_field_name
-      :type: str
-      :value: 'pixel_impedance'
-
-      
-
-   .. py:attribute:: pixel_impedance
-      :type: numpy.typing.NDArray
-
-      
-
-   .. py:method:: __len__()
-
-
-   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
-      :classmethod:
-
-      Concatenates two variants
-
-      Concatenating two variants results in a single variant with the
-      combined length of both variants.
-
-      To merge more than two variants, use
-      `functools.reduce(Variant.concatenate, list_of_variants)`.
-
-      Args:
-      - a (Variant)
-      - b (Variant)
-
-      Raises:
-      - EquivalenceError if a and b are not equivalent and can't be merged
-
-
-   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str | None = None) -> typing_extensions.Self
-
-      Slicing method that must be implemented by all subclasses.
-
-      Must return a copy of self object with all attached data within selected
-      indices.
-
-
-   .. py:method:: copy(label: str | None = None)
-
 
 
 .. py:class:: Vendor
@@ -193,17 +74,14 @@ Attributes
 .. py:class:: Equivalence
 
 
-   Bases: :py:obj:`abc.ABC`
-
-   Helper class that provides a standard way to create an ABC using
-   inheritance.
+   Mixin class that adds an equality and equivalence check.
 
    .. py:method:: __eq__(other: typing_extensions.Self)
 
       Return self==value.
 
 
-   .. py:method:: _array_safe_eq(a, b) -> bool
+   .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
       :staticmethod:
 
       Check if a and b are equal, even if they are numpy arrays containing nans.
@@ -235,23 +113,19 @@ Attributes
 
    Bases: :py:obj:`SelectByIndex`
 
-   Adds slicing functionality to subclass by implementing `__getitem__`.
-
-   Subclasses must implement a `_sliced_copy` function that defines what should
-   happen when the object is sliced. This class ensures that when calling a
-   slice between square brackets (as e.g. done for lists) then return the
-   expected sliced object.
+   Adds methods for slicing by time rather than index.
 
    .. py:property:: t
       :type: TimeIndexer
 
+      Time Indexer property.
 
    .. py:attribute:: time
       :type: numpy.typing.NDArray
 
       
 
-   .. py:method:: select_by_time(start_time: float | int | None = None, end_time: float | int | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
 
       Get a slice from start to end time stamps.
 
@@ -275,120 +149,6 @@ Attributes
 
 
 
-.. py:class:: SparseDataCollection
-
-
-   Bases: :py:obj:`dict`
-
-   dict() -> new empty dictionary
-   dict(mapping) -> new dictionary initialized from a mapping object's
-       (key, value) pairs
-   dict(iterable) -> new dictionary initialized as if via:
-       d = {}
-       for k, v in iterable:
-           d[k] = v
-   dict(**kwargs) -> new dictionary initialized with the name=value pairs
-       in the keyword argument list.  For example:  dict(one=1, two=2)
-
-   .. py:method:: concatenate(a, b) -> typing_extensions.Self
-      :classmethod:
-
-
-
-.. py:class:: VariantCollection(variant_type: type[V], *args, **kwargs)
-
-
-   Bases: :py:obj:`dict`, :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
-
-   A collection of variants of a single type
-
-   A VariantCollection is a dictionary with some added features.
-
-   A VariantCollection can only contain variants (of a certain type). When
-   initializing VariantCollection a subclass of Variant (or Variant itself to
-   allow diverse types )must be passed as the first argument (`variant_type`),
-   limiting the type of variant that is allowed to be added to the collection.
-   During initialization, other arguments can be passed as if initializing a
-   normal dictionary.
-
-   When adding a variant, the key of the item in the dictionary must equal the
-   label of the variant. The method `add()` can be used instead, which
-   automatically sets the variant label as the key.
-
-   Thirdly, when setting a variant with a label that already exists, the
-   default behaviour is to raise an exception. This prevents overwriting
-   existing variants. This behaviour can be overridden using `add(variant,
-   overwrite=True)`.
-
-
-   The `add()` method
-
-   Examples:
-   ```
-   >>> variant_a = EITDataVariant(label="raw", ...)
-   >>> vc = VariantCollection(EITDataVariant, raw=variant_a)
-   >>> variant_b = EITDataVariant(label="filtered", ...)
-   >>> vc.add(variant_b)  # equals vc["filtered"] = variant
-   ```
-
-   ```
-   >>> vc = VariantCollection(EITDataVariant)
-   >>> variant_c = SomeOtherVariant(label="offset", ...)
-   >>> vc.add(variant_c)  # raises InvalidVariantType() exception
-   ```
-
-
-   .. py:attribute:: variant_type
-      :type: type[V]
-
-      
-
-   .. py:method:: __eq__(other: typing_extensions.Self)
-
-      Return self==value.
-
-
-   .. py:method:: __setitem__(__key: str, __value: V) -> None
-
-      Set self[key] to value.
-
-
-   .. py:method:: add(*variant: V, overwrite: bool = False) -> None
-
-      Add one or multiple variants to the dictionary
-
-      This method automatically sets the key of the item to the label of the
-      variant. By default, overwriting variants with the same label is
-      prevented. Trying to do so will result in a DuplicateVariantLabel
-      exception being raised. Set `overwrite` to `True` to allow overwriting.
-
-      Args:
-      - variant (Variant): the variant to be added. Multiple variants can be
-      added at once.
-
-      Raises:
-      - DuplicateVariantLabel if one attempts to add a variant with a label
-      that already exists as key.
-
-
-   .. py:method:: _check_variant(variant: V, key=None, overwrite: bool = False) -> None
-
-
-   .. py:method:: concatenate(a: typing_extensions.Self, b: typing_extensions.Self) -> typing_extensions.Self
-      :classmethod:
-
-
-
-.. py:data:: PathLike
-   :type: TypeAlias
-
-   
-
-.. py:data:: PathArg
-   :type: TypeAlias
-
-   
-
 .. py:data:: T
 
    
@@ -398,12 +158,46 @@ Attributes
 
    Bases: :py:obj:`eitprocessing.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`abc.ABC`
 
-   Adds slicing functionality to subclass by implementing `__getitem__`.
+   Container for EIT data.
 
-   Subclasses must implement a `_sliced_copy` function that defines what should
-   happen when the object is sliced. This class ensures that when calling a
-   slice between square brackets (as e.g. done for lists) then return the
-   expected sliced object.
+   This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
+   class is meant to hold data from (part of) a singular continuous measurement.
+
+   This class can't be initialized directly. Instead, use `EITData.from_path(...)` to load data from disk.
+   Currently, loading data from three vendors is supported. You can either pass the vendor when using
+   `EITData.from_path(..., vendor="timpel")`, or use one of the available subclasses of EITData:
+   `SentecEITData.from_path(...)`.
+
+   Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
+
+   .. py:property:: global_baseline
+      :type: numpy.ndarray
+
+      Return the global baseline, i.e. the minimum pixel impedance across all pixels.
+
+   .. py:property:: pixel_impedance_global_offset
+      :type: numpy.ndarray
+
+      Return the pixel impedance with the global baseline removed.
+
+      In the resulting array the minimum impedance across all pixels is set to 0.
+
+   .. py:property:: pixel_baseline
+      :type: numpy.ndarray
+
+      Return the lowest value in each individual pixel over time.
+
+   .. py:property:: pixel_impedance_individual_offset
+      :type: numpy.ndarray
+
+      Return the pixel impedance with the baseline of each individual pixel removed.
+
+      Each pixel in the resulting array has a minimum value of 0.
+
+   .. py:property:: global_impedance
+      :type: numpy.ndarray
+
+      Return the global impedance, i.e. the sum of all pixels at each frame.
 
    .. py:attribute:: path
       :type: pathlib.Path | list[pathlib.Path]
@@ -445,47 +239,47 @@ Attributes
 
       
 
-   .. py:attribute:: variants
-      :type: eitprocessing.variants.variant_collection.VariantCollection
+   .. py:attribute:: pixel_impedance
+      :type: numpy.typing.NDArray
 
       
 
    .. py:method:: __post_init__()
 
 
-   .. py:method:: from_path(path: PathArg, vendor: vendor.Vendor | str, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> typing_extensions.Self | tuple[typing_extensions.Self, eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection, eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection]
+   .. py:method:: from_path(path: str | pathlib.Path | list[str | pathlib.Path], vendor: vendor.Vendor | str, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> eitprocessing.data_collection.DataCollection | tuple[eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection]
       :classmethod:
 
-      Load sequence from path(s)
+      Load sequence from path(s).
 
-      :param path: path(s) to data file.
-      :type path: Path | str | list[Path | str]
+      :param path: relative or absolute path(s) to data file.
       :param vendor: vendor indicating the device used.
-      :type vendor: Vendor | str
       :param label: description of object for human interpretation.
                     Defaults to "Sequence_<unique_id>".
-      :type label: str
       :param framerate: framerate at which the data was recorded.
                         Default for Draeger: 20
                         Default for Timpel: 50
-      :type framerate: int, optional
-      :param first_frame: index of first time point of sequence
-                          (i.e. NOT the timestamp).
+                        Default for Sentec: 50.2
+      :param first_frame: index of first frame to load.
                           Defaults to 0.
-      :type first_frame: int, optional
       :param max_frames: maximum number of frames to load.
                          The actual number of frames can be lower than this if this
                          would surpass the final frame.
-      :type max_frames: int, optional
+      :param return_non_eit_data: whether to load available continuous and sparse data.
 
       :raises NotImplementedError: is raised when there is no loading method for
       :raises the given vendor.:
 
-      :returns: a sequence containing the loaded data from all files in path
-      :rtype: Sequence
+      :returns: container for the loaded data and metadata from all files in path.
+      :rtype: EITData
 
 
-   .. py:method:: _ensure_path_list(path: PathArg) -> list[pathlib.Path]
+   .. py:method:: _from_path(path: pathlib.Path, framerate: float | None = None, first_frame: int | None = None, max_frames: int | None = None, return_non_eit_data: bool = False) -> eitprocessing.data_collection.DataCollection | tuple[eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection]
+      :classmethod:
+      :abstractmethod:
+
+
+   .. py:method:: _ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
       :staticmethod:
 
 
@@ -493,7 +287,7 @@ Attributes
       :staticmethod:
 
 
-   .. py:method:: _check_first_frame(first_frame)
+   .. py:method:: _check_first_frame(first_frame: int | None) -> int
       :staticmethod:
 
 
@@ -503,8 +297,7 @@ Attributes
       Check whether vendor exists, and assure it's a Vendor object.
 
 
-   .. py:method:: concatenate(a: T, b: T, label: str | None = None) -> T
-      :classmethod:
+   .. py:method:: concatenate(other: T, label: str | None = None) -> T
 
 
    .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
@@ -515,9 +308,7 @@ Attributes
       indices.
 
 
-   .. py:method:: _from_path(path: pathlib.Path, label: str | None = None, framerate: float | None = None, first_frame: int | None = None, max_frames: int | None = None, return_non_eit_data: bool = False) -> typing_extensions.Self | tuple[typing_extensions.Self, eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection, eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection]
-      :classmethod:
-      :abstractmethod:
+   .. py:method:: __len__()
 
 
 
@@ -526,12 +317,17 @@ Attributes
 
    Bases: :py:obj:`EITData`
 
-   Adds slicing functionality to subclass by implementing `__getitem__`.
+   Container for EIT data.
 
-   Subclasses must implement a `_sliced_copy` function that defines what should
-   happen when the object is sliced. This class ensures that when calling a
-   slice between square brackets (as e.g. done for lists) then return the
-   expected sliced object.
+   This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
+   class is meant to hold data from (part of) a singular continuous measurement.
+
+   This class can't be initialized directly. Instead, use `EITData.from_path(...)` to load data from disk.
+   Currently, loading data from three vendors is supported. You can either pass the vendor when using
+   `EITData.from_path(..., vendor="timpel")`, or use one of the available subclasses of EITData:
+   `SentecEITData.from_path(...)`.
+
+   Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
 
    .. py:attribute:: vendor
       :type: vendor.Vendor
@@ -541,51 +337,38 @@ Attributes
    .. py:method:: __add__(other: T) -> T
 
 
-   .. py:method:: from_path(path: PathArg, label: str | None = None, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> typing_extensions.Self | tuple[typing_extensions.Self, eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection, eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection]
+   .. py:method:: from_path(path: str | pathlib.Path | list[str | pathlib.Path], framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> eitprocessing.data_collection.DataCollection | tuple[eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection]
       :classmethod:
 
-      Load sequence from path(s)
+      Load sequence from path(s).
 
-      :param path: path(s) to data file.
-      :type path: Path | str | list[Path | str]
+      :param path: relative or absolute path(s) to data file.
       :param vendor: vendor indicating the device used.
-      :type vendor: Vendor | str
       :param label: description of object for human interpretation.
                     Defaults to "Sequence_<unique_id>".
-      :type label: str
       :param framerate: framerate at which the data was recorded.
                         Default for Draeger: 20
                         Default for Timpel: 50
-      :type framerate: int, optional
-      :param first_frame: index of first time point of sequence
-                          (i.e. NOT the timestamp).
+                        Default for Sentec: 50.2
+      :param first_frame: index of first frame to load.
                           Defaults to 0.
-      :type first_frame: int, optional
       :param max_frames: maximum number of frames to load.
                          The actual number of frames can be lower than this if this
                          would surpass the final frame.
-      :type max_frames: int, optional
+      :param return_non_eit_data: whether to load available continuous and sparse data.
 
       :raises NotImplementedError: is raised when there is no loading method for
       :raises the given vendor.:
 
-      :returns: a sequence containing the loaded data from all files in path
-      :rtype: Sequence
+      :returns: container for the loaded data and metadata from all files in path.
+      :rtype: EITData
 
 
 
-.. py:exception:: NoVendorProvided
+.. py:exception:: UnknownVendorError
 
 
-   Bases: :py:obj:`Exception`
-
-   Raised when no vendor is provided when trying to load data.
-
-
-.. py:exception:: UnknownVendor
-
-
-   Bases: :py:obj:`Exception`
+   Bases: :py:obj:`ValueError`
 
    Raised when an unknown vendor is provided when trying to load data.
 

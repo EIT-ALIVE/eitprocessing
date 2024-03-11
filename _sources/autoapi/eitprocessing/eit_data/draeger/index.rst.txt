@@ -13,6 +13,7 @@ Classes
 .. autoapisummary::
 
    eitprocessing.eit_data.draeger.DraegerEITData
+   eitprocessing.eit_data.draeger._MedibusField
 
 
 
@@ -22,9 +23,14 @@ Attributes
 
 .. autoapisummary::
 
-   eitprocessing.eit_data.draeger.medibus_field
-   eitprocessing.eit_data.draeger.medibus_fields
+   eitprocessing.eit_data.draeger._FRAME_SIZE_BYTES
+   eitprocessing.eit_data.draeger._medibus_fields
 
+
+.. py:data:: _FRAME_SIZE_BYTES
+   :value: 4358
+
+   
 
 .. py:class:: DraegerEITData
 
@@ -44,11 +50,11 @@ Attributes
 
       
 
-   .. py:method:: _from_path(path: pathlib.Path, label: str | None = None, framerate: float | None = 20, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> typing_extensions.Self | tuple[typing_extensions.Self, eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection, eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection]
+   .. py:method:: _from_path(path: pathlib.Path, framerate: float | None = 20, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> eitprocessing.data_collection.DataCollection | tuple[eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection]
       :classmethod:
 
 
-   .. py:method:: _convert_medibus_data(medibus_data: numpy.typing.NDArray, time: numpy.typing.NDArray) -> tuple[eitprocessing.continuous_data.continuous_data_collection.ContinuousDataCollection, eitprocessing.sparse_data.sparse_data_collection.SparseDataCollection]
+   .. py:method:: _convert_medibus_data(medibus_data: numpy.typing.NDArray, time: numpy.typing.NDArray) -> tuple[eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection]
       :classmethod:
 
 
@@ -64,11 +70,28 @@ Attributes
 
 
 
-.. py:data:: medibus_field
+.. py:class:: _MedibusField
 
-   
 
-.. py:data:: medibus_fields
+   Bases: :py:obj:`NamedTuple`
+
+   .. py:attribute:: signal_name
+      :type: str
+
+      
+
+   .. py:attribute:: unit
+      :type: str
+
+      
+
+   .. py:attribute:: continuous
+      :type: bool
+
+      
+
+
+.. py:data:: _medibus_fields
 
    
 

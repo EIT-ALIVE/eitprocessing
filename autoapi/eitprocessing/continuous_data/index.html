@@ -14,7 +14,7 @@
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="eitprocessing.continuous_data.continuous_data_collection" href="continuous_data_collection/index.html" />
+    <link rel="next" title="eitprocessing.data_collection" href="../data_collection/index.html" />
     <link rel="prev" title="eitprocessing.binreader.reader" href="../binreader/reader/index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -27,7 +27,7 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="continuous_data_collection/index.html" title="eitprocessing.continuous_data.continuous_data_collection"
+          <a href="../data_collection/index.html" title="eitprocessing.data_collection"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../binreader/reader/index.html" title="eitprocessing.binreader.reader"
@@ -46,88 +46,27 @@
             
   <section id="module-eitprocessing.continuous_data">
 <span id="eitprocessing-continuous-data"></span><h1><a class="reference internal" href="#module-eitprocessing.continuous_data" title="eitprocessing.continuous_data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.continuous_data</span></code></a><a class="headerlink" href="#module-eitprocessing.continuous_data" title="Link to this heading">¶</a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="continuous_data_collection/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.continuous_data.continuous_data_collection</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="continuous_data_variant/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.continuous_data.continuous_data_variant</span></code></a></li>
-</ul>
-</div>
-</section>
 <section id="package-contents">
 <h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading">¶</a></h2>
 <section id="classes">
 <h3>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousDataVariant" title="eitprocessing.continuous_data.ContinuousDataVariant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContinuousDataVariant</span></code></a></p></td>
-<td><p>Contains a single variant of a dataset.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.continuous_data.Equivalence" title="eitprocessing.continuous_data.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Equivalence</span></code></a></p></td>
+<td><p>Mixin class that adds an equality and equivalence check.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.continuous_data.Equivalence" title="eitprocessing.continuous_data.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Equivalence</span></code></a></p></td>
-<td><p>Helper class that provides a standard way to create an ABC using</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.continuous_data.SelectByTime" title="eitprocessing.continuous_data.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByTime</span></code></a></p></td>
+<td><p>Adds methods for slicing by time rather than index.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.continuous_data.VariantCollection" title="eitprocessing.continuous_data.VariantCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VariantCollection</span></code></a></p></td>
-<td><p>A collection of variants of a single type</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData" title="eitprocessing.continuous_data.ContinuousData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContinuousData</span></code></a></p></td>
-<td><p>Helper class that provides a standard way to create an ABC using</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData" title="eitprocessing.continuous_data.ContinuousData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContinuousData</span></code></a></p></td>
+<td><p>Data class for (non-EIT) data with a continuous time axis.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py class">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousDataVariant">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.continuous_data.</span></span><span class="sig-name descname"><span class="pre">ContinuousDataVariant</span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data/continuous_data_variant.html#ContinuousDataVariant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousDataVariant" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../variants/index.html#eitprocessing.variants.Variant" title="eitprocessing.variants.Variant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.variants.Variant</span></code></a></p>
-<p>Contains a single variant of a dataset.</p>
-<p>A variant of a dataset is defined as either the raw data, or an edited
-version of that raw data. For example, EIT data can contain a “raw”
-versions and a “filtered” version. Both variants share the same time axis.</p>
-<p>The actual data of a variant is contained in a variable that must be set by
-a subclass inheriting from this class.</p>
-<p>Attributes:
-- label (str): a short descriptor for the variant, that is used to access</p>
-<blockquote>
-<div><p>the variant</p>
-</div></blockquote>
-<ul class="simple">
-<li><p>description (str): a longer description of the variant</p></li>
-<li><p>params (dict): contains information on how to reproduce the variant, e.g.
-which filters and filters settigs were used</p></li>
-</ul>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousDataVariant.values">
-<span class="sig-name descname"><span class="pre">values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.typing.NDArray</span></em><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousDataVariant.values" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousDataVariant.__len__">
-<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data/continuous_data_variant.html#ContinuousDataVariant.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousDataVariant.__len__" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousDataVariant.concatenate">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">concatenate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data/continuous_data_variant.html#ContinuousDataVariant.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousDataVariant.concatenate" title="Link to this definition">¶</a></dt>
-<dd><p>Concatenates two variants</p>
-<p>Concatenating two variants results in a single variant with the
-combined length of both variants.</p>
-<p>To merge more than two variants, use
-<cite>functools.reduce(Variant.concatenate, list_of_variants)</cite>.</p>
-<p>Args:
-- a (Variant)
-- b (Variant)</p>
-<p>Raises:
-- EquivalenceError if a and b are not equivalent and can’t be merged</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.continuous_data.Equivalence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.continuous_data.</span></span><span class="sig-name descname"><span class="pre">Equivalence</span></span><a class="reference internal" href="../../../_modules/eitprocessing/mixins/equality.html#Equivalence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.Equivalence" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
-<p>Helper class that provides a standard way to create an ABC using
-inheritance.</p>
+<dd><p>Mixin class that adds an equality and equivalence check.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.continuous_data.Equivalence.__eq__">
 <span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/mixins/equality.html#Equivalence.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.Equivalence.__eq__" title="Link to this definition">¶</a></dt>
@@ -136,7 +75,7 @@ inheritance.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.continuous_data.Equivalence._array_safe_eq">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_array_safe_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/mixins/equality.html#Equivalence._array_safe_eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.Equivalence._array_safe_eq" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_array_safe_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/mixins/equality.html#Equivalence._array_safe_eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.Equivalence._array_safe_eq" title="Link to this definition">¶</a></dt>
 <dd><p>Check if a and b are equal, even if they are numpy arrays containing nans.</p>
 </dd></dl>
 
@@ -171,88 +110,92 @@ returned.</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.VariantCollection">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.continuous_data.</span></span><span class="sig-name descname"><span class="pre">VariantCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variant_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.12)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><span class="pre">V</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/variants/variant_collection.html#VariantCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.VariantCollection" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a>, <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.mixins.equality.Equivalence" title="eitprocessing.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.mixins.equality.Equivalence</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">V</span></code>]</p>
-<p>A collection of variants of a single type</p>
-<p>A VariantCollection is a dictionary with some added features.</p>
-<p>A VariantCollection can only contain variants (of a certain type). When
-initializing VariantCollection a subclass of Variant (or Variant itself to
-allow diverse types )must be passed as the first argument (<cite>variant_type</cite>),
-limiting the type of variant that is allowed to be added to the collection.
-During initialization, other arguments can be passed as if initializing a
-normal dictionary.</p>
-<p>When adding a variant, the key of the item in the dictionary must equal the
-label of the variant. The method <cite>add()</cite> can be used instead, which
-automatically sets the variant label as the key.</p>
-<p>Thirdly, when setting a variant with a label that already exists, the
-default behaviour is to raise an exception. This prevents overwriting
-existing variants. This behaviour can be overridden using <cite>add(variant,
-overwrite=True)</cite>.</p>
-<p>The <cite>add()</cite> method</p>
-<p>Examples:
-<code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">variant_a</span> <span class="pre">=</span> <span class="pre">EITDataVariant(label=&quot;raw&quot;,</span> <span class="pre">...)</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">vc</span> <span class="pre">=</span> <span class="pre">VariantCollection(EITDataVariant,</span> <span class="pre">raw=variant_a)</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">variant_b</span> <span class="pre">=</span> <span class="pre">EITDataVariant(label=&quot;filtered&quot;,</span> <span class="pre">...)</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">vc.add(variant_b)</span>&#160; <span class="pre">#</span> <span class="pre">equals</span> <span class="pre">vc[&quot;filtered&quot;]</span> <span class="pre">=</span> <span class="pre">variant</span>
-<span class="pre">`</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">vc</span> <span class="pre">=</span> <span class="pre">VariantCollection(EITDataVariant)</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">variant_c</span> <span class="pre">=</span> <span class="pre">SomeOtherVariant(label=&quot;offset&quot;,</span> <span class="pre">...)</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">vc.add(variant_c)</span>&#160; <span class="pre">#</span> <span class="pre">raises</span> <span class="pre">InvalidVariantType()</span> <span class="pre">exception</span>
-<span class="pre">`</span></code></p>
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.SelectByTime">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.continuous_data.</span></span><span class="sig-name descname"><span class="pre">SelectByTime</span></span><a class="reference internal" href="../../../_modules/eitprocessing/mixins/slicing.html#SelectByTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.SelectByTime" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByIndex</span></code></p>
+<p>Adds methods for slicing by time rather than index.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.SelectByTime.t">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.mixins.slicing.TimeIndexer" title="eitprocessing.mixins.slicing.TimeIndexer"><span class="pre">TimeIndexer</span></a></em><a class="headerlink" href="#eitprocessing.continuous_data.SelectByTime.t" title="Link to this definition">¶</a></dt>
+<dd><p>Time Indexer property.</p>
+</dd></dl>
+
 <dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.VariantCollection.variant_type">
-<span class="sig-name descname"><span class="pre">variant_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.12)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><span class="pre">V</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#eitprocessing.continuous_data.VariantCollection.variant_type" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.SelectByTime.time">
+<span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.typing.NDArray</span></em><a class="headerlink" href="#eitprocessing.continuous_data.SelectByTime.time" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.VariantCollection.__eq__">
-<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/variants/variant_collection.html#VariantCollection.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.VariantCollection.__eq__" title="Link to this definition">¶</a></dt>
-<dd><p>Return self==value.</p>
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.SelectByTime.select_by_time">
+<span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_inclusive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_inclusive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../_modules/eitprocessing/mixins/slicing.html#SelectByTime.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.SelectByTime.select_by_time" title="Link to this definition">¶</a></dt>
+<dd><p>Get a slice from start to end time stamps.</p>
+<p>Given a start and end time stamp (i.e. its value, not its index),
+return a slice of the original object, which must contain a time axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_time</strong> – first time point to include. Defaults to first frame of sequence.</p></li>
+<li><p><strong>end_time</strong> – last time point. Defaults to last frame of sequence.</p></li>
+<li><p><strong>(</strong><strong>default</strong> (<em>start_inclusive</em>) – <cite>True</cite>), end_inclusive (default <cite>False</cite>):
+these arguments control the behavior if the given time stamp
+does not match exactly with an existing time stamp of the input.
+if <cite>True</cite>: the given time stamp will be inside the sliced object.
+if <cite>False</cite>: the given time stamp will be outside the sliced object.</p></li>
+<li><p><strong>label</strong> – Description. Defaults to None, which will create a label based
+on the original object label and the frames by which it is sliced.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.12)"><strong>TypeError</strong></a> – if <cite>self</cite> does not contain a <cite>time</cite> attribute.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if time stamps are not sorted.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Slice of self.</p>
+</dd>
+</dl>
 </dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.VariantCollection.__setitem__">
-<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">__key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">__value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/variants/variant_collection.html#VariantCollection.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.VariantCollection.__setitem__" title="Link to this definition">¶</a></dt>
-<dd><p>Set self[key] to value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.VariantCollection.add">
-<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">variant</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/variants/variant_collection.html#VariantCollection.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.VariantCollection.add" title="Link to this definition">¶</a></dt>
-<dd><p>Add one or multiple variants to the dictionary</p>
-<p>This method automatically sets the key of the item to the label of the
-variant. By default, overwriting variants with the same label is
-prevented. Trying to do so will result in a DuplicateVariantLabel
-exception being raised. Set <cite>overwrite</cite> to <cite>True</cite> to allow overwriting.</p>
-<p>Args:
-- variant (Variant): the variant to be added. Multiple variants can be
-added at once.</p>
-<p>Raises:
-- DuplicateVariantLabel if one attempts to add a variant with a label
-that already exists as key.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.VariantCollection._check_variant">
-<span class="sig-name descname"><span class="pre">_check_variant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/variants/variant_collection.html#VariantCollection._check_variant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.VariantCollection._check_variant" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.VariantCollection.concatenate">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">concatenate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../_modules/eitprocessing/variants/variant_collection.html#VariantCollection.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.VariantCollection.concatenate" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.continuous_data.</span></span><span class="sig-name descname"><span class="pre">ContinuousData</span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.mixins.equality.Equivalence" title="eitprocessing.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.mixins.equality.Equivalence</span></code></a></p>
-<p>Helper class that provides a standard way to create an ABC using
-inheritance.</p>
+<dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.mixins.equality.Equivalence" title="eitprocessing.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.mixins.slicing.SelectByTime" title="eitprocessing.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.mixins.slicing.SelectByTime</span></code></a></p>
+<p>Data class for (non-EIT) data with a continuous time axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – Computer readable naming of the instance.</p></li>
+<li><p><strong>name</strong> – Human readable naming of the instance.</p></li>
+<li><p><strong>unit</strong> – Unit for the data.</p></li>
+<li><p><strong>category</strong> – Category the data falls into, e.g. ‘airway pressure’.</p></li>
+<li><p><strong>description</strong> – Human readable extended description of the data.</p></li>
+<li><p><strong>parameters</strong> – Parameters used to derive this data.</p></li>
+<li><p><strong>derived_from</strong> – Traceback of intermediates from which the current data was derived.</p></li>
+<li><p><strong>values</strong> – Data points.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.locked">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">locked</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.locked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.locked" title="Link to this definition">¶</a></dt>
+<dd><p>Return whether the values attribute is locked.</p>
+<p>See lock().</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.loaded">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.loaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.loaded" title="Link to this definition">¶</a></dt>
+<dd><p>Return whether the data was loaded from disk, or derived from elsewhere.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.label">
+<span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.label" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.name" title="Link to this definition">¶</a></dt>
@@ -264,52 +207,150 @@ inheritance.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.description">
-<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.description"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.description" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.category">
 <span class="sig-name descname"><span class="pre">category</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.category"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.category" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.description"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.description" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">typing_extensions.Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.parameters" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.derived_from">
+<span class="sig-name descname"><span class="pre">derived_from</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">typing_extensions.Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">typing_extensions.Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.derived_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.derived_from" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.time">
-<span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.typing.NDArray</span></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.time" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.time" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.loaded">
-<span class="sig-name descname"><span class="pre">loaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.loaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.loaded" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.calculated_from">
-<span class="sig-name descname"><span class="pre">calculated_from</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.calculated_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.calculated_from" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.variants">
-<span class="sig-name descname"><span class="pre">variants</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../variants/variant_collection/index.html#eitprocessing.variants.variant_collection.VariantCollection" title="eitprocessing.variants.variant_collection.VariantCollection"><span class="pre">eitprocessing.variants.variant_collection.VariantCollection</span></a></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.variants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.variants" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.values">
+<span class="sig-name descname"><span class="pre">values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.values" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.__post_init__">
-<span class="sig-name descname"><span class="pre">__post_init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.__post_init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.__post_init__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__post_init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.__post_init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.__post_init__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.concatenate">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">concatenate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.concatenate" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.__setattr__">
+<span class="sig-name descname"><span class="pre">__setattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.__setattr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.__setattr__" title="Link to this definition">¶</a></dt>
+<dd><p>Implement setattr(self, name, value).</p>
 </dd></dl>
 
-<dl class="py exception">
-<dt class="sig sig-object py" id="eitprocessing.continuous_data.DataSourceUnknown">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.continuous_data.</span></span><span class="sig-name descname"><span class="pre">DataSourceUnknown</span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#DataSourceUnknown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.DataSourceUnknown" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
-<p>Raised when the source of data is unknown.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.copy" title="Link to this definition">¶</a></dt>
+<dd><p>Create a copy.</p>
+<p>Whenever data is altered, it should probably be copied first. The alterations should then be made in the copy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.derive">
+<span class="sig-name descname"><span class="pre">derive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.12)"><span class="pre">collections.abc.Callable</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.derive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.derive" title="Link to this definition">¶</a></dt>
+<dd><p>Create a copy deriving data from values attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – New label for the derived object.</p></li>
+<li><p><strong>function</strong> – Function that takes the values and returns the derived values.</p></li>
+<li><p><strong>func_args</strong> – Arguments to pass to function.</p></li>
+<li><p><strong>**kwargs</strong> – New values for attributes of</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example:
+<a href="#id1"><span class="problematic" id="id2">``</span></a>`
+def convert_data(x, add=None, subtract=None, multiply=None, divide=None):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>if add:</dt><dd><p>x += add</p>
+</dd>
+<dt>if subtract:</dt><dd><p>x -= subtract</p>
+</dd>
+<dt>if multiply:</dt><dd><p>x <a href="#id3"><span class="problematic" id="id4">*</span></a>= multiply</p>
+</dd>
+<dt>if divide:</dt><dd><p>x /= divide</p>
+</dd>
+</dl>
+<p>return x</p>
+</div></blockquote>
+<dl class="simple">
+<dt>data = ContinuousData(</dt><dd><p>name=”Lung volume (in mL)”, label=”volume_mL”, unit=”mL”, category=”volume”, values=some_loaded_data</p>
+</dd>
+</dl>
+<p>)
+derived = data.derive(“volume_L”, convert_data, {“divide”: 1000}, name=”Lung volume (in L)”, unit=”L”)
+<a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.lock">
+<span class="sig-name descname"><span class="pre">lock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.lock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.lock" title="Link to this definition">¶</a></dt>
+<dd><p>Lock attributes, essentially rendering them read-only.</p>
+<p>Locked attributes cannot be overwritten. Attributes can be unlocked using <cite>unlock()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*attr</strong> – any number of attributes can be passed here, all of which will be locked. Defaults to “values”.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># lock the `values` attribute of `data`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="c1"># will result in an AttributeError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c1"># will result in a RuntimeError</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.unlock">
+<span class="sig-name descname"><span class="pre">unlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.unlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.unlock" title="Link to this definition">¶</a></dt>
+<dd><p>Unlock attributes, rendering them editable.</p>
+<p>Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*attr</strong> – any number of attributes can be passed here, all of which will be unlocked. Defaults to “values”.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># lock the `values` attribute of `data`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="c1"># will result in an AttributeError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c1"># will result in a RuntimeError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="go">[1,2,3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c1"># will result in a RuntimeError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData.__len__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.continuous_data.ContinuousData._sliced_copy">
+<span class="sig-name descname"><span class="pre">_sliced_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../_modules/eitprocessing/continuous_data.html#ContinuousData._sliced_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.continuous_data.ContinuousData._sliced_copy" title="Link to this definition">¶</a></dt>
+<dd><p>Slicing method that must be implemented by all subclasses.</p>
+<p>Must return a copy of self object with all attached data within selected
+indices.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -327,44 +368,42 @@ inheritance.</p>
     <h3><a href="../../../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.continuous_data</span></code></a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#package-contents">Package Contents</a><ul>
 <li><a class="reference internal" href="#classes">Classes</a><ul>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousDataVariant"><code class="docutils literal notranslate"><span class="pre">ContinuousDataVariant</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousDataVariant.values"><code class="docutils literal notranslate"><span class="pre">ContinuousDataVariant.values</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousDataVariant.__len__"><code class="docutils literal notranslate"><span class="pre">ContinuousDataVariant.__len__()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousDataVariant.concatenate"><code class="docutils literal notranslate"><span class="pre">ContinuousDataVariant.concatenate()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#eitprocessing.continuous_data.Equivalence"><code class="docutils literal notranslate"><span class="pre">Equivalence</span></code></a><ul>
 <li><a class="reference internal" href="#eitprocessing.continuous_data.Equivalence.__eq__"><code class="docutils literal notranslate"><span class="pre">Equivalence.__eq__()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.continuous_data.Equivalence._array_safe_eq"><code class="docutils literal notranslate"><span class="pre">Equivalence._array_safe_eq()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.continuous_data.Equivalence.isequivalent"><code class="docutils literal notranslate"><span class="pre">Equivalence.isequivalent()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.VariantCollection"><code class="docutils literal notranslate"><span class="pre">VariantCollection</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.VariantCollection.variant_type"><code class="docutils literal notranslate"><span class="pre">VariantCollection.variant_type</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.VariantCollection.__eq__"><code class="docutils literal notranslate"><span class="pre">VariantCollection.__eq__()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.VariantCollection.__setitem__"><code class="docutils literal notranslate"><span class="pre">VariantCollection.__setitem__()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.VariantCollection.add"><code class="docutils literal notranslate"><span class="pre">VariantCollection.add()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.VariantCollection._check_variant"><code class="docutils literal notranslate"><span class="pre">VariantCollection._check_variant()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.VariantCollection.concatenate"><code class="docutils literal notranslate"><span class="pre">VariantCollection.concatenate()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.SelectByTime"><code class="docutils literal notranslate"><span class="pre">SelectByTime</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.SelectByTime.t"><code class="docutils literal notranslate"><span class="pre">SelectByTime.t</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.SelectByTime.time"><code class="docutils literal notranslate"><span class="pre">SelectByTime.time</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.SelectByTime.select_by_time"><code class="docutils literal notranslate"><span class="pre">SelectByTime.select_by_time()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData"><code class="docutils literal notranslate"><span class="pre">ContinuousData</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.locked"><code class="docutils literal notranslate"><span class="pre">ContinuousData.locked</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.loaded"><code class="docutils literal notranslate"><span class="pre">ContinuousData.loaded</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.label"><code class="docutils literal notranslate"><span class="pre">ContinuousData.label</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.name"><code class="docutils literal notranslate"><span class="pre">ContinuousData.name</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.unit"><code class="docutils literal notranslate"><span class="pre">ContinuousData.unit</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.description"><code class="docutils literal notranslate"><span class="pre">ContinuousData.description</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.category"><code class="docutils literal notranslate"><span class="pre">ContinuousData.category</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.description"><code class="docutils literal notranslate"><span class="pre">ContinuousData.description</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.parameters"><code class="docutils literal notranslate"><span class="pre">ContinuousData.parameters</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.derived_from"><code class="docutils literal notranslate"><span class="pre">ContinuousData.derived_from</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.time"><code class="docutils literal notranslate"><span class="pre">ContinuousData.time</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.loaded"><code class="docutils literal notranslate"><span class="pre">ContinuousData.loaded</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.calculated_from"><code class="docutils literal notranslate"><span class="pre">ContinuousData.calculated_from</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.variants"><code class="docutils literal notranslate"><span class="pre">ContinuousData.variants</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.values"><code class="docutils literal notranslate"><span class="pre">ContinuousData.values</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.__post_init__"><code class="docutils literal notranslate"><span class="pre">ContinuousData.__post_init__()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.concatenate"><code class="docutils literal notranslate"><span class="pre">ContinuousData.concatenate()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.__setattr__"><code class="docutils literal notranslate"><span class="pre">ContinuousData.__setattr__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.copy"><code class="docutils literal notranslate"><span class="pre">ContinuousData.copy()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.derive"><code class="docutils literal notranslate"><span class="pre">ContinuousData.derive()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.lock"><code class="docutils literal notranslate"><span class="pre">ContinuousData.lock()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.unlock"><code class="docutils literal notranslate"><span class="pre">ContinuousData.unlock()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData.__len__"><code class="docutils literal notranslate"><span class="pre">ContinuousData.__len__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.continuous_data.ContinuousData._sliced_copy"><code class="docutils literal notranslate"><span class="pre">ContinuousData._sliced_copy()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#eitprocessing.continuous_data.DataSourceUnknown"><code class="docutils literal notranslate"><span class="pre">DataSourceUnknown</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -381,8 +420,8 @@ inheritance.</p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="continuous_data_collection/index.html"
-                          title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.continuous_data.continuous_data_collection</span></code></a></p>
+    <p class="topless"><a href="../data_collection/index.html"
+                          title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.data_collection</span></code></a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -415,7 +454,7 @@ inheritance.</p>
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="continuous_data_collection/index.html" title="eitprocessing.continuous_data.continuous_data_collection"
+          <a href="../data_collection/index.html" title="eitprocessing.data_collection"
              >next</a> |</li>
         <li class="right" >
           <a href="../binreader/reader/index.html" title="eitprocessing.binreader.reader"
