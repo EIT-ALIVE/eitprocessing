@@ -151,7 +151,8 @@ class EITData(SelectByTime, Equivalence, ABC):
         first_frame: int | None = None,
         max_frames: int | None = None,
         return_non_eit_data: bool = False,
-    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]: ...
+    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
+        ...
 
     @staticmethod
     def _ensure_path_list(path: str | Path | list[str | Path]) -> list[Path]:

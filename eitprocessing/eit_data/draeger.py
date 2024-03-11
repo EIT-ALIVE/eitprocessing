@@ -180,7 +180,7 @@ class DraegerEITData(EITData_):
         event_text = reader.string(length=30)
         timing_error = reader.int32()
 
-        frame_medibus_data = reader.npfloat32(length=52)  # noqa;
+        frame_medibus_data = reader.npfloat32(length=52)
 
         if index < 0:
             # do not keep any loaded data, just return the event marker
