@@ -17,29 +17,36 @@ if TYPE_CHECKING:
 
 @dataclass(eq=False)
 class Sequence(Equivalence, SelectByTime):
-    """Sequence of timepoints containing EIT and/or waveform data.
+    """Sequence of timepoints containing respiratory data.
 
-    A Sequence is a representation of a continuous set of data points, either EIT frames,
-    waveform data, or both. A Sequence can consist of an entire measurement, a section of a
-    measurement, a single breath, or even a portion of a breath.
-    A sequence can be split up into separate sections of a measurement or multiple (similar)
-    Sequence objects can be merged together to form a single Sequence.
+    A Sequence object is a representation of data points over time. These data can consist of any combination of EIT
+    frames (`EITData`), waveform data (`ContinuousData`) from different sources, or individual events (`SparseData`)
+    occurring at any given timepoint.
+    A Sequence can consist of an entire measurement, a section of a measurement, a single breath, or even a portion of a
+    breath. A Sequence can consist of multiple sets of each type of data from the same time-points or can be a single
+    measurement from just one source.
 
-    EIT data is contained within Framesets. A Frameset shares the time axis with a Sequence.
+    A Sequence can be split up into separate sections of a measurement or multiple (similar) Sequence objects can be
+    merged together to form a single Sequence.
 
     Args:
-        framesets (dict[str, Frameset]): dictionary of framesets
-        events (list[Event]): list of Event objects in data
-        timing_errors (list[TimingError]): list of TimingError objects in data
-        phases (list[PhaseIndicator]): list of PhaseIndicator objects in data
+        label: Computer readable naming of the instance.
+        name: Human readable naming of the instance.
+        description: Human readable extended description of the data.
+        eit_data: Collection of one or more sets of EIT data frames.
+        continuous_data: Collection of one or more sets of continuous data points.
+        sparse_data: Collection of one or more sets of individual data points.
     """
 
+    label: str
+    name: str = ""
+    description: str = ""
     eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData))
     continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData))
     sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData))
 
     def __post_init__(self):
-        pass
+        self.name = self.name or self.label
 
     @property
     def time(self) -> np.ndarray:
@@ -73,7 +80,7 @@ class Sequence(Equivalence, SelectByTime):
 
         return a.__class__(eit_data=eit_data)
 
-    def _sliced_copy(self, start_index: int, end_index: int) -> Self:
+    def _sliced_copy(self, start_index: int, end_index: int, label: str) -> Self:
         eit_data = DataCollection(EITData)
         for value in self.eit_data.values():
             eit_data.add(value[start_index:end_index])
@@ -92,6 +99,9 @@ class Sequence(Equivalence, SelectByTime):
             sparse_data.add(value.t[time[0], time[-1]])
 
         return self.__class__(
+            label=label,
+            name=f"Sliced copy of <{self.name}>",
+            description=f"Sliced copy of <{self.description}>",
             eit_data=eit_data,
             continuous_data=continuous_data,
             sparse_data=sparse_data,
