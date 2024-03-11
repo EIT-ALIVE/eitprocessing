@@ -23,7 +23,7 @@ class ContinuousData(Equivalence, SelectByTime):
         name: Human readable naming of the instance.
         unit: Unit for the data.
         category: Category the data falls into, e.g. 'airway pressure'.
-        description: Human readible extended description of the data.
+        description: Human readable extended description of the data.
         parameters: Parameters used to derive this data.
         derived_from: Traceback of intermediates from which the current data was derived.
         values: Data points.
