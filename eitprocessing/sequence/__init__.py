@@ -80,7 +80,7 @@ class Sequence(Equivalence, SelectByTime):
 
         return a.__class__(eit_data=eit_data)
 
-    def _sliced_copy(self, start_index: int, end_index: int) -> Self:
+    def _sliced_copy(self, start_index: int, end_index: int, label: str) -> Self:
         eit_data = DataCollection(EITData)
         for value in self.eit_data.values():
             eit_data.add(value[start_index:end_index])
@@ -99,6 +99,9 @@ class Sequence(Equivalence, SelectByTime):
             sparse_data.add(value.t[time[0], time[-1]])
 
         return self.__class__(
+            label=label,
+            name=f"Sliced copy of <{self.name}>",
+            description=f"Sliced copy of <{self.description}>",
             eit_data=eit_data,
             continuous_data=continuous_data,
             sparse_data=sparse_data,
