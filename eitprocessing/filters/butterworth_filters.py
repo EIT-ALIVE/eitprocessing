@@ -55,7 +55,7 @@ class ButterworthFilter(TimeDomainFilter):
     sample_frequency: float
     ignore_max_order: InitVar[bool] = False
 
-    def __post_init__(self, ignore_max_order):
+    def __post_init__(self, ignore_max_order: bool):
         self._check_init(ignore_max_order)
         self._set_filter_type_class()
 
@@ -73,9 +73,8 @@ class ButterworthFilter(TimeDomainFilter):
         cls = FILTER_TYPES[self.filter_type]
         self.__class__ = cls
 
-    def _check_init(self, ignore_max_order) -> None:
-        """
-        Check the arguments of __init__ and raise exceptions when they don't meet requirements.
+    def _check_init(self, ignore_max_order: bool) -> None:  # noqa:C901
+        """Check the arguments of __init__ and raise exceptions when they don't meet requirements.
 
         Raises:
             ValueError: if the `filter_type` is unknown.
@@ -92,24 +91,22 @@ class ButterworthFilter(TimeDomainFilter):
         """
         if self.filter_type in ("lowpass", "highpass"):
             if not isinstance(self.cutoff_frequency, int | float):
-                msg = "Invalid `cutoff_frequency`. " f"Must be an integer or float, not {type(self.cutoff_frequency)}."
+                msg = f"Invalid `cutoff_frequency`. Must be an integer or float, not {type(self.cutoff_frequency)}."
                 raise TypeError(msg)
 
         elif self.filter_type in ("bandpass", "bandstop"):
             if isinstance(self.cutoff_frequency, list):
                 self.cutoff_frequency = tuple(self.cutoff_frequency)
             elif not isinstance(self.cutoff_frequency, tuple):
-                msg = "Invalid `cutoff_frequency`. " f"Must be a tuple, not {type(self.cutoff_frequency)}."
+                msg = f"Invalid `cutoff_frequency`. Must be a tuple, not {type(self.cutoff_frequency)}."
                 raise TypeError(msg)
 
-            if len(self.cutoff_frequency) != 2:
-                msg = f"Invalid `cutoff_frequency` ({self.cutoff_frequency}). " "Must have length 2."
+            if len(self.cutoff_frequency) != 2:  # noqa: PLR2004
+                msg = f"Invalid `cutoff_frequency` ({self.cutoff_frequency}). Must have length 2."
                 raise ValueError(msg)
 
             if not all(isinstance(value, int | float) for value in self.cutoff_frequency):
-                msg = (
-                    f"Invalid `cutoff_frequency` ({self.cutoff_frequency}). " "Must be a tuple containing two numbers."
-                )
+                msg = f"Invalid `cutoff_frequency` ({self.cutoff_frequency}). Must be a tuple containing two numbers."
                 raise TypeError(msg)
         else:
             msg = f"Invalid `filter_type` ({self.filter_type}). Must be one of {', '.join(FILTER_TYPES.keys())}."
