@@ -45,11 +45,15 @@ class ContinuousData(Equivalence, SelectByTime):
         self.lock("time")
 
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
-        old_value = getattr(self, attr)
-        if isinstance(old_value, np.ndarray) and old_value.flags["WRITEABLE"] is False:
-            msg = f"Attribute '{attr}' is locked and can't be overwritten."
-            raise AttributeError(msg)
-        super().__setattr__(self, attr, value)
+        try:
+            old_value = getattr(self, attr)
+        except AttributeError:
+            pass
+        else:
+            if isinstance(old_value, np.ndarray) and old_value.flags["WRITEABLE"] is False:
+                msg = f"Attribute '{attr}' is locked and can't be overwritten."
+                raise AttributeError(msg)
+        super().__setattr__(attr, value)
 
     def copy(
         self,
@@ -174,3 +178,29 @@ class ContinuousData(Equivalence, SelectByTime):
     def loaded(self) -> bool:
         """Return whether the data was loaded from disk, or derived from elsewhere."""
         return len(self.derived_from) == 0
+
+    def __len__(self):
+        return len(self.time)
+
+    def _sliced_copy(
+        self,
+        start_index: int,
+        end_index: int,
+        label: str,
+    ) -> Self:
+        # TODO: check correct implementation
+        cls = self.__class__
+        time = self.time[start_index:end_index]
+        values = self.values[start_index:end_index]
+        description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
+
+        return cls(
+            label=label,
+            name=self.name,
+            unit=self.unit,
+            category=self.category,
+            description=description,
+            derived_from=[*self.derived_from, self],
+            time=time,
+            values=values,
+        )
