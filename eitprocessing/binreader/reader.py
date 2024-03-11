@@ -34,12 +34,12 @@ class Reader:
         data = self._read_full_type_code(full_type_code)
         return np.array(data, dtype=cast)
 
-    def read_string(self, length=1):
+    def read_string(self, length: int = 1) -> str:
         full_type_code = f"{length}s"
         data = self._read_full_type_code(full_type_code)
         return data[0].decode().rstrip()
 
-    def _read_full_type_code(self, full_type_code) -> tuple[Any, ...]:
+    def _read_full_type_code(self, full_type_code: str) -> tuple[Any, ...]:
         if self.endian:
             if self.endian not in ["little", "big"]:
                 msg = f"Endian type '{self.endian}' not recognized. Allowed values are 'little' and 'big'."
@@ -58,19 +58,19 @@ class Reader:
     def float64(self) -> float:
         return self.read_single(type_code="d", cast=float)
 
-    def npfloat32(self, length=1) -> NDArray[np.float32]:
+    def npfloat32(self, length: int = 1) -> NDArray[np.float32]:
         return self.read_array(type_code="f", cast=np.float32, length=length)
 
-    def npfloat64(self, length=1) -> NDArray[np.float64]:
+    def npfloat64(self, length: int = 1) -> NDArray[np.float64]:
         return self.read_array(type_code="d", cast=np.float64, length=length)
 
     def int32(self) -> int:
         return self.read_single(type_code="i", cast=int)
 
-    def npint32(self, length=1) -> NDArray[np.int32]:
+    def npint32(self, length: int = 1) -> NDArray[np.int32]:
         return self.read_array(type_code="i", cast=np.int32, length=length)
 
-    def string(self, length=1) -> str:
+    def string(self, length: int = 1) -> str:
         return self.read_string(length=length)
 
     def uint8(self) -> int:
