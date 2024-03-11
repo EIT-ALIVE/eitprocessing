@@ -34,12 +34,15 @@ class Sequence(Equivalence, SelectByTime):
         phases (list[PhaseIndicator]): list of PhaseIndicator objects in data
     """
 
+    label: str
+    name: str = ""
+    description: str = ""
     eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData))
     continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData))
     sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData))
 
     def __post_init__(self):
-        pass
+        self.name = self.name or self.label
 
     @property
     def time(self) -> np.ndarray:
