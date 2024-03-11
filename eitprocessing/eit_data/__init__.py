@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import reduce
@@ -178,7 +179,9 @@ class EITData(SelectByTime, Equivalence, ABC):
             first_frame = 0
         if int(first_frame) != first_frame:
             msg = f"`first_frame` must be an int, but was given as {first_frame} (type: {type(first_frame)})"
-            raise TypeError(msg)
+            raise TypeError(
+                msg,
+            )
         if first_frame < 0:
             msg = f"`first_frame` can not be negative, but was given as {first_frame}"
             raise ValueError(msg)
@@ -187,6 +190,11 @@ class EITData(SelectByTime, Equivalence, ABC):
     @staticmethod
     def _ensure_vendor(vendor: Vendor | str) -> Vendor:
         """Check whether vendor exists, and assure it's a Vendor object."""
+        if not vendor:
+            raise NoVendorProvided()
+
+        if isinstance(vendor, str):
+            vendor = vendor.lower()
         try:
             return Vendor(vendor)
         except ValueError as e:
@@ -238,7 +246,24 @@ class EITData(SelectByTime, Equivalence, ABC):
         end_index: int,
         label: str,
     ) -> Self:
-        cls = self.__class__
+        cls = self._get_vendor_class(self.vendor)
+
+        if end_index <= start_index:
+            msg = f"{end_index} (end_index) lower than {start_index} (start_index)."
+            raise ValueError(
+                msg,
+            )
+
+        time_length = len(self.time)
+
+        if start_index >= time_length:
+            msg = f"{start_index} (start_index) higher than maximum time length {time_length}."
+            raise ValueError(msg)
+
+        if end_index >= time_length:
+            msg = f"{end_index} (end_index) higher than maximum time length {time_length}."
+            raise ValueError(msg)
+
         time = self.time[start_index:end_index]
         nframes = len(time)
 
