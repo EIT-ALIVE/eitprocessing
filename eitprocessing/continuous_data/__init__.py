@@ -47,11 +47,12 @@ class ContinuousData(Equivalence, SelectByTime):
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
         try:
             old_value = getattr(self, attr)
-            if isinstance(old_value, np.ndarray) and old_value.flags["WRITEABLE"] is False:
-                msg = f"Attribute '{attr}' is locked and can't be overwritten."
-                raise ValueError(msg)
         except AttributeError:
             pass
+        else:
+            if isinstance(old_value, np.ndarray) and old_value.flags["WRITEABLE"] is False:
+                msg = f"Attribute '{attr}' is locked and can't be overwritten."
+                raise AttributeError(msg)
         super().__setattr__(attr, value)
 
     def copy(
@@ -177,6 +178,9 @@ class ContinuousData(Equivalence, SelectByTime):
     def loaded(self) -> bool:
         """Return whether the data was loaded from disk, or derived from elsewhere."""
         return len(self.derived_from) == 0
+
+    def __len__(self):
+        return len(self.time)
 
     def _sliced_copy(
         self,
