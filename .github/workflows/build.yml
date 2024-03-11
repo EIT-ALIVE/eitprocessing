@@ -3,8 +3,8 @@ name: Python package
 on:
   push:
     branches:
-    - main
-    - drcandacemakedamoore/docker
+      - main
+      - drcandacemakedamoore/docker
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
@@ -12,18 +12,17 @@ on:
       - "**.rst"
       - "**.ipynb"
     branches:
-    - main
+      - main
 
 jobs:
-
   build:
     if: github.event.pull_request.draft == false
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest']
-        python-version: ['3.10']
+        os: ["ubuntu-latest"]
+        python-version: ["3.10"]
     name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -57,7 +56,7 @@ jobs:
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
-          python-version: '3.10'
+          python-version: "3.10"
       - name: Python info
         shell: bash -l {0}
         run: |
@@ -67,10 +66,8 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip setuptools
           python3 -m pip install .[dev,publishing]
-      - name: Check style against standards using prospector
-        run: prospector
-      - name: Check import order
-        run: isort --check-only eitprocessing --diff
+      - name: Check linting with ruff
+        run: ruff .
 
   coveralls:
     if: github.event.pull_request.draft == false

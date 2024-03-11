@@ -1,22 +1,21 @@
-"""Tests for the Butterworth time domain filter"""
-from typing import Literal
-from typing import TypeAlias
+from typing import Literal, TypeAlias
+
 import numpy as np
 import pytest
 from scipy import signal
-from eitprocessing.filters.butterworth_filters import BandPassFilter
-from eitprocessing.filters.butterworth_filters import BandStopFilter
-from eitprocessing.filters.butterworth_filters import ButterworthFilter
-from eitprocessing.filters.butterworth_filters import HighPassFilter
-from eitprocessing.filters.butterworth_filters import LowPassFilter
+
+from eitprocessing.filters.butterworth_filters import (
+    BandPassFilter,
+    BandStopFilter,
+    ButterworthFilter,
+    HighPassFilter,
+    LowPassFilter,
+)
+
+SpecifiedFilter: TypeAlias = type[LowPassFilter | HighPassFilter | BandPassFilter | BandStopFilter]
 
 
-SpecifiedFilter: TypeAlias = type[
-    LowPassFilter | HighPassFilter | BandPassFilter | BandStopFilter
-]
-
-
-@pytest.fixture
+@pytest.fixture()
 def filter_arguments():
     return {
         "filter_type": "lowpass",
@@ -186,7 +185,7 @@ def test_specified_butterworth_equivalence(filter_arguments):
     assert filter7 == filter8
 
 
-def test_butterworth_functionality():  # pylint: disable=too-many-locals
+def test_butterworth_functionality():
     """Tests the functionality of the Butterworth filters.
 
     This function tests whether a filter created by initializing a ButterworthFilter does the same
@@ -196,7 +195,6 @@ def test_butterworth_functionality():  # pylint: disable=too-many-locals
     initialized, and is equal to using the normal scipy functions without the ButterworthFilter
     wrapper.
     """
-
     sample_frequency = 50
     freq_low = 1
     freq_medium = 4
@@ -223,9 +221,9 @@ def test_butterworth_functionality():  # pylint: disable=too-many-locals
         class_: SpecifiedFilter,
         data: np.ndarray,
         axis: int,
-    ):
+    ) -> None:
         """Compare filters created using ButterworthFilter to filters created using the
-        corresponding subclass
+        corresponding subclass.
 
         This function creates two filter instances, one using the ButterworthFilter, and one using
         either of the four subclasses. It then compares whether those filters are equal, and have
@@ -247,14 +245,20 @@ def test_butterworth_functionality():  # pylint: disable=too-many-locals
             sample_frequency=sample_frequency,
         )
         filter2 = class_(
-            cutoff_frequency=cutoff, order=order, sample_frequency=sample_frequency
+            cutoff_frequency=cutoff,
+            order=order,
+            sample_frequency=sample_frequency,
         )
         result1 = filter1.apply_filter(data, axis=axis)
         result2 = filter2.apply_filter(data, axis=axis)
         assert np.array_equal(result1, result2)
 
         sos = signal.butter(
-            order, cutoff, filter_type, fs=sample_frequency, output="sos"
+            order,
+            cutoff,
+            filter_type,
+            fs=sample_frequency,
+            output="sos",
         )
         scipy_result = signal.sosfiltfilt(sos, data, axis=axis)
         assert result1.shape == scipy_result.shape
@@ -271,8 +275,16 @@ def test_butterworth_functionality():  # pylint: disable=too-many-locals
         compare_filters(lowpass_cutoff, "lowpass", LowPassFilter, signal_, axis)
         compare_filters(highpass_cutoff, "highpass", HighPassFilter, signal_, axis)
         compare_filters(
-            (lowpass_cutoff, highpass_cutoff), "bandpass", BandPassFilter, signal_, axis
+            (lowpass_cutoff, highpass_cutoff),
+            "bandpass",
+            BandPassFilter,
+            signal_,
+            axis,
         )
         compare_filters(
-            (lowpass_cutoff, highpass_cutoff), "bandstop", BandStopFilter, signal_, axis
+            (lowpass_cutoff, highpass_cutoff),
+            "bandstop",
+            BandStopFilter,
+            signal_,
+            axis,
         )
