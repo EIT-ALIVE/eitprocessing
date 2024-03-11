@@ -3,6 +3,9 @@ from matplotlib import pyplot as plt
 
 from eitprocessing.eit_data.eit_data_variant import EITDataVariant
 
+# TODO: remove line below to activate linting
+# ruff: noqa
+
 
 def animate_EITDataVariant(
     eit_data_variant: EITDataVariant,

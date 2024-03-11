@@ -1,5 +1,8 @@
 from matplotlib import pyplot as plt
 
+# TODO: remove line below to activate linting
+# ruff: noqa
+
 
 def plot_waveforms(self, waveforms=None) -> None:
     if waveforms is None:

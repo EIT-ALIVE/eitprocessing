@@ -4,6 +4,8 @@ import numpy as np
 import pytest
 
 from eitprocessing.eit_data.draeger import DraegerEITData
+# TODO: remove line below to activate linting
+# ruff: noqa
 
 environment = os.environ.get(
     "EIT_PROCESSING_TEST_DATA",
