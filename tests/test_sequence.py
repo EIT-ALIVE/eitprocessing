@@ -22,27 +22,27 @@ dummy_file = Path(data_directory) / "not_a_file.dummy"
 
 @pytest.fixture(scope="module")
 def draeger_data1():
-    return Sequence(EITData.from_path(draeger_file1, vendor="draeger"))
+    return Sequence("draeger_data1", eit_data=EITData.from_path(draeger_file1, vendor="draeger"))
 
 
 @pytest.fixture(scope="module")
 def draeger_data2():
-    return Sequence(EITData.from_path(draeger_file2, vendor="draeger"))
+    return Sequence("draeger_data2", eit_data=EITData.from_path(draeger_file2, vendor="draeger"))
 
 
 @pytest.fixture(scope="module")
 def draeger_data_both():
-    return Sequence(EITData.from_path([draeger_file2, draeger_file1], vendor="draeger"))
+    return Sequence("draeger_data_both", eit_data=EITData.from_path([draeger_file2, draeger_file1], vendor="draeger"))
 
 
 @pytest.fixture(scope="module")
 def timpel_data():
-    return Sequence(EITData.from_path(timpel_file, vendor="timpel"))
+    return Sequence("timpel_data", eit_data=EITData.from_path(timpel_file, vendor="timpel"))
 
 
 @pytest.fixture()
 def timpel_data_double():
-    return Sequence(EITData.from_path([timpel_file, timpel_file], vendor="timpel"))
+    return Sequence("timpel_data_double", eit_data=EITData.from_path([timpel_file, timpel_file], vendor="timpel"))
 
 
 def test_from_path_draeger(
@@ -73,7 +73,7 @@ def test_from_path_timpel(
     timpel_data: Sequence,
     # timpel_data_double: Sequence,  # does not currently work, because it won't load due to the time axes overlapping
 ):
-    using_vendor = Sequence(EITData.from_path(timpel_file, vendor=Vendor.TIMPEL))
+    using_vendor = Sequence("timpel_data", eit_data=EITData.from_path(timpel_file, vendor=Vendor.TIMPEL))
     assert timpel_data == using_vendor
     assert isinstance(timpel_data, Sequence)
     assert isinstance(timpel_data.eit_data["raw"], TimpelEITData)
@@ -105,11 +105,17 @@ def test_merge(
     # timpel_data_double: Sequence,
 ):
     merged_draeger = Sequence.concatenate(draeger_data2, draeger_data1)
-    assert len(merged_draeger.eit_data["raw"]) == len(draeger_data2.eit_data["raw"]) + len(
-        draeger_data1.eit_data["raw"],
+    merged_draeger.label = draeger_data_both.label
+    merged_draeger.name = draeger_data_both.name
+
+    assert len(merged_draeger.eit_data["raw"]) == (
+        len(draeger_data2.eit_data["raw"]) + len(draeger_data1.eit_data["raw"])
     )
     assert merged_draeger == draeger_data_both
+
     added_draeger = draeger_data2 + draeger_data1
+    added_draeger.label = merged_draeger.label
+    added_draeger.name = merged_draeger.name
     assert added_draeger == merged_draeger
 
     draeger_load_double = Sequence(EITData.from_path([draeger_file1, draeger_file1], "draeger"))
