@@ -2,7 +2,8 @@ from functools import reduce
 from pathlib import Path
 
 from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data import EITData, draeger, sentec, timpel
+from eitprocessing.eit_data import EITData
+from eitprocessing.eit_data.loading import draeger, sentec, timpel
 from eitprocessing.eit_data.vendor import Vendor
 
 
