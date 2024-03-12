@@ -75,10 +75,11 @@ class Sequence(Equivalence, SelectByTime):
         # TODO: rewrite
 
         eit_data = a.eit_data.concatenate(b.eit_data) if a.eit_data and b.eit_data else None
-
+        label = f"{a.label} and {b.label}"
+        name = f"{a.name} and {b.name}"
         # TODO: add concatenation of other attached objects
 
-        return a.__class__(eit_data=eit_data)
+        return cls(label=label, name=name, eit_data=eit_data)
 
     def _sliced_copy(self, start_index: int, end_index: int, label: str) -> Self:
         eit_data = DataCollection(EITData)
