@@ -3,7 +3,6 @@ from __future__ import annotations
 import mmap
 import sys
 import warnings
-from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
@@ -11,7 +10,7 @@ import numpy as np
 from eitprocessing.binreader.reader import Reader
 from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data import EITData_
+from eitprocessing.eit_data import EITData
 from eitprocessing.eit_data.event import Event
 from eitprocessing.eit_data.phases import MaxValue, MinValue
 from eitprocessing.eit_data.vendor import Vendor
@@ -23,188 +22,183 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 _FRAME_SIZE_BYTES = 4358
+FRAMERATE = 20
 
 
-@dataclass(eq=False)
-class DraegerEITData(EITData_):
-    """Container for EIT data recorded using the Dräger Pulmovista PV500."""
+def from_path(
+    path: Path,
+    framerate: float | None = 20,
+    first_frame: int = 0,
+    max_frames: int | None = None,
+    return_non_eit_data: bool = False,
+) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
+    """Load Dräger EIT data from path(s).
 
-    vendor: Vendor = field(default=Vendor.DRAEGER, init=False)
-    framerate: float = 20
-
-    @classmethod
-    def _from_path(
-        cls,
-        path: Path,
-        framerate: float | None = 20,
-        first_frame: int = 0,
-        max_frames: int | None = None,
-        return_non_eit_data: bool = False,
-    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
-        file_size = path.stat().st_size
-        if file_size % _FRAME_SIZE_BYTES:
-            msg = (
-                f"File size {file_size} of file {path!s} not divisible by {_FRAME_SIZE_BYTES}.\n"
-                f"Make sure this is a valid and uncorrupted Dräger data file."
-            )
-            raise OSError(msg)
-        total_frames = file_size // _FRAME_SIZE_BYTES
-
-        if (f0 := first_frame) > (fn := total_frames):
-            msg = f"Invalid input: `first_frame` ({f0}) is larger than the total number of frames in the file ({fn})."
-            raise ValueError(msg)
-
-        n_frames = min(total_frames - first_frame, max_frames or sys.maxsize)
-
-        if max_frames and max_frames != n_frames:
-            msg = (
-                f"The number of frames requested ({max_frames}) is larger "
-                f"than the available number ({n_frames}) of frames after "
-                f"the first frame selected ({first_frame}, total frames: "
-                f"{total_frames}).\n {n_frames} frames will be loaded."
-            )
-            warnings.warn(msg)
-
-        # We need to load 1 frame before first actual frame to check if there is an event marker. Data for the pre-first
-        # (dummy) frame will be removed from self at the end of this function.
-        load_dummy_frame = first_frame > 0
-        first_frame_to_load = first_frame - 1 if load_dummy_frame else 0
-
-        pixel_impedance = np.zeros((n_frames, 32, 32))
-        time = np.zeros((n_frames,))
-        events = []
-        phases = []
-        medibus_data = np.zeros((52, n_frames))
-
-        with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
-            fh.seek(first_frame_to_load * _FRAME_SIZE_BYTES)
-            reader = Reader(fh)
-            previous_marker = None
-
-            first_index = -1 if load_dummy_frame else 0
-            for index in range(first_index, n_frames):
-                previous_marker = cls._read_frame(
-                    reader,
-                    index,
-                    time,
-                    pixel_impedance,
-                    medibus_data,
-                    events,
-                    phases,
-                    previous_marker,
-                )
-
-        if not framerate:
-            framerate = cls.framerate
-
-        eit_data_collection = DataCollection(cls)
-        eit_data_collection.add(
-            cls(
-                path=path,
-                framerate=framerate,
-                nframes=n_frames,
-                time=time,
-                phases=phases,
-                events=events,
-                label="raw",
-                pixel_impedance=pixel_impedance,
-            ),
+    See loading.from_path().
+    """
+    file_size = path.stat().st_size
+    if file_size % _FRAME_SIZE_BYTES:
+        msg = (
+            f"File size {file_size} of file {path!s} not divisible by {_FRAME_SIZE_BYTES}.\n"
+            f"Make sure this is a valid and uncorrupted Dräger data file."
         )
-        if return_non_eit_data:
-            (
-                continuous_data_collection,
-                sparse_data_collections,
-            ) = cls._convert_medibus_data(medibus_data, time)
+        raise OSError(msg)
+    total_frames = file_size // _FRAME_SIZE_BYTES
 
-            return (
-                eit_data_collection,
-                continuous_data_collection,
-                sparse_data_collections,
+    if (f0 := first_frame) > (fn := total_frames):
+        msg = f"Invalid input: `first_frame` ({f0}) is larger than the total number of frames in the file ({fn})."
+        raise ValueError(msg)
+
+    n_frames = min(total_frames - first_frame, max_frames or sys.maxsize)
+
+    if max_frames and max_frames != n_frames:
+        msg = (
+            f"The number of frames requested ({max_frames}) is larger "
+            f"than the available number ({n_frames}) of frames after "
+            f"the first frame selected ({first_frame}, total frames: "
+            f"{total_frames}).\n {n_frames} frames will be loaded."
+        )
+        warnings.warn(msg)
+
+    # We need to load 1 frame before first actual frame to check if there is an event marker. Data for the pre-first
+    # (dummy) frame will be removed from self at the end of this function.
+    load_dummy_frame = first_frame > 0
+    first_frame_to_load = first_frame - 1 if load_dummy_frame else 0
+
+    pixel_impedance = np.zeros((n_frames, 32, 32))
+    time = np.zeros((n_frames,))
+    events = []
+    phases = []
+    medibus_data = np.zeros((52, n_frames))
+
+    with path.open("br") as fh:
+        fh.seek(first_frame_to_load * _FRAME_SIZE_BYTES)
+        reader = Reader(fh)
+        previous_marker = None
+
+        first_index = -1 if load_dummy_frame else 0
+        for index in range(first_index, n_frames):
+            previous_marker = _read_frame(
+                reader,
+                index,
+                time,
+                pixel_impedance,
+                medibus_data,
+                events,
+                phases,
+                previous_marker,
             )
 
-        return eit_data_collection
+    if not framerate:
+        framerate = FRAMERATE
 
-    @classmethod
-    def _convert_medibus_data(
-        cls,
-        medibus_data: NDArray,
-        time: NDArray,
-    ) -> tuple[DataCollection, DataCollection]:
-        continuous_data_collection = DataCollection(ContinuousData)
-        sparse_data_collection = DataCollection(SparseData)
+    eit_data_collection = DataCollection(EITData)
+    eit_data_collection.add(
+        EITData(
+            vendor=Vendor.DRAEGER,
+            path=path,
+            framerate=framerate,
+            nframes=n_frames,
+            time=time,
+            phases=phases,
+            events=events,
+            label="raw",
+            pixel_impedance=pixel_impedance,
+        ),
+    )
+    if return_non_eit_data:
+        (
+            continuous_data_collection,
+            sparse_data_collections,
+        ) = _convert_medibus_data(medibus_data, time)
 
-        for field_info, data in zip(_medibus_fields, medibus_data, strict=True):
-            if field_info.continuous:
-                continuous_data = ContinuousData(
-                    label=field_info.signal_name,
-                    name=field_info.signal_name,
-                    description=f"Continuous {field_info.signal_name} data loaded from file",
-                    unit=field_info.unit,
-                    time=time,
-                    values=data,
-                    category=field_info.signal_name,
-                )
-                continuous_data.lock()
-                continuous_data_collection.add(continuous_data)
+        return (
+            eit_data_collection,
+            continuous_data_collection,
+            sparse_data_collections,
+        )
 
-            else:
-                # TODO parse sparse data
-                ...
+    return eit_data_collection
 
-        return continuous_data_collection, sparse_data_collection
 
-    @classmethod
-    def _read_frame(  # noqa: PLR0913
-        cls,
-        reader: Reader,
-        index: int,
-        time: NDArray,
-        pixel_impedance: NDArray,
-        medibus_data: NDArray,
-        events: list,
-        phases: list,
-        previous_marker: int | None,
-    ) -> int:
-        """Read frame by frame data from DRAEGER files.
+def _convert_medibus_data(
+    medibus_data: NDArray,
+    time: NDArray,
+) -> tuple[DataCollection, DataCollection]:
+    continuous_data_collection = DataCollection(ContinuousData)
+    sparse_data_collection = DataCollection(SparseData)
 
-        This method adds the loaded data to the provided arrays `time` and
-        `pixel_impedance` and the provided lists `events` and `phases` when the
-        index is non-negative. When the index is negative, no data is saved. In
-        any case, the event marker is returned.
-        """
-        frame_time = round(reader.float64() * 24 * 60 * 60, 3)
-        _ = reader.float32()
-        frame_pixel_impedance = reader.npfloat32(length=1024)
-        frame_pixel_impedance = np.reshape(frame_pixel_impedance, (32, 32), "C")
-        min_max_flag = reader.int32()
-        event_marker = reader.int32()
-        event_text = reader.string(length=30)
-        timing_error = reader.int32()
+    for field_info, data in zip(_medibus_fields, medibus_data, strict=True):
+        if field_info.continuous:
+            continuous_data = ContinuousData(
+                label=field_info.signal_name,
+                name=field_info.signal_name,
+                description=f"Continuous {field_info.signal_name} data loaded from file",
+                unit=field_info.unit,
+                time=time,
+                values=data,
+                category=field_info.signal_name,
+            )
+            continuous_data.lock()
+            continuous_data_collection.add(continuous_data)
 
-        frame_medibus_data = reader.npfloat32(length=52)
+        else:
+            # TODO parse sparse data
+            ...
 
-        if index < 0:
-            # do not keep any loaded data, just return the event marker
-            return event_marker
+    return continuous_data_collection, sparse_data_collection
 
-        time[index] = frame_time
-        pixel_impedance[index, :, :] = frame_pixel_impedance
-        medibus_data[:, index] = frame_medibus_data
 
-        # The event marker stays the same until the next event occurs.
-        # Therefore, check whether the event marker has changed with
-        # respect to the most recent event. If so, create a new event.
-        if (previous_marker is not None) and (event_marker > previous_marker):
-            events.append(Event(index, frame_time, event_marker, event_text))
-        if timing_error:
-            warnings.warn("A timing error was encountered during loading.")
-            # TODO: expand on what timing errors are in some documentation.
-        if min_max_flag == 1:
-            phases.append(MaxValue(index, frame_time))
-        elif min_max_flag == -1:
-            phases.append(MinValue(index, frame_time))
+def _read_frame(  # noqa: PLR0913
+    reader: Reader,
+    index: int,
+    time: NDArray,
+    pixel_impedance: NDArray,
+    medibus_data: NDArray,
+    events: list,
+    phases: list,
+    previous_marker: int | None,
+) -> int:
+    """Read frame by frame data from DRAEGER files.
 
+    This method adds the loaded data to the provided arrays `time` and
+    `pixel_impedance` and the provided lists `events` and `phases` when the
+    index is non-negative. When the index is negative, no data is saved. In
+    any case, the event marker is returned.
+    """
+    frame_time = round(reader.float64() * 24 * 60 * 60, 3)
+    _ = reader.float32()
+    frame_pixel_impedance = reader.npfloat32(length=1024)
+    frame_pixel_impedance = np.reshape(frame_pixel_impedance, (32, 32), "C")
+    min_max_flag = reader.int32()
+    event_marker = reader.int32()
+    event_text = reader.string(length=30)
+    timing_error = reader.int32()
+
+    frame_medibus_data = reader.npfloat32(length=52)
+
+    if index < 0:
+        # do not keep any loaded data, just return the event marker
         return event_marker
+
+    time[index] = frame_time
+    pixel_impedance[index, :, :] = frame_pixel_impedance
+    medibus_data[:, index] = frame_medibus_data
+
+    # The event marker stays the same until the next event occurs.
+    # Therefore, check whether the event marker has changed with
+    # respect to the most recent event. If so, create a new event.
+    if (previous_marker is not None) and (event_marker > previous_marker):
+        events.append(Event(index, frame_time, event_marker, event_text))
+    if timing_error:
+        warnings.warn("A timing error was encountered during loading.")
+        # TODO: expand on what timing errors are in some documentation.
+    if min_max_flag == 1:
+        phases.append(MaxValue(index, frame_time))
+    elif min_max_flag == -1:
+        phases.append(MinValue(index, frame_time))
+
+    return event_marker
 
 
 class _MedibusField(NamedTuple):

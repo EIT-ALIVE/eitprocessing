@@ -1,28 +1,25 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from functools import reduce
 from pathlib import Path
 from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
-from typing_extensions import Self, override
+from typing_extensions import Self
 
-from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from eitprocessing.data_collection import DataCollection
+    from eitprocessing.eit_data.vendor import Vendor
 
 T = TypeVar("T", bound="EITData")
 
 
 @dataclass(eq=False)
-class EITData(SelectByTime, Equivalence, ABC):
+class EITData(SelectByTime, Equivalence):
     """Container for EIT data.
 
     This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
@@ -51,155 +48,26 @@ class EITData(SelectByTime, Equivalence, ABC):
             self.label = f"{self.__class__.__name__}_{id(self)}"
         self._check_equivalence = ["vendor", "framerate"]
 
-    @classmethod
-    def from_path(
-        cls,
-        path: str | Path | list[str | Path],
-        vendor: Vendor | str,
-        framerate: float | None = None,
-        first_frame: int = 0,
-        max_frames: int | None = None,
-        return_non_eit_data: bool = False,
-    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
-        """Load sequence from path(s).
-
-        Args:
-            path: relative or absolute path(s) to data file.
-            vendor: vendor indicating the device used.
-            label: description of object for human interpretation.
-                Defaults to "Sequence_<unique_id>".
-            framerate: framerate at which the data was recorded.
-                Default for Draeger: 20
-                Default for Timpel: 50
-                Default for Sentec: 50.2
-            first_frame: index of first frame to load.
-                Defaults to 0.
-            max_frames: maximum number of frames to load.
-                The actual number of frames can be lower than this if this
-                would surpass the final frame.
-            return_non_eit_data: whether to load available continuous and sparse data.
-
-        Raises:
-            NotImplementedError: is raised when there is no loading method for
-            the given vendor.
-
-        Returns:
-            EITData: container for the loaded data and metadata from all files in path.
-        """
-        from eitprocessing.data_collection import DataCollection
-
-        vendor = cls._ensure_vendor(vendor)
-        vendor_class = cls._get_vendor_class(vendor)
-
-        first_frame = cls._check_first_frame(first_frame)
-
-        paths = cls._ensure_path_list(path)
-
-        eit_datasets: list[DataCollection] = []
-        continuous_datasets: list[DataCollection] = []
-        sparse_datasets: list[DataCollection] = []
-
-        for single_path in paths:
-            single_path.resolve(strict=True)  # raise error if any file does not exist
-
-        for single_path in paths:
-            loaded_data = vendor_class._from_path(  # noqa: SLF001
-                path=single_path,
-                framerate=framerate,
-                first_frame=first_frame,
-                max_frames=max_frames,
-                return_non_eit_data=return_non_eit_data,
-            )
-
-            if return_non_eit_data:
-                from eitprocessing.continuous_data import ContinuousData
-                from eitprocessing.sparse_data import SparseData
-
-                if type(loaded_data) is not tuple:
-                    eit = loaded_data
-                    continuous = DataCollection(ContinuousData)
-                    sparse = DataCollection(SparseData)
-                else:
-                    eit, continuous, sparse = loaded_data
-
-                eit: DataCollection
-                continuous: DataCollection
-                sparse: DataCollection
-
-                eit_datasets.append(eit)
-                continuous_datasets.append(continuous)
-                sparse_datasets.append(sparse)
-
-            else:
-                assert isinstance(loaded_data, DataCollection)  # noqa: S101
-                eit_datasets.append(loaded_data)
-
-        if return_non_eit_data:
-            return tuple(
-                reduce(DataCollection.concatenate, datasets)
-                for datasets in (eit_datasets, continuous_datasets, sparse_datasets)
-            )
-
-        return reduce(DataCollection.concatenate, eit_datasets)
-
-    @classmethod
-    @abstractmethod
-    def _from_path(
-        cls: type[Self],
-        path: Path,
-        framerate: float | None = None,
-        first_frame: int | None = None,
-        max_frames: int | None = None,
-        return_non_eit_data: bool = False,
-    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
-        ...
-
     @staticmethod
-    def _ensure_path_list(path: str | Path | list[str | Path]) -> list[Path]:
+    def ensure_path_list(path: str | Path | list[str | Path]) -> list[Path]:
+        """Return the path or paths as a list.
+
+        The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
+        list of Path objects given either a str/Path or list of str/Paths.
+        """
         if isinstance(path, list):
             return [Path(p) for p in path]
         return [Path(path)]
 
-    @staticmethod
-    def _get_vendor_class(vendor: Vendor) -> type[EITData_]:
-        from eitprocessing.eit_data.draeger import DraegerEITData
-        from eitprocessing.eit_data.sentec import SentecEITData
-        from eitprocessing.eit_data.timpel import TimpelEITData
-
-        vendor_classes: dict[Vendor, type[EITData_]] = {
-            Vendor.DRAEGER: DraegerEITData,
-            Vendor.TIMPEL: TimpelEITData,
-            Vendor.SENTEC: SentecEITData,
-        }
-        return vendor_classes[vendor]
-
-    @staticmethod
-    def _check_first_frame(first_frame: int | None) -> int:
-        if first_frame is None:
-            first_frame = 0
-        if int(first_frame) != first_frame:
-            msg = f"`first_frame` must be an int, but was given as {first_frame} (type: {type(first_frame)})"
-            raise TypeError(msg)
-        if first_frame < 0:
-            msg = f"`first_frame` can not be negative, but was given as {first_frame}"
-            raise ValueError(msg)
-        return int(first_frame)
-
-    @staticmethod
-    def _ensure_vendor(vendor: Vendor | str) -> Vendor:
-        """Check whether vendor exists, and assure it's a Vendor object."""
-        try:
-            return Vendor(vendor)
-        except ValueError as e:
-            msg = f"Unknown vendor {vendor}."
-            raise UnknownVendorError(msg) from e
+    def __add__(self: T, other: T) -> T:
+        return self.concatenate(self, other)
 
     def concatenate(self: T, other: T, label: str | None = None) -> T:  # noqa: D102, will be removed soon
         cls = self.__class__
         self.isequivalent(other, raise_=True)
 
-        a_path = cls._ensure_path_list(self.path)
-        b_path = cls._ensure_path_list(other.path)
+        a_path = cls.ensure_path_list(self.path)
+        b_path = cls.ensure_path_list(other.path)
         path = a_path + b_path
 
         if np.min(other.time) <= np.max(self.time):
@@ -292,34 +160,3 @@ class EITData(SelectByTime, Equivalence, ABC):
     def global_impedance(self) -> np.ndarray:
         """Return the global impedance, i.e. the sum of all pixels at each frame."""
         return np.nansum(self.pixel_impedance, axis=(1, 2))
-
-
-@dataclass(eq=False)
-class EITData_(EITData):  # noqa: N801, D101
-    vendor: Vendor = field(init=False)
-
-    def __add__(self: T, other: T) -> T:
-        return self.concatenate(self, other)
-
-    @override  # remove vendor as argument
-    @classmethod
-    def from_path(
-        cls,
-        path: str | Path | list[str | Path],
-        framerate: float | None = None,
-        first_frame: int = 0,
-        max_frames: int | None = None,
-        return_non_eit_data: bool = False,
-    ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
-        return super().from_path(
-            path=path,
-            vendor=cls.vendor,
-            framerate=framerate,
-            first_frame=first_frame,
-            max_frames=max_frames,
-            return_non_eit_data=return_non_eit_data,
-        )
-
-
-class UnknownVendorError(ValueError):
-    """Raised when an unknown vendor is provided when trying to load data."""
