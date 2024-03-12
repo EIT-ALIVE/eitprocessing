@@ -24,7 +24,7 @@ VENDOR = Vendor.SENTEC
 FRAMERATE = 50.2
 
 
-def from_path(  # noqa: C901
+def load_from_single_path(  # noqa: C901
     path: Path,
     framerate: float | None = 50.2,
     first_frame: int = 0,

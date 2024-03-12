@@ -24,7 +24,7 @@ _NAN_VALUE = -1000
 FRAMERATE = 50
 
 
-def from_path(  # noqa: C901
+def load_from_single_path(  # noqa: C901
     path: Path,
     framerate: float | None = 20,
     first_frame: int = 0,

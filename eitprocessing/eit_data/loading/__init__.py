@@ -45,9 +45,9 @@ def from_path(
     vendor = _ensure_vendor(vendor)
 
     load_func = {
-        "draeger": draeger.from_path,
-        "timpel": timpel.from_path,
-        "sentec": sentec.from_path,
+        "draeger": draeger.load_from_single_path,
+        "timpel": timpel.load_from_single_path,
+        "sentec": sentec.load_from_single_path,
     }[vendor]
 
     first_frame = _check_first_frame(first_frame)
