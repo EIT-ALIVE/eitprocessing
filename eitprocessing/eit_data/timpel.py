@@ -104,7 +104,7 @@ class TimpelEITData(EITData_):
                 "cmH2O",
                 "pressure",
                 "Airway pressure measured by Timpel device",
-                loaded=True,
+                time=time,
                 values=data[:, 1024],
             ),
         )
@@ -116,7 +116,7 @@ class TimpelEITData(EITData_):
                 "L/s",
                 "flow",
                 "FLow measures by Timpel device",
-                loaded=True,
+                time=time,
                 values=data[:, 1025],
             ),
         )
@@ -128,7 +128,7 @@ class TimpelEITData(EITData_):
                 "L",
                 "volume",
                 "Volume measured by Timpel device",
-                loaded=True,
+                time=time,
                 values=data[:, 1026],
             ),
         )
