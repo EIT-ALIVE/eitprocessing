@@ -84,7 +84,7 @@ class SelectByTime(SelectByIndex):
 
     time: NDArray
 
-    def select_by_time(
+    def select_by_time(  # noqa: D417
         self,
         start_time: float | None = None,
         end_time: float | None = None,

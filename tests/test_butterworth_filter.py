@@ -13,6 +13,8 @@ from eitprocessing.filters.butterworth_filters import (
 )
 
 SpecifiedFilter: TypeAlias = type[LowPassFilter | HighPassFilter | BandPassFilter | BandStopFilter]
+# TODO: remove line below to activate linting
+# ruff: noqa
 
 
 @pytest.fixture()

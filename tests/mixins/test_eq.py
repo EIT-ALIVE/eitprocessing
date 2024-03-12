@@ -1,4 +1,6 @@
 # OLD FILE. TESTS NOT YET FUNCTIONAL
+# TODO: remove line below to activate linting
+# ruff: noqa
 
 import bisect
 import os
