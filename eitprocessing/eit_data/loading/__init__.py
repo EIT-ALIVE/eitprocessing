@@ -7,7 +7,7 @@ from eitprocessing.eit_data.loading import draeger, sentec, timpel
 from eitprocessing.eit_data.vendor import Vendor
 
 
-def from_path(
+def load_from(
     path: str | Path | list[str | Path],
     vendor: Vendor | str,
     framerate: float | None = None,
