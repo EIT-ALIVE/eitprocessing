@@ -25,7 +25,7 @@ _FRAME_SIZE_BYTES = 4358
 FRAMERATE = 20
 
 
-def from_path(
+def load_from_single_path(
     path: Path,
     framerate: float | None = 20,
     first_frame: int = 0,
