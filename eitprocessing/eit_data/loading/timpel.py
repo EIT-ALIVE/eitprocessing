@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 _COLUMN_WIDTH = 1030
 _NAN_VALUE = -1000
 
-FRAMERATE = 50
+TIMPEL_FRAMERATE = 50
 
 
 load_timpel_data = partial(load_data, vendor=Vendor.TIMPEL)
@@ -41,7 +41,7 @@ def load_from_single_path(
     See loading.from_path().
     """
     if not framerate:
-        framerate = FRAMERATE
+        framerate = TIMPEL_FRAMERATE
 
     try:
         data: NDArray = np.loadtxt(
