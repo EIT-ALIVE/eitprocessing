@@ -1,0 +1,41 @@
+:py:mod:`eitprocessing.parameters`
+==================================
+
+.. py:module:: eitprocessing.parameters
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   eeli/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.parameters.ParameterExtraction
+
+
+
+
+.. py:class:: ParameterExtraction
+
+
+   .. py:attribute:: available_in_gui
+      :value: True
+
+      
+
+   .. py:method:: compute_parameter(input_data)
+      :abstractmethod:
+
+
+
