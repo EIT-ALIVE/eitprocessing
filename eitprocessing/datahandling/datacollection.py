@@ -112,3 +112,15 @@ class DataCollection(UserDict, Equivalence, Generic[V]):
             concatenated[key] = self[key].concatenate(other[key])
 
         return concatenated
+
+    def select_by_time(
+        self,
+        start_time: float | None,
+        end_time: float | None,
+        start_inclusive: bool = True,
+        end_inclusive: bool = False,
+    ) -> Self:
+        """Return a DataCollection containing sliced copies of the items."""
+        return DataCollection(
+            {k: v.select_by_time(start_time, end_time, start_inclusive, end_inclusive) for k, v in self.items()},
+        )
