@@ -101,7 +101,7 @@ def load_data(
         description=description,
         eit_data=reduce(DataCollection.concatenate, eit_datasets),
         continuous_data=reduce(DataCollection.concatenate, continuous_datasets),
-        sparse_datasets=reduce(DataCollection.concatenate, sparse_datasets),
+        sparse_data=reduce(DataCollection.concatenate, sparse_datasets),
     )
 
 
