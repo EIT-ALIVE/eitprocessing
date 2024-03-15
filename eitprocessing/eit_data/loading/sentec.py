@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 VENDOR = Vendor.SENTEC
-FRAMERATE = 50.2
+SENTEC_FRAMERATE = 50.2
 
 load_sentec_data = partial(load_data, vendor=Vendor.SENTEC)
 
@@ -112,7 +112,7 @@ def load_from_single_path(  # noqa: C901
         warnings.warn(msg)
 
     if not framerate:
-        framerate = FRAMERATE
+        framerate = SENTEC_FRAMERATE
 
     eit_data_collection = DataCollection(EITData)
     eit_data_collection.add(

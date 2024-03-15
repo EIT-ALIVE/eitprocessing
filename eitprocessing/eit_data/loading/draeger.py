@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 _FRAME_SIZE_BYTES = 4358
-FRAMERATE = 20
+DRAEGER_FRAMERATE = 20
 load_draeger_data = partial(load_data, vendor=Vendor.DRAEGER)
 
 
@@ -92,7 +92,7 @@ def load_from_single_path(
             )
 
     if not framerate:
-        framerate = FRAMERATE
+        framerate = DRAEGER_FRAMERATE
 
     eit_data_collection = DataCollection(EITData)
     eit_data_collection.add(
