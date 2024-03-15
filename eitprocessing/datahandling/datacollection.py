@@ -121,5 +121,6 @@ class DataCollection(dict, Equivalence, Generic[V]):
     ) -> Self:
         """Return a DataCollection containing sliced copies of the items."""
         return DataCollection(
-            {k: v.select_by_time(start_time, end_time, start_inclusive, end_inclusive) for k, v in self.items()},
+            self.data_type,
+            **{k: v.select_by_time(start_time, end_time, start_inclusive, end_inclusive) for k, v in self.items()},
         )
