@@ -1,29 +1,24 @@
 from functools import reduce
 from pathlib import Path
-from typing import NamedTuple
 
 from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData
 from eitprocessing.eit_data.vendor import Vendor
+from eitprocessing.sequence import Sequence
 from eitprocessing.sparse_data import SparseData
-
-
-class LoadDataResult(NamedTuple):
-    """Result from load_data(), containing three DataCollections with EITData, ContinuousData and SparseData."""
-
-    eit_data: DataCollection[str, EITData]
-    continuous_data: DataCollection[str, ContinuousData]
-    sparse_data: DataCollection[str, SparseData]
 
 
 def load_data(
     path: str | Path | list[str | Path],
     vendor: Vendor | str,
+    label: str | None = None,
+    name: str | None = None,
+    description: str = "",
     framerate: float | None = None,
     first_frame: int = 0,
     max_frames: int | None = None,
-) -> tuple[DataCollection[EITData], DataCollection[ContinuousData], DataCollection[SparseData]]:
+) -> Sequence:
     """Load EIT data from path(s).
 
     Args:
@@ -46,14 +41,9 @@ def load_data(
         the given vendor.
 
     Returns:
-        LoadDataResult: a named tuple containing a DataCollection of EITData (result.eit_data or result[0]), a
-        DataCollection of ContinuousData (result.continuous_data or result[1]) and a DataCollection of SparseData
-        (result.sparse_data or result[2]).
+        Sequence: a Sequence with the given label, name and description, containing the loaded data.
     """
-    from eitprocessing.continuous_data import ContinuousData
-    from eitprocessing.data_collection import DataCollection
     from eitprocessing.eit_data.loading import draeger, sentec, timpel
-    from eitprocessing.sparse_data import SparseData
 
     vendor = _ensure_vendor(vendor)
     load_func = {
@@ -96,9 +86,13 @@ def load_data(
         continuous_datasets.append(continuous)
         sparse_datasets.append(sparse)
 
-    return LoadDataResult(
-        reduce(DataCollection.concatenate, datasets)
-        for datasets in (eit_datasets, continuous_datasets, sparse_datasets)
+    return Sequence(
+        label=label,
+        name=name,
+        description=description,
+        eit_data=reduce(DataCollection.concatenate, eit_datasets),
+        continuous_data=reduce(DataCollection.concatenate, continuous_datasets),
+        sparse_datasets=reduce(DataCollection.concatenate, sparse_datasets),
     )
 
 
