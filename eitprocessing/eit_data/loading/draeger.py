@@ -33,8 +33,7 @@ def load_from_single_path(
     framerate: float | None = 20,
     first_frame: int = 0,
     max_frames: int | None = None,
-    return_non_eit_data: bool = False,
-) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
+) -> tuple[DataCollection, DataCollection, DataCollection]:
     """Load Dräger EIT data from path(s).
 
     See loading.from_path().
@@ -109,19 +108,16 @@ def load_from_single_path(
             pixel_impedance=pixel_impedance,
         ),
     )
-    if return_non_eit_data:
-        (
-            continuous_data_collection,
-            sparse_data_collections,
-        ) = _convert_medibus_data(medibus_data, time)
+    (
+        continuous_data_collection,
+        sparse_data_collections,
+    ) = _convert_medibus_data(medibus_data, time)
 
-        return (
-            eit_data_collection,
-            continuous_data_collection,
-            sparse_data_collections,
-        )
-
-    return eit_data_collection
+    return (
+        eit_data_collection,
+        continuous_data_collection,
+        sparse_data_collections,
+    )
 
 
 def _convert_medibus_data(

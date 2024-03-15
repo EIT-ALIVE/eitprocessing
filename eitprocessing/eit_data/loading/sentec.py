@@ -33,7 +33,6 @@ def load_from_single_path(  # noqa: C901
     framerate: float | None = 50.2,
     first_frame: int = 0,
     max_frames: int | None = None,
-    return_non_eit_data: bool = False,
 ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
     """Load Sentec EIT data from path(s).
 
@@ -128,9 +127,7 @@ def load_from_single_path(  # noqa: C901
         ),
     )
 
-    if return_non_eit_data:
-        return eit_data_collection, DataCollection(ContinuousData), DataCollection(SparseData)
-    return eit_data_collection
+    return eit_data_collection, DataCollection(ContinuousData), DataCollection(SparseData)
 
 
 def _read_frame(
