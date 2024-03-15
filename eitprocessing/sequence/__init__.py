@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData
@@ -11,7 +13,6 @@ from eitprocessing.mixins.slicing import SelectByTime
 from eitprocessing.sparse_data import SparseData
 
 if TYPE_CHECKING:
-    import numpy as np
     from typing_extensions import Self
 
 
@@ -49,6 +50,24 @@ class Sequence(Equivalence, SelectByTime):
         if not self.label:
             self.label = f"Sequence_{id(self)}"
         self.name = self.name or self.label
+
+        self._post_load_calculations()
+
+    def _post_load_calculations(self) -> None:
+        if len(self.eit_data) and "global_impedance_raw" not in self.continuous_data:
+            global_impedance = np.nansum(self.eit_data["raw"].pixel_impedance, axis=(1, 2))
+            self.continuous_data.add(
+                ContinuousData(
+                    label="global_impedance_raw",
+                    name="Global impedance of the raw EIT data",
+                    unit="a.u.",
+                    category="impedance",
+                    sample_frequency=self.eit_data["raw"].framerate,
+                    derived_from=[self.eit_data["raw"]],
+                    time=self.eit_data["raw"].time,
+                    values=global_impedance,
+                ),
+            )
 
     @property
     def time(self) -> np.ndarray:
