@@ -60,8 +60,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper class for reading binary files from disk.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">      file_handle: a buffered reader handle, e.g. the result of the `open()` function.</span>
-<span class="sd">      endian: the endianness of the binary data. Either &#39;little&#39; or &#39;big&#39;, or None.</span>
+<span class="sd">        file_handle: a buffered reader handle, e.g. the result of the `open()` function.</span>
+<span class="sd">        endian: the endianness of the binary data. Either &#39;little&#39; or &#39;big&#39;, or None.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Reader.file_handle">
@@ -88,8 +88,8 @@
 <span class="sd">        `cast` should be a type, e.g. `int` or `float` used to cast the value to the proper type.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">          type_code: singular type code.</span>
-<span class="sd">          cast: the associated type.</span>
+<span class="sd">            type_code: singular type code.</span>
+<span class="sd">            cast: the associated type.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">type_code</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
@@ -103,9 +103,9 @@
 <span class="sd">        See `read_single()`.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">          type_code: singular type code.</span>
-<span class="sd">          cast: the associated type.</span>
-<span class="sd">          length: number of values to be read.</span>
+<span class="sd">            type_code: singular type code.</span>
+<span class="sd">            cast: the associated type.</span>
+<span class="sd">            length: number of values to be read.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}{</span><span class="n">type_code</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
@@ -138,7 +138,7 @@
 <span class="sd">        character is returned.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">          length: number of characters.</span>
+<span class="sd">            length: number of characters.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2">s&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
