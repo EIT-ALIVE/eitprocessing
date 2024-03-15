@@ -54,9 +54,9 @@ def load_data(  # noqa: PLR0913
 
     vendor = _ensure_vendor(vendor)
     load_func = {
-        "draeger": draeger.load_from_single_path,
-        "timpel": timpel.load_from_single_path,
-        "sentec": sentec.load_from_single_path,
+        Vendor.DRAEGER: draeger.load_from_single_path,
+        Vendor.TIMPEL: timpel.load_from_single_path,
+        Vendor.SENTEC: sentec.load_from_single_path,
     }[vendor]
 
     first_frame = _check_first_frame(first_frame)
