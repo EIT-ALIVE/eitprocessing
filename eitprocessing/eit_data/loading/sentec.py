@@ -33,10 +33,7 @@ def load_from_single_path(  # noqa: C901
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
-    """Load Sentec EIT data from path(s).
-
-    See loading.from_path().
-    """
+    """Load Sentec EIT data from path."""
     with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
         file_length = os.fstat(fo.fileno()).st_size
         reader = Reader(fh, endian="little")

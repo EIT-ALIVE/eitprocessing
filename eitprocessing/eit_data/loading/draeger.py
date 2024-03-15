@@ -34,10 +34,7 @@ def load_from_single_path(
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> tuple[DataCollection, DataCollection, DataCollection]:
-    """Load Dräger EIT data from path(s).
-
-    See loading.from_path().
-    """
+    """Load Dräger EIT data from path."""
     file_size = path.stat().st_size
     if file_size % _FRAME_SIZE_BYTES:
         msg = (

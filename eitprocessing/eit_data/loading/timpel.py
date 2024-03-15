@@ -35,10 +35,7 @@ def load_from_single_path(
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
-    """Load Timpel EIT data from path(s).
-
-    See loading.from_path().
-    """
+    """Load Timpel EIT data from path."""
     if not framerate:
         framerate = TIMPEL_FRAMERATE
 

@@ -22,6 +22,8 @@ def load_data(
     Args:
         path: relative or absolute path(s) to data file.
         vendor: vendor indicating the device used.
+            Note: for load functions of specific vendors (e.g. `load_draeger_data`), this argument is defaulted to the
+            correct vendor.
         label: short description of sequence for computer interpretation.
             Defaults to "Sequence_<unique_id>".
         name: short description of sequence for human interpretation.
