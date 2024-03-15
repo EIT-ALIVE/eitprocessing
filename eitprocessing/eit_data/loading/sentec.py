@@ -4,6 +4,7 @@ import mmap
 import os
 import warnings
 from enum import IntEnum
+from functools import partial
 from typing import TYPE_CHECKING, BinaryIO
 
 import numpy as np
@@ -12,6 +13,7 @@ from eitprocessing.binreader.reader import Reader
 from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData
+from eitprocessing.eit_data.loading import load_data
 from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.sparse_data import SparseData
 
@@ -22,6 +24,8 @@ if TYPE_CHECKING:
 
 VENDOR = Vendor.SENTEC
 FRAMERATE = 50.2
+
+load_sentec_data = partial(load_data, vendor=Vendor.SENTEC)
 
 
 def load_from_single_path(  # noqa: C901

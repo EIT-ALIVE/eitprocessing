@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from functools import partial
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -8,6 +9,7 @@ import numpy as np
 from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData
+from eitprocessing.eit_data.loading import load_data
 from eitprocessing.eit_data.phases import MaxValue, MinValue, QRSMark
 from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.sparse_data import SparseData
@@ -22,6 +24,9 @@ _COLUMN_WIDTH = 1030
 _NAN_VALUE = -1000
 
 FRAMERATE = 50
+
+
+load_timpel_data = partial(load_data, vendor=Vendor.TIMPEL)
 
 
 def load_from_single_path(  # noqa: C901

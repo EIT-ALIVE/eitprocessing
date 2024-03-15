@@ -3,6 +3,7 @@ from __future__ import annotations
 import mmap
 import sys
 import warnings
+from functools import partial
 from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
@@ -12,6 +13,7 @@ from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData
 from eitprocessing.eit_data.event import Event
+from eitprocessing.eit_data.loading import load_data
 from eitprocessing.eit_data.phases import MaxValue, MinValue
 from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.sparse_data import SparseData
@@ -23,6 +25,7 @@ if TYPE_CHECKING:
 
 _FRAME_SIZE_BYTES = 4358
 FRAMERATE = 20
+load_draeger_data = partial(load_data, vendor=Vendor.DRAEGER)
 
 
 def load_from_single_path(
