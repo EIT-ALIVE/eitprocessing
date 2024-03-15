@@ -1,0 +1,380 @@
+import itertools
+import math
+from dataclasses import dataclass, field
+from typing import NamedTuple, TypeAlias
+
+import numpy as np
+from scipy import signal
+
+from eitprocessing.features.moving_average import MovingAverage
+from eitprocessing.sequence import Sequence
+
+Duration: TypeAlias = float
+Index: TypeAlias = int
+
+
+class Breath(NamedTuple):
+    """Indicates the start, middle and end of a single breath."""
+
+    start_index: Index
+    middle_index: Index
+    end_index: Index
+
+
+@dataclass
+class BreathDetection:
+    """Algorithm for detecting breaths in data representing respiration.
+
+    This algorithm detects the position of breaths in data by detecting valleys
+    (local minimum values) and peaks (local maximum values) in data. When
+    initializing BreathDetection, the sample frequency of the data and the
+    minimum duration of a breath have to be provided. The minimum duration
+    should be short enough to include the shortest expected breath in the data.
+
+    Examples:
+    >>> bd = BreathDetection(sample_frequency=50, minimum_duration=0.5)
+    >>> breaths = bd.find_breaths(global_impedance)
+    """
+
+    minimum_distance: Duration = 2 / 3
+    amplitude_cutoff_fraction: float | None = 0.25
+    invalid_data_removal_window_length: Duration = 1
+    invalid_data_removal_percentile: int = 5
+    invalid_data_removal_multiplier: int = 4
+    moving_average_params: dict = field(default_factory=dict)
+
+    def __post_init__(self):
+        self.moving_average_params = {"window_length": 15, "window_fun": np.bartlett} | self.moving_average_params
+
+    def _find_features(
+        self,
+        data: np.ndarray,
+        moving_average: np.ndarray,
+        sample_frequency: float,
+        invert: float = False,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Find features (peaks or valleys) in the data.
+
+        This method finds features (either peaks or valleys) in the data using
+        the `scipy.signal.find_peaks()` function. The minimum distance (in
+        time) between peaks is determined by the `minimum_distance` attribute.
+
+        To find peaks, `invert` should be False. To find valleys, `invert`
+        should be True, which flips the data before finding peaks.
+
+        Args:
+            data: a 1D array containing the data.
+            moving_average: a 1D array containing the moving average
+                of the data.
+            sample_frequency: sample_frequency of the data.
+            invert: whether to invert the data before detecting peaks. Defaults to False.
+
+        Returns:
+            A tuple containing two 1D arrays of length N with the indices (int)
+            and values (float) of the features, where N is the number of
+            features found.
+        """
+        data_ = -data if invert else data
+        moving_average_ = -moving_average if invert else moving_average
+        feature_indices, _ = signal.find_peaks(
+            data_,
+            distance=self.minimum_distance * sample_frequency,
+            height=moving_average_,
+        )
+
+        feature_values = data[feature_indices]
+
+        return feature_indices, feature_values
+
+    def _remove_edge_cases(
+        self,
+        peak_indices: np.ndarray,
+        peak_values: np.ndarray,
+        valley_indices: np.ndarray,
+        valley_values: np.ndarray,
+        data: np.ndarray,
+        moving_average: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Remove overdetected peaks/valleys at the start and end of the data.
+
+        This method removed a valley at the start of the data, if the data
+        before said valley stays below the moving average of the data at said
+        valley. Likewise, it removes the last valley if the data after the last
+        valley stays below the moving average of the data at said valley. This
+        ensures a valley is a true valley, and not just a local minimum while
+        the true valley is cut off.
+
+        Then, all peaks that occur before the first and after the last valley
+        are removed. This ensures peaks only fall between valleys.
+
+        Args:
+            peak_indices: indices of the peaks
+            peak_values: values of the peaks
+            valley_indices: indices of the valleys
+            valley_values: values of the valleys
+            data: the data in which the peaks/valleys were detected
+            moving_average: the moving average of data
+
+        Returns:
+            A tuple (peak_indices, peak_values, valley_indices, valley_values)
+            with edge cases removed.
+        """
+        if max(data[: valley_indices[0]]) < moving_average[valley_indices[0]]:
+            # remove the first valley, if the data before that valley is not
+            # high enough to be sure it's a valley
+            valley_indices = np.delete(valley_indices, 0)
+            valley_values = np.delete(valley_values, 0)
+
+        if max(data[valley_indices[-1] :]) < moving_average[valley_indices[-1]]:
+            # remove the last valley, if the data after that valley is not high
+            # enough to be sure it's a valley
+            valley_indices = np.delete(valley_indices, -1)
+            valley_values = np.delete(valley_values, -1)
+
+        # remove peaks that come before the first valley
+        keep_peaks = peak_indices > valley_indices[0]
+        peak_indices = peak_indices[keep_peaks]
+        peak_values = peak_values[keep_peaks]
+
+        # remove peak that come after the last valley
+        keep_peaks = peak_indices < valley_indices[-1]
+        peak_indices = peak_indices[keep_peaks]
+        peak_values = peak_values[keep_peaks]
+
+        return peak_indices, peak_values, valley_indices, valley_values
+
+    def _remove_doubles(
+        self,
+        peak_indices: np.ndarray,
+        peak_values: np.ndarray,
+        valley_indices: np.ndarray,
+        valley_values: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Remove double peaks/valleys.
+
+        This method ensures there is only one peak between valleys, and only
+        one valley between peaks. If there are multiple peaks between two
+        valleys, the peak with the highest value is kept and the others are
+        removed. If there are no peaks between several valleys (i.e. multiple
+        valleys between peaks) the valley with the lowest value is kept, while
+        the others are removed.
+
+        This method does not remove peaks before the first or after the last
+        valley.
+
+        Args:
+            peak_indices: indices of the peaks
+            peak_values: values of the peaks
+            valley_indices: indices of the valleys
+            valley_values: values of the valleys
+
+        Returns:
+            A tuple (peak_indices, peak_values, valley_indices, valley_values)
+            with double peaks/valleys removed.
+        """
+        current_valley_index = 0
+        while current_valley_index < len(valley_indices) - 1:
+            start_index = valley_indices[current_valley_index]
+            end_index = valley_indices[current_valley_index + 1]
+            peaks_between_valleys = np.argwhere(
+                (peak_indices > start_index) & (peak_indices < end_index),
+            )
+            if not len(peaks_between_valleys):
+                # no peak between valleys, remove highest valley
+                delete_valley_index = (
+                    current_valley_index
+                    if valley_values[current_valley_index] > valley_values[current_valley_index + 1]
+                    else current_valley_index + 1
+                )
+                valley_indices = np.delete(valley_indices, delete_valley_index)
+                valley_values = np.delete(valley_values, delete_valley_index)
+                continue
+
+            if len(peaks_between_valleys) > 1:
+                # multiple peaks between valleys, remove lowest peak
+                delete_peak_index = (
+                    peaks_between_valleys[0]
+                    if peak_values[peaks_between_valleys[0]] < peak_values[peaks_between_valleys[1]]
+                    else peaks_between_valleys[1]
+                )
+                peak_indices = np.delete(peak_indices, delete_peak_index)
+                peak_values = np.delete(peak_values, delete_peak_index)
+                continue
+
+            current_valley_index += 1
+
+        return peak_indices, peak_values, valley_indices, valley_values
+
+    def _remove_low_amplitudes(
+        self,
+        peak_indices: np.ndarray,
+        peak_values: np.ndarray,
+        valley_indices: np.ndarray,
+        valley_values: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Remove peaks if the amplitude is low compared to the median amplitude.
+
+        The amplitude of a peak is determined as the average vertical distance
+        between the peak value and the two valley values besides it. The cutoff
+        value for the amplitude is calculated as the median amplitude times
+        `amplitude_cutoff_fraction`. Peaks that have an amplitude below the
+        cutoff are removed. Then, `_remove_doubles()` is called to remove
+        either of the valleys next to the peak.
+
+        If `amplitude_cutoff_fraction` is None, the input is returned
+        unchanged.
+
+        Args:
+          peak_indices: the indices of the peaks
+          peak_values: the values of the peaks
+          valley_indices: the indices of the valleys
+          valley_values: the values of the valleys
+
+        Returns:
+            A tuple (peak_indices, peak_values, valley_indices, valley_values)
+            with low-amplitude breaths removed.
+        """
+        if not self.amplitude_cutoff_fraction:
+            return peak_indices, peak_values, valley_indices, valley_values
+
+        inspiratory_amplitude = peak_values - valley_values[:-1]
+        expiratory_amplitude = peak_values - valley_values[1:]
+        amplitude = (inspiratory_amplitude + expiratory_amplitude) / 2
+
+        amplitude_cutoff = self.amplitude_cutoff_fraction * np.median(amplitude)
+        delete_peaks = np.argwhere(amplitude < amplitude_cutoff)
+
+        peak_indices = np.delete(peak_indices, delete_peaks)
+        peak_values = np.delete(peak_values, delete_peaks)
+
+        peak_indices, peak_values, valley_indices, valley_values = self._remove_doubles(
+            peak_indices,
+            peak_values,
+            valley_indices,
+            valley_values,
+        )
+
+        return peak_indices, peak_values, valley_indices, valley_values
+
+    def _remove_breaths_around_invalid_data(
+        self,
+        breaths: list[Breath],
+        data: np.ndarray,
+        sample_frequency: float,
+    ) -> list[Breath]:
+        mean = np.mean(data)
+        lower_percentile = np.percentile(
+            data,
+            self.invalid_data_removal_percentile,
+        )
+        cutoff_low = mean - (mean - lower_percentile) * self.invalid_data_removal_multiplier
+        upper_percentile = np.percentile(
+            data,
+            100 - self.invalid_data_removal_percentile,
+        )
+        cutoff_high = mean + (upper_percentile - mean) * self.invalid_data_removal_multiplier
+        outliers = (data < cutoff_low) | (data > cutoff_high)
+
+        window_length = math.ceil(
+            self.invalid_data_removal_window_length * sample_frequency,
+        )
+        window = np.ones(window_length)
+
+        extended_data_is_zero = np.convolve(outliers, window, mode="same")
+        extended_data_is_zero = extended_data_is_zero.astype(bool).astype(int)
+
+        for breath in breaths[:]:
+            if np.max(extended_data_is_zero[breath.start_index : breath.end_index]):
+                breaths.remove(breath)
+
+        return breaths
+
+    def find_breaths(
+        self,
+        sequence: Sequence,
+        data_type: str = "continuous",
+        label: str = "global_impedance_raw",
+    ) -> list[Breath]:
+        """Find breaths in the data.
+
+        This method attempts to find peaks and valleys in the data in a
+        multi-step process. First, it naively finds any peaks that are a
+        certain distance apart and higher than the moving average, and
+        similarly valleys that are a certain distance apart and below the
+        moving average.
+
+        Next, valleys at the start and end of the signal are removed
+        to ensure the first and last valleys are actual valleys, and not just
+        the start or end of the signal. Peaks before the first or after the
+        last valley are removed, to ensure peaks always fall between two
+        valleys.
+
+        At this point, it is possible multiple peaks exist between two valleys.
+        Lower peaks are removed leaving only the highest peak between two
+        valleys. Similarly, multiple valleys between two peaks are reduced to
+        only the lowest valley.
+
+        As a last step, breaths with a low amplitude (the average between the
+        inspiratory and expiratory amplitudes) are removed.
+
+        Breaths are constructed as a valley-peak-valley combination,
+        representing the start of inspiration, the end of inspiration/start of
+        expiration, and end of expiration.
+
+        Args:
+            sequence: the Sequence containing the data.
+            data_type: should be "continuous".
+            label: label for the continuous data to apply the breath detection to.
+
+        Returns:
+            A list of Breath objects.
+        """
+        if data_type != "continuous":
+            msg = f"BreathDetection only works on continuous data, not {data_type}"
+            raise NotImplementedError(msg)
+
+        continuous_data = sequence.continuous_data[label]
+        data: np.ndarray = continuous_data.values  # noqa: PD011
+        sample_frequency = continuous_data.sample_frequency
+
+        averager = MovingAverage(**self.moving_average_params)
+        moving_average = averager.apply(sequence=sequence, label=label, data_type=data_type)
+
+        peak_indices, peak_values = self._find_features(
+            data=data,
+            moving_average=moving_average,
+            sample_frequency=sample_frequency,
+        )
+        valley_indices, valley_values = self._find_features(
+            data=data,
+            moving_average=moving_average,
+            invert=True,
+            sample_frequency=sample_frequency,
+        )
+
+        indices_and_values = (
+            peak_indices,
+            peak_values,
+            valley_indices,
+            valley_values,
+        )
+        indices_and_values = self._remove_edge_cases(*indices_and_values, data, moving_average)
+        indices_and_values = self._remove_doubles(*indices_and_values)
+        indices_and_values = self._remove_low_amplitudes(*indices_and_values)
+
+        peak_indices, _, valley_indices, _ = indices_and_values
+
+        breaths = [
+            Breath(start, middle, end)
+            for middle, (start, end) in zip(peak_indices, itertools.pairwise(valley_indices), strict=True)
+        ]
+
+        breaths = self._remove_breaths_around_invalid_data(breaths, data, sample_frequency)
+
+        # TODO: add the result as sparse data
+
+        return breaths  # noqa: RET504
