@@ -7,7 +7,7 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.mixins.equality import Equivalence
-from eitprocessing.datahandling.mixins.slicing import SelectByTime
+from eitprocessing.datahandling.mixins.slicing import SelectByIndex, TimeIndexer
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -109,7 +109,7 @@ class Sequence(Equivalence, SelectByIndex):
             sparse_data=sparse_data,
         )
 
-    def select_by_time(  # noqa: PLR0913
+    def select_by_time(
         self,
         start_time: float | None = None,
         end_time: float | None = None,
@@ -136,3 +136,11 @@ class Sequence(Equivalence, SelectByIndex):
             continuous_data=self.continuous_data.select_by_time(start_time, end_time, start_inclusive, end_inclusive),
             sparse_data=self.sparse_data.select_by_time(start_time, end_time, start_inclusive, end_inclusive),
         )
+
+    @property
+    def t(self):
+        """Time indexer.
+
+        See slicing.TimeIndexer.
+        """
+        return TimeIndexer(self)
