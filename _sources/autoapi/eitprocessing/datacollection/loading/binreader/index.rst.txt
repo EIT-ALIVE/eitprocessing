@@ -1,0 +1,159 @@
+:py:mod:`eitprocessing.datacollection.loading.binreader`
+========================================================
+
+.. py:module:: eitprocessing.datacollection.loading.binreader
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datacollection.loading.binreader.Reader
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datacollection.loading.binreader.T
+   eitprocessing.datacollection.loading.binreader.N
+
+
+.. py:data:: T
+
+   
+
+.. py:data:: N
+
+   
+
+.. py:class:: Reader
+
+
+   Helper class for reading binary files from disk.
+
+   :param file_handle: a buffered reader handle, e.g. the result of the `open()` function.
+   :param endian: the endianness of the binary data. Either 'little' or 'big', or None.
+
+   .. py:attribute:: file_handle
+      :type: io.BufferedReader
+
+      
+
+   .. py:attribute:: endian
+      :type: Literal[little, big] | None
+
+      
+
+   .. py:attribute:: string
+
+      
+
+   .. py:method:: read_single(type_code: str, cast: type[T]) -> T
+
+      Read and return a single unit of the given type code.
+
+      The type of data to be read should be provided as a single typ code. See
+      https://docs.python.org/3.10/library/struct.html#byte-order-size-and-alignment for a list of available type
+      codes.
+
+      A unit returns a single value, and can be one or more bytes of data. E.g. requesting a signed 32-bit integer
+      ('q') will result in reading 8 bytes of data.
+
+      `cast` should be a type, e.g. `int` or `float` used to cast the value to the proper type.
+
+      :param type_code: singular type code.
+      :param cast: the associated type.
+
+
+   .. py:method:: read_list(type_code: str, cast: type[T], length: int) -> list[T]
+
+      Read multiple values of the same type and return as list.
+
+      See `read_single()`.
+
+      :param type_code: singular type code.
+      :param cast: the associated type.
+      :param length: number of values to be read.
+
+
+   .. py:method:: read_array(type_code: str, cast: type[N], length: int) -> numpy.typing.NDArray[N]
+
+      Read multiple values of the same type and return as NumPy array.
+
+      See `read_list()`.
+
+
+   .. py:method:: read_string(length: int = 1) -> str
+
+      Read and return a string with a given length.
+
+      Reads `length` characters of type code 's' and returns as a string. When length is not provided, a single
+      character is returned.
+
+      :param length: number of characters.
+
+
+   .. py:method:: _read_full_type_code(full_type_code: str) -> tuple[Any, Ellipsis]
+
+      Read the data associated with the type code.
+
+
+   .. py:method:: float32() -> float
+
+      Read and return a single signed 32-bit floating point value.
+
+
+   .. py:method:: float64() -> float
+
+      Read and return a single signed 64-bit floating point value.
+
+
+   .. py:method:: npfloat32(length: int = 1) -> numpy.typing.NDArray[numpy.float32]
+
+      Read and return an array of signed 32-bit floating point values.
+
+
+   .. py:method:: npfloat64(length: int = 1) -> numpy.typing.NDArray[numpy.float64]
+
+      Read and return an array of signed 64-bit floating point values.
+
+
+   .. py:method:: int32() -> int
+
+      Read and return a single signed 32-bit integer value.
+
+
+   .. py:method:: npint32(length: int = 1) -> numpy.typing.NDArray[numpy.int32]
+
+      Read and return an array of signed 32-bit integer values.
+
+
+   .. py:method:: uint8() -> int
+
+      Read and return a single unsigned 8-bit integer value.
+
+
+   .. py:method:: uint16() -> int
+
+      Read and return a single unsigned 16-bit integer value.
+
+
+   .. py:method:: uint32() -> int
+
+      Read and return a single unsigned 32-bit integer value.
+
+
+   .. py:method:: uint64() -> int
+
+      Read and return a single unsigned 64-bit integer value.
+
+
+

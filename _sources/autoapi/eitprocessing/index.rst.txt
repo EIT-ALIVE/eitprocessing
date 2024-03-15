@@ -10,14 +10,18 @@ Subpackages
    :titlesonly:
    :maxdepth: 3
 
-   binreader/index.rst
-   continuous_data/index.rst
-   data_collection/index.rst
-   eit_data/index.rst
+   datacollection/index.rst
    filters/index.rst
    mixins/index.rst
    plotting/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
    sequence/index.rst
-   sparse_data/index.rst
 
 

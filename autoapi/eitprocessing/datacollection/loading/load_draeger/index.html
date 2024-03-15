@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>eitprocessing.datacollection.loading.load_draeger &#8212; eitprocessing 0.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/nature.css?v=601dbdee" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="eitprocessing.datacollection.loading.load_sentec" href="../load_sentec/index.html" />
+    <link rel="prev" title="eitprocessing.datacollection.loading.binreader" href="../binreader/index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../load_sentec/index.html" title="eitprocessing.datacollection.loading.load_sentec"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../binreader/index.html" title="eitprocessing.datacollection.loading.binreader"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing</span></code></a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datacollection</span></code></a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="../index.html" accesskey="U"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datacollection.loading</span></code></a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datacollection.loading.load_draeger</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-eitprocessing.datacollection.loading.load_draeger">
+<span id="eitprocessing-datacollection-loading-load-draeger"></span><h1><a class="reference internal" href="#module-eitprocessing.datacollection.loading.load_draeger" title="eitprocessing.datacollection.loading.load_draeger"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datacollection.loading.load_draeger</span></code></a><a class="headerlink" href="#module-eitprocessing.datacollection.loading.load_draeger" title="Link to this heading">¶</a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._MedibusField" title="eitprocessing.datacollection.loading.load_draeger._MedibusField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_MedibusField</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger.load_from_single_path" title="eitprocessing.datacollection.loading.load_draeger.load_from_single_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_from_single_path</span></code></a>(...)</p></td>
+<td><p>Load Dräger EIT data from path.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._convert_medibus_data" title="eitprocessing.datacollection.loading.load_draeger._convert_medibus_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_convert_medibus_data</span></code></a>(...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._read_frame" title="eitprocessing.datacollection.loading.load_draeger._read_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_read_frame</span></code></a>(→ int)</p></td>
+<td><p>Read frame by frame data from DRAEGER files.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._FRAME_SIZE_BYTES" title="eitprocessing.datacollection.loading.load_draeger._FRAME_SIZE_BYTES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_FRAME_SIZE_BYTES</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger.DRAEGER_FRAMERATE" title="eitprocessing.datacollection.loading.load_draeger.DRAEGER_FRAMERATE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DRAEGER_FRAMERATE</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger.load_draeger_data" title="eitprocessing.datacollection.loading.load_draeger.load_draeger_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_draeger_data</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._medibus_fields" title="eitprocessing.datacollection.loading.load_draeger._medibus_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_medibus_fields</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger._FRAME_SIZE_BYTES">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datacollection.loading.load_draeger.</span></span><span class="sig-name descname"><span class="pre">_FRAME_SIZE_BYTES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4358</span></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#_FRAME_SIZE_BYTES"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger._FRAME_SIZE_BYTES" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger.DRAEGER_FRAMERATE">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datacollection.loading.load_draeger.</span></span><span class="sig-name descname"><span class="pre">DRAEGER_FRAMERATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#DRAEGER_FRAMERATE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger.DRAEGER_FRAMERATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger.load_draeger_data">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datacollection.loading.load_draeger.</span></span><span class="sig-name descname"><span class="pre">load_draeger_data</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#load_draeger_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger.load_draeger_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger.load_from_single_path">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datacollection.loading.load_draeger.</span></span><span class="sig-name descname"><span class="pre">load_from_single_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">framerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../index.html#eitprocessing.datacollection.DataCollection" title="eitprocessing.datacollection.DataCollection"><span class="pre">eitprocessing.datacollection.DataCollection</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../index.html#eitprocessing.datacollection.DataCollection" title="eitprocessing.datacollection.DataCollection"><span class="pre">eitprocessing.datacollection.DataCollection</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../index.html#eitprocessing.datacollection.DataCollection" title="eitprocessing.datacollection.DataCollection"><span class="pre">eitprocessing.datacollection.DataCollection</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#load_from_single_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger.load_from_single_path" title="Link to this definition">¶</a></dt>
+<dd><p>Load Dräger EIT data from path.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger._convert_medibus_data">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datacollection.loading.load_draeger.</span></span><span class="sig-name descname"><span class="pre">_convert_medibus_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">medibus_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.typing.NDArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.typing.NDArray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../index.html#eitprocessing.datacollection.DataCollection" title="eitprocessing.datacollection.DataCollection"><span class="pre">eitprocessing.datacollection.DataCollection</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../index.html#eitprocessing.datacollection.DataCollection" title="eitprocessing.datacollection.DataCollection"><span class="pre">eitprocessing.datacollection.DataCollection</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#_convert_medibus_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger._convert_medibus_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger._read_frame">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datacollection.loading.load_draeger.</span></span><span class="sig-name descname"><span class="pre">_read_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../binreader/index.html#eitprocessing.datacollection.loading.binreader.Reader" title="eitprocessing.datacollection.loading.binreader.Reader"><span class="pre">eitprocessing.datacollection.loading.binreader.Reader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.typing.NDArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_impedance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.typing.NDArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medibus_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.typing.NDArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">phases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#_read_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger._read_frame" title="Link to this definition">¶</a></dt>
+<dd><p>Read frame by frame data from DRAEGER files.</p>
+<p>This method adds the loaded data to the provided arrays <cite>time</cite> and
+<cite>pixel_impedance</cite> and the provided lists <cite>events</cite> and <cite>phases</cite> when the
+index is non-negative. When the index is negative, no data is saved. In
+any case, the event marker is returned.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger._MedibusField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datacollection.loading.load_draeger.</span></span><span class="sig-name descname"><span class="pre">_MedibusField</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#_MedibusField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger._MedibusField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger._MedibusField.signal_name">
+<span class="sig-name descname"><span class="pre">signal_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#_MedibusField.signal_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger._MedibusField.signal_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger._MedibusField.unit">
+<span class="sig-name descname"><span class="pre">unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#_MedibusField.unit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger._MedibusField.unit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger._MedibusField.continuous">
+<span class="sig-name descname"><span class="pre">continuous</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#_MedibusField.continuous"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger._MedibusField.continuous" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="eitprocessing.datacollection.loading.load_draeger._medibus_fields">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datacollection.loading.load_draeger.</span></span><span class="sig-name descname"><span class="pre">_medibus_fields</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datacollection/loading/load_draeger.html#_medibus_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datacollection.loading.load_draeger._medibus_fields" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datacollection.loading.load_draeger</span></code></a><ul>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#attributes">Attributes</a><ul>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._FRAME_SIZE_BYTES"><code class="docutils literal notranslate"><span class="pre">_FRAME_SIZE_BYTES</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger.DRAEGER_FRAMERATE"><code class="docutils literal notranslate"><span class="pre">DRAEGER_FRAMERATE</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger.load_draeger_data"><code class="docutils literal notranslate"><span class="pre">load_draeger_data</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger.load_from_single_path"><code class="docutils literal notranslate"><span class="pre">load_from_single_path()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._convert_medibus_data"><code class="docutils literal notranslate"><span class="pre">_convert_medibus_data()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._read_frame"><code class="docutils literal notranslate"><span class="pre">_read_frame()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._MedibusField"><code class="docutils literal notranslate"><span class="pre">_MedibusField</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._MedibusField.signal_name"><code class="docutils literal notranslate"><span class="pre">_MedibusField.signal_name</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._MedibusField.unit"><code class="docutils literal notranslate"><span class="pre">_MedibusField.unit</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._MedibusField.continuous"><code class="docutils literal notranslate"><span class="pre">_MedibusField.continuous</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datacollection.loading.load_draeger._medibus_fields"><code class="docutils literal notranslate"><span class="pre">_medibus_fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../binreader/index.html"
+                          title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datacollection.loading.binreader</span></code></a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../load_sentec/index.html"
+                          title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datacollection.loading.load_sentec</span></code></a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../../_sources/autoapi/eitprocessing/datacollection/loading/load_draeger/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../load_sentec/index.html" title="eitprocessing.datacollection.loading.load_sentec"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../binreader/index.html" title="eitprocessing.datacollection.loading.binreader"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing</span></code></a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datacollection</span></code></a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datacollection.loading</span></code></a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datacollection.loading.load_draeger</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>
