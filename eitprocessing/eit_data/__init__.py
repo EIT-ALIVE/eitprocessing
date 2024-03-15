@@ -119,6 +119,7 @@ class EITData(SelectByTime, Equivalence):
         return cls(
             path=self.path,
             nframes=nframes,
+            vendor=self.vendor,
             time=time,
             framerate=self.framerate,
             phases=phases,
