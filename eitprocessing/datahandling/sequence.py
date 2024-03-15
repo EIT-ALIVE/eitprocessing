@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(eq=False)
-class Sequence(Equivalence, SelectByTime):
+class Sequence(Equivalence, SelectByIndex):
     """Sequence of timepoints containing respiratory data.
 
     A Sequence object is a representation of data points over time. These data can consist of any combination of EIT
@@ -107,4 +107,32 @@ class Sequence(Equivalence, SelectByTime):
             eit_data=eit_data,
             continuous_data=continuous_data,
             sparse_data=sparse_data,
+        )
+
+    def select_by_time(  # noqa: PLR0913
+        self,
+        start_time: float | None = None,
+        end_time: float | None = None,
+        start_inclusive: bool = True,
+        end_inclusive: bool = False,
+        label: str | None = None,
+        name: str | None = None,
+        description: str | None = "",
+    ) -> Self:
+        """Return a sliced version of the Sequence.
+
+        See SelectByTime.select_by_time().
+        """
+        if not label:
+            label = f"copy_of_<{self.label}>"
+        if not name:
+            f"Sliced copy of <{self.name}>"
+
+        return self.__class__(
+            label=label,
+            name=name,
+            description=description,
+            eit_data=self.eit_data.select_by_time(start_time, end_time, start_inclusive, end_inclusive),
+            continuous_data=self.continuous_data.select_by_time(start_time, end_time, start_inclusive, end_inclusive),
+            sparse_data=self.sparse_data.select_by_time(start_time, end_time, start_inclusive, end_inclusive),
         )
