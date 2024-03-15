@@ -1,7 +1,18 @@
-:py:mod:`eitprocessing.sequence`
-================================
+:py:mod:`eitprocessing.eit_data.loading`
+========================================
 
-.. py:module:: eitprocessing.sequence
+.. py:module:: eitprocessing.eit_data.loading
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   draeger/index.rst
+   sentec/index.rst
+   timpel/index.rst
 
 
 Package Contents
@@ -12,184 +23,21 @@ Classes
 
 .. autoapisummary::
 
-   eitprocessing.sequence.ContinuousData
-   eitprocessing.sequence.DataCollection
-   eitprocessing.sequence.EITData
-   eitprocessing.sequence.Equivalence
-   eitprocessing.sequence.SelectByTime
-   eitprocessing.sequence.SparseData
-   eitprocessing.sequence.Sequence
+   eitprocessing.eit_data.loading.DataCollection
+   eitprocessing.eit_data.loading.EITData
+   eitprocessing.eit_data.loading.Vendor
+   eitprocessing.eit_data.loading.Sequence
 
 
 
+Functions
+~~~~~~~~~
 
-.. py:class:: ContinuousData
+.. autoapisummary::
 
-
-   Bases: :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`eitprocessing.mixins.slicing.SelectByTime`
-
-   Data class for (non-EIT) data with a continuous time axis.
-
-   :param label: Computer readable naming of the instance.
-   :param name: Human readable naming of the instance.
-   :param unit: Unit for the data.
-   :param category: Category the data falls into, e.g. 'airway pressure'.
-   :param description: Human readable extended description of the data.
-   :param parameters: Parameters used to derive this data.
-   :param derived_from: Traceback of intermediates from which the current data was derived.
-   :param values: Data points.
-
-   .. py:property:: locked
-      :type: bool
-
-      Return whether the values attribute is locked.
-
-      See lock().
-
-   .. py:property:: loaded
-      :type: bool
-
-      Return whether the data was loaded from disk, or derived from elsewhere.
-
-   .. py:attribute:: label
-      :type: str
-
-      
-
-   .. py:attribute:: name
-      :type: str
-
-      
-
-   .. py:attribute:: unit
-      :type: str
-
-      
-
-   .. py:attribute:: category
-      :type: str
-
-      
-
-   .. py:attribute:: description
-      :type: str
-      :value: ''
-
-      
-
-   .. py:attribute:: parameters
-      :type: dict[str, typing_extensions.Any]
-
-      
-
-   .. py:attribute:: derived_from
-      :type: typing_extensions.Any | list[typing_extensions.Any]
-
-      
-
-   .. py:attribute:: time
-      :type: numpy.ndarray
-
-      
-
-   .. py:attribute:: values
-      :type: numpy.ndarray
-
-      
-
-   .. py:method:: __post_init__() -> None
-
-
-   .. py:method:: __setattr__(attr: str, value: typing_extensions.Any)
-
-      Implement setattr(self, name, value).
-
-
-   .. py:method:: copy(label: str, *, name: str | None = None, unit: str | None = None, description: str | None = None, parameters: dict | None = None) -> typing_extensions.Self
-
-      Create a copy.
-
-      Whenever data is altered, it should probably be copied first. The alterations should then be made in the copy.
-
-
-   .. py:method:: derive(label: str, function: collections.abc.Callable, func_args: dict, **kwargs) -> typing_extensions.Self
-
-      Create a copy deriving data from values attribute.
-
-      :param label: New label for the derived object.
-      :param function: Function that takes the values and returns the derived values.
-      :param func_args: Arguments to pass to function.
-      :param \*\*kwargs: New values for attributes of
-
-      Example:
-      ```
-      def convert_data(x, add=None, subtract=None, multiply=None, divide=None):
-          if add:
-              x += add
-          if subtract:
-              x -= subtract
-          if multiply:
-              x *= multiply
-          if divide:
-              x /= divide
-          return x
-
-
-      data = ContinuousData(
-          name="Lung volume (in mL)", label="volume_mL", unit="mL", category="volume", values=some_loaded_data
-      )
-      derived = data.derive("volume_L", convert_data, {"divide": 1000}, name="Lung volume (in L)", unit="L")
-      ```
-
-
-   .. py:method:: lock(*attr: str) -> None
-
-      Lock attributes, essentially rendering them read-only.
-
-      Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.
-
-      :param \*attr: any number of attributes can be passed here, all of which will be locked. Defaults to "values".
-
-      .. rubric:: Examples
-
-      >>> # lock the `values` attribute of `data`
-      >>> data.lock()
-      >>> data.values = [1, 2, 3] # will result in an AttributeError
-      >>> data.values[0] = 1      # will result in a RuntimeError
-
-
-   .. py:method:: unlock(*attr: str) -> None
-
-      Unlock attributes, rendering them editable.
-
-      Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.
-
-      :param \*attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to "values".
-
-      .. rubric:: Examples
-
-      >>> # lock the `values` attribute of `data`
-      >>> data.lock()
-      >>> data.values = [1, 2, 3] # will result in an AttributeError
-      >>> data.values[0] = 1      # will result in a RuntimeError
-      >>> data.unlock()
-      >>> data.values = [1, 2, 3]
-      >>> print(data.values)
-      [1,2,3]
-      >>> data.values[0] = 1      # will result in a RuntimeError
-      >>> print(data.values)
-      1
-
-
-   .. py:method:: __len__()
-
-
-   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
-
-      Slicing method that must be implemented by all subclasses.
-
-      Must return a copy of self object with all attached data within selected
-      indices.
+   eitprocessing.eit_data.loading.load_data
+   eitprocessing.eit_data.loading._check_first_frame
+   eitprocessing.eit_data.loading._ensure_vendor
 
 
 
@@ -389,88 +237,32 @@ Classes
 
 
 
-.. py:class:: Equivalence
+.. py:class:: Vendor
 
 
-   Mixin class that adds an equality and equivalence check.
+   Bases: :py:obj:`strenum.LowercaseStrEnum`
 
-   .. py:method:: __eq__(other: typing_extensions.Self)
+   Enum indicating the vendor (manufacturer) of the source EIT device.
 
-      Return self==value.
-
-
-   .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
-      :staticmethod:
-
-      Check if a and b are equal, even if they are numpy arrays containing nans.
-
-
-   .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
-
-      Test whether the data structure between two objects are equivalent.
-
-      Equivalence, in this case means that objects are compatible e.g. to be
-      merged. Data content can vary, but e.g. the category of data (e.g.
-      airway pressure, flow, tidal volume) and unit, etc., must match.
-
-
-      :param other: object that will be compared to self.
-      :param raise_: sets this method's behavior in case of non-equivalence. If
-                     True, an `EquivalenceError` is raised, otherwise `False` is
-                     returned.
-
-      :raises EquivalenceError: if `raise_ == True` and the objects are not
-      :raises equivalent.:
-
-      :returns: bool describing result of equivalence comparison.
-
-
-
-.. py:class:: SelectByTime
-
-
-   Bases: :py:obj:`SelectByIndex`
-
-   Adds methods for slicing by time rather than index.
-
-   .. py:property:: t
-      :type: TimeIndexer
-
-      Time Indexer property.
-
-   .. py:attribute:: time
-      :type: numpy.typing.NDArray
+   .. py:attribute:: DRAEGER
 
       
 
-   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
+   .. py:attribute:: TIMPEL
 
-      Get a slice from start to end time stamps.
+      
 
-      Given a start and end time stamp (i.e. its value, not its index),
-      return a slice of the original object, which must contain a time axis.
+   .. py:attribute:: SENTEC
 
-      :param start_time: first time point to include. Defaults to first frame of sequence.
-      :param end_time: last time point. Defaults to last frame of sequence.
-      :param start_inclusive (default: `True`), end_inclusive (default `False`):
-                                       these arguments control the behavior if the given time stamp
-                                       does not match exactly with an existing time stamp of the input.
-                                       if `True`: the given time stamp will be inside the sliced object.
-                                       if `False`: the given time stamp will be outside the sliced object.
-      :param label: Description. Defaults to None, which will create a label based
-                    on the original object label and the frames by which it is sliced.
+      
 
-      :raises TypeError: if `self` does not contain a `time` attribute.
-      :raises ValueError: if time stamps are not sorted.
+   .. py:attribute:: DRAGER
 
-      :returns: Slice of self.
+      
 
+   .. py:attribute:: DRÄGER
 
-
-.. py:class:: SparseData
-
-
-   SparseData.
+      
 
 
 .. py:class:: Sequence
@@ -555,5 +347,49 @@ Classes
       Must return a copy of self object with all attached data within selected
       indices.
 
+
+
+.. py:function:: load_data(path: str | pathlib.Path | list[str | pathlib.Path], vendor: eitprocessing.eit_data.vendor.Vendor | str, label: str | None = None, name: str | None = None, description: str = '', framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None) -> eitprocessing.sequence.Sequence
+
+   Load EIT data from path(s).
+
+   :param path: relative or absolute path(s) to data file.
+   :param vendor: vendor indicating the device used.
+                  Note: for load functions of specific vendors (e.g. `load_draeger_data`), this argument is defaulted to the
+                  correct vendor.
+   :param label: short description of sequence for computer interpretation.
+                 Defaults to "Sequence_<unique_id>".
+   :param name: short description of sequence for human interpretation.
+                Defaults to the same value as label.
+   :param description: long description of sequence for human interpretation.
+   :param framerate: framerate at which the data was recorded.
+                     Default for Draeger: 20
+                     Default for Timpel: 50
+                     Default for Sentec: 50.2
+   :param first_frame: index of first frame to load.
+                       Defaults to 0.
+   :param max_frames: maximum number of frames to load.
+                      The actual number of frames can be lower than this if this
+                      would surpass the final frame.
+
+   :raises NotImplementedError: is raised when there is no loading method for
+   :raises the given vendor.:
+
+   :returns: a Sequence with the given label, name and description, containing the loaded data.
+   :rtype: Sequence
+
+   Example:
+   ```
+   sequence = load_data(["path/to/file1", "path/to/file2"], vendor="sentec", label="initial_measurement")
+   pixel_impedance = sequence.eit_data["raw"].pixel_impedance
+   ```
+
+
+.. py:function:: _check_first_frame(first_frame: int | None) -> int
+
+
+.. py:function:: _ensure_vendor(vendor: eitprocessing.eit_data.vendor.Vendor | str) -> eitprocessing.eit_data.vendor.Vendor
+
+   Check whether vendor exists, and assure it's a Vendor object.
 
 

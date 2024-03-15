@@ -202,7 +202,7 @@ Attributes
 .. py:class:: EITData
 
 
-   Bases: :py:obj:`eitprocessing.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.mixins.equality.Equivalence`, :py:obj:`abc.ABC`
+   Bases: :py:obj:`eitprocessing.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.mixins.equality.Equivalence`
 
    Container for EIT data.
 
@@ -293,54 +293,16 @@ Attributes
    .. py:method:: __post_init__()
 
 
-   .. py:method:: from_path(path: str | pathlib.Path | list[str | pathlib.Path], vendor: vendor.Vendor | str, framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None, return_non_eit_data: bool = False) -> eitprocessing.data_collection.DataCollection | tuple[eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection]
-      :classmethod:
-
-      Load sequence from path(s).
-
-      :param path: relative or absolute path(s) to data file.
-      :param vendor: vendor indicating the device used.
-      :param label: description of object for human interpretation.
-                    Defaults to "Sequence_<unique_id>".
-      :param framerate: framerate at which the data was recorded.
-                        Default for Draeger: 20
-                        Default for Timpel: 50
-                        Default for Sentec: 50.2
-      :param first_frame: index of first frame to load.
-                          Defaults to 0.
-      :param max_frames: maximum number of frames to load.
-                         The actual number of frames can be lower than this if this
-                         would surpass the final frame.
-      :param return_non_eit_data: whether to load available continuous and sparse data.
-
-      :raises NotImplementedError: is raised when there is no loading method for
-      :raises the given vendor.:
-
-      :returns: container for the loaded data and metadata from all files in path.
-      :rtype: EITData
-
-
-   .. py:method:: _from_path(path: pathlib.Path, framerate: float | None = None, first_frame: int | None = None, max_frames: int | None = None, return_non_eit_data: bool = False) -> eitprocessing.data_collection.DataCollection | tuple[eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection, eitprocessing.data_collection.DataCollection]
-      :classmethod:
-      :abstractmethod:
-
-
-   .. py:method:: _ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
+   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
       :staticmethod:
 
+      Return the path or paths as a list.
 
-   .. py:method:: _get_vendor_class(vendor: vendor.Vendor) -> type[EITData_]
-      :staticmethod:
-
-
-   .. py:method:: _check_first_frame(first_frame: int | None) -> int
-      :staticmethod:
+      The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
+      list of Path objects given either a str/Path or list of str/Paths.
 
 
-   .. py:method:: _ensure_vendor(vendor: vendor.Vendor | str) -> vendor.Vendor
-      :staticmethod:
-
-      Check whether vendor exists, and assure it's a Vendor object.
+   .. py:method:: __add__(other: T) -> T
 
 
    .. py:method:: concatenate(other: T, label: str | None = None) -> T

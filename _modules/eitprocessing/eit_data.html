@@ -37,23 +37,20 @@
   <h1>Source code for eitprocessing.eit_data</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span><span class="p">,</span> <span class="n">override</span>
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
-<span class="kn">from</span> <span class="nn">eitprocessing.eit_data.vendor</span> <span class="kn">import</span> <span class="n">Vendor</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.mixins.equality</span> <span class="kn">import</span> <span class="n">Equivalence</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.mixins.slicing</span> <span class="kn">import</span> <span class="n">SelectByTime</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
 
-    <span class="kn">from</span> <span class="nn">eitprocessing.data_collection</span> <span class="kn">import</span> <span class="n">DataCollection</span>
+    <span class="kn">from</span> <span class="nn">eitprocessing.eit_data.vendor</span> <span class="kn">import</span> <span class="n">Vendor</span>
 
 <div class="viewcode-block" id="T">
 <a class="viewcode-back" href="../../autoapi/eitprocessing/eit_data/index.html#eitprocessing.data_collection.T">[docs]</a>
@@ -64,7 +61,7 @@
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <div class="viewcode-block" id="EITData">
 <a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.data_collection.EITData">[docs]</a>
-<span class="k">class</span> <span class="nc">EITData</span><span class="p">(</span><span class="n">SelectByTime</span><span class="p">,</span> <span class="n">Equivalence</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">EITData</span><span class="p">(</span><span class="n">SelectByTime</span><span class="p">,</span> <span class="n">Equivalence</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for EIT data.</span>
 
 <span class="sd">    This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The</span>
@@ -123,165 +120,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_equivalence</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;vendor&quot;</span><span class="p">,</span> <span class="s2">&quot;framerate&quot;</span><span class="p">]</span></div>
 
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="EITData.from_path">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.data_collection.EITData.from_path">[docs]</a>
-    <span class="k">def</span> <span class="nf">from_path</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">],</span>
-        <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">return_non_eit_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataCollection</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load sequence from path(s).</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            path: relative or absolute path(s) to data file.</span>
-<span class="sd">            vendor: vendor indicating the device used.</span>
-<span class="sd">            label: description of object for human interpretation.</span>
-<span class="sd">                Defaults to &quot;Sequence_&lt;unique_id&gt;&quot;.</span>
-<span class="sd">            framerate: framerate at which the data was recorded.</span>
-<span class="sd">                Default for Draeger: 20</span>
-<span class="sd">                Default for Timpel: 50</span>
-<span class="sd">                Default for Sentec: 50.2</span>
-<span class="sd">            first_frame: index of first frame to load.</span>
-<span class="sd">                Defaults to 0.</span>
-<span class="sd">            max_frames: maximum number of frames to load.</span>
-<span class="sd">                The actual number of frames can be lower than this if this</span>
-<span class="sd">                would surpass the final frame.</span>
-<span class="sd">            return_non_eit_data: whether to load available continuous and sparse data.</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            NotImplementedError: is raised when there is no loading method for</span>
-<span class="sd">            the given vendor.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            EITData: container for the loaded data and metadata from all files in path.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">eitprocessing.data_collection</span> <span class="kn">import</span> <span class="n">DataCollection</span>
-
-        <span class="n">vendor</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_ensure_vendor</span><span class="p">(</span><span class="n">vendor</span><span class="p">)</span>
-        <span class="n">vendor_class</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_vendor_class</span><span class="p">(</span><span class="n">vendor</span><span class="p">)</span>
-
-        <span class="n">first_frame</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_check_first_frame</span><span class="p">(</span><span class="n">first_frame</span><span class="p">)</span>
-
-        <span class="n">paths</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_ensure_path_list</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-
-        <span class="n">eit_datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataCollection</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">continuous_datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataCollection</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">sparse_datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataCollection</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">for</span> <span class="n">single_path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
-            <span class="n">single_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># raise error if any file does not exist</span>
-
-        <span class="k">for</span> <span class="n">single_path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
-            <span class="n">loaded_data</span> <span class="o">=</span> <span class="n">vendor_class</span><span class="o">.</span><span class="n">_from_path</span><span class="p">(</span>  <span class="c1"># noqa: SLF001</span>
-                <span class="n">path</span><span class="o">=</span><span class="n">single_path</span><span class="p">,</span>
-                <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
-                <span class="n">first_frame</span><span class="o">=</span><span class="n">first_frame</span><span class="p">,</span>
-                <span class="n">max_frames</span><span class="o">=</span><span class="n">max_frames</span><span class="p">,</span>
-                <span class="n">return_non_eit_data</span><span class="o">=</span><span class="n">return_non_eit_data</span><span class="p">,</span>
-            <span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">return_non_eit_data</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">eitprocessing.continuous_data</span> <span class="kn">import</span> <span class="n">ContinuousData</span>
-                <span class="kn">from</span> <span class="nn">eitprocessing.sparse_data</span> <span class="kn">import</span> <span class="n">SparseData</span>
-
-                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>
-                    <span class="n">eit</span> <span class="o">=</span> <span class="n">loaded_data</span>
-                    <span class="n">continuous</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">ContinuousData</span><span class="p">)</span>
-                    <span class="n">sparse</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">SparseData</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">eit</span><span class="p">,</span> <span class="n">continuous</span><span class="p">,</span> <span class="n">sparse</span> <span class="o">=</span> <span class="n">loaded_data</span>
-
-                <span class="n">eit</span><span class="p">:</span> <span class="n">DataCollection</span>
-                <span class="n">continuous</span><span class="p">:</span> <span class="n">DataCollection</span>
-                <span class="n">sparse</span><span class="p">:</span> <span class="n">DataCollection</span>
-
-                <span class="n">eit_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eit</span><span class="p">)</span>
-                <span class="n">continuous_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">continuous</span><span class="p">)</span>
-                <span class="n">sparse_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sparse</span><span class="p">)</span>
-
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">)</span>  <span class="c1"># noqa: S101</span>
-                <span class="n">eit_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">return_non_eit_data</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
-                <span class="n">reduce</span><span class="p">(</span><span class="n">DataCollection</span><span class="o">.</span><span class="n">concatenate</span><span class="p">,</span> <span class="n">datasets</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">datasets</span> <span class="ow">in</span> <span class="p">(</span><span class="n">eit_datasets</span><span class="p">,</span> <span class="n">continuous_datasets</span><span class="p">,</span> <span class="n">sparse_datasets</span><span class="p">)</span>
-            <span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">reduce</span><span class="p">(</span><span class="n">DataCollection</span><span class="o">.</span><span class="n">concatenate</span><span class="p">,</span> <span class="n">eit_datasets</span><span class="p">)</span></div>
-
-
-    <span class="nd">@classmethod</span>
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="EITData._from_path">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.data_collection.EITData._from_path">[docs]</a>
-    <span class="k">def</span> <span class="nf">_from_path</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
-        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-        <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">return_non_eit_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataCollection</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
-        <span class="o">...</span></div>
-
-
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="EITData._ensure_path_list">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.data_collection.EITData._ensure_path_list">[docs]</a>
-    <span class="k">def</span> <span class="nf">_ensure_path_list</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<div class="viewcode-block" id="EITData.ensure_path_list">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.data_collection.EITData.ensure_path_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">ensure_path_list</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the path or paths as a list.</span>
+
+<span class="sd">        The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a</span>
+<span class="sd">        list of Path objects given either a str/Path or list of str/Paths.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span></div>
 
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="EITData._get_vendor_class">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.data_collection.EITData._get_vendor_class">[docs]</a>
-    <span class="k">def</span> <span class="nf">_get_vendor_class</span><span class="p">(</span><span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">EITData_</span><span class="p">]:</span>
-        <span class="kn">from</span> <span class="nn">eitprocessing.eit_data.draeger</span> <span class="kn">import</span> <span class="n">DraegerEITData</span>
-        <span class="kn">from</span> <span class="nn">eitprocessing.eit_data.sentec</span> <span class="kn">import</span> <span class="n">SentecEITData</span>
-        <span class="kn">from</span> <span class="nn">eitprocessing.eit_data.timpel</span> <span class="kn">import</span> <span class="n">TimpelEITData</span>
-
-        <span class="n">vendor_classes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Vendor</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">EITData_</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">Vendor</span><span class="o">.</span><span class="n">DRAEGER</span><span class="p">:</span> <span class="n">DraegerEITData</span><span class="p">,</span>
-            <span class="n">Vendor</span><span class="o">.</span><span class="n">TIMPEL</span><span class="p">:</span> <span class="n">TimpelEITData</span><span class="p">,</span>
-            <span class="n">Vendor</span><span class="o">.</span><span class="n">SENTEC</span><span class="p">:</span> <span class="n">SentecEITData</span><span class="p">,</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">vendor_classes</span><span class="p">[</span><span class="n">vendor</span><span class="p">]</span></div>
-
-
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="EITData._check_first_frame">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.data_collection.EITData._check_first_frame">[docs]</a>
-    <span class="k">def</span> <span class="nf">_check_first_frame</span><span class="p">(</span><span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">first_frame</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">first_frame</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">first_frame</span><span class="p">)</span> <span class="o">!=</span> <span class="n">first_frame</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;`first_frame` must be an int, but was given as </span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s2"> (type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">first_frame</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">first_frame</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;`first_frame` can not be negative, but was given as </span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">first_frame</span><span class="p">)</span></div>
-
-
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="EITData._ensure_vendor">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.data_collection.EITData._ensure_vendor">[docs]</a>
-    <span class="k">def</span> <span class="nf">_ensure_vendor</span><span class="p">(</span><span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vendor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether vendor exists, and assure it&#39;s a Vendor object.&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Vendor</span><span class="p">(</span><span class="n">vendor</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unknown vendor </span><span class="si">{</span><span class="n">vendor</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="k">raise</span> <span class="n">UnknownVendorError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+<div class="viewcode-block" id="EITData.__add__">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/sequence/index.html#eitprocessing.data_collection.EITData.__add__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="EITData.concatenate">
@@ -290,8 +146,8 @@
         <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">isequivalent</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">raise_</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">a_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_ensure_path_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-        <span class="n">b_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_ensure_path_list</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">a_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ensure_path_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">b_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ensure_path_list</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">a_path</span> <span class="o">+</span> <span class="n">b_path</span>
 
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">):</span>
@@ -346,6 +202,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
             <span class="n">nframes</span><span class="o">=</span><span class="n">nframes</span><span class="p">,</span>
+            <span class="n">vendor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span>
             <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
             <span class="n">framerate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">framerate</span><span class="p">,</span>
             <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span>
@@ -406,52 +263,6 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the global impedance, i.e. the sum of all pixels at each frame.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_impedance</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
 </div>
-
-
-
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<div class="viewcode-block" id="EITData_">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/eit_data/index.html#eitprocessing.data_collection.EITData_">[docs]</a>
-<span class="k">class</span> <span class="nc">EITData_</span><span class="p">(</span><span class="n">EITData</span><span class="p">):</span>  <span class="c1"># noqa: N801, D101</span>
-<div class="viewcode-block" id="EITData_.vendor">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/eit_data/index.html#eitprocessing.data_collection.EITData_.vendor">[docs]</a>
-    <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="EITData_.__add__">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/eit_data/index.html#eitprocessing.data_collection.EITData_.__add__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span></div>
-
-
-    <span class="nd">@override</span>  <span class="c1"># remove vendor as argument</span>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="EITData_.from_path">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/eit_data/index.html#eitprocessing.data_collection.EITData_.from_path">[docs]</a>
-    <span class="k">def</span> <span class="nf">from_path</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">],</span>
-        <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">return_non_eit_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataCollection</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-            <span class="n">vendor</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span>
-            <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
-            <span class="n">first_frame</span><span class="o">=</span><span class="n">first_frame</span><span class="p">,</span>
-            <span class="n">max_frames</span><span class="o">=</span><span class="n">max_frames</span><span class="p">,</span>
-            <span class="n">return_non_eit_data</span><span class="o">=</span><span class="n">return_non_eit_data</span><span class="p">,</span>
-        <span class="p">)</span></div>
-</div>
-
-
-
-<div class="viewcode-block" id="UnknownVendorError">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/eit_data/index.html#eitprocessing.data_collection.UnknownVendorError">[docs]</a>
-<span class="k">class</span> <span class="nc">UnknownVendorError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an unknown vendor is provided when trying to load data.&quot;&quot;&quot;</span></div>
 
 </pre></div>
 
