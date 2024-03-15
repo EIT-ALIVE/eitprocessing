@@ -1,9 +1,10 @@
 from functools import reduce
 from pathlib import Path
 
-from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data import EITData
-from eitprocessing.eit_data.vendor import Vendor
+from eitprocessing.datacollection import DataCollection
+from eitprocessing.datacollection.eitdata import EITData
+from eitprocessing.datacollection.loading import load_draeger, load_sentec
+from eitprocessing.datacollection.vendor import Vendor
 from eitprocessing.sequence import Sequence
 
 
@@ -52,13 +53,13 @@ def load_data(
     pixel_impedance = sequence.eit_data["raw"].pixel_impedance
     ```
     """
-    from eitprocessing.eit_data.loading import draeger, sentec, timpel  # not in top level to avoid circular import
+    from eitprocessing.datacollection.loading import load_timpel  # not in top level to avoid circular import
 
     vendor = _ensure_vendor(vendor)
     load_func = {
-        Vendor.DRAEGER: draeger.load_from_single_path,
-        Vendor.TIMPEL: timpel.load_from_single_path,
-        Vendor.SENTEC: sentec.load_from_single_path,
+        Vendor.DRAEGER: load_draeger.load_from_single_path,
+        Vendor.TIMPEL: load_timpel.load_from_single_path,
+        Vendor.SENTEC: load_sentec.load_from_single_path,
     }[vendor]
 
     first_frame = _check_first_frame(first_frame)

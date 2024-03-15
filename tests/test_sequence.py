@@ -4,10 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from eitprocessing.eit_data import EITData, Vendor
-from eitprocessing.eit_data.draeger import DraegerEITData
-from eitprocessing.eit_data.timpel import TimpelEITData
-from eitprocessing.sequence import Sequence
+from eitprocessing import Sequence
+from eitprocessing.datacollection.eitdata import EITData, Vendor
+from eitprocessing.datacollection.loading.load_draeger import DraegerEITData
+from eitprocessing.datacollection.loading.load_timpel import TimpelEITData
 
 environment = os.environ.get(
     "EIT_PROCESSING_TEST_DATA",

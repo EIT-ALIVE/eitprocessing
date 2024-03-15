@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import mmap
 import sys
 import warnings
 from functools import partial
@@ -8,15 +7,15 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 
-from eitprocessing.binreader.reader import Reader
-from eitprocessing.continuous_data import ContinuousData
-from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data import EITData
-from eitprocessing.eit_data.event import Event
-from eitprocessing.eit_data.loading import load_data
-from eitprocessing.eit_data.phases import MaxValue, MinValue
-from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.sparse_data import SparseData
+from eitprocessing.datacollection import DataCollection
+from eitprocessing.datacollection.continuousdata import ContinuousData
+from eitprocessing.datacollection.eitdata import EITData
+from eitprocessing.datacollection.event import Event
+from eitprocessing.datacollection.loading import load_data
+from eitprocessing.datacollection.loading.binreader import Reader
+from eitprocessing.datacollection.phases import MaxValue, MinValue
+from eitprocessing.datacollection.sparsedata import SparseData
+from eitprocessing.datacollection.vendor import Vendor
 
 if TYPE_CHECKING:
     from pathlib import Path
