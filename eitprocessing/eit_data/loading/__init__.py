@@ -42,6 +42,12 @@ def load_data(
 
     Returns:
         Sequence: a Sequence with the given label, name and description, containing the loaded data.
+
+    Example:
+    ```
+    sequence = load_data(["path/to/file1", "path/to/file2"], vendor="sentec")
+    pixel_impedance = sequence.eit_data["raw"].pixel_impedance
+    ```
     """
     from eitprocessing.eit_data.loading import draeger, sentec, timpel
 
