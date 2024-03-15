@@ -149,7 +149,10 @@ class SelectByTime(SelectByIndex):
 
     @property
     def t(self) -> TimeIndexer:
-        """Time Indexer property."""  # TODO: add a short explanation of what this is used for.
+        """Time indexer.
+
+        See TimeIndexer.
+        """  # TODO: add a short explanation of what this is used for.
         return TimeIndexer(self)
 
 
@@ -160,11 +163,9 @@ class TimeIndexer:
     Example:
     ```
     >>> data = EITData.from_path(<path>, ...)
-    >>> tp_start = data.time[1]
-    >>> tp_end = data.time[4]
-    >>> time_slice = data.t[tp_start:tp_end]
-    >>> index_slice = data[1:4]
-    >>> time_slice == index_slice
+    >>> time_slice1 = data.t[tp_start:tp_end]
+    >>> time_slice2 = data.select_by_time(tp_start, tp_end)
+    >>> time_slice1 == time_slice2
     True
     ```
     """
