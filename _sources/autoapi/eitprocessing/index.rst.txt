@@ -16,7 +16,6 @@ Subpackages
    eit_data/index.rst
    filters/index.rst
    mixins/index.rst
-   parameters/index.rst
    plotting/index.rst
    sequence/index.rst
    sparse_data/index.rst
