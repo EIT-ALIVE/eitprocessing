@@ -22,7 +22,6 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-VENDOR = Vendor.SENTEC
 SENTEC_FRAMERATE = 50.2
 
 load_sentec_data = partial(load_data, vendor=Vendor.SENTEC)
