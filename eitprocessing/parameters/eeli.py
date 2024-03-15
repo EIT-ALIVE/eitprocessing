@@ -1,55 +1,60 @@
 import numpy as np
-from numpy.typing import NDArray
-from ..features import BreathDetection
+# from ..features import BreathDetection
 from . import ParameterExtraction
 
 
 class EELI(ParameterExtraction):
     def __init__(
         self,
-        regions: list[NDArray] | None = None,
-        detect_breaths_method: str = "Extreme values",
-        summary_stats: dict[str, Callable[[NDArray], float]] = {
-            "per breath": lambda x: x,
-            "mean": np.mean,
-            "standard deviation": np.std,
-            "median": np.median,
-        },
+        summary_stats: dict = None,
+        detect_breaths_parameters: dict = None,
     ):
-        self.detect_breaths_method = detect_breaths_method
-        self.regions = regions
-        self.summary_stats = summary_stats
+        self.summary_stats = {
+            "per breath": lambda x: x,
+            "mean": lambda x: np.mean(x, axis=0),
+            "standard deviation": lambda x: np.std(x, axis=0),
+            "median": lambda x: np.median(x, axis=0),
+        } | (summary_stats or {})
 
-    def compute_parameter(self, sequence, frameset_name: str) -> dict | list[dict]:
+        self.detect_breaths_parameters = {"data_type": "continuous", "label": "global_impedance_raw"} | (detect_breaths_parameters or {})
+
+    def compute_parameter(self, sequence, data_type: str = 'continuous', label: str = 'global_impedance_raw') -> dict | list[dict]:
         """Computes the end-expiratory lung impedance (EELI) per breath in the
-        global impedance."""
+        global or pixel impedance."""
 
-        breath_detector = BreathDetection(
-            sequence.framerate, **self.breath_detection_kwargs
-        )
-        breaths = breath_detector.find_breaths(global_impedance)
+        # breath_detector = BreathDetection(
+        #     sequence.framerate, **self.detect_breaths_parameters
+        # )
+        # breaths = breath_detector.find_breaths(sequence)
+        
 
-        _, _, end_indices = (np.array(indices) for indices in zip(breaths))
+        # _, _, end_indices = (np.array(indices) for indices in zip(breaths))
 
-        if self.regions is None:
-            global_impedance = sequence.framesets[frameset_name].global_impedance
-            global_eelis: NDArray = global_impedance[end_indices]
+        end_indices = [6, 12, 18, 24, 32, 38]
 
-            global_eeli = {}
-            for name, function in self.summary_stats.items():
-                global_eeli[name] = function(global_eelis)
+        if data_type == "continuous":
+            data = sequence.continuous_data[label]
+            if data.category == "impedance":
+                impedance = data.values
+                eelis: np.ndarray = impedance[end_indices]
 
-            return global_eeli
-        else:
-            pixel_impedance = sequence.framesets[frameset_name].pixel_values
-            regional_eeli = []
-            for region in self.regions:
-                regional_pixel_impedance = np.matmul(pixel_impedance, region)
-                regional_impedance = np.nansum(regional_pixel_impedance, axis=(0, 1))
-                regional_eelis: NDArray = regional_impedance[end_indices]
-                results = {}
+                eeli = {}
                 for name, function in self.summary_stats.items():
-                    results[name] = function(regional_eelis)
-                regional_eeli.append(results)
+                    eeli[name] = function(eelis)
 
-            return regional_eeli
+                return eeli
+            raise ValueError("The data category is not 'impedance'.")
+
+        if data_type == "eit":
+            pixel_impedance = sequence.eit_data[label].pixel_impedance
+
+            pixel_eelis: np.ndarray = pixel_impedance[end_indices, :, :]
+            eeli = {}
+
+            for name, function in self.summary_stats.items():
+                eeli[name] = function(pixel_eelis)
+            
+            return eeli
+
+        if data_type == "sparse":
+            raise ValueError("The data type cannot be sparse.")
