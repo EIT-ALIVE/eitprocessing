@@ -15,8 +15,8 @@ class Reader:
     """Helper class for reading binary files from disk.
 
     Args:
-      file_handle: a buffered reader handle, e.g. the result of the `open()` function.
-      endian: the endianness of the binary data. Either 'little' or 'big', or None.
+        file_handle: a buffered reader handle, e.g. the result of the `open()` function.
+        endian: the endianness of the binary data. Either 'little' or 'big', or None.
     """
 
     file_handle: io.BufferedReader
@@ -35,8 +35,8 @@ class Reader:
         `cast` should be a type, e.g. `int` or `float` used to cast the value to the proper type.
 
         Args:
-          type_code: singular type code.
-          cast: the associated type.
+            type_code: singular type code.
+            cast: the associated type.
         """
         data = self._read_full_type_code(type_code)
         return cast(data[0])
@@ -47,9 +47,9 @@ class Reader:
         See `read_single()`.
 
         Args:
-          type_code: singular type code.
-          cast: the associated type.
-          length: number of values to be read.
+            type_code: singular type code.
+            cast: the associated type.
+            length: number of values to be read.
         """
         full_type_code = f"{length}{type_code}"
         data = self._read_full_type_code(full_type_code)
@@ -76,7 +76,7 @@ class Reader:
         character is returned.
 
         Args:
-          length: number of characters.
+            length: number of characters.
         """
         full_type_code = f"{length}s"
         data = self._read_full_type_code(full_type_code)
