@@ -53,7 +53,7 @@ class EELI(ParameterExtraction):
 
             for name, function in self.summary_stats.items():
                 eeli[name] = function(pixel_eelis)
-            
+
             return eeli
 
         if data_type == "sparse":
