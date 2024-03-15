@@ -6,12 +6,11 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from eitprocessing.datacollection import DataCollection
+from eitprocessing.datacollection import DataCollection, Vendor
 from eitprocessing.datacollection.continuousdata import ContinuousData
 from eitprocessing.datacollection.eitdata import EITData
 from eitprocessing.datacollection.loading import load_data
 from eitprocessing.datacollection.sparsedata import MaxValue, MinValue, QRSMark, SparseData
-from eitprocessing.datacollection.vendor import Vendor
 
 if TYPE_CHECKING:
     from pathlib import Path

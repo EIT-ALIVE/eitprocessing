@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from enum import auto
 from typing import TYPE_CHECKING, Generic, TypeVar
+
+from strenum import LowercaseStrEnum
 
 from eitprocessing.datacollection.continuousdata import ContinuousData
 from eitprocessing.datacollection.eitdata import EITData
@@ -111,3 +114,13 @@ class DataCollection(dict, Equivalence, Generic[V]):
             concatenated[key] = self[key].concatenate(other[key])
 
         return concatenated
+
+
+class Vendor(LowercaseStrEnum):
+    """Enum indicating the vendor (manufacturer) of the source EIT device."""
+
+    DRAEGER = auto()
+    TIMPEL = auto()
+    SENTEC = auto()
+    DRAGER = DRAEGER
+    DRÄGER = DRAEGER
