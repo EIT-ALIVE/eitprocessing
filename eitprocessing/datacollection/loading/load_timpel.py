@@ -10,8 +10,7 @@ from eitprocessing.datacollection import DataCollection
 from eitprocessing.datacollection.continuousdata import ContinuousData
 from eitprocessing.datacollection.eitdata import EITData
 from eitprocessing.datacollection.loading import load_data
-from eitprocessing.datacollection.phases import MaxValue, MinValue, QRSMark
-from eitprocessing.datacollection.sparsedata import SparseData
+from eitprocessing.datacollection.sparsedata import MaxValue, MinValue, QRSMark, SparseData
 from eitprocessing.datacollection.vendor import Vendor
 
 if TYPE_CHECKING:

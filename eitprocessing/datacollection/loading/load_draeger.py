@@ -10,11 +10,9 @@ import numpy as np
 from eitprocessing.datacollection import DataCollection
 from eitprocessing.datacollection.continuousdata import ContinuousData
 from eitprocessing.datacollection.eitdata import EITData
-from eitprocessing.datacollection.event import Event
 from eitprocessing.datacollection.loading import load_data
 from eitprocessing.datacollection.loading.binreader import Reader
-from eitprocessing.datacollection.phases import MaxValue, MinValue
-from eitprocessing.datacollection.sparsedata import SparseData
+from eitprocessing.datacollection.sparsedata import Event, MaxValue, MinValue, SparseData
 from eitprocessing.datacollection.vendor import Vendor
 
 if TYPE_CHECKING:
