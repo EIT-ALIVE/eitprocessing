@@ -24,8 +24,11 @@ def load_data(
     Args:
         path: relative or absolute path(s) to data file.
         vendor: vendor indicating the device used.
-        label: description of object for human interpretation.
+        label: short description of sequence for computer interpretation.
             Defaults to "Sequence_<unique_id>".
+        name: short description of sequence for human interpretation.
+            Defaults to the same value as label.
+        description: long description of sequence for human interpretation.
         framerate: framerate at which the data was recorded.
             Default for Draeger: 20
             Default for Timpel: 50
@@ -45,7 +48,7 @@ def load_data(
 
     Example:
     ```
-    sequence = load_data(["path/to/file1", "path/to/file2"], vendor="sentec")
+    sequence = load_data(["path/to/file1", "path/to/file2"], vendor="sentec", label="initial_measurement")
     pixel_impedance = sequence.eit_data["raw"].pixel_impedance
     ```
     """
