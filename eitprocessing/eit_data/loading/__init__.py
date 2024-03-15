@@ -9,7 +9,7 @@ from eitprocessing.sequence import Sequence
 from eitprocessing.sparse_data import SparseData
 
 
-def load_data(
+def load_data(  # noqa: PLR0913
     path: str | Path | list[str | Path],
     vendor: Vendor | str,
     label: str | None = None,
