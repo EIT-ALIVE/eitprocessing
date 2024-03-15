@@ -1,12 +1,10 @@
 from functools import reduce
 from pathlib import Path
 
-from eitprocessing.continuous_data import ContinuousData
 from eitprocessing.data_collection import DataCollection
 from eitprocessing.eit_data import EITData
 from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.sequence import Sequence
-from eitprocessing.sparse_data import SparseData
 
 
 def load_data(  # noqa: PLR0913
@@ -73,23 +71,12 @@ def load_data(  # noqa: PLR0913
         single_path.resolve(strict=True)  # raise error if any file does not exist
 
     for single_path in paths:
-        loaded_data = load_func(
+        eit, continuous, sparse = load_func(
             path=single_path,
             framerate=framerate,
             first_frame=first_frame,
             max_frames=max_frames,
         )
-
-        if type(loaded_data) is not tuple:
-            eit = loaded_data
-            continuous = DataCollection(ContinuousData)
-            sparse = DataCollection(SparseData)
-        else:
-            eit, continuous, sparse = loaded_data
-
-        eit: DataCollection
-        continuous: DataCollection
-        sparse: DataCollection
 
         eit_datasets.append(eit)
         continuous_datasets.append(continuous)
