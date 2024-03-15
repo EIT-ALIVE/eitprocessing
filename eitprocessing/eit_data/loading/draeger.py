@@ -110,7 +110,7 @@ def load_from_single_path(
     (
         continuous_data_collection,
         sparse_data_collections,
-    ) = _convert_medibus_data(medibus_data, time)
+    ) = _convert_medibus_data(medibus_data, time, framerate)
 
     return (
         eit_data_collection,
@@ -120,8 +120,9 @@ def load_from_single_path(
 
 
 def _convert_medibus_data(
-    medibus_data: NDArray,
-    time: NDArray,
+    medibus_data: np.ndarray,
+    time: np.ndarray,
+    framerate: float,
 ) -> tuple[DataCollection, DataCollection]:
     continuous_data_collection = DataCollection(ContinuousData)
     sparse_data_collection = DataCollection(SparseData)
@@ -136,6 +137,7 @@ def _convert_medibus_data(
                 time=time,
                 values=data,
                 category=field_info.signal_name,
+                sample_frequency=framerate,
             )
             continuous_data.lock()
             continuous_data_collection.add(continuous_data)

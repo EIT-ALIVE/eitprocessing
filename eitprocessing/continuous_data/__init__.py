@@ -33,6 +33,7 @@ class ContinuousData(Equivalence, SelectByTime):
     name: str
     unit: str
     category: str
+    sample_frequency: float
     description: str = ""
     parameters: dict[str, Any] = field(default_factory=dict)
     derived_from: Any | list[Any] = field(default_factory=list)
@@ -203,4 +204,5 @@ class ContinuousData(Equivalence, SelectByTime):
             derived_from=[*self.derived_from, self],
             time=time,
             values=values,
+            sample_frequency=self.sample_frequency,
         )

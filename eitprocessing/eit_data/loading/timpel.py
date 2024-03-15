@@ -106,6 +106,7 @@ def load_from_single_path(
             "Airway pressure measured by Timpel device",
             loaded=True,
             values=data[:, 1024],
+            sample_frequency=framerate,
         ),
     )
 
@@ -118,6 +119,7 @@ def load_from_single_path(
             "FLow measures by Timpel device",
             loaded=True,
             values=data[:, 1025],
+            sample_frequency=framerate,
         ),
     )
 
@@ -130,6 +132,7 @@ def load_from_single_path(
             "Volume measured by Timpel device",
             loaded=True,
             values=data[:, 1026],
+            sample_frequency=framerate,
         ),
     )
 
