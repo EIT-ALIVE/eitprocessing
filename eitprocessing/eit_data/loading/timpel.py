@@ -29,7 +29,7 @@ FRAMERATE = 50
 load_timpel_data = partial(load_data, vendor=Vendor.TIMPEL)
 
 
-def load_from_single_path(  # noqa: C901
+def load_from_single_path(
     path: Path,
     framerate: float | None = 20,
     first_frame: int = 0,
@@ -161,7 +161,4 @@ def load_from_single_path(  # noqa: C901
         ),
     )
 
-    if return_non_eit_data:
-        return eit_data_collection, continuous_data_collection, DataCollection(SparseData)
-
-    return eit_data_collection
+    return eit_data_collection, continuous_data_collection, DataCollection(SparseData)
