@@ -38,14 +38,16 @@ class Sequence(Equivalence, SelectByTime):
         sparse_data: Collection of one or more sets of individual data points.
     """
 
-    label: str
-    name: str = ""
+    label: str | None = None
+    name: str | None = None
     description: str = ""
     eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData))
     continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData))
     sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData))
 
     def __post_init__(self):
+        if not self.label:
+            self.label = f"Sequence_{id(self)}"
         self.name = self.name or self.label
 
     @property
