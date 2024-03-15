@@ -149,7 +149,7 @@ extend-safe-fixes = [
 ]
 
 # Override default settings for specific rules
-pylint.max-args = 7
+pylint.max-args = 9
 flake8-tidy-imports.ban-relative-imports = "all" # Disallow all relative imports.
 isort.known-first-party = ["eitprocessing"]
 

@@ -7,7 +7,7 @@ from eitprocessing.eit_data.vendor import Vendor
 from eitprocessing.sequence import Sequence
 
 
-def load_data(  # noqa: PLR0913
+def load_data(
     path: str | Path | list[str | Path],
     vendor: Vendor | str,
     label: str | None = None,
@@ -50,7 +50,7 @@ def load_data(  # noqa: PLR0913
     pixel_impedance = sequence.eit_data["raw"].pixel_impedance
     ```
     """
-    from eitprocessing.eit_data.loading import draeger, sentec, timpel
+    from eitprocessing.eit_data.loading import draeger, sentec, timpel  # not in top level to avoid circular import
 
     vendor = _ensure_vendor(vendor)
     load_func = {

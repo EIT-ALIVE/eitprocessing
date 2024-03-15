@@ -148,7 +148,7 @@ def _convert_medibus_data(
     return continuous_data_collection, sparse_data_collection
 
 
-def _read_frame(  # noqa: PLR0913
+def _read_frame(
     reader: Reader,
     index: int,
     time: NDArray,
