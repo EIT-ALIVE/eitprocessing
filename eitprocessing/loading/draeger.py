@@ -8,15 +8,14 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 
-from eitprocessing.binreader.reader import Reader
-from eitprocessing.continuous_data import ContinuousData
-from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data import EITData
-from eitprocessing.eit_data.event import Event
-from eitprocessing.eit_data.loading import load_data
-from eitprocessing.eit_data.phases import MaxValue, MinValue
-from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.sparse_data import SparseData
+from eitprocessing.continuousdata import ContinuousData
+from eitprocessing.datacollection import DataCollection
+from eitprocessing.eitdata import EITData, Vendor
+from eitprocessing.event import Event
+from eitprocessing.loading import load_eit_data
+from eitprocessing.loading.reader import Reader
+from eitprocessing.phases import MaxValue, MinValue
+from eitprocessing.sparsedata import SparseData
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -25,7 +24,7 @@ if TYPE_CHECKING:
 
 _FRAME_SIZE_BYTES = 4358
 DRAEGER_FRAMERATE = 20
-load_draeger_data = partial(load_data, vendor=Vendor.DRAEGER)
+load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
 
 
 def load_from_single_path(

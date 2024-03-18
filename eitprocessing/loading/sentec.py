@@ -9,13 +9,12 @@ from typing import TYPE_CHECKING, BinaryIO
 
 import numpy as np
 
-from eitprocessing.binreader.reader import Reader
-from eitprocessing.continuous_data import ContinuousData
-from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data import EITData
-from eitprocessing.eit_data.loading import load_data
-from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.sparse_data import SparseData
+from eitprocessing.continuousdata import ContinuousData
+from eitprocessing.datacollection import DataCollection
+from eitprocessing.eitdata import EITData, Vendor
+from eitprocessing.loading import load_eit_data
+from eitprocessing.loading.reader import Reader
+from eitprocessing.sparsedata import SparseData
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -24,7 +23,7 @@ if TYPE_CHECKING:
 
 SENTEC_FRAMERATE = 50.2
 
-load_sentec_data = partial(load_data, vendor=Vendor.SENTEC)
+load_sentec_data = partial(load_eit_data, vendor=Vendor.SENTEC)
 
 
 def load_from_single_path(  # noqa: C901

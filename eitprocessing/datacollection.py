@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Generic, TypeVar
 
-from eitprocessing.continuous_data import ContinuousData
-from eitprocessing.eit_data import EITData
+from eitprocessing.continuousdata import ContinuousData
+from eitprocessing.eitdata import EITData
 from eitprocessing.mixins.equality import Equivalence
-from eitprocessing.sparse_data import SparseData
+from eitprocessing.sparsedata import SparseData
 
 if TYPE_CHECKING:
     from typing_extensions import Self

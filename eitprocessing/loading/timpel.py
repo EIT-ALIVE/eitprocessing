@@ -6,13 +6,12 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from eitprocessing.continuous_data import ContinuousData
-from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data import EITData
-from eitprocessing.eit_data.loading import load_data
-from eitprocessing.eit_data.phases import MaxValue, MinValue, QRSMark
-from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.sparse_data import SparseData
+from eitprocessing.continuousdata import ContinuousData
+from eitprocessing.datacollection import DataCollection
+from eitprocessing.eitdata import EITData, Vendor
+from eitprocessing.loading import load_eit_data
+from eitprocessing.phases import MaxValue, MinValue, QRSMark
+from eitprocessing.sparsedata import SparseData
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -26,7 +25,7 @@ _NAN_VALUE = -1000
 TIMPEL_FRAMERATE = 50
 
 
-load_timpel_data = partial(load_data, vendor=Vendor.TIMPEL)
+load_timpel_data = partial(load_eit_data, vendor=Vendor.TIMPEL)
 
 
 def load_from_single_path(
