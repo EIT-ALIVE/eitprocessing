@@ -15,7 +15,7 @@ from eitprocessing.mixins.slicing import SelectByTime
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from eitprocessing.eitdata import Vendor
+    from eitprocessing.objects.eitdata import Vendor
 
 T = TypeVar("T", bound="EITData")
 

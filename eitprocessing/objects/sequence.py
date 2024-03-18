@@ -3,12 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from eitprocessing.continuousdata import ContinuousData
-from eitprocessing.datacollection import DataCollection
-from eitprocessing.eitdata import EITData
 from eitprocessing.mixins.equality import Equivalence
 from eitprocessing.mixins.slicing import SelectByTime
-from eitprocessing.sparsedata import SparseData
+from eitprocessing.objects.continuousdata import ContinuousData
+from eitprocessing.objects.datacollection import DataCollection
+from eitprocessing.objects.eitdata import EITData
+from eitprocessing.objects.sparsedata import SparseData
 
 if TYPE_CHECKING:
     import numpy as np

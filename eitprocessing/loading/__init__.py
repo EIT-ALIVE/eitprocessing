@@ -1,9 +1,9 @@
 from functools import reduce
 from pathlib import Path
 
-from eitprocessing.datacollection import DataCollection
-from eitprocessing.eitdata import EITData, Vendor
-from eitprocessing.sequence import Sequence
+from eitprocessing.objects.datacollection import DataCollection
+from eitprocessing.objects.eitdata import EITData, Vendor
+from eitprocessing.objects.sequence import Sequence
 
 
 def load_eit_data(

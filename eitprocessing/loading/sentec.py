@@ -9,12 +9,12 @@ from typing import TYPE_CHECKING, BinaryIO
 
 import numpy as np
 
-from eitprocessing.continuousdata import ContinuousData
-from eitprocessing.datacollection import DataCollection
-from eitprocessing.eitdata import EITData, Vendor
 from eitprocessing.loading import load_eit_data
 from eitprocessing.loading.reader import Reader
-from eitprocessing.sparsedata import SparseData
+from eitprocessing.objects.continuousdata import ContinuousData
+from eitprocessing.objects.datacollection import DataCollection
+from eitprocessing.objects.eitdata import EITData, Vendor
+from eitprocessing.objects.sparsedata import SparseData
 
 if TYPE_CHECKING:
     from pathlib import Path
