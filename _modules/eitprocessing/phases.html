@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>phases &#8212; eitprocessing 0.0.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../_static/nature.css?v=601dbdee" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
-    <script src="../_static/documentation_options.js?v=7026087e"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <title>eitprocessing.phases &#8212; eitprocessing 0.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=601dbdee" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
+          <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
+          <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">phases</a></li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.phases</a></li> 
       </ul>
     </div>  
 
@@ -34,22 +34,22 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for phases</h1><div class="highlight"><pre>
+  <h1>Source code for eitprocessing.phases</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 
 
 <span class="nd">@dataclass</span>
 <div class="viewcode-block" id="PhaseIndicator">
-<a class="viewcode-back" href="../autoapi/phases/index.html#phases.PhaseIndicator">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/phases/index.html#eitprocessing.phases.PhaseIndicator">[docs]</a>
 <span class="k">class</span> <span class="nc">PhaseIndicator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parent class for phase indications.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="PhaseIndicator.index">
-<a class="viewcode-back" href="../autoapi/phases/index.html#phases.PhaseIndicator.index">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/phases/index.html#eitprocessing.phases.PhaseIndicator.index">[docs]</a>
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span></div>
 
 <div class="viewcode-block" id="PhaseIndicator.time">
-<a class="viewcode-back" href="../autoapi/phases/index.html#phases.PhaseIndicator.time">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/phases/index.html#eitprocessing.phases.PhaseIndicator.time">[docs]</a>
     <span class="n">time</span><span class="p">:</span> <span class="nb">float</span></div>
 </div>
 
@@ -57,7 +57,7 @@
 
 <span class="nd">@dataclass</span>
 <div class="viewcode-block" id="MinValue">
-<a class="viewcode-back" href="../autoapi/phases/index.html#phases.MinValue">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/phases/index.html#eitprocessing.phases.MinValue">[docs]</a>
 <span class="k">class</span> <span class="nc">MinValue</span><span class="p">(</span><span class="n">PhaseIndicator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Automatically registered local minimum of an EIT measurement.&quot;&quot;&quot;</span></div>
 
@@ -65,7 +65,7 @@
 
 <span class="nd">@dataclass</span>
 <div class="viewcode-block" id="MaxValue">
-<a class="viewcode-back" href="../autoapi/phases/index.html#phases.MaxValue">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/phases/index.html#eitprocessing.phases.MaxValue">[docs]</a>
 <span class="k">class</span> <span class="nc">MaxValue</span><span class="p">(</span><span class="n">PhaseIndicator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Automatically registered local maximum of an EIT measurement.&quot;&quot;&quot;</span></div>
 
@@ -73,7 +73,7 @@
 
 <span class="nd">@dataclass</span>
 <div class="viewcode-block" id="QRSMark">
-<a class="viewcode-back" href="../autoapi/phases/index.html#phases.QRSMark">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/phases/index.html#eitprocessing.phases.QRSMark">[docs]</a>
 <span class="k">class</span> <span class="nc">QRSMark</span><span class="p">(</span><span class="n">PhaseIndicator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Automatically registered QRS mark an EIT measurement from a Timpel device.&quot;&quot;&quot;</span></div>
 
@@ -88,7 +88,7 @@
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
+    <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
@@ -103,14 +103,14 @@
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
+          <a href="../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
+          <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">phases</a></li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.phases</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -1,7 +1,7 @@
-:py:mod:`phases`
-================
+:py:mod:`eitprocessing.phases`
+==============================
 
-.. py:module:: phases
+.. py:module:: eitprocessing.phases
 
 
 Module Contents
@@ -12,10 +12,10 @@ Classes
 
 .. autoapisummary::
 
-   phases.PhaseIndicator
-   phases.MinValue
-   phases.MaxValue
-   phases.QRSMark
+   eitprocessing.phases.PhaseIndicator
+   eitprocessing.phases.MinValue
+   eitprocessing.phases.MaxValue
+   eitprocessing.phases.QRSMark
 
 
 

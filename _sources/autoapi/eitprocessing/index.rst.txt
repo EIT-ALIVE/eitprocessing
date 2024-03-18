@@ -25,6 +25,8 @@ Submodules
    continuousdata/index.rst
    datacollection/index.rst
    eitdata/index.rst
+   event/index.rst
+   phases/index.rst
    sequence/index.rst
    sparsedata/index.rst
 

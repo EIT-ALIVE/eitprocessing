@@ -1,7 +1,7 @@
-:py:mod:`event`
-===============
+:py:mod:`eitprocessing.event`
+=============================
 
-.. py:module:: event
+.. py:module:: eitprocessing.event
 
 
 Module Contents
@@ -12,7 +12,7 @@ Classes
 
 .. autoapisummary::
 
-   event.Event
+   eitprocessing.event.Event
 
 
 
