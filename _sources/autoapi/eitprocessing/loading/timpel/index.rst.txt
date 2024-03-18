@@ -1,0 +1,53 @@
+:py:mod:`eitprocessing.loading.timpel`
+======================================
+
+.. py:module:: eitprocessing.loading.timpel
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.loading.timpel.load_from_single_path
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.loading.timpel._COLUMN_WIDTH
+   eitprocessing.loading.timpel._NAN_VALUE
+   eitprocessing.loading.timpel.TIMPEL_FRAMERATE
+   eitprocessing.loading.timpel.load_timpel_data
+
+
+.. py:data:: _COLUMN_WIDTH
+   :value: 1030
+
+   
+
+.. py:data:: _NAN_VALUE
+
+   
+
+.. py:data:: TIMPEL_FRAMERATE
+   :value: 50
+
+   
+
+.. py:data:: load_timpel_data
+
+   
+
+.. py:function:: load_from_single_path(path: pathlib.Path, framerate: float | None = 20, first_frame: int = 0, max_frames: int | None = None) -> eitprocessing.datacollection.DataCollection | tuple[eitprocessing.datacollection.DataCollection, eitprocessing.datacollection.DataCollection, eitprocessing.datacollection.DataCollection]
+
+   Load Timpel EIT data from path.
+
+

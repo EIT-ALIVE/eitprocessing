@@ -37,15 +37,12 @@
   <h1>Source code for eitprocessing.datacollection</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">auto</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 
-<span class="kn">from</span> <span class="nn">strenum</span> <span class="kn">import</span> <span class="n">LowercaseStrEnum</span>
-
-<span class="kn">from</span> <span class="nn">eitprocessing.datacollection.continuousdata</span> <span class="kn">import</span> <span class="n">ContinuousData</span>
-<span class="kn">from</span> <span class="nn">eitprocessing.datacollection.eitdata</span> <span class="kn">import</span> <span class="n">EITData</span>
-<span class="kn">from</span> <span class="nn">eitprocessing.datacollection.sparsedata</span> <span class="kn">import</span> <span class="n">SparseData</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.continuousdata</span> <span class="kn">import</span> <span class="n">ContinuousData</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.eitdata</span> <span class="kn">import</span> <span class="n">EITData</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.mixins.equality</span> <span class="kn">import</span> <span class="n">Equivalence</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.sparsedata</span> <span class="kn">import</span> <span class="n">SparseData</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
@@ -57,7 +54,7 @@
 
 
 <div class="viewcode-block" id="DataCollection">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/loading/index.html#eitprocessing.datacollection.DataCollection">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/loading/index.html#eitprocessing.datacollection.DataCollection">[docs]</a>
 <span class="k">class</span> <span class="nc">DataCollection</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">Equivalence</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">V</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A collection of a single type of data with unique labels.</span>
 
@@ -88,14 +85,14 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DataCollection.__setitem__">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/loading/index.html#eitprocessing.datacollection.DataCollection.__setitem__">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/loading/index.html#eitprocessing.datacollection.DataCollection.__setitem__">[docs]</a>
     <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">__value</span><span class="p">:</span> <span class="n">V</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_item</span><span class="p">(</span><span class="n">__value</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">__key</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">__key</span><span class="p">,</span> <span class="n">__value</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DataCollection.add">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/loading/index.html#eitprocessing.datacollection.DataCollection.add">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/loading/index.html#eitprocessing.datacollection.DataCollection.add">[docs]</a>
     <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">item</span><span class="p">:</span> <span class="n">V</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add one or multiple item(s) to the collection.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">item_</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
@@ -104,7 +101,7 @@
 
 
 <div class="viewcode-block" id="DataCollection._check_item">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/loading/index.html#eitprocessing.datacollection.DataCollection._check_item">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/loading/index.html#eitprocessing.datacollection.DataCollection._check_item">[docs]</a>
     <span class="k">def</span> <span class="nf">_check_item</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">item</span><span class="p">:</span> <span class="n">V</span><span class="p">,</span>
@@ -145,28 +142,28 @@
 
 
 <div class="viewcode-block" id="DataCollection.get_loaded_data">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/loading/index.html#eitprocessing.datacollection.DataCollection.get_loaded_data">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/loading/index.html#eitprocessing.datacollection.DataCollection.get_loaded_data">[docs]</a>
     <span class="k">def</span> <span class="nf">get_loaded_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">V</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all data that was directly loaded from disk.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">loaded</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="DataCollection.get_data_derived_from">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/loading/index.html#eitprocessing.datacollection.DataCollection.get_data_derived_from">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/loading/index.html#eitprocessing.datacollection.DataCollection.get_data_derived_from">[docs]</a>
     <span class="k">def</span> <span class="nf">get_data_derived_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">V</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">V</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all data that was derived from a specific source.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">derived_from</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="DataCollection.get_derived_data">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/loading/index.html#eitprocessing.datacollection.DataCollection.get_derived_data">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/loading/index.html#eitprocessing.datacollection.DataCollection.get_derived_data">[docs]</a>
     <span class="k">def</span> <span class="nf">get_derived_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">V</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all data that was derived from any source.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">derived_from</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="DataCollection.concatenate">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/loading/index.html#eitprocessing.datacollection.DataCollection.concatenate">[docs]</a>
+<a class="viewcode-back" href="../../autoapi/eitprocessing/loading/index.html#eitprocessing.datacollection.DataCollection.concatenate">[docs]</a>
     <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">[</span><span class="n">V</span><span class="p">],</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">[</span><span class="n">V</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">[</span><span class="n">V</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Concatenate this collection with an equivalent collection.</span>
 
@@ -179,34 +176,6 @@
             <span class="n">concatenated</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">concatenated</span></div>
-</div>
-
-
-
-<div class="viewcode-block" id="Vendor">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/loading/index.html#eitprocessing.datacollection.Vendor">[docs]</a>
-<span class="k">class</span> <span class="nc">Vendor</span><span class="p">(</span><span class="n">LowercaseStrEnum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum indicating the vendor (manufacturer) of the source EIT device.&quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="Vendor.DRAEGER">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/index.html#eitprocessing.datacollection.Vendor.DRAEGER">[docs]</a>
-    <span class="n">DRAEGER</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="Vendor.TIMPEL">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/index.html#eitprocessing.datacollection.Vendor.TIMPEL">[docs]</a>
-    <span class="n">TIMPEL</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="Vendor.SENTEC">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/index.html#eitprocessing.datacollection.Vendor.SENTEC">[docs]</a>
-    <span class="n">SENTEC</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="Vendor.DRAGER">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/index.html#eitprocessing.datacollection.Vendor.DRAGER">[docs]</a>
-    <span class="n">DRAGER</span> <span class="o">=</span> <span class="n">DRAEGER</span></div>
-
-<div class="viewcode-block" id="Vendor.DRÄGER">
-<a class="viewcode-back" href="../../autoapi/eitprocessing/datacollection/index.html#eitprocessing.datacollection.Vendor.DRÄGER">[docs]</a>
-    <span class="n">DRÄGER</span> <span class="o">=</span> <span class="n">DRAEGER</span></div>
 </div>
 
 </pre></div>

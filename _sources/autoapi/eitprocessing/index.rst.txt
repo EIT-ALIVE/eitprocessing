@@ -10,8 +10,8 @@ Subpackages
    :titlesonly:
    :maxdepth: 3
 
-   datacollection/index.rst
    filters/index.rst
+   loading/index.rst
    mixins/index.rst
    plotting/index.rst
 
@@ -22,6 +22,10 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
+   continuousdata/index.rst
+   datacollection/index.rst
+   eitdata/index.rst
    sequence/index.rst
+   sparsedata/index.rst
 
 

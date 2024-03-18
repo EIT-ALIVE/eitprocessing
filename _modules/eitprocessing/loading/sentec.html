@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eitprocessing.loading.sentec &#8212; eitprocessing 0.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css?v=601dbdee" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../loading.html" accesskey="U">eitprocessing.loading</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.loading.sentec</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for eitprocessing.loading.sentec</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">mmap</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">BinaryIO</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">eitprocessing.continuousdata</span> <span class="kn">import</span> <span class="n">ContinuousData</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.datacollection</span> <span class="kn">import</span> <span class="n">DataCollection</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.eitdata</span> <span class="kn">import</span> <span class="n">EITData</span><span class="p">,</span> <span class="n">Vendor</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.loading</span> <span class="kn">import</span> <span class="n">load_eit_data</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.loading.reader</span> <span class="kn">import</span> <span class="n">Reader</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.sparsedata</span> <span class="kn">import</span> <span class="n">SparseData</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+    <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
+
+<div class="viewcode-block" id="SENTEC_FRAMERATE">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.SENTEC_FRAMERATE">[docs]</a>
+<span class="n">SENTEC_FRAMERATE</span> <span class="o">=</span> <span class="mf">50.2</span></div>
+
+
+<div class="viewcode-block" id="load_sentec_data">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.load_sentec_data">[docs]</a>
+<span class="n">load_sentec_data</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">load_eit_data</span><span class="p">,</span> <span class="n">vendor</span><span class="o">=</span><span class="n">Vendor</span><span class="o">.</span><span class="n">SENTEC</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="load_from_single_path">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.load_from_single_path">[docs]</a>
+<span class="k">def</span> <span class="nf">load_from_single_path</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">50.2</span><span class="p">,</span>
+    <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataCollection</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load Sentec EIT data from path.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;br&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">,</span> <span class="n">mmap</span><span class="o">.</span><span class="n">mmap</span><span class="p">(</span><span class="n">fo</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">length</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">access</span><span class="o">=</span><span class="n">mmap</span><span class="o">.</span><span class="n">ACCESS_READ</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+        <span class="n">file_length</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fstat</span><span class="p">(</span><span class="n">fo</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span><span class="o">.</span><span class="n">st_size</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">Reader</span><span class="p">(</span><span class="n">fh</span><span class="p">,</span> <span class="n">endian</span><span class="o">=</span><span class="s2">&quot;little&quot;</span><span class="p">)</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">uint8</span><span class="p">()</span>
+
+        <span class="n">time</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">max_n_images</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">file_length</span> <span class="o">/</span> <span class="mi">32</span> <span class="o">/</span> <span class="mi">32</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">max_n_images</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">n_images_added</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># while there are still data to be read and the number of read data points is higher</span>
+        <span class="c1"># than the maximum specified, keep reading</span>
+        <span class="k">while</span> <span class="n">fh</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">file_length</span> <span class="ow">and</span> <span class="p">(</span><span class="n">max_frames</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">max_frames</span><span class="p">):</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">uint64</span><span class="p">()</span>  <span class="c1"># skip timestamp reading</span>
+            <span class="n">domain_id</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">uint8</span><span class="p">()</span>
+            <span class="n">number_data_fields</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">uint8</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_data_fields</span><span class="p">):</span>
+                <span class="n">data_id</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">uint8</span><span class="p">()</span>
+                <span class="n">payload_size</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">uint16</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">payload_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">domain_id</span> <span class="o">==</span> <span class="n">Domain</span><span class="o">.</span><span class="n">MEASUREMENT</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">data_id</span> <span class="o">==</span> <span class="n">MeasurementDataID</span><span class="o">.</span><span class="n">TIMESTAMP</span><span class="p">:</span>
+                        <span class="n">time_of_caption</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">uint32</span><span class="p">()</span>
+                        <span class="n">time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time_of_caption</span><span class="p">)</span>
+
+                    <span class="k">elif</span> <span class="n">data_id</span> <span class="o">==</span> <span class="n">MeasurementDataID</span><span class="o">.</span><span class="n">ZERO_REF_IMAGE</span><span class="p">:</span>
+                        <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                        <span class="n">ref</span> <span class="o">=</span> <span class="n">_read_frame</span><span class="p">(</span>
+                            <span class="n">fh</span><span class="p">,</span>
+                            <span class="n">version</span><span class="p">,</span>
+                            <span class="n">index</span><span class="p">,</span>
+                            <span class="n">payload_size</span><span class="p">,</span>
+                            <span class="n">reader</span><span class="p">,</span>
+                            <span class="n">first_frame</span><span class="p">,</span>
+                        <span class="p">)</span>
+
+                        <span class="k">if</span> <span class="n">ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">image</span><span class="p">[</span><span class="n">n_images_added</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">ref</span>
+                            <span class="n">n_images_added</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">fh</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">payload_size</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_CUR</span><span class="p">)</span>
+
+                <span class="c1"># read the framerate from the file, if present</span>
+                <span class="c1"># (domain 64 = configuration, data 5 = framerate)</span>
+                <span class="k">elif</span> <span class="n">domain_id</span> <span class="o">==</span> <span class="n">Domain</span><span class="o">.</span><span class="n">CONFIGURATION</span> <span class="ow">and</span> <span class="n">data_id</span> <span class="o">==</span> <span class="n">ConfigurationDataID</span><span class="o">.</span><span class="n">FRAMERATE</span><span class="p">:</span>
+                    <span class="n">framerate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">float32</span><span class="p">(),</span> <span class="mi">4</span><span class="p">)</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Framerate value found in file. The framerate value will be set to </span><span class="si">{</span><span class="n">framerate</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fh</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">payload_size</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_CUR</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="p">[:</span><span class="n">n_images_added</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+    <span class="n">n_frames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">f0</span> <span class="o">:=</span> <span class="n">first_frame</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">fn</span> <span class="o">:=</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid input: `first_frame` (</span><span class="si">{</span><span class="n">f0</span><span class="si">}</span><span class="s2">) is larger than the total number of frames in the file (</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">).&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">max_frames</span> <span class="ow">and</span> <span class="n">n_frames</span> <span class="o">!=</span> <span class="n">max_frames</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The number of frames requested (</span><span class="si">{</span><span class="n">max_frames</span><span class="si">}</span><span class="s2">) is larger &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;than the available number (</span><span class="si">{</span><span class="n">n_frames</span><span class="si">}</span><span class="s2">) of frames after &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;the first frame selected (</span><span class="si">{</span><span class="n">first_frame</span><span class="si">}</span><span class="s2">, total frames: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">).</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">n_frames</span><span class="si">}</span><span class="s2"> frames will be loaded.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">framerate</span><span class="p">:</span>
+        <span class="n">framerate</span> <span class="o">=</span> <span class="n">SENTEC_FRAMERATE</span>
+
+    <span class="n">eit_data_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">)</span>
+    <span class="n">eit_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">EITData</span><span class="p">(</span>
+            <span class="n">vendor</span><span class="o">=</span><span class="n">Vendor</span><span class="o">.</span><span class="n">SENTEC</span><span class="p">,</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+            <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
+            <span class="n">nframes</span><span class="o">=</span><span class="n">n_frames</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="n">period</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000000</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+            <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">eit_data_collection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">ContinuousData</span><span class="p">),</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">SparseData</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_read_frame">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec._read_frame">[docs]</a>
+<span class="k">def</span> <span class="nf">_read_frame</span><span class="p">(</span>
+    <span class="n">fh</span><span class="p">:</span> <span class="n">BinaryIO</span><span class="p">,</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">payload_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">reader</span><span class="p">:</span> <span class="n">Reader</span><span class="p">,</span>
+    <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a single frame in the file.</span>
+
+<span class="sd">    The current position of the file has to be already set to the point where the image should be read (data_id 5).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">                fh: opened file object</span>
+<span class="sd">                version: version of the Sentec file</span>
+<span class="sd">                index: current number of read frames</span>
+<span class="sd">                payload_size: size of the payload of the data to be read.</span>
+<span class="sd">                reader: bites reader object</span>
+<span class="sd">                first_frame: index of first time point of sequence.</span>
+
+<span class="sd">    Returns: A 32 x 32 matrix, containing the pixels values.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">first_frame</span><span class="p">:</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">payload_size</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_CUR</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">version</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># read quality index. We don&#39;t use it, so we skip the bytes</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">uint8</span><span class="p">()</span>
+        <span class="n">n_pixels</span> <span class="o">=</span> <span class="p">(</span><span class="n">payload_size</span> <span class="o">-</span> <span class="mi">3</span><span class="p">)</span> <span class="o">//</span> <span class="mi">4</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_pixels</span> <span class="o">=</span> <span class="p">(</span><span class="n">payload_size</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">//</span> <span class="mi">4</span>
+
+    <span class="n">image_width</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">uint8</span><span class="p">()</span>
+    <span class="n">image_height</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">uint8</span><span class="p">()</span>
+
+    <span class="c1"># the sign of the zero_ref values has to be inverted</span>
+    <span class="n">zero_ref</span> <span class="o">=</span> <span class="o">-</span><span class="n">reader</span><span class="o">.</span><span class="n">npfloat32</span><span class="p">(</span><span class="n">n_pixels</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">image_width</span> <span class="o">*</span> <span class="n">image_height</span> <span class="o">!=</span> <span class="n">n_pixels</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The length of image array is &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_pixels</span><span class="si">}</span><span class="s2"> which is not equal to the &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;product of the width (</span><span class="si">{</span><span class="n">image_width</span><span class="si">}</span><span class="s2">) and &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;height (</span><span class="si">{</span><span class="n">image_height</span><span class="si">}</span><span class="s2">) of the frame.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Image will not be stored.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">zero_ref</span><span class="p">,</span> <span class="p">(</span><span class="n">image_width</span><span class="p">,</span> <span class="n">image_height</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Domain">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.Domain">[docs]</a>
+<span class="k">class</span> <span class="nc">Domain</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Domain loaded data falls in.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Domain.MEASUREMENT">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.Domain.MEASUREMENT">[docs]</a>
+    <span class="n">MEASUREMENT</span> <span class="o">=</span> <span class="mi">16</span></div>
+
+<div class="viewcode-block" id="Domain.CONFIGURATION">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.Domain.CONFIGURATION">[docs]</a>
+    <span class="n">CONFIGURATION</span> <span class="o">=</span> <span class="mi">64</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MeasurementDataID">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.MeasurementDataID">[docs]</a>
+<span class="k">class</span> <span class="nc">MeasurementDataID</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ID of measured data.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MeasurementDataID.TIMESTAMP">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.MeasurementDataID.TIMESTAMP">[docs]</a>
+    <span class="n">TIMESTAMP</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="MeasurementDataID.ZERO_REF_IMAGE">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.MeasurementDataID.ZERO_REF_IMAGE">[docs]</a>
+    <span class="n">ZERO_REF_IMAGE</span> <span class="o">=</span> <span class="mi">5</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ConfigurationDataID">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.ConfigurationDataID">[docs]</a>
+<span class="k">class</span> <span class="nc">ConfigurationDataID</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ID of configuration data.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ConfigurationDataID.FRAMERATE">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/loading/sentec/index.html#eitprocessing.loading.sentec.ConfigurationDataID.FRAMERATE">[docs]</a>
+    <span class="n">FRAMERATE</span> <span class="o">=</span> <span class="mi">1</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../loading.html" >eitprocessing.loading</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.loading.sentec</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>
