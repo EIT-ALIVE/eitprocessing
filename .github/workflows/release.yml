@@ -34,7 +34,7 @@ jobs:
           ghcr.io/eit-alive/eittestdata:latest
           sh -c 'set -xe ;
             cd /ci ;
-            python -m pip install ".[dev,publishing]" ;
+            python -m pip install ".[dev,publishing]"'
 
   upload_test_pypi:
     needs: [build]
