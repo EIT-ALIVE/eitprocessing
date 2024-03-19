@@ -10,7 +10,6 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.loading import load_eit_data
-from eitprocessing.datahandling.phases import MaxValue, MinValue, QRSMark
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -129,31 +128,55 @@ def load_from_single_path(
         ),
     )
 
-    # extract breath start, breath end and QRS marks
-    phases = []
-    for index in np.flatnonzero(data[:, 1027] == 1):
-        phases.append(MinValue(index, time[int(index)]))  # noqa: PERF401
-
-    for index in np.flatnonzero(data[:, 1028] == 1):
-        phases.append(MaxValue(index, time[int(index)]))  # noqa: PERF401
-
-    for index in np.flatnonzero(data[:, 1029] == 1):
-        phases.append(QRSMark(index, time[int(index)]))  # noqa: PERF401
-
-    phases.sort(key=lambda x: x.index)
-
+    eit_data = EITData(
+        vendor=Vendor.TIMPEL,
+        label="raw",
+        path=path,
+        nframes=nframes,
+        time=time,
+        framerate=framerate,
+        pixel_impedance=pixel_impedance,
+    )
     eit_data_collection = DataCollection(EITData)
-    eit_data_collection.add(
-        EITData(
-            vendor=Vendor.TIMPEL,
-            label="raw",
-            path=path,
-            nframes=nframes,
-            time=time,
-            framerate=framerate,
-            phases=phases,
-            pixel_impedance=pixel_impedance,
+    eit_data_collection.add(eit_data)
+
+    sparsedata_collection = DataCollection(SparseData)
+
+    # extract breath start, breath end and QRS marks
+    min_indices = np.nonzero(data[:, 1027] == 1)[0]
+    sparsedata_collection.add(
+        SparseData(
+            label="minvalues_(timpel)",
+            name="Minimum values detected by Timpel device.",
+            unit=None,
+            category="minvalue",
+            derived_from=[eit_data],
+            time=time[min_indices],
         ),
     )
 
-    return eit_data_collection, continuous_data_collection, DataCollection(SparseData)
+    max_indices = np.nonzero(data[:, 1028] == 1)[0]
+    sparsedata_collection.add(
+        SparseData(
+            label="maxvalues_(timpel)",
+            name="Maximum values detected by Timpel device.",
+            unit=None,
+            category="maxvalue",
+            derived_from=[eit_data],
+            time=time[max_indices],
+        ),
+    )
+
+    qrs_indices = np.nonzero(data[:, 1029] == 1)[0]
+    sparsedata_collection.add(
+        SparseData(
+            label="qrscomplexes_(timpel)",
+            name="QRS complexes detected by Timpel device",
+            unit=None,
+            category="qrs_complex",
+            derived_from=[eit_data],
+            time=time[qrs_indices],
+        ),
+    )
+
+    return eit_data_collection, continuous_data_collection, sparsedata_collection
