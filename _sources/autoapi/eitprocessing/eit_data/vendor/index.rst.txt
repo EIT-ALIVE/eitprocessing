@@ -1,0 +1,47 @@
+:py:mod:`eitprocessing.eit_data.vendor`
+=======================================
+
+.. py:module:: eitprocessing.eit_data.vendor
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.eit_data.vendor.Vendor
+
+
+
+
+.. py:class:: Vendor
+
+
+   Bases: :py:obj:`strenum.LowercaseStrEnum`
+
+   Enum indicating the vendor (manufacturer) of the source EIT device.
+
+   .. py:attribute:: DRAEGER
+
+      
+
+   .. py:attribute:: TIMPEL
+
+      
+
+   .. py:attribute:: SENTEC
+
+      
+
+   .. py:attribute:: DRAGER
+
+      
+
+   .. py:attribute:: DRÄGER
+
+      
+
+

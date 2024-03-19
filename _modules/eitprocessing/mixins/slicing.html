@@ -51,7 +51,7 @@
 
 
 <div class="viewcode-block" id="SelectByIndex">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.SelectByIndex">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.continuous_data.SelectByIndex">[docs]</a>
 <span class="k">class</span> <span class="nc">SelectByIndex</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds slicing functionality to subclass by implementing `__getitem__`.</span>
 
@@ -62,12 +62,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SelectByIndex.label">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.SelectByIndex.label">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.continuous_data.SelectByIndex.label">[docs]</a>
     <span class="n">label</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
 <div class="viewcode-block" id="SelectByIndex.__getitem__">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.SelectByIndex.__getitem__">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.continuous_data.SelectByIndex.__getitem__">[docs]</a>
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">slice</span> <span class="o">|</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">step</span> <span class="ow">and</span> <span class="n">key</span><span class="o">.</span><span class="n">step</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
@@ -85,7 +85,7 @@
 
 
 <div class="viewcode-block" id="SelectByIndex.select_by_index">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.SelectByIndex.select_by_index">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.continuous_data.SelectByIndex.select_by_index">[docs]</a>
     <span class="k">def</span> <span class="nf">select_by_index</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -114,7 +114,7 @@
 
     <span class="nd">@abstractmethod</span>
 <div class="viewcode-block" id="SelectByIndex._sliced_copy">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.SelectByIndex._sliced_copy">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.continuous_data.SelectByIndex._sliced_copy">[docs]</a>
     <span class="k">def</span> <span class="nf">_sliced_copy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -132,17 +132,17 @@
 
 
 <div class="viewcode-block" id="SelectByTime">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.SelectByTime">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.SelectByTime">[docs]</a>
 <span class="k">class</span> <span class="nc">SelectByTime</span><span class="p">(</span><span class="n">SelectByIndex</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds methods for slicing by time rather than index.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SelectByTime.time">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.SelectByTime.time">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.continuous_data.SelectByTime.time">[docs]</a>
     <span class="n">time</span><span class="p">:</span> <span class="n">NDArray</span></div>
 
 
 <div class="viewcode-block" id="SelectByTime.select_by_time">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.SelectByTime.select_by_time">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/sequence/index.html#eitprocessing.continuous_data.SelectByTime.select_by_time">[docs]</a>
     <span class="k">def</span> <span class="nf">select_by_time</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -209,7 +209,7 @@
 
     <span class="nd">@property</span>
 <div class="viewcode-block" id="SelectByTime.t">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.SelectByTime.t">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.continuous_data.SelectByTime.t">[docs]</a>
     <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TimeIndexer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Time Indexer property.&quot;&quot;&quot;</span>  <span class="c1"># TODO: add a short explanation of what this is used for.</span>
         <span class="k">return</span> <span class="n">TimeIndexer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
@@ -219,7 +219,7 @@
 
 <span class="nd">@dataclass</span>
 <div class="viewcode-block" id="TimeIndexer">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.TimeIndexer">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.continuous_data.TimeIndexer">[docs]</a>
 <span class="k">class</span> <span class="nc">TimeIndexer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper class for slicing an object using the time axis instead of indices.</span>
 
@@ -236,12 +236,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TimeIndexer.obj">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.TimeIndexer.obj">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.continuous_data.TimeIndexer.obj">[docs]</a>
     <span class="n">obj</span><span class="p">:</span> <span class="n">SelectByTime</span></div>
 
 
 <div class="viewcode-block" id="TimeIndexer.__getitem__">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.mixins.slicing.TimeIndexer.__getitem__">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/mixins/slicing/index.html#eitprocessing.continuous_data.TimeIndexer.__getitem__">[docs]</a>
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">slice</span> <span class="o">|</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">step</span><span class="p">:</span>

@@ -1,0 +1,15 @@
+:py:mod:`eitprocessing.binreader`
+=================================
+
+.. py:module:: eitprocessing.binreader
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   reader/index.rst
+
+
