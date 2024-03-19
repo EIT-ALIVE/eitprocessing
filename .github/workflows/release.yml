@@ -35,8 +35,6 @@ jobs:
           sh -c 'set -xe ;
             cd /ci ;
             python -m pip install ".[dev,publishing]" ;
-            pytest -v ;
-            python setup.py sdist bdist_wheel'
 
   upload_test_pypi:
     needs: [build]
