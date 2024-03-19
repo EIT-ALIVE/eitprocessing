@@ -35,6 +35,11 @@ jobs:
           sh -c 'set -xe ;
             cd /ci ;
             python -m pip install ".[dev,publishing]"'
+      - name: Build wheel and source distribution
+        run: python -m build
+      - uses: actions/upload-artifact@v3
+        with:
+          path: dist/*
 
   upload_test_pypi:
     needs: [build]
