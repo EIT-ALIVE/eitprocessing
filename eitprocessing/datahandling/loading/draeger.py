@@ -8,14 +8,14 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 
-from eitprocessing.loading import load_eit_data
-from eitprocessing.loading.reader import Reader
-from eitprocessing.objects.continuousdata import ContinuousData
-from eitprocessing.objects.datacollection import DataCollection
-from eitprocessing.objects.eitdata import EITData, Vendor
-from eitprocessing.objects.event import Event
-from eitprocessing.objects.phases import MaxValue, MinValue
-from eitprocessing.objects.sparsedata import SparseData
+from eitprocessing.datahandling.continuousdata import ContinuousData
+from eitprocessing.datahandling.datacollection import DataCollection
+from eitprocessing.datahandling.eitdata import EITData, Vendor
+from eitprocessing.datahandling.event import Event
+from eitprocessing.datahandling.loading import load_eit_data
+from eitprocessing.datahandling.loading.reader import Reader
+from eitprocessing.datahandling.phases import MaxValue, MinValue
+from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
     from pathlib import Path

@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from eitprocessing.mixins.equality import Equivalence
-from eitprocessing.mixins.slicing import SelectByTime
+from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 if TYPE_CHECKING:
     from collections.abc import Callable

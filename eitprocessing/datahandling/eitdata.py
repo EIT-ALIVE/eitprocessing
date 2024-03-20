@@ -9,13 +9,13 @@ import numpy as np
 from strenum import LowercaseStrEnum
 from typing_extensions import Self
 
-from eitprocessing.mixins.equality import Equivalence
-from eitprocessing.mixins.slicing import SelectByTime
+from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from eitprocessing.objects.eitdata import Vendor
+    from eitprocessing.datahandling.eitdata import Vendor
 
 T = TypeVar("T", bound="EITData")
 
