@@ -40,7 +40,6 @@
 
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.datacollection</span> <span class="kn">import</span> <span class="n">DataCollection</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.eitdata</span> <span class="kn">import</span> <span class="n">EITData</span><span class="p">,</span> <span class="n">Vendor</span>
-<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.loading</span> <span class="kn">import</span> <span class="n">draeger</span><span class="p">,</span> <span class="n">sentec</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
 
 
@@ -91,7 +90,7 @@
 <span class="sd">    pixel_impedance = sequence.eit_data[&quot;raw&quot;].pixel_impedance</span>
 <span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.loading</span> <span class="kn">import</span> <span class="n">timpel</span>  <span class="c1"># not in top level to avoid circular import</span>
+    <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.loading</span> <span class="kn">import</span> <span class="n">draeger</span><span class="p">,</span> <span class="n">sentec</span><span class="p">,</span> <span class="n">timpel</span>  <span class="c1"># not in top level to avoid circular import</span>
 
     <span class="n">vendor</span> <span class="o">=</span> <span class="n">_ensure_vendor</span><span class="p">(</span><span class="n">vendor</span><span class="p">)</span>
     <span class="n">load_func</span> <span class="o">=</span> <span class="p">{</span>
