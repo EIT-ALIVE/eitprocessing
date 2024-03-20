@@ -10,8 +10,8 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
+   binreader/index.rst
    draeger/index.rst
-   reader/index.rst
    sentec/index.rst
    timpel/index.rst
 

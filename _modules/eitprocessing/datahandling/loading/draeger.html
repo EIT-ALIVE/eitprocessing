@@ -51,7 +51,7 @@
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.eitdata</span> <span class="kn">import</span> <span class="n">EITData</span><span class="p">,</span> <span class="n">Vendor</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.event</span> <span class="kn">import</span> <span class="n">Event</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.loading</span> <span class="kn">import</span> <span class="n">load_eit_data</span>
-<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.loading.reader</span> <span class="kn">import</span> <span class="n">Reader</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.loading.binreader</span> <span class="kn">import</span> <span class="n">BinReader</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.phases</span> <span class="kn">import</span> <span class="n">MaxValue</span><span class="p">,</span> <span class="n">MinValue</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.sparsedata</span> <span class="kn">import</span> <span class="n">SparseData</span>
 
@@ -120,7 +120,7 @@
 
     <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;br&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
         <span class="n">fh</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">first_frame_to_load</span> <span class="o">*</span> <span class="n">_FRAME_SIZE_BYTES</span><span class="p">)</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">Reader</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">BinReader</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
         <span class="n">previous_marker</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">first_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">load_dummy_frame</span> <span class="k">else</span> <span class="mi">0</span>
@@ -200,7 +200,7 @@
 <div class="viewcode-block" id="_read_frame">
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/draeger/index.html#eitprocessing.datahandling.loading.draeger._read_frame">[docs]</a>
 <span class="k">def</span> <span class="nf">_read_frame</span><span class="p">(</span>
-    <span class="n">reader</span><span class="p">:</span> <span class="n">Reader</span><span class="p">,</span>
+    <span class="n">reader</span><span class="p">:</span> <span class="n">BinReader</span><span class="p">,</span>
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">time</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
     <span class="n">pixel_impedance</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>

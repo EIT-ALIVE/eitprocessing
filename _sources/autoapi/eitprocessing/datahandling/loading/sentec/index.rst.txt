@@ -51,7 +51,7 @@ Attributes
    Load Sentec EIT data from path.
 
 
-.. py:function:: _read_frame(fh: BinaryIO, version: int, index: int, payload_size: int, reader: eitprocessing.datahandling.loading.reader.Reader, first_frame: int = 0) -> numpy.typing.NDArray | None
+.. py:function:: _read_frame(fh: BinaryIO, version: int, index: int, payload_size: int, reader: eitprocessing.datahandling.loading.binreader.BinReader, first_frame: int = 0) -> numpy.typing.NDArray | None
 
    Read a single frame in the file.
 

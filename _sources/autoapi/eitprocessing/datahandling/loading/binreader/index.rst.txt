@@ -1,7 +1,7 @@
-:py:mod:`eitprocessing.datahandling.loading.reader`
-===================================================
+:py:mod:`eitprocessing.datahandling.loading.binreader`
+======================================================
 
-.. py:module:: eitprocessing.datahandling.loading.reader
+.. py:module:: eitprocessing.datahandling.loading.binreader
 
 
 Module Contents
@@ -12,7 +12,7 @@ Classes
 
 .. autoapisummary::
 
-   eitprocessing.datahandling.loading.reader.Reader
+   eitprocessing.datahandling.loading.binreader.BinReader
 
 
 
@@ -22,8 +22,8 @@ Attributes
 
 .. autoapisummary::
 
-   eitprocessing.datahandling.loading.reader.T
-   eitprocessing.datahandling.loading.reader.N
+   eitprocessing.datahandling.loading.binreader.T
+   eitprocessing.datahandling.loading.binreader.N
 
 
 .. py:data:: T
@@ -34,7 +34,7 @@ Attributes
 
    
 
-.. py:class:: Reader
+.. py:class:: BinReader
 
 
    Helper class for reading binary files from disk.
