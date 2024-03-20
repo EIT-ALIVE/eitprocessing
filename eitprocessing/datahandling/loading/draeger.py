@@ -69,7 +69,7 @@ def load_from_single_path(
     phases = []
     medibus_data = np.zeros((52, n_frames))
 
-    with path.open("br") as fh:
+    with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
         fh.seek(first_frame_to_load * _FRAME_SIZE_BYTES)
         reader = BinReader(fh)
         previous_marker = None
