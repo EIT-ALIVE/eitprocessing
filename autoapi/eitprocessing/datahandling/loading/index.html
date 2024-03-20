@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>eitprocessing.datahandling.loading &#8212; eitprocessing 0.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=601dbdee" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="eitprocessing.datahandling.loading.draeger" href="draeger/index.html" />
+    <link rel="prev" title="eitprocessing.datahandling" href="../index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="draeger/index.html" title="eitprocessing.datahandling.loading.draeger"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="eitprocessing.datahandling"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing</span></code></a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../index.html" accesskey="U"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling</span></code></a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.loading</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-eitprocessing.datahandling.loading">
+<span id="eitprocessing-datahandling-loading"></span><h1><a class="reference internal" href="#module-eitprocessing.datahandling.loading" title="eitprocessing.datahandling.loading"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.loading</span></code></a><a class="headerlink" href="#module-eitprocessing.datahandling.loading" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="draeger/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.loading.draeger</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="reader/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.loading.reader</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="sentec/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.loading.sentec</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="timpel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.loading.timpel</span></code></a></li>
+</ul>
+</div>
+</section>
+<section id="package-contents">
+<h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.DataCollection" title="eitprocessing.datahandling.loading.DataCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataCollection</span></code></a></p></td>
+<td><p>A collection of a single type of data with unique labels.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData" title="eitprocessing.datahandling.loading.EITData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EITData</span></code></a></p></td>
+<td><p>Container for EIT data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.Vendor" title="eitprocessing.datahandling.loading.Vendor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Vendor</span></code></a></p></td>
+<td><p>Enum indicating the vendor (manufacturer) of the source EIT device.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence" title="eitprocessing.datahandling.loading.Sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sequence</span></code></a></p></td>
+<td><p>Sequence of timepoints containing respiratory data.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.load_eit_data" title="eitprocessing.datahandling.loading.load_eit_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_eit_data</span></code></a>(...)</p></td>
+<td><p>Load EIT data from path(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading._check_first_frame" title="eitprocessing.datahandling.loading._check_first_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_check_first_frame</span></code></a>(→ int)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading._ensure_vendor" title="eitprocessing.datahandling.loading._ensure_vendor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_ensure_vendor</span></code></a>(→ eitprocessing.datahandling.eitdata.Vendor)</p></td>
+<td><p>Check whether vendor exists, and assure it's a Vendor object.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.DataCollection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.</span></span><span class="sig-name descname"><span class="pre">DataCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.12)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><span class="pre">V</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.DataCollection" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a>, <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">V</span></code>]</p>
+<p>A collection of a single type of data with unique labels.</p>
+<p>This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
+ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects
+added to the collection need to have a <cite>label</cite> attribute and a <cite>concatenate()</cite> method.</p>
+<p>When adding an item to the collection, the type of the value has to match the data type of the collection.
+Furthermore, the key has to match the attribute ‘label’ attached to the value.</p>
+<p>The convenience method <cite>add()</cite> adds an item by setting the key to <cite>value.label</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_type</strong> – the type of data stored in this collection. Expected to be one of EITData, ContinuousData or</p></li>
+<li><p><strong>SparseData.</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.DataCollection.data_type">
+<span class="sig-name descname"><span class="pre">data_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.12)"><span class="pre">type</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.DataCollection.data_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.DataCollection.__setitem__">
+<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">__key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">__value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.DataCollection.__setitem__" title="Link to this definition">¶</a></dt>
+<dd><p>Set self[key] to value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.DataCollection.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.DataCollection.add" title="Link to this definition">¶</a></dt>
+<dd><p>Add one or multiple item(s) to the collection.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.DataCollection._check_item">
+<span class="sig-name descname"><span class="pre">_check_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection._check_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.DataCollection._check_item" title="Link to this definition">¶</a></dt>
+<dd><p>Check whether the item can be added to the collection.</p>
+<p>In order to be added to the collection, the data type of the item has to match the data type set in the
+collection. They key that is used to store the item in the collection has to match the label of the item itself.
+By default, existing keys can not be overridden.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item</strong> – Object to be added to the collection.</p></li>
+<li><p><strong>key</strong> – Key of the item. Has to match <cite>item.label</cite>.</p></li>
+<li><p><strong>overwrite</strong> – If False, the key can not already exist in the collection. Set to True to allow overwriting an</p></li>
+<li><p><strong>collection.</strong> (<em>existing object in the</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.12)"><strong>TypeError</strong></a> – If the type of the item does not match the type set in the collection.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.12)"><strong>KeyError</strong></a> – If the key does not match <cite>item.label</cite>, or when the key already exists in de collection and</p></li>
+<li><p><strong>overwrite is set to False.</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.DataCollection.get_loaded_data">
+<span class="sig-name descname"><span class="pre">get_loaded_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">V</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection.get_loaded_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.DataCollection.get_loaded_data" title="Link to this definition">¶</a></dt>
+<dd><p>Return all data that was directly loaded from disk.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.DataCollection.get_data_derived_from">
+<span class="sig-name descname"><span class="pre">get_data_derived_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">V</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection.get_data_derived_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.DataCollection.get_data_derived_from" title="Link to this definition">¶</a></dt>
+<dd><p>Return all data that was derived from a specific source.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.DataCollection.get_derived_data">
+<span class="sig-name descname"><span class="pre">get_derived_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">V</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection.get_derived_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.DataCollection.get_derived_data" title="Link to this definition">¶</a></dt>
+<dd><p>Return all data that was derived from any source.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.DataCollection.concatenate">
+<span class="sig-name descname"><span class="pre">concatenate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span><span class="p"><span class="pre">[</span></span><span class="pre">V</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span><span class="p"><span class="pre">[</span></span><span class="pre">V</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.DataCollection.concatenate" title="Link to this definition">¶</a></dt>
+<dd><p>Concatenate this collection with an equivalent collection.</p>
+<p>Each item of self of concatenated with the item of other with the same key.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.</span></span><span class="sig-name descname"><span class="pre">EITData</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a>, <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a></p>
+<p>Container for EIT data.</p>
+<p>This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
+class is meant to hold data from (part of) a singular continuous measurement.</p>
+<p>This class can’t be initialized directly. Instead, use <cite>EITData.from_path(…)</cite> to load data from disk.
+Currently, loading data from three vendors is supported. You can either pass the vendor when using
+<cite>EITData.from_path(…, vendor=”timpel”)</cite>, or use one of the available subclasses of EITData:
+<cite>SentecEITData.from_path(…)</cite>.</p>
+<p>Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.global_baseline">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">global_baseline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.global_baseline" title="Link to this definition">¶</a></dt>
+<dd><p>Return the global baseline, i.e. the minimum pixel impedance across all pixels.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.pixel_impedance_global_offset">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_impedance_global_offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.pixel_impedance_global_offset" title="Link to this definition">¶</a></dt>
+<dd><p>Return the pixel impedance with the global baseline removed.</p>
+<p>In the resulting array the minimum impedance across all pixels is set to 0.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.pixel_baseline">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_baseline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.pixel_baseline" title="Link to this definition">¶</a></dt>
+<dd><p>Return the lowest value in each individual pixel over time.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.pixel_impedance_individual_offset">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_impedance_individual_offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.pixel_impedance_individual_offset" title="Link to this definition">¶</a></dt>
+<dd><p>Return the pixel impedance with the baseline of each individual pixel removed.</p>
+<p>Each pixel in the resulting array has a minimum value of 0.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.global_impedance">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">global_impedance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.global_impedance" title="Link to this definition">¶</a></dt>
+<dd><p>Return the global impedance, i.e. the sum of all pixels at each frame.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.path">
+<span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.nframes">
+<span class="sig-name descname"><span class="pre">nframes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.nframes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.time">
+<span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.typing.NDArray</span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.framerate">
+<span class="sig-name descname"><span class="pre">framerate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.framerate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.vendor">
+<span class="sig-name descname"><span class="pre">vendor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#eitprocessing.datahandling.loading.Vendor" title="eitprocessing.datahandling.loading.Vendor"><span class="pre">Vendor</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.vendor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.phases">
+<span class="sig-name descname"><span class="pre">phases</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.phases" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.events">
+<span class="sig-name descname"><span class="pre">events</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.events" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.label">
+<span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.label" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.pixel_impedance">
+<span class="sig-name descname"><span class="pre">pixel_impedance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.typing.NDArray</span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.pixel_impedance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.__post_init__">
+<span class="sig-name descname"><span class="pre">__post_init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.__post_init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.__post_init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.ensure_path_list">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ensure_path_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.ensure_path_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.ensure_path_list" title="Link to this definition">¶</a></dt>
+<dd><p>Return the path or paths as a list.</p>
+<p>The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
+list of Path objects given either a str/Path or list of str/Paths.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.__add__">
+<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.__add__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.concatenate">
+<span class="sig-name descname"><span class="pre">concatenate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.concatenate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData._sliced_copy">
+<span class="sig-name descname"><span class="pre">_sliced_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData._sliced_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData._sliced_copy" title="Link to this definition">¶</a></dt>
+<dd><p>Slicing method that must be implemented by all subclasses.</p>
+<p>Must return a copy of self object with all attached data within selected
+indices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.__len__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Vendor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.</span></span><span class="sig-name descname"><span class="pre">Vendor</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#Vendor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.Vendor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">strenum.LowercaseStrEnum</span></code></p>
+<p>Enum indicating the vendor (manufacturer) of the source EIT device.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Vendor.DRAEGER">
+<span class="sig-name descname"><span class="pre">DRAEGER</span></span><a class="headerlink" href="#eitprocessing.datahandling.loading.Vendor.DRAEGER" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Vendor.TIMPEL">
+<span class="sig-name descname"><span class="pre">TIMPEL</span></span><a class="headerlink" href="#eitprocessing.datahandling.loading.Vendor.TIMPEL" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Vendor.SENTEC">
+<span class="sig-name descname"><span class="pre">SENTEC</span></span><a class="headerlink" href="#eitprocessing.datahandling.loading.Vendor.SENTEC" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Vendor.DRAGER">
+<span class="sig-name descname"><span class="pre">DRAGER</span></span><a class="headerlink" href="#eitprocessing.datahandling.loading.Vendor.DRAGER" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">DRÄGER</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.</span></span><span class="sig-name descname"><span class="pre">Sequence</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sequence.html#Sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a></p>
+<p>Sequence of timepoints containing respiratory data.</p>
+<p>A Sequence object is a representation of data points over time. These data can consist of any combination of EIT
+frames (<cite>EITData</cite>), waveform data (<cite>ContinuousData</cite>) from different sources, or individual events (<cite>SparseData</cite>)
+occurring at any given timepoint.
+A Sequence can consist of an entire measurement, a section of a measurement, a single breath, or even a portion of a
+breath. A Sequence can consist of multiple sets of each type of data from the same time-points or can be a single
+measurement from just one source.</p>
+<p>A Sequence can be split up into separate sections of a measurement or multiple (similar) Sequence objects can be
+merged together to form a single Sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – Computer readable naming of the instance.</p></li>
+<li><p><strong>name</strong> – Human readable naming of the instance.</p></li>
+<li><p><strong>description</strong> – Human readable extended description of the data.</p></li>
+<li><p><strong>eit_data</strong> – Collection of one or more sets of EIT data frames.</p></li>
+<li><p><strong>continuous_data</strong> – Collection of one or more sets of continuous data points.</p></li>
+<li><p><strong>sparse_data</strong> – Collection of one or more sets of individual data points.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.time" title="Link to this definition">¶</a></dt>
+<dd><p>Time axis from either EITData or ContinuousData.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.label">
+<span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.label" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.description" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.eit_data">
+<span class="sig-name descname"><span class="pre">eit_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../datacollection/index.html#eitprocessing.datahandling.datacollection.DataCollection" title="eitprocessing.datahandling.datacollection.DataCollection"><span class="pre">eitprocessing.datahandling.datacollection.DataCollection</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.eit_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.continuous_data">
+<span class="sig-name descname"><span class="pre">continuous_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../datacollection/index.html#eitprocessing.datahandling.datacollection.DataCollection" title="eitprocessing.datahandling.datacollection.DataCollection"><span class="pre">eitprocessing.datahandling.datacollection.DataCollection</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.continuous_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.sparse_data">
+<span class="sig-name descname"><span class="pre">sparse_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../datacollection/index.html#eitprocessing.datahandling.datacollection.DataCollection" title="eitprocessing.datahandling.datacollection.DataCollection"><span class="pre">eitprocessing.datahandling.datacollection.DataCollection</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.sparse_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.__post_init__">
+<span class="sig-name descname"><span class="pre">__post_init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sequence.html#Sequence.__post_init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.__post_init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sequence.html#Sequence.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.__len__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.__add__">
+<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence" title="eitprocessing.datahandling.loading.Sequence"><span class="pre">Sequence</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence" title="eitprocessing.datahandling.loading.Sequence"><span class="pre">Sequence</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sequence.html#Sequence.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.__add__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence.concatenate">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">concatenate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence" title="eitprocessing.datahandling.loading.Sequence"><span class="pre">Sequence</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence" title="eitprocessing.datahandling.loading.Sequence"><span class="pre">Sequence</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence" title="eitprocessing.datahandling.loading.Sequence"><span class="pre">Sequence</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sequence.html#Sequence.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence.concatenate" title="Link to this definition">¶</a></dt>
+<dd><p>Create a merge of two Sequence objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.Sequence._sliced_copy">
+<span class="sig-name descname"><span class="pre">_sliced_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sequence.html#Sequence._sliced_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.Sequence._sliced_copy" title="Link to this definition">¶</a></dt>
+<dd><p>Slicing method that must be implemented by all subclasses.</p>
+<p>Must return a copy of self object with all attached data within selected
+indices.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.load_eit_data">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.</span></span><span class="sig-name descname"><span class="pre">load_eit_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../eitdata/index.html#eitprocessing.datahandling.eitdata.Vendor" title="eitprocessing.datahandling.eitdata.Vendor"><span class="pre">eitprocessing.datahandling.eitdata.Vendor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framerate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../sequence/index.html#eitprocessing.datahandling.sequence.Sequence" title="eitprocessing.datahandling.sequence.Sequence"><span class="pre">eitprocessing.datahandling.sequence.Sequence</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/loading.html#load_eit_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.load_eit_data" title="Link to this definition">¶</a></dt>
+<dd><p>Load EIT data from path(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – relative or absolute path(s) to data file.</p></li>
+<li><p><strong>vendor</strong> – vendor indicating the device used.
+Note: for load functions of specific vendors (e.g. <cite>load_draeger_data</cite>), this argument is defaulted to the
+correct vendor.</p></li>
+<li><p><strong>label</strong> – short description of sequence for computer interpretation.
+Defaults to “Sequence_&lt;unique_id&gt;”.</p></li>
+<li><p><strong>name</strong> – short description of sequence for human interpretation.
+Defaults to the same value as label.</p></li>
+<li><p><strong>description</strong> – long description of sequence for human interpretation.</p></li>
+<li><p><strong>framerate</strong> – framerate at which the data was recorded.
+Default for Draeger: 20
+Default for Timpel: 50
+Default for Sentec: 50.2</p></li>
+<li><p><strong>first_frame</strong> – index of first frame to load.
+Defaults to 0.</p></li>
+<li><p><strong>max_frames</strong> – maximum number of frames to load.
+The actual number of frames can be lower than this if this
+would surpass the final frame.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.12)"><strong>NotImplementedError</strong></a> – is raised when there is no loading method for</p></li>
+<li><p><strong>the given vendor.</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a Sequence with the given label, name and description, containing the loaded data.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence" title="eitprocessing.datahandling.loading.Sequence">Sequence</a></p>
+</dd>
+</dl>
+<p>Example:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">sequence</span> <span class="pre">=</span> <span class="pre">load_data([&quot;path/to/file1&quot;,</span> <span class="pre">&quot;path/to/file2&quot;],</span> <span class="pre">vendor=&quot;sentec&quot;,</span> <span class="pre">label=&quot;initial_measurement&quot;)</span>
+<span class="pre">pixel_impedance</span> <span class="pre">=</span> <span class="pre">sequence.eit_data[&quot;raw&quot;].pixel_impedance</span>
+<span class="pre">`</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading._check_first_frame">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.</span></span><span class="sig-name descname"><span class="pre">_check_first_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/loading.html#_check_first_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading._check_first_frame" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading._ensure_vendor">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.</span></span><span class="sig-name descname"><span class="pre">_ensure_vendor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vendor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../eitdata/index.html#eitprocessing.datahandling.eitdata.Vendor" title="eitprocessing.datahandling.eitdata.Vendor"><span class="pre">eitprocessing.datahandling.eitdata.Vendor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../eitdata/index.html#eitprocessing.datahandling.eitdata.Vendor" title="eitprocessing.datahandling.eitdata.Vendor"><span class="pre">eitprocessing.datahandling.eitdata.Vendor</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/loading.html#_ensure_vendor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading._ensure_vendor" title="Link to this definition">¶</a></dt>
+<dd><p>Check whether vendor exists, and assure it’s a Vendor object.</p>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.loading</span></code></a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#package-contents">Package Contents</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.DataCollection"><code class="docutils literal notranslate"><span class="pre">DataCollection</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.DataCollection.data_type"><code class="docutils literal notranslate"><span class="pre">DataCollection.data_type</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.DataCollection.__setitem__"><code class="docutils literal notranslate"><span class="pre">DataCollection.__setitem__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.DataCollection.add"><code class="docutils literal notranslate"><span class="pre">DataCollection.add()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.DataCollection._check_item"><code class="docutils literal notranslate"><span class="pre">DataCollection._check_item()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.DataCollection.get_loaded_data"><code class="docutils literal notranslate"><span class="pre">DataCollection.get_loaded_data()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.DataCollection.get_data_derived_from"><code class="docutils literal notranslate"><span class="pre">DataCollection.get_data_derived_from()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.DataCollection.get_derived_data"><code class="docutils literal notranslate"><span class="pre">DataCollection.get_derived_data()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.DataCollection.concatenate"><code class="docutils literal notranslate"><span class="pre">DataCollection.concatenate()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData"><code class="docutils literal notranslate"><span class="pre">EITData</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.global_baseline"><code class="docutils literal notranslate"><span class="pre">EITData.global_baseline</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.pixel_impedance_global_offset"><code class="docutils literal notranslate"><span class="pre">EITData.pixel_impedance_global_offset</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.pixel_baseline"><code class="docutils literal notranslate"><span class="pre">EITData.pixel_baseline</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.pixel_impedance_individual_offset"><code class="docutils literal notranslate"><span class="pre">EITData.pixel_impedance_individual_offset</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.global_impedance"><code class="docutils literal notranslate"><span class="pre">EITData.global_impedance</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.path"><code class="docutils literal notranslate"><span class="pre">EITData.path</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.nframes"><code class="docutils literal notranslate"><span class="pre">EITData.nframes</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.time"><code class="docutils literal notranslate"><span class="pre">EITData.time</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.framerate"><code class="docutils literal notranslate"><span class="pre">EITData.framerate</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.vendor"><code class="docutils literal notranslate"><span class="pre">EITData.vendor</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.phases"><code class="docutils literal notranslate"><span class="pre">EITData.phases</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.events"><code class="docutils literal notranslate"><span class="pre">EITData.events</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.label"><code class="docutils literal notranslate"><span class="pre">EITData.label</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.pixel_impedance"><code class="docutils literal notranslate"><span class="pre">EITData.pixel_impedance</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.__post_init__"><code class="docutils literal notranslate"><span class="pre">EITData.__post_init__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.ensure_path_list"><code class="docutils literal notranslate"><span class="pre">EITData.ensure_path_list()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.__add__"><code class="docutils literal notranslate"><span class="pre">EITData.__add__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.concatenate"><code class="docutils literal notranslate"><span class="pre">EITData.concatenate()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData._sliced_copy"><code class="docutils literal notranslate"><span class="pre">EITData._sliced_copy()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.__len__"><code class="docutils literal notranslate"><span class="pre">EITData.__len__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Vendor"><code class="docutils literal notranslate"><span class="pre">Vendor</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Vendor.DRAEGER"><code class="docutils literal notranslate"><span class="pre">Vendor.DRAEGER</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Vendor.TIMPEL"><code class="docutils literal notranslate"><span class="pre">Vendor.TIMPEL</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Vendor.SENTEC"><code class="docutils literal notranslate"><span class="pre">Vendor.SENTEC</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Vendor.DRAGER"><code class="docutils literal notranslate"><span class="pre">Vendor.DRAGER</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Vendor.DRÄGER</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence"><code class="docutils literal notranslate"><span class="pre">Sequence</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.time"><code class="docutils literal notranslate"><span class="pre">Sequence.time</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.label"><code class="docutils literal notranslate"><span class="pre">Sequence.label</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.name"><code class="docutils literal notranslate"><span class="pre">Sequence.name</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.description"><code class="docutils literal notranslate"><span class="pre">Sequence.description</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.eit_data"><code class="docutils literal notranslate"><span class="pre">Sequence.eit_data</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.continuous_data"><code class="docutils literal notranslate"><span class="pre">Sequence.continuous_data</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.sparse_data"><code class="docutils literal notranslate"><span class="pre">Sequence.sparse_data</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.__post_init__"><code class="docutils literal notranslate"><span class="pre">Sequence.__post_init__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.__len__"><code class="docutils literal notranslate"><span class="pre">Sequence.__len__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.__add__"><code class="docutils literal notranslate"><span class="pre">Sequence.__add__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence.concatenate"><code class="docutils literal notranslate"><span class="pre">Sequence.concatenate()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.Sequence._sliced_copy"><code class="docutils literal notranslate"><span class="pre">Sequence._sliced_copy()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.load_eit_data"><code class="docutils literal notranslate"><span class="pre">load_eit_data()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading._check_first_frame"><code class="docutils literal notranslate"><span class="pre">_check_first_frame()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading._ensure_vendor"><code class="docutils literal notranslate"><span class="pre">_ensure_vendor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../index.html"
+                          title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling</span></code></a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="draeger/index.html"
+                          title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.loading.draeger</span></code></a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/autoapi/eitprocessing/datahandling/loading/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="draeger/index.html" title="eitprocessing.datahandling.loading.draeger"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="eitprocessing.datahandling"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing</span></code></a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling</span></code></a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.loading</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

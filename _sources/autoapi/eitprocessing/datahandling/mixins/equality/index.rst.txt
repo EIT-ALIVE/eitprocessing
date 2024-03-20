@@ -1,0 +1,64 @@
+:py:mod:`eitprocessing.datahandling.mixins.equality`
+====================================================
+
+.. py:module:: eitprocessing.datahandling.mixins.equality
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.mixins.equality.Equivalence
+
+
+
+
+.. py:class:: Equivalence
+
+
+   Mixin class that adds an equality and equivalence check.
+
+   .. py:method:: __eq__(other: typing_extensions.Self)
+
+      Return self==value.
+
+
+   .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
+      :staticmethod:
+
+      Check if a and b are equal, even if they are numpy arrays containing nans.
+
+
+   .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
+
+      Test whether the data structure between two objects are equivalent.
+
+      Equivalence, in this case means that objects are compatible e.g. to be
+      merged. Data content can vary, but e.g. the category of data (e.g.
+      airway pressure, flow, tidal volume) and unit, etc., must match.
+
+
+      :param other: object that will be compared to self.
+      :param raise_: sets this method's behavior in case of non-equivalence. If
+                     True, an `EquivalenceError` is raised, otherwise `False` is
+                     returned.
+
+      :raises EquivalenceError: if `raise_ == True` and the objects are not
+      :raises equivalent.:
+
+      :returns: bool describing result of equivalence comparison.
+
+
+
+.. py:exception:: EquivalenceError
+
+
+   Bases: :py:obj:`TypeError`, :py:obj:`ValueError`
+
+   Raised if objects are not equivalent.
+
+

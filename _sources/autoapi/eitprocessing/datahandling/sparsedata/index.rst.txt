@@ -1,0 +1,25 @@
+:py:mod:`eitprocessing.datahandling.sparsedata`
+===============================================
+
+.. py:module:: eitprocessing.datahandling.sparsedata
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.sparsedata.SparseData
+
+
+
+
+.. py:class:: SparseData
+
+
+   SparseData.
+
+

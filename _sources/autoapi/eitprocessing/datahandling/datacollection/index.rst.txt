@@ -1,0 +1,106 @@
+:py:mod:`eitprocessing.datahandling.datacollection`
+===================================================
+
+.. py:module:: eitprocessing.datahandling.datacollection
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.datacollection.DataCollection
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.datacollection.V
+
+
+.. py:data:: V
+
+   
+
+.. py:class:: DataCollection(data_type: type[V], *args, **kwargs)
+
+
+   Bases: :py:obj:`dict`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
+
+   A collection of a single type of data with unique labels.
+
+   This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
+   ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects
+   added to the collection need to have a `label` attribute and a `concatenate()` method.
+
+   When adding an item to the collection, the type of the value has to match the data type of the collection.
+   Furthermore, the key has to match the attribute 'label' attached to the value.
+
+   The convenience method `add()` adds an item by setting the key to `value.label`.
+
+   :param data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or
+   :param SparseData.:
+
+   .. py:attribute:: data_type
+      :type: type
+
+      
+
+   .. py:method:: __setitem__(__key: str, __value: V) -> None
+
+      Set self[key] to value.
+
+
+   .. py:method:: add(*item: V, overwrite: bool = False) -> None
+
+      Add one or multiple item(s) to the collection.
+
+
+   .. py:method:: _check_item(item: V, key: str | None = None, overwrite: bool = False) -> None
+
+      Check whether the item can be added to the collection.
+
+      In order to be added to the collection, the data type of the item has to match the data type set in the
+      collection. They key that is used to store the item in the collection has to match the label of the item itself.
+      By default, existing keys can not be overridden.
+
+      :param item: Object to be added to the collection.
+      :param key: Key of the item. Has to match `item.label`.
+      :param overwrite: If False, the key can not already exist in the collection. Set to True to allow overwriting an
+      :param existing object in the collection.:
+
+      :raises TypeError: If the type of the item does not match the type set in the collection.
+      :raises KeyError: If the key does not match `item.label`, or when the key already exists in de collection and
+      :raises overwrite is set to False.:
+
+
+   .. py:method:: get_loaded_data() -> dict[str, V]
+
+      Return all data that was directly loaded from disk.
+
+
+   .. py:method:: get_data_derived_from(obj: V) -> dict[str, V]
+
+      Return all data that was derived from a specific source.
+
+
+   .. py:method:: get_derived_data() -> dict[str, V]
+
+      Return all data that was derived from any source.
+
+
+   .. py:method:: concatenate(other: typing_extensions.Self[V]) -> typing_extensions.Self[V]
+
+      Concatenate this collection with an equivalent collection.
+
+      Each item of self of concatenated with the item of other with the same key.
+
+
+

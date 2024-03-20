@@ -1,0 +1,62 @@
+:py:mod:`eitprocessing.datahandling.phases`
+===========================================
+
+.. py:module:: eitprocessing.datahandling.phases
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.phases.PhaseIndicator
+   eitprocessing.datahandling.phases.MinValue
+   eitprocessing.datahandling.phases.MaxValue
+   eitprocessing.datahandling.phases.QRSMark
+
+
+
+
+.. py:class:: PhaseIndicator
+
+
+   Parent class for phase indications.
+
+   .. py:attribute:: index
+      :type: int
+
+      
+
+   .. py:attribute:: time
+      :type: float
+
+      
+
+
+.. py:class:: MinValue
+
+
+   Bases: :py:obj:`PhaseIndicator`
+
+   Automatically registered local minimum of an EIT measurement.
+
+
+.. py:class:: MaxValue
+
+
+   Bases: :py:obj:`PhaseIndicator`
+
+   Automatically registered local maximum of an EIT measurement.
+
+
+.. py:class:: QRSMark
+
+
+   Bases: :py:obj:`PhaseIndicator`
+
+   Automatically registered QRS mark an EIT measurement from a Timpel device.
+
+
