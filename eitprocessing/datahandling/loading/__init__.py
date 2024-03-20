@@ -3,7 +3,6 @@ from pathlib import Path
 
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
-from eitprocessing.datahandling.loading import draeger, sentec
 from eitprocessing.datahandling.sequence import Sequence
 
 
@@ -52,7 +51,7 @@ def load_eit_data(
     pixel_impedance = sequence.eit_data["raw"].pixel_impedance
     ```
     """
-    from eitprocessing.datahandling.loading import timpel  # not in top level to avoid circular import
+    from eitprocessing.datahandling.loading import draeger, sentec, timpel  # not in top level to avoid circular import
 
     vendor = _ensure_vendor(vendor)
     load_func = {
