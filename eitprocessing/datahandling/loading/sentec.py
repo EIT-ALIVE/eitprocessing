@@ -13,7 +13,7 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.loading import load_eit_data
-from eitprocessing.datahandling.loading.reader import Reader
+from eitprocessing.datahandling.loading.binreader import BinReader
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -35,7 +35,7 @@ def load_from_single_path(  # noqa: C901
     """Load Sentec EIT data from path."""
     with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
         file_length = os.fstat(fo.fileno()).st_size
-        reader = Reader(fh, endian="little")
+        reader = BinReader(fh, endian="little")
         version = reader.uint8()
 
         time = []
@@ -130,7 +130,7 @@ def _read_frame(
     version: int,
     index: int,
     payload_size: int,
-    reader: Reader,
+    reader: BinReader,
     first_frame: int = 0,
 ) -> NDArray | None:
     """

@@ -13,7 +13,7 @@ from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.event import Event
 from eitprocessing.datahandling.loading import load_eit_data
-from eitprocessing.datahandling.loading.reader import Reader
+from eitprocessing.datahandling.loading.binreader import BinReader
 from eitprocessing.datahandling.phases import MaxValue, MinValue
 from eitprocessing.datahandling.sparsedata import SparseData
 
@@ -71,7 +71,7 @@ def load_from_single_path(
 
     with path.open("br") as fh:
         fh.seek(first_frame_to_load * _FRAME_SIZE_BYTES)
-        reader = Reader(fh)
+        reader = BinReader(fh)
         previous_marker = None
 
         first_index = -1 if load_dummy_frame else 0
@@ -145,7 +145,7 @@ def _convert_medibus_data(
 
 
 def _read_frame(
-    reader: Reader,
+    reader: BinReader,
     index: int,
     time: NDArray,
     pixel_impedance: NDArray,
