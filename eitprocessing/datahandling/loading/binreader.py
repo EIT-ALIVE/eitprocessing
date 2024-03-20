@@ -11,7 +11,7 @@ N = TypeVar("N", bound=np.number)
 
 
 @dataclass
-class Reader:
+class BinReader:
     """Helper class for reading binary files from disk.
 
     Args:

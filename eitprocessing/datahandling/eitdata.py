@@ -1,19 +1,21 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import auto
 from pathlib import Path
 from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
+from strenum import LowercaseStrEnum
 from typing_extensions import Self
 
-from eitprocessing.mixins.equality import Equivalence
-from eitprocessing.mixins.slicing import SelectByTime
+from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from eitprocessing.eit_data.vendor import Vendor
+    from eitprocessing.datahandling.eitdata import Vendor
 
 T = TypeVar("T", bound="EITData")
 
@@ -161,3 +163,13 @@ class EITData(SelectByTime, Equivalence):
     def global_impedance(self) -> np.ndarray:
         """Return the global impedance, i.e. the sum of all pixels at each frame."""
         return np.nansum(self.pixel_impedance, axis=(1, 2))
+
+
+class Vendor(LowercaseStrEnum):
+    """Enum indicating the vendor (manufacturer) of the source EIT device."""
+
+    DRAEGER = auto()
+    TIMPEL = auto()
+    SENTEC = auto()
+    DRAGER = DRAEGER
+    DRÄGER = DRAEGER

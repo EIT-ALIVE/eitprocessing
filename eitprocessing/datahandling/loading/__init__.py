@@ -1,13 +1,13 @@
 from functools import reduce
 from pathlib import Path
 
-from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data import EITData
-from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.sequence import Sequence
+from eitprocessing.datahandling.datacollection import DataCollection
+from eitprocessing.datahandling.eitdata import EITData, Vendor
+from eitprocessing.datahandling.loading import draeger, sentec
+from eitprocessing.datahandling.sequence import Sequence
 
 
-def load_data(
+def load_eit_data(
     path: str | Path | list[str | Path],
     vendor: Vendor | str,
     label: str | None = None,
@@ -52,7 +52,7 @@ def load_data(
     pixel_impedance = sequence.eit_data["raw"].pixel_impedance
     ```
     """
-    from eitprocessing.eit_data.loading import draeger, sentec, timpel  # not in top level to avoid circular import
+    from eitprocessing.datahandling.loading import timpel  # not in top level to avoid circular import
 
     vendor = _ensure_vendor(vendor)
     load_func = {

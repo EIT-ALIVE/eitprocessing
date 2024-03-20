@@ -8,15 +8,14 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 
-from eitprocessing.binreader.reader import Reader
-from eitprocessing.continuous_data import ContinuousData
-from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data import EITData
-from eitprocessing.eit_data.event import Event
-from eitprocessing.eit_data.loading import load_data
-from eitprocessing.eit_data.phases import MaxValue, MinValue
-from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.sparse_data import SparseData
+from eitprocessing.datahandling.continuousdata import ContinuousData
+from eitprocessing.datahandling.datacollection import DataCollection
+from eitprocessing.datahandling.eitdata import EITData, Vendor
+from eitprocessing.datahandling.event import Event
+from eitprocessing.datahandling.loading import load_eit_data
+from eitprocessing.datahandling.loading.binreader import BinReader
+from eitprocessing.datahandling.phases import MaxValue, MinValue
+from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -25,7 +24,7 @@ if TYPE_CHECKING:
 
 _FRAME_SIZE_BYTES = 4358
 DRAEGER_FRAMERATE = 20
-load_draeger_data = partial(load_data, vendor=Vendor.DRAEGER)
+load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
 
 
 def load_from_single_path(
@@ -70,9 +69,9 @@ def load_from_single_path(
     phases = []
     medibus_data = np.zeros((52, n_frames))
 
-    with path.open("br") as fh:
+    with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
         fh.seek(first_frame_to_load * _FRAME_SIZE_BYTES)
-        reader = Reader(fh)
+        reader = BinReader(fh)
         previous_marker = None
 
         first_index = -1 if load_dummy_frame else 0
@@ -146,7 +145,7 @@ def _convert_medibus_data(
 
 
 def _read_frame(
-    reader: Reader,
+    reader: BinReader,
     index: int,
     time: NDArray,
     pixel_impedance: NDArray,

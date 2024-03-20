@@ -9,13 +9,12 @@ from typing import TYPE_CHECKING, BinaryIO
 
 import numpy as np
 
-from eitprocessing.binreader.reader import Reader
-from eitprocessing.continuous_data import ContinuousData
-from eitprocessing.data_collection import DataCollection
-from eitprocessing.eit_data import EITData
-from eitprocessing.eit_data.loading import load_data
-from eitprocessing.eit_data.vendor import Vendor
-from eitprocessing.sparse_data import SparseData
+from eitprocessing.datahandling.continuousdata import ContinuousData
+from eitprocessing.datahandling.datacollection import DataCollection
+from eitprocessing.datahandling.eitdata import EITData, Vendor
+from eitprocessing.datahandling.loading import load_eit_data
+from eitprocessing.datahandling.loading.binreader import BinReader
+from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -24,7 +23,7 @@ if TYPE_CHECKING:
 
 SENTEC_FRAMERATE = 50.2
 
-load_sentec_data = partial(load_data, vendor=Vendor.SENTEC)
+load_sentec_data = partial(load_eit_data, vendor=Vendor.SENTEC)
 
 
 def load_from_single_path(  # noqa: C901
@@ -36,7 +35,7 @@ def load_from_single_path(  # noqa: C901
     """Load Sentec EIT data from path."""
     with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
         file_length = os.fstat(fo.fileno()).st_size
-        reader = Reader(fh, endian="little")
+        reader = BinReader(fh, endian="little")
         version = reader.uint8()
 
         time = []
@@ -131,7 +130,7 @@ def _read_frame(
     version: int,
     index: int,
     payload_size: int,
-    reader: Reader,
+    reader: BinReader,
     first_frame: int = 0,
 ) -> NDArray | None:
     """
