@@ -4,7 +4,7 @@ from typing import Any
 import numpy as np
 from typing_extensions import Self
 
-from eitprocessing.mixins.slicing import SelectByTime
+from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 
 @dataclass
@@ -40,18 +40,11 @@ class SparseData(SelectByTime):
     description: str = ""
     parameters: dict[str, Any] = field(default_factory=dict)
     derived_from: list[Any] = field(default_factory=list)
-    time: np.ndarray | None = None
+    time: np.ndarray | None
     values: Any | None = None
-    value: Any | None = None
 
     def __post_init__(self) -> None:
-        if self.values and self.value:
-            msg = "Can't store `value` and `values`. Only provided one of them."
-            raise ValueError(msg)
-
-        if all((self.time is None, self.value is None, self.values is None)):
-            msg = "No data provided. Provided (time and) values or value."
-            raise ValueError(msg)
+        pass
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.label}')"
@@ -64,7 +57,7 @@ class SparseData(SelectByTime):
     ) -> Self:
         # TODO: check correct implementation
         cls = self.__class__
-        time = self.time[start_index:end_index] if self.time is not None else None
+        time = self.time[start_index:end_index]
         values = self.values[start_index:end_index] if self.values is not None else None
         description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
 
@@ -77,5 +70,4 @@ class SparseData(SelectByTime):
             derived_from=[*self.derived_from, self],
             time=time,
             values=values,
-            value=self.value,
         )
