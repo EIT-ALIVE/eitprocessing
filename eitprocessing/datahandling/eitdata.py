@@ -117,32 +117,6 @@ class EITData(SelectByTime, Equivalence):
     def __len__(self):
         return self.pixel_impedance.shape[0]
 
-    @property
-    def global_baseline(self) -> np.ndarray:
-        """Return the global baseline, i.e. the minimum pixel impedance across all pixels."""
-        return np.nanmin(self.pixel_impedance)
-
-    @property
-    def pixel_impedance_global_offset(self) -> np.ndarray:
-        """Return the pixel impedance with the global baseline removed.
-
-        In the resulting array the minimum impedance across all pixels is set to 0.
-        """
-        return self.pixel_impedance - self.global_baseline
-
-    @property
-    def pixel_baseline(self) -> np.ndarray:
-        """Return the lowest value in each individual pixel over time."""
-        return np.nanmin(self.pixel_impedance, axis=0)
-
-    @property
-    def pixel_impedance_individual_offset(self) -> np.ndarray:
-        """Return the pixel impedance with the baseline of each individual pixel removed.
-
-        Each pixel in the resulting array has a minimum value of 0.
-        """
-        return self.pixel_impedance - self.pixel_baseline
-
     def _calculate_global_impedance(self) -> np.ndarray:
         """Return the global impedance, i.e. the sum of all pixels at each frame."""
         return np.nansum(self.pixel_impedance, axis=(1, 2))
