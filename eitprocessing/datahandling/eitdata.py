@@ -156,8 +156,7 @@ class EITData(SelectByTime, Equivalence):
         """
         return self.pixel_impedance - self.pixel_baseline
 
-    @property
-    def global_impedance(self) -> np.ndarray:
+    def _calculate_global_impedance(self) -> np.ndarray:
         """Return the global impedance, i.e. the sum of all pixels at each frame."""
         return np.nansum(self.pixel_impedance, axis=(1, 2))
 
