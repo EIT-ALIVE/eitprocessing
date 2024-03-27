@@ -48,6 +48,12 @@ Attributes
    :param data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or
    :param SparseData.:
 
+   .. py:property:: t
+
+      Time indexer.
+
+      See slicing.TimeIndexer.
+
    .. py:attribute:: data_type
       :type: type
 
@@ -101,6 +107,11 @@ Attributes
       Concatenate this collection with an equivalent collection.
 
       Each item of self of concatenated with the item of other with the same key.
+
+
+   .. py:method:: select_by_time(start_time: float | None, end_time: float | None, start_inclusive: bool = True, end_inclusive: bool = False) -> typing_extensions.Self
+
+      Return a DataCollection containing sliced copies of the items.
 
 
 

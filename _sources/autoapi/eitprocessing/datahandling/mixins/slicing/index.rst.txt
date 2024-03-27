@@ -68,7 +68,9 @@ Classes
    .. py:property:: t
       :type: TimeIndexer
 
-      Time Indexer property.
+      Time indexer.
+
+      See TimeIndexer.
 
    .. py:attribute:: time
       :type: numpy.typing.NDArray
@@ -107,11 +109,9 @@ Classes
    Example:
    ```
    >>> data = EITData.from_path(<path>, ...)
-   >>> tp_start = data.time[1]
-   >>> tp_end = data.time[4]
-   >>> time_slice = data.t[tp_start:tp_end]
-   >>> index_slice = data[1:4]
-   >>> time_slice == index_slice
+   >>> time_slice1 = data.t[tp_start:tp_end]
+   >>> time_slice2 = data.select_by_time(tp_start, tp_end)
+   >>> time_slice1 == time_slice2
    True
    ```
 

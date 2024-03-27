@@ -92,6 +92,13 @@ Furthermore, the key has to match the attribute ‘label’ attached to the valu
 </ul>
 </dd>
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.datacollection.DataCollection.t">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection.t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.datacollection.DataCollection.t" title="Link to this definition">¶</a></dt>
+<dd><p>Time indexer.</p>
+<p>See slicing.TimeIndexer.</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.datacollection.DataCollection.data_type">
 <span class="sig-name descname"><span class="pre">data_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.12)"><span class="pre">type</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection.data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.datacollection.DataCollection.data_type" title="Link to this definition">¶</a></dt>
@@ -160,6 +167,12 @@ By default, existing keys can not be overridden.</p>
 <p>Each item of self of concatenated with the item of other with the same key.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.datacollection.DataCollection.select_by_time">
+<span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_inclusive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_inclusive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.datacollection.DataCollection.select_by_time" title="Link to this definition">¶</a></dt>
+<dd><p>Return a DataCollection containing sliced copies of the items.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -182,6 +195,7 @@ By default, existing keys can not be overridden.</p>
 <li><a class="reference internal" href="#attributes">Attributes</a><ul>
 <li><a class="reference internal" href="#eitprocessing.datahandling.datacollection.V"><code class="docutils literal notranslate"><span class="pre">V</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.datacollection.DataCollection"><code class="docutils literal notranslate"><span class="pre">DataCollection</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.datacollection.DataCollection.t"><code class="docutils literal notranslate"><span class="pre">DataCollection.t</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.datacollection.DataCollection.data_type"><code class="docutils literal notranslate"><span class="pre">DataCollection.data_type</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.datacollection.DataCollection.__setitem__"><code class="docutils literal notranslate"><span class="pre">DataCollection.__setitem__()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.datacollection.DataCollection.add"><code class="docutils literal notranslate"><span class="pre">DataCollection.add()</span></code></a></li>
@@ -190,6 +204,7 @@ By default, existing keys can not be overridden.</p>
 <li><a class="reference internal" href="#eitprocessing.datahandling.datacollection.DataCollection.get_data_derived_from"><code class="docutils literal notranslate"><span class="pre">DataCollection.get_data_derived_from()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.datacollection.DataCollection.get_derived_data"><code class="docutils literal notranslate"><span class="pre">DataCollection.get_derived_data()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.datacollection.DataCollection.concatenate"><code class="docutils literal notranslate"><span class="pre">DataCollection.concatenate()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.datacollection.DataCollection.select_by_time"><code class="docutils literal notranslate"><span class="pre">DataCollection.select_by_time()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -211,7 +211,10 @@
 <div class="viewcode-block" id="SelectByTime.t">
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime.t">[docs]</a>
     <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TimeIndexer</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Time Indexer property.&quot;&quot;&quot;</span>  <span class="c1"># TODO: add a short explanation of what this is used for.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Time indexer.</span>
+
+<span class="sd">        See TimeIndexer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># TODO: add a short explanation of what this is used for.</span>
         <span class="k">return</span> <span class="n">TimeIndexer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 </div>
 
@@ -226,11 +229,9 @@
 <span class="sd">    Example:</span>
 <span class="sd">    ```</span>
 <span class="sd">    &gt;&gt;&gt; data = EITData.from_path(&lt;path&gt;, ...)</span>
-<span class="sd">    &gt;&gt;&gt; tp_start = data.time[1]</span>
-<span class="sd">    &gt;&gt;&gt; tp_end = data.time[4]</span>
-<span class="sd">    &gt;&gt;&gt; time_slice = data.t[tp_start:tp_end]</span>
-<span class="sd">    &gt;&gt;&gt; index_slice = data[1:4]</span>
-<span class="sd">    &gt;&gt;&gt; time_slice == index_slice</span>
+<span class="sd">    &gt;&gt;&gt; time_slice1 = data.t[tp_start:tp_end]</span>
+<span class="sd">    &gt;&gt;&gt; time_slice2 = data.select_by_time(tp_start, tp_end)</span>
+<span class="sd">    &gt;&gt;&gt; time_slice1 == time_slice2</span>
 <span class="sd">    True</span>
 <span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
