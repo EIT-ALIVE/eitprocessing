@@ -111,8 +111,8 @@ class Sequence(Equivalence, SelectByIndex):
 
     def select_by_time(
         self,
-        start_time: float | None = None,
-        end_time: float | None = None,
+        start: float | None = None,
+        end: float | None = None,
         start_inclusive: bool = True,
         end_inclusive: bool = False,
         label: str | None = None,
@@ -132,9 +132,9 @@ class Sequence(Equivalence, SelectByIndex):
             label=label,
             name=name,
             description=description,
-            eit_data=self.eit_data.select_by_time(start_time, end_time, start_inclusive, end_inclusive),
-            continuous_data=self.continuous_data.select_by_time(start_time, end_time, start_inclusive, end_inclusive),
-            sparse_data=self.sparse_data.select_by_time(start_time, end_time, start_inclusive, end_inclusive),
+            eit_data=self.eit_data.select_by_time(start, end, start_inclusive, end_inclusive),
+            continuous_data=self.continuous_data.select_by_time(start, end, start_inclusive, end_inclusive),
+            sparse_data=self.sparse_data.select_by_time(start, end, start_inclusive, end_inclusive),
         )
 
     @property
