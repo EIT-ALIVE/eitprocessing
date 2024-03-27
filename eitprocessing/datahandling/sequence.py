@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import SelectByIndex, TimeIndexer
 from eitprocessing.datahandling.sparsedata import SparseData
@@ -44,6 +45,7 @@ class Sequence(Equivalence, SelectByIndex):
     eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData))
     continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData))
     sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData))
+    interval_data: DataCollection = field(default_factory=lambda: DataCollection(IntervalData))
 
     def __post_init__(self):
         if not self.label:
