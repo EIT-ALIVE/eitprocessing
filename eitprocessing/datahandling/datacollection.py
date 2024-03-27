@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import TimeIndexer
 from eitprocessing.datahandling.sparsedata import SparseData
@@ -11,7 +12,7 @@ from eitprocessing.datahandling.sparsedata import SparseData
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-V = TypeVar("V", EITData, ContinuousData, SparseData)
+V = TypeVar("V", EITData, ContinuousData, SparseData, IntervalData)
 
 
 class DataCollection(dict, Equivalence, Generic[V]):
