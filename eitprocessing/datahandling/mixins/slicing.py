@@ -88,7 +88,7 @@ class SelectByTime(SelectByIndex):
         self,
         start_time: float | None = None,
         end_time: float | None = None,
-        start_inclusive: bool = True,
+        start_inclusive: bool = False,
         end_inclusive: bool = False,
         label: str | None = None,
     ) -> Self:
