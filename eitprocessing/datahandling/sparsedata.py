@@ -37,10 +37,10 @@ class SparseData(SelectByTime):
     name: str
     unit: str | None
     category: str
+    time: np.ndarray | None
     description: str = ""
     parameters: dict[str, Any] = field(default_factory=dict)
     derived_from: list[Any] = field(default_factory=list)
-    time: np.ndarray | None
     values: Any | None = None
 
     def __post_init__(self) -> None:
