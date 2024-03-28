@@ -181,32 +181,68 @@ def load_from_single_path(
         ),
     )
 
-    naive_valleys = deque(min_indices)
-    breaths = []
-    while len(naive_valleys) > 1:
-        v1, v2 = naive_valleys[0], naive_valleys[1]
-        peaks_between = np.flatnonzero((max_indices > v1) & (max_indices < v2))
-        n_peaks_between = len(peaks_between)
-        gi = continuousdata_collection["global_impedance_(raw)"].values  # noqa: PD011
-        if n_peaks_between == 0:
-            remove = v2 if gi[v1] <= gi[v2] else v1
-            naive_valleys.remove(remove)
+    gi = continuousdata_collection["global_impedance_(raw)"].values  # noqa: PD011
+    # TODO: replace next section with BreathDetection._remove_doubles() and BreathDetection._remove_edge_cases() from
+    # 41_breath_detection_psomhorst; this code was directly copied from b59ac54
+
+    valley_indices = min_indices.copy()
+    peak_indices = max_indices.copy()
+
+    keep_peaks = peak_indices > valley_indices[0]
+    peak_indices = peak_indices[keep_peaks]
+
+    keep_peaks = peak_indices < valley_indices[-1]
+    peak_indices = peak_indices[keep_peaks]
+
+    valley_values = gi[min_indices]
+    peak_values = gi[max_indices]
+
+    current_valley_index = 0
+    while current_valley_index < len(valley_indices) - 1:
+        start_index = valley_indices[current_valley_index]
+        end_index = valley_indices[current_valley_index + 1]
+        peaks_between_valleys = np.argwhere(
+            (peak_indices > start_index) & (peak_indices < end_index),
+        )
+        if not len(peaks_between_valleys):
+            # no peak between valleys, remove highest valley
+            delete_valley_index = (
+                current_valley_index
+                if valley_values[current_valley_index] > valley_values[current_valley_index + 1]
+                else current_valley_index + 1
+            )
+            valley_indices = np.delete(valley_indices, delete_valley_index)
+            valley_values = np.delete(valley_values, delete_valley_index)
             continue
-        naive_valleys.popleft()
-        # TODO: check for the lowest end valley too
-        p = peaks_between[0] if n_peaks_between == 1 else peaks_between[gi[peaks_between].argmax()]
-        breaths.append(((time[v1], time[v2]), Breath(v1, max_indices[p], v2)))
+
+        if len(peaks_between_valleys) > 1:
+            # multiple peaks between valleys, remove lowest peak
+            delete_peak_index = (
+                peaks_between_valleys[0]
+                if peak_values[peaks_between_valleys[0]] < peak_values[peaks_between_valleys[1]]
+                else peaks_between_valleys[1]
+            )
+            peak_indices = np.delete(peak_indices, delete_peak_index)
+            peak_values = np.delete(peak_values, delete_peak_index)
+            continue
+
+        current_valley_index += 1
+
+    breaths = []
+    for start, end, middle in zip(valley_indices[:-1], valley_indices[1:], peak_indices, strict=True):
+        breaths.append(((time[start], time[end]), Breath(time[start], time[middle], time[end])))
 
     time_ranges, values = zip(*breaths, strict=True)
     intervaldata_collection = DataCollection(IntervalData)
     intervaldata_collection.add(
         IntervalData(
-            "breaths_(timpel)",
-            "Breaths (Timpel)",
-            None,
-            "breaths",
+            label="breaths_(timpel)",
+            name="Breaths (Timpel)",
+            unit=None,
+            category="breaths",
             time_ranges=time_ranges,
             values=values,
+            partial_inclusion=False,
         ),
     )
 
