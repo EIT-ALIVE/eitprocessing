@@ -113,17 +113,12 @@ def load_from_single_path(
     # TODO: move some medibus data to sparse / interval
     # TODO: move phases and events to sparse / interval
 
-    continuous_data_collection.add(
-        ContinuousData(
-            label="global_impedance_(raw)",
-            name="Global impedance (raw)",
-            unit="a.u.",
-            category="impedance",
-            derived_from=[eit_data_collection["raw"]],
-            time=eit_data_collection["raw"].time,
-            values=eit_data_collection["raw"]._calculate_global_impedance(),  # noqa: SLF001
-        ),
-    )
+    return {
+        "eitdata_collection": eit_data_collection,
+        "continuousdata_collection": continuous_data_collection,
+        "sparsedata_collection": sparse_data_collection,
+        "intervaldata_collection": interval_data_collection,
+    }
 
     return {
         "eitdata_collection": eit_data_collection,
