@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import warnings
+from collections import deque
 from functools import partial
 from typing import TYPE_CHECKING
 
 import numpy as np
 
+from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sparsedata import SparseData
 
@@ -88,11 +91,34 @@ def load_from_single_path(
 
     pixel_impedance = np.where(pixel_impedance == _NAN_VALUE, np.nan, pixel_impedance)
 
+    eit_data = EITData(
+        vendor=Vendor.TIMPEL,
+        label="raw",
+        path=path,
+        nframes=nframes,
+        time=time,
+        framerate=framerate,
+        pixel_impedance=pixel_impedance,
+    )
+    eitdata_collection = DataCollection(EITData)
+    eitdata_collection.add(eit_data)
+
     # extract waveform data
     # TODO: properly export waveform data
 
-    continuous_data_collection = DataCollection(ContinuousData)
-    continuous_data_collection.add(
+    continuousdata_collection = DataCollection(ContinuousData)
+    continuousdata_collection.add(
+        ContinuousData(
+            "global_impedance_(raw)",
+            "Global impedance",
+            "a.u.",
+            "global_impedance",
+            "Global impedance calculated from raw EIT data",
+            time=time,
+            values=eit_data._calculate_global_impedance(),  # noqa: SLF001
+        ),
+    )
+    continuousdata_collection.add(
         ContinuousData(
             label="airway_pressure_(timpel)",
             name="Airway pressure",
@@ -104,7 +130,7 @@ def load_from_single_path(
         ),
     )
 
-    continuous_data_collection.add(
+    continuousdata_collection.add(
         ContinuousData(
             label="flow_(timpel)",
             name="Flow",
@@ -116,7 +142,7 @@ def load_from_single_path(
         ),
     )
 
-    continuous_data_collection.add(
+    continuousdata_collection.add(
         ContinuousData(
             label="volume_(timpel)",
             name="Volume",
@@ -128,21 +154,9 @@ def load_from_single_path(
         ),
     )
 
-    eit_data = EITData(
-        vendor=Vendor.TIMPEL,
-        label="raw",
-        path=path,
-        nframes=nframes,
-        time=time,
-        framerate=framerate,
-        pixel_impedance=pixel_impedance,
-    )
-    eit_data_collection = DataCollection(EITData)
-    eit_data_collection.add(eit_data)
-
+    # extract sparse data
     sparsedata_collection = DataCollection(SparseData)
 
-    # extract breath start, breath end and QRS marks
     min_indices = np.nonzero(data[:, 1027] == 1)[0]
     sparsedata_collection.add(
         SparseData(
@@ -167,6 +181,35 @@ def load_from_single_path(
         ),
     )
 
+    naive_valleys = deque(min_indices)
+    breaths = []
+    while len(naive_valleys) > 1:
+        v1, v2 = naive_valleys[0], naive_valleys[1]
+        peaks_between = np.flatnonzero((max_indices > v1) & (max_indices < v2))
+        n_peaks_between = len(peaks_between)
+        gi = continuousdata_collection["global_impedance_(raw)"].values  # noqa: PD011
+        if n_peaks_between == 0:
+            remove = v2 if gi[v1] <= gi[v2] else v1
+            naive_valleys.remove(remove)
+            continue
+        naive_valleys.popleft()
+        # TODO: check for the lowest end valley too
+        p = peaks_between[0] if n_peaks_between == 1 else peaks_between[gi[peaks_between].argmax()]
+        breaths.append(((time[v1], time[v2]), Breath(v1, max_indices[p], v2)))
+
+    time_ranges, values = zip(*breaths, strict=True)
+    intervaldata_collection = DataCollection(IntervalData)
+    intervaldata_collection.add(
+        IntervalData(
+            "breaths_(timpel)",
+            "Breaths (Timpel)",
+            None,
+            "breaths",
+            time_ranges=time_ranges,
+            values=values,
+        ),
+    )
+
     qrs_indices = np.nonzero(data[:, 1029] == 1)[0]
     sparsedata_collection.add(
         SparseData(
@@ -179,4 +222,9 @@ def load_from_single_path(
         ),
     )
 
-    return eit_data_collection, continuous_data_collection, sparsedata_collection
+    return {
+        "eitdata_collection": eitdata_collection,
+        "continuousdata_collection": continuousdata_collection,
+        "sparsedata_collection": sparsedata_collection,
+        "intervaldata_collection": intervaldata_collection,
+    }
