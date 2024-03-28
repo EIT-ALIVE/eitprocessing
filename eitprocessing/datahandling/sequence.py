@@ -104,17 +104,17 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
             for value in self.continuous_data.values():
                 sliced_continuous.add(value[start_index:end_index])
 
-        if not self.sparse_data:
-            sliced_sparse = self.sparse_data
-        else:
-            sliced_sparse = DataCollection(SparseData)
-            if start_index >= len(self.time):
-                msg = "start_index larger than length of time axis"
-                raise ValueError(msg)
+        sparse_data = DataCollection(SparseData)
+        interval_data = DataCollection(IntervalData)
+        if start_index >= len(self.time):
+            msg = "start_index larger than length of time axis"
+            raise ValueError(msg)
 
-            time = self.time[start_index:end_index]
-            for value in self.sparse_data.values():
-                sliced_sparse.add(value.t[time[0], time[-1]])
+        time = self.time[start_index:end_index]
+        for value in self.sparse_data.values():
+            sparse_data.add(value.t[time[0] : time[-1]])
+        for value in self.interval_data.values():
+            interval_data.add(value.t[time[0] : time[-1]])
 
         return self.__class__(
             label=newlabel,
@@ -122,7 +122,8 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
             description=f"Sliced copy of <{self.description}>",
             eit_data=sliced_eit,
             continuous_data=sliced_continuous,
-            sparse_data=sliced_sparse,
+            sparse_data=sparse_data,
+            interval_data=interval_data,
         )
 
     def select_by_time(
