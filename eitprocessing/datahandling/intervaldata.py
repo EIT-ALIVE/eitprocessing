@@ -13,7 +13,38 @@ class TimeRange(NamedTuple):
 
 @dataclass
 class IntervalData:
-    """Container for single value data existing over a period of time."""
+    """Container for interval data existing over a period of time.
+
+    Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
+    end-expiratory pressure), the position of a patient, a maneuver being performed, detected periods in the data, etc.
+
+    Interval data is characterised by n time ranges and optionally n values. Some interval data will not require values.
+    E.g. interval data with the label "expiratory_breath_hold" only requires time ranges for when expiratory breath
+    holds were performed. Other interval data, e.g. "set_driving_pressure" do require values.
+
+    Interval data can be selected by time through the `select_by_time(start_time, end_time)` method. Alternatively,
+    `t[start_time:end_time]` can be used. When the start or end time overlaps with a time range, the time range and its
+    associated value are included in the selection if `partial_inclusion` is `True`, but ignored if `partial_inclusion`
+    is `False`. If the time range is partially included, the start and end times are trimmed to the start and end time
+    of the selection.
+
+    A use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you will want to keep the
+    driving pressure that was set before the start of the selectioon. A use case where `partial_inclusion` should be set
+    to `False` is "detected_breaths": you will want to ignore partial breaths that started before or ended after the
+    selected period.
+
+    Args:
+      label: a computer-readable name
+      name: a human-readable name
+      unit: the unit associated with the data
+      category: the category of data
+      time_ranges: a list of time ranges (tuples containing a start time and end time)
+      values: an optional list of values with the same length as time_ranges
+      parameters: parameters used to derive the data
+      derived_from: list of data sets this data was derived from
+      description: extended human readible description of the data
+      partial_inclusion: whether to include a trimmed version of a time range when selecting data
+    """
 
     label: str
     name: str
