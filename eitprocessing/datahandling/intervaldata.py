@@ -20,7 +20,7 @@ class IntervalData:
     unit: str | None
     category: str
     time_ranges: list[TimeRange | tuple[float, float]]
-    values: list[Any]
+    values: list[Any] | None = None
     parameters: dict[str, Any] = field(default_factory=dict)
     derived_from: list[Any] = field(default_factory=list)
     description: str = ""
