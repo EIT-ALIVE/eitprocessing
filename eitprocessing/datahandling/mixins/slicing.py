@@ -88,7 +88,7 @@ class SelectByTime(SelectByIndex):
         self,
         start_time: float | None = None,
         end_time: float | None = None,
-        start_inclusive: bool = True,
+        start_inclusive: bool = False,
         end_inclusive: bool = False,
         label: str | None = None,
     ) -> Self:
@@ -149,7 +149,10 @@ class SelectByTime(SelectByIndex):
 
     @property
     def t(self) -> TimeIndexer:
-        """Time Indexer property."""  # TODO: add a short explanation of what this is used for.
+        """Time indexer.
+
+        See TimeIndexer.
+        """  # TODO: add a short explanation of what this is used for.
         return TimeIndexer(self)
 
 
@@ -160,11 +163,9 @@ class TimeIndexer:
     Example:
     ```
     >>> data = EITData.from_path(<path>, ...)
-    >>> tp_start = data.time[1]
-    >>> tp_end = data.time[4]
-    >>> time_slice = data.t[tp_start:tp_end]
-    >>> index_slice = data[1:4]
-    >>> time_slice == index_slice
+    >>> time_slice1 = data.t[tp_start:tp_end]
+    >>> time_slice2 = data.select_by_time(tp_start, tp_end)
+    >>> time_slice1 == time_slice2
     True
     ```
     """
@@ -176,10 +177,10 @@ class TimeIndexer:
             if key.step:
                 msg = "Can't slice by time using specific step sizes."
                 raise ValueError(msg)
-            return self.obj.select_by_time(key.start, key.stop)
+            return self.obj.select_by_time(start_time=key.start, end_time=key.stop)
 
         if isinstance(key, int | float):
-            return self.obj.select_by_time(start=key, end=key, end_inclusive=True)
+            return self.obj.select_by_time(start_time=key, end_time=key, end_inclusive=True)
 
         msg = f"Invalid slicing input. Should be `slice` or `int` or `float`, not {type(key)}."
         raise TypeError(msg)

@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import warnings
+from collections import deque
 from functools import partial
 from typing import TYPE_CHECKING
 
 import numpy as np
 
+from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.loading import load_eit_data
-from eitprocessing.datahandling.phases import MaxValue, MinValue, QRSMark
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -89,71 +91,176 @@ def load_from_single_path(
 
     pixel_impedance = np.where(pixel_impedance == _NAN_VALUE, np.nan, pixel_impedance)
 
+    eit_data = EITData(
+        vendor=Vendor.TIMPEL,
+        label="raw",
+        path=path,
+        nframes=nframes,
+        time=time,
+        framerate=framerate,
+        pixel_impedance=pixel_impedance,
+    )
+    eitdata_collection = DataCollection(EITData)
+    eitdata_collection.add(eit_data)
+
     # extract waveform data
     # TODO: properly export waveform data
 
-    continuous_data_collection = DataCollection(ContinuousData)
-    continuous_data_collection.add(
+    continuousdata_collection = DataCollection(ContinuousData)
+    continuousdata_collection.add(
+        ContinuousData(
+            "global_impedance_(raw)",
+            "Global impedance",
+            "a.u.",
+            "global_impedance",
+            "Global impedance calculated from raw EIT data",
+            time=time,
+            values=eit_data._calculate_global_impedance(),  # noqa: SLF001
+        ),
+    )
+    continuousdata_collection.add(
         ContinuousData(
             "airway_pressure_(timpel)",
             "Airway pressure",
             "cmH2O",
             "pressure",
             "Airway pressure measured by Timpel device",
-            loaded=True,
+            time=time,
             values=data[:, 1024],
         ),
     )
 
-    continuous_data_collection.add(
+    continuousdata_collection.add(
         ContinuousData(
             "flow_(timpel)",
             "Flow",
             "L/s",
             "flow",
             "FLow measures by Timpel device",
-            loaded=True,
+            time=time,
             values=data[:, 1025],
         ),
     )
 
-    continuous_data_collection.add(
+    continuousdata_collection.add(
         ContinuousData(
             "volume_(timpel)",
             "Volume",
             "L",
             "volume",
             "Volume measured by Timpel device",
-            loaded=True,
+            time=time,
             values=data[:, 1026],
         ),
     )
 
-    # extract breath start, breath end and QRS marks
-    phases = []
-    for index in np.flatnonzero(data[:, 1027] == 1):
-        phases.append(MinValue(index, time[int(index)]))  # noqa: PERF401
+    # extract sparse data
+    sparsedata_collection = DataCollection(SparseData)
 
-    for index in np.flatnonzero(data[:, 1028] == 1):
-        phases.append(MaxValue(index, time[int(index)]))  # noqa: PERF401
-
-    for index in np.flatnonzero(data[:, 1029] == 1):
-        phases.append(QRSMark(index, time[int(index)]))  # noqa: PERF401
-
-    phases.sort(key=lambda x: x.index)
-
-    eit_data_collection = DataCollection(EITData)
-    eit_data_collection.add(
-        EITData(
-            vendor=Vendor.TIMPEL,
-            label="raw",
-            path=path,
-            nframes=nframes,
-            time=time,
-            framerate=framerate,
-            phases=phases,
-            pixel_impedance=pixel_impedance,
+    min_indices = np.nonzero(data[:, 1027] == 1)[0]
+    sparsedata_collection.add(
+        SparseData(
+            label="minvalues_(timpel)",
+            name="Minimum values detected by Timpel device.",
+            unit=None,
+            category="minvalue",
+            derived_from=[eit_data],
+            time=time[min_indices],
         ),
     )
 
-    return eit_data_collection, continuous_data_collection, DataCollection(SparseData)
+    max_indices = np.nonzero(data[:, 1028] == 1)[0]
+    sparsedata_collection.add(
+        SparseData(
+            label="maxvalues_(timpel)",
+            name="Maximum values detected by Timpel device.",
+            unit=None,
+            category="maxvalue",
+            derived_from=[eit_data],
+            time=time[max_indices],
+        ),
+    )
+
+    gi = continuousdata_collection["global_impedance_(raw)"].values  # noqa: PD011
+    # TODO: replace next section with BreathDetection._remove_doubles() and BreathDetection._remove_edge_cases() from
+    # 41_breath_detection_psomhorst; this code was directly copied from b59ac54
+
+    valley_indices = min_indices.copy()
+    peak_indices = max_indices.copy()
+
+    keep_peaks = peak_indices > valley_indices[0]
+    peak_indices = peak_indices[keep_peaks]
+
+    keep_peaks = peak_indices < valley_indices[-1]
+    peak_indices = peak_indices[keep_peaks]
+
+    valley_values = gi[min_indices]
+    peak_values = gi[max_indices]
+
+    current_valley_index = 0
+    while current_valley_index < len(valley_indices) - 1:
+        start_index = valley_indices[current_valley_index]
+        end_index = valley_indices[current_valley_index + 1]
+        peaks_between_valleys = np.argwhere(
+            (peak_indices > start_index) & (peak_indices < end_index),
+        )
+        if not len(peaks_between_valleys):
+            # no peak between valleys, remove highest valley
+            delete_valley_index = (
+                current_valley_index
+                if valley_values[current_valley_index] > valley_values[current_valley_index + 1]
+                else current_valley_index + 1
+            )
+            valley_indices = np.delete(valley_indices, delete_valley_index)
+            valley_values = np.delete(valley_values, delete_valley_index)
+            continue
+
+        if len(peaks_between_valleys) > 1:
+            # multiple peaks between valleys, remove lowest peak
+            delete_peak_index = (
+                peaks_between_valleys[0]
+                if peak_values[peaks_between_valleys[0]] < peak_values[peaks_between_valleys[1]]
+                else peaks_between_valleys[1]
+            )
+            peak_indices = np.delete(peak_indices, delete_peak_index)
+            peak_values = np.delete(peak_values, delete_peak_index)
+            continue
+
+        current_valley_index += 1
+
+    breaths = []
+    for start, end, middle in zip(valley_indices[:-1], valley_indices[1:], peak_indices, strict=True):
+        breaths.append(((time[start], time[end]), Breath(time[start], time[middle], time[end])))
+
+    time_ranges, values = zip(*breaths, strict=True)
+    intervaldata_collection = DataCollection(IntervalData)
+    intervaldata_collection.add(
+        IntervalData(
+            label="breaths_(timpel)",
+            name="Breaths (Timpel)",
+            unit=None,
+            category="breaths",
+            time_ranges=time_ranges,
+            values=values,
+            partial_inclusion=False,
+        ),
+    )
+
+    qrs_indices = np.nonzero(data[:, 1029] == 1)[0]
+    sparsedata_collection.add(
+        SparseData(
+            label="qrscomplexes_(timpel)",
+            name="QRS complexes detected by Timpel device",
+            unit=None,
+            category="qrs_complex",
+            derived_from=[eit_data],
+            time=time[qrs_indices],
+        ),
+    )
+
+    return {
+        "eitdata_collection": eitdata_collection,
+        "continuousdata_collection": continuousdata_collection,
+        "sparsedata_collection": sparsedata_collection,
+        "intervaldata_collection": intervaldata_collection,
+    }

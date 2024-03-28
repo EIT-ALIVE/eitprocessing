@@ -12,6 +12,7 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.event import Event
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.loading.binreader import BinReader
 from eitprocessing.datahandling.phases import MaxValue, MinValue
@@ -106,14 +107,30 @@ def load_from_single_path(
     )
     (
         continuous_data_collection,
-        sparse_data_collections,
+        sparse_data_collection,
     ) = _convert_medibus_data(medibus_data, time)
+    interval_data_collection = DataCollection(IntervalData)
+    # TODO: move some medibus data to sparse / interval
+    # TODO: move phases and events to sparse / interval
 
-    return (
-        eit_data_collection,
-        continuous_data_collection,
-        sparse_data_collections,
+    continuous_data_collection.add(
+        ContinuousData(
+            label="global_impedance_(raw)",
+            name="Global impedance (raw)",
+            unit="a.u.",
+            category="impedance",
+            derived_from=[eit_data_collection["raw"]],
+            time=eit_data_collection["raw"].time,
+            values=eit_data_collection["raw"]._calculate_global_impedance(),  # noqa: SLF001
+        ),
     )
+
+    return {
+        "eitdata_collection": eit_data_collection,
+        "continuousdata_collection": continuous_data_collection,
+        "sparsedata_collection": sparse_data_collection,
+        "intervaldata_collection": interval_data_collection,
+    }
 
 
 def _convert_medibus_data(

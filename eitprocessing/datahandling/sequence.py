@@ -6,8 +6,9 @@ from typing import TYPE_CHECKING
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.mixins.equality import Equivalence
-from eitprocessing.datahandling.mixins.slicing import SelectByTime
+from eitprocessing.datahandling.mixins.slicing import SelectByIndex, TimeIndexer
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(eq=False)
-class Sequence(Equivalence, SelectByTime):
+class Sequence(Equivalence, SelectByIndex):
     """Sequence of timepoints containing respiratory data.
 
     A Sequence object is a representation of data points over time. These data can consist of any combination of EIT
@@ -44,6 +45,7 @@ class Sequence(Equivalence, SelectByTime):
     eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData))
     continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData))
     sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData))
+    interval_data: DataCollection = field(default_factory=lambda: DataCollection(IntervalData))
 
     def __post_init__(self):
         if not self.label:
@@ -92,13 +94,16 @@ class Sequence(Equivalence, SelectByTime):
             continuous_data.add(value[start_index:end_index])
 
         sparse_data = DataCollection(SparseData)
+        interval_data = DataCollection(IntervalData)
         if start_index >= len(self.time):
             msg = "start_index larger than length of time axis"
             raise ValueError(msg)
 
         time = self.time[start_index:end_index]
         for value in self.sparse_data.values():
-            sparse_data.add(value.t[time[0], time[-1]])
+            sparse_data.add(value.t[time[0] : time[-1]])
+        for value in self.interval_data.values():
+            interval_data.add(value.t[time[0] : time[-1]])
 
         return self.__class__(
             label=label,
@@ -107,4 +112,48 @@ class Sequence(Equivalence, SelectByTime):
             eit_data=eit_data,
             continuous_data=continuous_data,
             sparse_data=sparse_data,
+            interval_data=interval_data,
         )
+
+    def select_by_time(
+        self,
+        start_time: float | None = None,
+        end_time: float | None = None,
+        start_inclusive: bool = True,
+        end_inclusive: bool = False,
+        label: str | None = None,
+        name: str | None = None,
+        description: str | None = "",
+    ) -> Self:
+        """Return a sliced version of the Sequence.
+
+        See SelectByTime.select_by_time().
+        """
+        if not label:
+            label = f"copy_of_<{self.label}>"
+        if not name:
+            f"Sliced copy of <{self.name}>"
+
+        return self.__class__(
+            label=label,
+            name=name,
+            description=description,
+            # perform select_by_time() on all four data types
+            **{
+                key: getattr(self, key).select_by_time(
+                    start_time=start_time,
+                    end_time=end_time,
+                    start_inclusive=start_inclusive,
+                    end_inclusive=end_inclusive,
+                )
+                for key in ("eit_data", "continuous_data", "sparse_data", "interval_data")
+            },
+        )
+
+    @property
+    def t(self):
+        """Time indexer.
+
+        See slicing.TimeIndexer.
+        """
+        return TimeIndexer(self)
