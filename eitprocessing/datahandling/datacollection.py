@@ -122,9 +122,29 @@ class DataCollection(dict, Equivalence, Generic[V]):
         end_inclusive: bool = False,
     ) -> Self:
         """Return a DataCollection containing sliced copies of the items."""
+        if self.data_type is IntervalData:
+            return DataCollection(
+                self.data_type,
+                **{
+                    k: v.select_by_time(
+                        start_time=start_time,
+                        end_time=end_time,
+                    )
+                    for k, v in self.items()
+                },
+            )
+
         return DataCollection(
             self.data_type,
-            **{k: v.select_by_time(start_time, end_time, start_inclusive, end_inclusive) for k, v in self.items()},
+            **{
+                k: v.select_by_time(
+                    start_time=start_time,
+                    end_time=end_time,
+                    start_inclusive=start_inclusive,
+                    end_inclusive=end_inclusive,
+                )
+                for k, v in self.items()
+            },
         )
 
     @property
