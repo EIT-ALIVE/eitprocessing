@@ -177,10 +177,10 @@ class TimeIndexer:
             if key.step:
                 msg = "Can't slice by time using specific step sizes."
                 raise ValueError(msg)
-            return self.obj.select_by_time(key.start, key.stop)
+            return self.obj.select_by_time(start_time=key.start, end_time=key.stop)
 
         if isinstance(key, int | float):
-            return self.obj.select_by_time(start=key, end=key, end_inclusive=True)
+            return self.obj.select_by_time(start_time=key, end_time=key, end_inclusive=True)
 
         msg = f"Invalid slicing input. Should be `slice` or `int` or `float`, not {type(key)}."
         raise TypeError(msg)
