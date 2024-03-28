@@ -94,13 +94,16 @@ class Sequence(Equivalence, SelectByIndex):
             continuous_data.add(value[start_index:end_index])
 
         sparse_data = DataCollection(SparseData)
+        interval_data = DataCollection(IntervalData)
         if start_index >= len(self.time):
             msg = "start_index larger than length of time axis"
             raise ValueError(msg)
 
         time = self.time[start_index:end_index]
         for value in self.sparse_data.values():
-            sparse_data.add(value.t[time[0], time[-1]])
+            sparse_data.add(value.t[time[0] : time[-1]])
+        for value in self.interval_data.values():
+            interval_data.add(value.t[time[0] : time[-1]])
 
         return self.__class__(
             label=label,
@@ -109,6 +112,7 @@ class Sequence(Equivalence, SelectByIndex):
             eit_data=eit_data,
             continuous_data=continuous_data,
             sparse_data=sparse_data,
+            interval_data=interval_data,
         )
 
     def select_by_time(
