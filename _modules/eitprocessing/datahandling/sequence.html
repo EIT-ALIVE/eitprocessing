@@ -209,9 +209,16 @@
             <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-            <span class="n">eit_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eit_data</span><span class="o">.</span><span class="n">select_by_time</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">start_inclusive</span><span class="p">,</span> <span class="n">end_inclusive</span><span class="p">),</span>
-            <span class="n">continuous_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">continuous_data</span><span class="o">.</span><span class="n">select_by_time</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">start_inclusive</span><span class="p">,</span> <span class="n">end_inclusive</span><span class="p">),</span>
-            <span class="n">sparse_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sparse_data</span><span class="o">.</span><span class="n">select_by_time</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">start_inclusive</span><span class="p">,</span> <span class="n">end_inclusive</span><span class="p">),</span>
+            <span class="c1"># perform select_by_time() on all four data types</span>
+            <span class="o">**</span><span class="p">{</span>
+                <span class="n">key</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">select_by_time</span><span class="p">(</span>
+                    <span class="n">start_time</span><span class="o">=</span><span class="n">start_time</span><span class="p">,</span>
+                    <span class="n">end_time</span><span class="o">=</span><span class="n">end_time</span><span class="p">,</span>
+                    <span class="n">start_inclusive</span><span class="o">=</span><span class="n">start_inclusive</span><span class="p">,</span>
+                    <span class="n">end_inclusive</span><span class="o">=</span><span class="n">end_inclusive</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;eit_data&quot;</span><span class="p">,</span> <span class="s2">&quot;continuous_data&quot;</span><span class="p">,</span> <span class="s2">&quot;sparse_data&quot;</span><span class="p">,</span> <span class="s2">&quot;interval_data&quot;</span><span class="p">)</span>
+            <span class="p">},</span>
         <span class="p">)</span></div>
 
 
