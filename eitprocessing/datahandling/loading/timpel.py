@@ -154,21 +154,9 @@ def load_from_single_path(
         ),
     )
 
-    eit_data = EITData(
-        vendor=Vendor.TIMPEL,
-        label="raw",
-        path=path,
-        nframes=nframes,
-        time=time,
-        framerate=framerate,
-        pixel_impedance=pixel_impedance,
-    )
-    eit_data_collection = DataCollection(EITData)
-    eit_data_collection.add(eit_data)
-
+    # extract sparse data
     sparsedata_collection = DataCollection(SparseData)
 
-    # extract breath start, breath end and QRS marks
     min_indices = np.nonzero(data[:, 1027] == 1)[0]
     sparsedata_collection.add(
         SparseData(
@@ -193,6 +181,35 @@ def load_from_single_path(
         ),
     )
 
+    naive_valleys = deque(min_indices)
+    breaths = []
+    while len(naive_valleys) > 1:
+        v1, v2 = naive_valleys[0], naive_valleys[1]
+        peaks_between = np.flatnonzero((max_indices > v1) & (max_indices < v2))
+        n_peaks_between = len(peaks_between)
+        gi = continuousdata_collection["global_impedance_(raw)"].values  # noqa: PD011
+        if n_peaks_between == 0:
+            remove = v2 if gi[v1] <= gi[v2] else v1
+            naive_valleys.remove(remove)
+            continue
+        naive_valleys.popleft()
+        # TODO: check for the lowest end valley too
+        p = peaks_between[0] if n_peaks_between == 1 else peaks_between[gi[peaks_between].argmax()]
+        breaths.append(((time[v1], time[v2]), Breath(v1, max_indices[p], v2)))
+
+    time_ranges, values = zip(*breaths, strict=True)
+    intervaldata_collection = DataCollection(IntervalData)
+    intervaldata_collection.add(
+        IntervalData(
+            "breaths_(timpel)",
+            "Breaths (Timpel)",
+            None,
+            "breaths",
+            time_ranges=time_ranges,
+            values=values,
+        ),
+    )
+
     qrs_indices = np.nonzero(data[:, 1029] == 1)[0]
     sparsedata_collection.add(
         SparseData(
@@ -205,4 +222,9 @@ def load_from_single_path(
         ),
     )
 
-    return eit_data_collection, continuous_data_collection, sparsedata_collection
+    return {
+        "eitdata_collection": eitdata_collection,
+        "continuousdata_collection": continuousdata_collection,
+        "sparsedata_collection": sparsedata_collection,
+        "intervaldata_collection": intervaldata_collection,
+    }
