@@ -63,7 +63,7 @@ class IntervalData:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.label}')"
 
-    def select_by_time(
+    def select_by_time(  # noqa: C901
         self,
         start_time: float | None = None,
         end_time: float | None = None,
