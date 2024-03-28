@@ -107,7 +107,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         for value in self.sparse_data.values():
             sparse_data.add(value.t[time[0] : time[-1]])
         for value in self.interval_data.values():
-            interval_data.add(value.select_by_time(time[0], time[-1]))
+            interval_data.add(value.t[time[0] : time[-1]])
 
         return self.__class__(
             label=label,
