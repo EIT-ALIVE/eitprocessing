@@ -85,8 +85,6 @@ class IntervalData:
         if end_time is None:
             end_time = self.time_ranges[-1].end_time
 
-        time_range_value_pairs = zip(self.time_ranges, self.values, strict=True)
-
         def keep_starting_on_or_before_end(item: tuple[TimeRange, Any]) -> bool:
             time_range, _ = item
             return time_range.start_time <= end_time
@@ -103,6 +101,12 @@ class IntervalData:
                 return False
             return True
 
+        def replace_start_end_time(time_range: TimeRange) -> TimeRange:
+            start_time_ = max(time_range.start_time, start_time)
+            end_time_ = min(time_range.end_time, end_time)
+            return TimeRange(start_time_, end_time_)
+
+        time_range_value_pairs = zip(self.time_ranges, self.values, strict=True)
         time_range_value_pairs = filter(keep_starting_on_or_before_end, time_range_value_pairs)
         time_range_value_pairs = filter(keep_ending_on_or_after_start, time_range_value_pairs)
 
@@ -110,12 +114,6 @@ class IntervalData:
             time_range_value_pairs = filter(keep_fully_overlapping, time_range_value_pairs)
 
         time_ranges, values = zip(*time_range_value_pairs, strict=True)
-
-        def replace_start_end_time(time_range: TimeRange) -> TimeRange:
-            start_time_ = max(time_range.start_time, start_time)
-            end_time_ = min(time_range.end_time, end_time)
-            return TimeRange(start_time_, end_time_)
-
         time_ranges = list(map(replace_start_end_time, time_ranges))
 
         return self.__class__(
