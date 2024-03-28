@@ -16,11 +16,12 @@ class IntervalData:
     """Container for interval data existing over a period of time.
 
     Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
-    end-expiratory pressure), the position of a patient, a maneuver being performed, detected periods in the data, etc.
+    end-expiratory pressure), the position of a patient, a maneuver (end-expiratory hold) being performed, detected
+    periods in the data, etc.
 
-    Interval data is characterised by n time ranges and optionally n values. Some interval data will not require values.
-    E.g. interval data with the label "expiratory_breath_hold" only requires time ranges for when expiratory breath
-    holds were performed. Other interval data, e.g. "set_driving_pressure" do require values.
+    Interval data consists of a number of time range-value pairs or time ranges without associated values. E.g. interval
+    data with the label "expiratory_breath_hold" only requires time ranges for when expiratory breath holds were
+    performed. Other interval data, e.g. "set_driving_pressure" do have associated values.
 
     Interval data can be selected by time through the `select_by_time(start_time, end_time)` method. Alternatively,
     `t[start_time:end_time]` can be used. When the start or end time overlaps with a time range, the time range and its
@@ -28,10 +29,12 @@ class IntervalData:
     is `False`. If the time range is partially included, the start and end times are trimmed to the start and end time
     of the selection.
 
-    A use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you will want to keep the
-    driving pressure that was set before the start of the selectioon. A use case where `partial_inclusion` should be set
-    to `False` is "detected_breaths": you will want to ignore partial breaths that started before or ended after the
-    selected period.
+    A potential use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you might want to
+    keep the driving pressure that was set before the start of the selectioon. A use case where `partial_inclusion`
+    should be set to `False` is "detected_breaths": you might want to ignore partial breaths that started before or
+    ended after the selected period.
+
+    Note that when selecting by time, the end time is included in the selection.
 
     Args:
       label: a computer-readable name
