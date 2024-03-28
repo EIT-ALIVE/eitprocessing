@@ -37,13 +37,13 @@ class EITData(SelectByTime, Equivalence):
 
     path: Path | list[Path]
     nframes: int
-    time: NDArray
+    time: np.ndarray = field(repr=False)
     framerate: float
     vendor: Vendor
-    phases: list = field(default_factory=list)
-    events: list = field(default_factory=list)
+    phases: list = field(default_factory=list, repr=False)
+    events: list = field(default_factory=list, repr=False)
     label: str | None = None
-    pixel_impedance: NDArray = field(repr=False, kw_only=True)
+    pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
 
     def __post_init__(self):
         if not self.label:

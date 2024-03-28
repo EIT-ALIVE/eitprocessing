@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling.mixins.slicing import TimeIndexer
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -111,3 +112,24 @@ class DataCollection(dict, Equivalence, Generic[V]):
             concatenated[key] = self[key].concatenate(other[key])
 
         return concatenated
+
+    def select_by_time(
+        self,
+        start_time: float | None,
+        end_time: float | None,
+        start_inclusive: bool = True,
+        end_inclusive: bool = False,
+    ) -> Self:
+        """Return a DataCollection containing sliced copies of the items."""
+        return DataCollection(
+            self.data_type,
+            **{k: v.select_by_time(start_time, end_time, start_inclusive, end_inclusive) for k, v in self.items()},
+        )
+
+    @property
+    def t(self):
+        """Time indexer.
+
+        See slicing.TimeIndexer.
+        """
+        return TimeIndexer(self)

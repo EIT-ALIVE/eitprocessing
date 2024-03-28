@@ -7,7 +7,7 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.mixins.equality import Equivalence
-from eitprocessing.datahandling.mixins.slicing import SelectByTime
+from eitprocessing.datahandling.mixins.slicing import SelectByIndex, TimeIndexer
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(eq=False)
-class Sequence(Equivalence, SelectByTime):
+class Sequence(Equivalence, SelectByIndex):
     """Sequence of timepoints containing respiratory data.
 
     A Sequence object is a representation of data points over time. These data can consist of any combination of EIT
@@ -108,3 +108,46 @@ class Sequence(Equivalence, SelectByTime):
             continuous_data=continuous_data,
             sparse_data=sparse_data,
         )
+
+    def select_by_time(
+        self,
+        start_time: float | None = None,
+        end_time: float | None = None,
+        start_inclusive: bool = True,
+        end_inclusive: bool = False,
+        label: str | None = None,
+        name: str | None = None,
+        description: str | None = "",
+    ) -> Self:
+        """Return a sliced version of the Sequence.
+
+        See SelectByTime.select_by_time().
+        """
+        if not label:
+            label = f"copy_of_<{self.label}>"
+        if not name:
+            f"Sliced copy of <{self.name}>"
+
+        return self.__class__(
+            label=label,
+            name=name,
+            description=description,
+            # perform select_by_time() on all four data types
+            **{
+                key: getattr(self, key).select_by_time(
+                    start_time=start_time,
+                    end_time=end_time,
+                    start_inclusive=start_inclusive,
+                    end_inclusive=end_inclusive,
+                )
+                for key in ("eit_data", "continuous_data", "sparse_data", "interval_data")
+            },
+        )
+
+    @property
+    def t(self):
+        """Time indexer.
+
+        See slicing.TimeIndexer.
+        """
+        return TimeIndexer(self)
