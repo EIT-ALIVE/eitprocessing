@@ -49,6 +49,11 @@ class IntervalData:
             partial_inclusion = self.partial_inclusion
         label = label or f"Sliced version of <{self.label}>"
 
+        if start_time is None:
+            start_time = self.time_ranges[0].start_time
+        if end_time is None:
+            end_time = self.time_ranges[-1].end_time
+
         time_range_value_pairs = zip(self.time_ranges, self.values, strict=True)
 
         def keep_starting_on_or_before_end(item: tuple[TimeRange, Any]) -> bool:
