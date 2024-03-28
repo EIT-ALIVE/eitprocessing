@@ -111,6 +111,10 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         for value in self.sparse_data.values():
             sliced_sparse.add(value.t[time[0], time[-1]])
 
+        sliced_interval = DataCollection(IntervalData)
+        for value in self.interval_data.values():
+            sliced_interval.add(value.t[time[0], time[-1]])
+
         return self.__class__(
             label=self.label,  # newlabel gives errors
             name=f"Sliced copy of <{self.name}>",
@@ -118,6 +122,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
             eit_data=sliced_eit,
             continuous_data=sliced_continuous,
             sparse_data=sliced_sparse,
+            interval_data=sliced_interval,
         )
 
     def select_by_time(
