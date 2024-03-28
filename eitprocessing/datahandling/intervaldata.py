@@ -34,8 +34,8 @@ class IntervalData:
 
     def select_by_time(
         self,
-        start: float | None = None,
-        end: float | None = None,
+        start_time: float | None = None,
+        end_time: float | None = None,
         partial_inclusion: bool | None = None,
         label: str | None = None,
     ) -> Self:
@@ -53,17 +53,17 @@ class IntervalData:
 
         def keep_starting_on_or_before_end(item: tuple[TimeRange, Any]) -> bool:
             time_range, _ = item
-            return time_range.start_time <= end
+            return time_range.start_time <= end_time
 
         def keep_ending_on_or_after_start(item: tuple[TimeRange, Any]) -> bool:
             time_range, _ = item
-            return time_range.end_time >= start
+            return time_range.end_time >= start_time
 
         def keep_fully_overlapping(item: tuple[TimeRange, Any]) -> bool:
             time_range, _ = item
-            if time_range.start_time < start:
+            if time_range.start_time < start_time:
                 return False
-            if time_range.end_time > end:
+            if time_range.end_time > end_time:
                 return False
             return True
 
@@ -76,8 +76,8 @@ class IntervalData:
         time_ranges, values = zip(*time_range_value_pairs, strict=True)
 
         def replace_start_end_time(time_range: TimeRange) -> TimeRange:
-            start_time_ = max(time_range.start_time, start)
-            end_time_ = min(time_range.end_time, end)
+            start_time_ = max(time_range.start_time, start_time)
+            end_time_ = min(time_range.end_time, end_time)
             return TimeRange(start_time_, end_time_)
 
         time_ranges = list(map(replace_start_end_time, time_ranges))
