@@ -9,17 +9,15 @@ from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 @dataclass
 class SparseData(SelectByTime):
-    """Container for single value or sparse data.
+    """Container for sparse data.
 
-    Sparse data is data that does not appear/change at predictable regular time intervals. Examples are detected breaths
-    or heart beats, tidal impedance variations per breath, or a single PEEP value for a PEEP step during a decremental
-    PEEP trial.
+    Sparse data does not have a set time between data points. Examples are data points at end of inspiration/end of
+    expiration (e.g. tidal volume, end-expiratoy lung impedance) or detected time points (e.g. QRS complexes).
 
-    Sparse data can consist of only time (e.g. detected QRS complexes), time-value pairs (e.g. tidal impedance variation
-    of breaths at the end of each breath), values without time (e.g. objects) or a single value (e.g. the PEEP level of
-    the current PEEP step).
+    Sparse data can consist of only time (e.g. detected QRS complexes) or time-value pairs (e.g. tidal impedance
+    variation at the end of each breath).
 
-    Either the value or values can be provided, but not both.
+    Values will generally be numeric values in arrays, but can also be lists of different types of object.
 
     Args:
         label: Computer readable name.
@@ -30,7 +28,6 @@ class SparseData(SelectByTime):
         parameters: Parameters used to derive the data.
         derived_from: Traceback of intermediates from which the current data was derived.
         values: List or array of values. These van be numeric data, text or Python objects.
-        value: single value. This van be numeric, text or a Python object.
     """
 
     label: str
