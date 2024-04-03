@@ -67,7 +67,7 @@ class Equivalence:
         Returns:
             bool describing result of equivalence comparison.
         """
-        if self == other:
+        if self is other:
             return True
 
         try:
