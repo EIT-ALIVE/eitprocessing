@@ -116,6 +116,8 @@ class IntervalData:
         if not partial_inclusion:
             time_range_value_pairs = filter(keep_fully_overlapping, time_range_value_pairs)
 
+        time_range_value_pairs = list(time_range_value_pairs)
+
         if len(time_range_value_pairs):
             time_ranges, values = zip(*time_range_value_pairs, strict=True)
             time_ranges = list(map(replace_start_end_time, time_ranges))
