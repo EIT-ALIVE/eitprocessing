@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
-    from numpy.typing import NDArray
     from typing_extensions import Self
 
 
@@ -79,10 +78,22 @@ class SelectByIndex(ABC):
         ...
 
 
-class SelectByTime(SelectByIndex):
+class HasTimeIndexer:
+    """Gives access to a TimeIndexer object that can be used to slice by time."""
+
+    @property
+    def t(self) -> TimeIndexer:
+        """Time indexer.
+
+        See TimeIndexer.
+        """  # TODO: add a short explanation of what this is used for.
+        return TimeIndexer(self)
+
+
+class SelectByTime(SelectByIndex, HasTimeIndexer):
     """Adds methods for slicing by time rather than index."""
 
-    time: NDArray
+    time: np.ndarray
 
     def select_by_time(  # noqa: D417
         self,
@@ -146,14 +157,6 @@ class SelectByTime(SelectByIndex):
             end=end_index,
             label=label,
         )
-
-    @property
-    def t(self) -> TimeIndexer:
-        """Time indexer.
-
-        See TimeIndexer.
-        """  # TODO: add a short explanation of what this is used for.
-        return TimeIndexer(self)
 
 
 @dataclass
