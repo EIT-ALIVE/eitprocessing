@@ -35,7 +35,7 @@ class ContinuousData(Equivalence, SelectByTime):
     category: str
     description: str = ""
     parameters: dict[str, Any] = field(default_factory=dict, repr=False)
-    derived_from: Any | list[Any] = field(default_factory=list)
+    derived_from: Any | list[Any] = field(default_factory=list, repr=False)
     time: np.ndarray = field(kw_only=True, repr=False)
     values: np.ndarray = field(kw_only=True, repr=False)
 
