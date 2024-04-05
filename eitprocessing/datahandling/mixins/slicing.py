@@ -162,9 +162,9 @@ class TimeIndexer:
 
     Example:
     ```
-    >>> data = EITData.from_path(<path>, ...)
-    >>> time_slice1 = data.t[tp_start:tp_end]
-    >>> time_slice2 = data.select_by_time(tp_start, tp_end)
+    >>> sequence = load_eit_data(<path>, ...)
+    >>> time_slice1 = sequence.t[tp_start:tp_end]
+    >>> time_slice2 = sequence.select_by_time(tp_start, tp_end)
     >>> time_slice1 == time_slice2
     True
     ```
