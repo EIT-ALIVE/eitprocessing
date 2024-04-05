@@ -7,7 +7,7 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.mixins.equality import Equivalence
-from eitprocessing.datahandling.mixins.slicing import SelectByIndex, TimeIndexer
+from eitprocessing.datahandling.mixins.slicing import SelectByTime, TimeIndexer
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(eq=False)
-class Sequence(Equivalence, SelectByIndex):
+class Sequence(Equivalence, SelectByTime):
     """Sequence of timepoints containing respiratory data.
 
     A Sequence object is a representation of data points over time. These data can consist of any combination of EIT
