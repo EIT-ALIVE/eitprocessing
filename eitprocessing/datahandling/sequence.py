@@ -41,9 +41,9 @@ class Sequence(Equivalence, SelectByIndex):
     label: str | None = None
     name: str | None = None
     description: str = ""
-    eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData))
-    continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData))
-    sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData))
+    eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData), repr=False)
+    continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData), repr=False)
+    sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData), repr=False)
 
     def __post_init__(self):
         if not self.label:
