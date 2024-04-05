@@ -83,10 +83,17 @@ class HasTimeIndexer:
 
     @property
     def t(self) -> TimeIndexer:
-        """Time indexer.
+        """Slicing an object using the time axis instead of indices.
 
-        See TimeIndexer.
-        """  # TODO: add a short explanation of what this is used for.
+        Example:
+        ```
+        >>> sequence = load_eit_data(<path>, ...)
+        >>> time_slice1 = sequence.t[tp_start:tp_end]
+        >>> time_slice2 = sequence.select_by_time(tp_start, tp_end)
+        >>> time_slice1 == time_slice2
+        True
+        ```
+        """
         return TimeIndexer(self)
 
 
