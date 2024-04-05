@@ -13,6 +13,7 @@ Classes
 .. autoapisummary::
 
    eitprocessing.datahandling.mixins.slicing.SelectByIndex
+   eitprocessing.datahandling.mixins.slicing.HasTimeIndexer
    eitprocessing.datahandling.mixins.slicing.SelectByTime
    eitprocessing.datahandling.mixins.slicing.TimeIndexer
 
@@ -58,12 +59,10 @@ Classes
 
 
 
-.. py:class:: SelectByTime
+.. py:class:: HasTimeIndexer
 
 
-   Bases: :py:obj:`SelectByIndex`
-
-   Adds methods for slicing by time rather than index.
+   Gives access to a TimeIndexer object that can be used to slice by time.
 
    .. py:property:: t
       :type: TimeIndexer
@@ -72,8 +71,16 @@ Classes
 
       See TimeIndexer.
 
+
+.. py:class:: SelectByTime
+
+
+   Bases: :py:obj:`SelectByIndex`, :py:obj:`HasTimeIndexer`
+
+   Adds methods for slicing by time rather than index.
+
    .. py:attribute:: time
-      :type: numpy.typing.NDArray
+      :type: numpy.ndarray
 
       
 

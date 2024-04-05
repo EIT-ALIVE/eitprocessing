@@ -57,10 +57,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex" title="eitprocessing.datahandling.mixins.slicing.SelectByIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByIndex</span></code></a></p></td>
 <td><p>Adds slicing functionality to subclass by implementing <cite>__getitem__</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByTime</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></a></p></td>
+<td><p>Gives access to a TimeIndexer object that can be used to slice by time.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByTime</span></code></a></p></td>
 <td><p>Adds methods for slicing by time rather than index.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeIndexer</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeIndexer</span></code></a></p></td>
 <td><p>Helper class for slicing an object using the time axis instead of indices.</p></td>
 </tr>
 </tbody>
@@ -104,20 +107,26 @@ indices.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByTime">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.mixins.slicing.</span></span><span class="sig-name descname"><span class="pre">SelectByTime</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex" title="eitprocessing.datahandling.mixins.slicing.SelectByIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByIndex</span></code></a></p>
-<p>Adds methods for slicing by time rather than index.</p>
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.mixins.slicing.</span></span><span class="sig-name descname"><span class="pre">HasTimeIndexer</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#HasTimeIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="Link to this definition">¶</a></dt>
+<dd><p>Gives access to a TimeIndexer object that can be used to slice by time.</p>
 <dl class="py property">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByTime.t">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer"><span class="pre">TimeIndexer</span></a></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime.t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime.t" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.t">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer"><span class="pre">TimeIndexer</span></a></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#HasTimeIndexer.t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.t" title="Link to this definition">¶</a></dt>
 <dd><p>Time indexer.</p>
 <p>See TimeIndexer.</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByTime">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.mixins.slicing.</span></span><span class="sig-name descname"><span class="pre">SelectByTime</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex" title="eitprocessing.datahandling.mixins.slicing.SelectByIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByIndex</span></code></a>, <a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></a></p>
+<p>Adds methods for slicing by time rather than index.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByTime.time">
-<span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.typing.NDArray</span></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime.time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime.time" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime.time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime.time" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -202,8 +211,11 @@ on the original object label and the frames by which it is sliced.</p></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex._sliced_copy"><code class="docutils literal notranslate"><span class="pre">SelectByIndex._sliced_copy()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.t"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer.t</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="docutils literal notranslate"><span class="pre">SelectByTime</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime.t"><code class="docutils literal notranslate"><span class="pre">SelectByTime.t</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime.time"><code class="docutils literal notranslate"><span class="pre">SelectByTime.time</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime.select_by_time"><code class="docutils literal notranslate"><span class="pre">SelectByTime.select_by_time()</span></code></a></li>
 </ul>

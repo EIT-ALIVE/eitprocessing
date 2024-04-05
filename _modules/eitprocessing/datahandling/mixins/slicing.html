@@ -46,7 +46,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
     <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
 
@@ -131,14 +130,32 @@
 
 
 
+<div class="viewcode-block" id="HasTimeIndexer">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer">[docs]</a>
+<span class="k">class</span> <span class="nc">HasTimeIndexer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gives access to a TimeIndexer object that can be used to slice by time.&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="HasTimeIndexer.t">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.t">[docs]</a>
+    <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TimeIndexer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Time indexer.</span>
+
+<span class="sd">        See TimeIndexer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># TODO: add a short explanation of what this is used for.</span>
+        <span class="k">return</span> <span class="n">TimeIndexer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+</div>
+
+
+
 <div class="viewcode-block" id="SelectByTime">
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime">[docs]</a>
-<span class="k">class</span> <span class="nc">SelectByTime</span><span class="p">(</span><span class="n">SelectByIndex</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SelectByTime</span><span class="p">(</span><span class="n">SelectByIndex</span><span class="p">,</span> <span class="n">HasTimeIndexer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds methods for slicing by time rather than index.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SelectByTime.time">
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime.time">[docs]</a>
-    <span class="n">time</span><span class="p">:</span> <span class="n">NDArray</span></div>
+    <span class="n">time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span></div>
 
 
 <div class="viewcode-block" id="SelectByTime.select_by_time">
@@ -205,17 +222,6 @@
             <span class="n">end</span><span class="o">=</span><span class="n">end_index</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
         <span class="p">)</span></div>
-
-
-    <span class="nd">@property</span>
-<div class="viewcode-block" id="SelectByTime.t">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime.t">[docs]</a>
-    <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TimeIndexer</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Time indexer.</span>
-
-<span class="sd">        See TimeIndexer.</span>
-<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># TODO: add a short explanation of what this is used for.</span>
-        <span class="k">return</span> <span class="n">TimeIndexer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 </div>
 
 
