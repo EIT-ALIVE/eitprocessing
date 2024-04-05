@@ -100,8 +100,6 @@ class HasTimeIndexer:
 class SelectByTime(SelectByIndex, HasTimeIndexer):
     """Adds methods for slicing by time rather than index."""
 
-    time: np.ndarray
-
     def select_by_time(  # noqa: D417
         self,
         start_time: float | None = None,
