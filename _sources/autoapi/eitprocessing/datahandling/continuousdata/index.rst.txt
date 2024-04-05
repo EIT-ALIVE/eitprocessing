@@ -186,4 +186,9 @@ Classes
       indices.
 
 
+   .. py:method:: concatenate(other: typing_extensions.Self) -> typing_extensions.Self
+
+      Concatenate two sets of continuous data.
+
+
 

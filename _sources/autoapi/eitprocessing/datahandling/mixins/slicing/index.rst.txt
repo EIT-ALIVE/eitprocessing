@@ -13,7 +13,6 @@ Classes
 .. autoapisummary::
 
    eitprocessing.datahandling.mixins.slicing.SelectByIndex
-   eitprocessing.datahandling.mixins.slicing.HasTimeIndexer
    eitprocessing.datahandling.mixins.slicing.SelectByTime
    eitprocessing.datahandling.mixins.slicing.TimeIndexer
 
@@ -59,32 +58,22 @@ Classes
 
 
 
-.. py:class:: HasTimeIndexer
+.. py:class:: SelectByTime
 
 
-   Gives access to a TimeIndexer object that can be used to slice by time.
+   Bases: :py:obj:`SelectByIndex`
+
+   Adds methods for slicing by time rather than index.
 
    .. py:property:: t
       :type: TimeIndexer
 
-      Slicing an object using the time axis instead of indices.
+      Time Indexer property.
 
-      Example:
-      ```
-      >>> sequence = load_eit_data(<path>, ...)
-      >>> time_slice1 = sequence.t[tp_start:tp_end]
-      >>> time_slice2 = sequence.select_by_time(tp_start, tp_end)
-      >>> time_slice1 == time_slice2
-      True
-      ```
+   .. py:attribute:: time
+      :type: numpy.typing.NDArray
 
-
-.. py:class:: SelectByTime
-
-
-   Bases: :py:obj:`SelectByIndex`, :py:obj:`HasTimeIndexer`
-
-   Adds methods for slicing by time rather than index.
+      
 
    .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
 
@@ -117,10 +106,12 @@ Classes
 
    Example:
    ```
-   >>> sequence = load_eit_data(<path>, ...)
-   >>> time_slice1 = sequence.t[tp_start:tp_end]
-   >>> time_slice2 = sequence.select_by_time(tp_start, tp_end)
-   >>> time_slice1 == time_slice2
+   >>> data = EITData.from_path(<path>, ...)
+   >>> tp_start = data.time[1]
+   >>> tp_end = data.time[4]
+   >>> time_slice = data.t[tp_start:tp_end]
+   >>> index_slice = data[1:4]
+   >>> time_slice == index_slice
    True
    ```
 
