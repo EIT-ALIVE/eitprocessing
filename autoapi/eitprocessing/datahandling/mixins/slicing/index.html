@@ -160,9 +160,9 @@ on the original object label and the frames by which it is sliced.</p></li>
 <dd><p>Helper class for slicing an object using the time axis instead of indices.</p>
 <p>Example:
 <code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">data</span> <span class="pre">=</span> <span class="pre">EITData.from_path(&lt;path&gt;,</span> <span class="pre">...)</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">=</span> <span class="pre">data.t[tp_start:tp_end]</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice2</span> <span class="pre">=</span> <span class="pre">data.select_by_time(tp_start,</span> <span class="pre">tp_end)</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">sequence</span> <span class="pre">=</span> <span class="pre">load_eit_data(&lt;path&gt;,</span> <span class="pre">...)</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">=</span> <span class="pre">sequence.t[tp_start:tp_end]</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice2</span> <span class="pre">=</span> <span class="pre">sequence.select_by_time(tp_start,</span> <span class="pre">tp_end)</span>
 <span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">==</span> <span class="pre">time_slice2</span>
 <span class="pre">True</span>
 <span class="pre">`</span></code></p>

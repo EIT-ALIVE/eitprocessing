@@ -228,9 +228,9 @@
 
 <span class="sd">    Example:</span>
 <span class="sd">    ```</span>
-<span class="sd">    &gt;&gt;&gt; data = EITData.from_path(&lt;path&gt;, ...)</span>
-<span class="sd">    &gt;&gt;&gt; time_slice1 = data.t[tp_start:tp_end]</span>
-<span class="sd">    &gt;&gt;&gt; time_slice2 = data.select_by_time(tp_start, tp_end)</span>
+<span class="sd">    &gt;&gt;&gt; sequence = load_eit_data(&lt;path&gt;, ...)</span>
+<span class="sd">    &gt;&gt;&gt; time_slice1 = sequence.t[tp_start:tp_end]</span>
+<span class="sd">    &gt;&gt;&gt; time_slice2 = sequence.select_by_time(tp_start, tp_end)</span>
 <span class="sd">    &gt;&gt;&gt; time_slice1 == time_slice2</span>
 <span class="sd">    True</span>
 <span class="sd">    ```</span>
