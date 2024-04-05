@@ -13,8 +13,6 @@ from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 if TYPE_CHECKING:
-    from numpy.typing import NDArray
-
     from eitprocessing.datahandling.eitdata import Vendor
 
 T = TypeVar("T", bound="EITData")
