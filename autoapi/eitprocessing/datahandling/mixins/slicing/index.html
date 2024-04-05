@@ -113,8 +113,15 @@ indices.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.t">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer"><span class="pre">TimeIndexer</span></a></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#HasTimeIndexer.t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.t" title="Link to this definition">¶</a></dt>
-<dd><p>Time indexer.</p>
-<p>See TimeIndexer.</p>
+<dd><p>Slicing an object using the time axis instead of indices.</p>
+<p>Example:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">sequence</span> <span class="pre">=</span> <span class="pre">load_eit_data(&lt;path&gt;,</span> <span class="pre">...)</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">=</span> <span class="pre">sequence.t[tp_start:tp_end]</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice2</span> <span class="pre">=</span> <span class="pre">sequence.select_by_time(tp_start,</span> <span class="pre">tp_end)</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">==</span> <span class="pre">time_slice2</span>
+<span class="pre">True</span>
+<span class="pre">`</span></code></p>
 </dd></dl>
 
 </dd></dl>
