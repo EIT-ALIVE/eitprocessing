@@ -9,15 +9,18 @@ from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 @dataclass
 class SparseData(SelectByTime):
-    """Container for sparse data.
+    """Container for data occuring at unpredictable time points.
 
-    Sparse data does not have a set time between data points. Examples are data points at end of inspiration/end of
-    expiration (e.g. tidal volume, end-expiratoy lung impedance) or detected time points (e.g. QRS complexes).
+    In sparse data the time points are not necessarily evenly spaced. Data can consist time-value pairs or only time
+    points. Values generally are numeric values in arrays, but can also be lists of different types of object.
 
-    Sparse data can consist of only time (e.g. detected QRS complexes) or time-value pairs (e.g. tidal impedance
-    variation at the end of each breath).
+    Sparse data differs from IntervalData in that each data points is associated with a single time point rather than a
+    time range.
 
-    Values will generally be numeric values in arrays, but can also be lists of different types of object.
+    Examples are data points at end of inspiration/end of expiration (e.g. tidal volume, end-expiratoy lung impedance)
+    or detected time points (e.g. QRS complexes).
+
+
 
     Args:
         label: Computer readable name.
