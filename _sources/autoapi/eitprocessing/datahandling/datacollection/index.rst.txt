@@ -32,7 +32,7 @@ Attributes
 .. py:class:: DataCollection(data_type: type[V], *args, **kwargs)
 
 
-   Bases: :py:obj:`dict`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
+   Bases: :py:obj:`collections.UserDict`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
 
    A collection of a single type of data with unique labels.
 
@@ -54,8 +54,6 @@ Attributes
       
 
    .. py:method:: __setitem__(__key: str, __value: V) -> None
-
-      Set self[key] to value.
 
 
    .. py:method:: add(*item: V, overwrite: bool = False) -> None
