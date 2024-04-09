@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import UserDict
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 from eitprocessing.datahandling.continuousdata import ContinuousData
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 V = TypeVar("V", EITData, ContinuousData, SparseData)
 
 
-class DataCollection(dict, Equivalence, Generic[V]):
+class DataCollection(UserDict, Equivalence, Generic[V]):
     """A collection of a single type of data with unique labels.
 
     This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
