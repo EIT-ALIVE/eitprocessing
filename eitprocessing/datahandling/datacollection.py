@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import UserDict
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 from eitprocessing.datahandling.continuousdata import ContinuousData
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
 V = TypeVar("V", EITData, ContinuousData, SparseData)
 
 
-class DataCollection(dict, Equivalence, HasTimeIndexer, Generic[V]):
+class DataCollection(UserDict, Equivalence, HasTimeIndexer, Generic[V]):
     """A collection of a single type of data with unique labels.
 
     This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
@@ -123,5 +124,10 @@ class DataCollection(dict, Equivalence, HasTimeIndexer, Generic[V]):
         """Return a DataCollection containing sliced copies of the items."""
         return DataCollection(
             self.data_type,
-            **{k: v.select_by_time(start_time, end_time, start_inclusive, end_inclusive) for k, v in self.items()},
+            **{
+                k: v.select_by_time(
+                    start_time, end_time, start_inclusive, end_inclusive
+                )
+                for k, v in self.items()
+            },
         )
