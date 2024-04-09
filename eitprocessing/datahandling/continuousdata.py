@@ -43,6 +43,7 @@ class ContinuousData(Equivalence, SelectByTime):
         if self.loaded:
             self.lock()
         self.lock("time")
+        self._check_equivalence = ["unit", "category", "parameters"]
 
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
         try:
@@ -203,4 +204,18 @@ class ContinuousData(Equivalence, SelectByTime):
             derived_from=[*self.derived_from, self],
             time=time,
             values=values,
+        )
+
+    def concatenate(self, other: Self) -> Self:
+        """Concatenate two sets of continuous data."""
+        return self.__class__(
+            label=self.label,
+            name=self.name,
+            unit=self.unit,
+            category=self.category,
+            description="",
+            parameters=self.parameters,
+            derived_from=[*self.derived_from, *other.derived_from, self, other],
+            time=np.concatenate((self.time, other.time)),
+            values=np.concatenate((self.values, other.values)),
         )

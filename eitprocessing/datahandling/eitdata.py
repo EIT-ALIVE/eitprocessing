@@ -87,12 +87,11 @@ class EITData(SelectByTime, Equivalence):
         framerate = self.framerate
         nframes = self.nframes + other.nframes
 
-        cls_ = cls._get_vendor_class(self.vendor)
-
         phases = self.phases + other.phases
         events = self.events + other.events
 
-        return cls_(
+        return self.__class__(
+            vendor=self.vendor,
             path=path,
             label=label,
             framerate=framerate,
