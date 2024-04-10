@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 V = TypeVar("V", EITData, ContinuousData, SparseData)
 
 
-class DataCollection(UserDict, Equivalence, HasTimeIndexer, Generic[V]):
+class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
     """A collection of a single type of data with unique labels.
 
     This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
