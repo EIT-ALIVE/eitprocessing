@@ -14,9 +14,10 @@ class Equivalence:
     """Mixin class that adds an equality and equivalence check."""
 
     # inspired by: https://stackoverflow.com/a/51743960/5170442
-    def __eq__(self, other: Self):
+    def __eq__(self, other: Self) -> bool:
         if self is other:
             return True
+
         if is_dataclass(self):
             if self.__class__ is not other.__class__:
                 return NotImplemented
@@ -25,6 +26,10 @@ class Equivalence:
             if len(t1) != len(t2):
                 return False
             return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2, strict=True))
+
+        if isinstance(self, UserDict) and isinstance(other, UserDict):
+            return all(Equivalence.__eq__(self[key], other[key]) for key in self)
+
         return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
@@ -38,9 +43,6 @@ class Equivalence:
 
         if isinstance(a, dict) and isinstance(b, dict):
             return dict.__eq__(a, b)
-
-        if isinstance(a, UserDict) and isinstance(b, UserDict):
-            return dict.__eq__(a.data, b.data)
 
         try:
             # `a == b` could trigger an infinite loop when called on an instance of Equivalence
