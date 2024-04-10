@@ -77,10 +77,14 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         # TODO: rewrite
 
         eit_data = a.eit_data.concatenate(b.eit_data) if a.eit_data and b.eit_data else None
+        continuous_data = (
+            a.continuous_data.concatenate(b.continuous_data) if a.continuous_data and b.continuous_data else None
+        )
+        sparse_data = a.sparse_data.concatenate(b.sparse_data) if a.sparse_data and b.sparse_data else None
 
         # TODO: add concatenation of other attached objects
 
-        return a.__class__(eit_data=eit_data)
+        return a.__class__(eit_data=eit_data, continuous_data=continuous_data, sparse_data=sparse_data)
 
     def _sliced_copy(self, start_index: int, end_index: int, label: str) -> Self:
         eit_data = DataCollection(EITData)
