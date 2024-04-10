@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import UserDict
 from dataclasses import is_dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -37,6 +38,9 @@ class Equivalence:
 
         if isinstance(a, dict) and isinstance(b, dict):
             return dict.__eq__(a, b)
+
+        if isinstance(a, UserDict) and isinstance(b, UserDict):
+            return dict.__eq__(a.data, b.data)
 
         try:
             # `a == b` could trigger an infinite loop when called on an instance of Equivalence
@@ -77,7 +81,7 @@ class Equivalence:
                 raise EquivalenceError(msg)  # noqa: TRY301
 
             # check keys in collection
-            if isinstance(self, dict):
+            if isinstance(self, dict | UserDict):
                 if set(self.keys()) != set(other.keys()):
                     msg = f"Keys don't match:\n\t{self.keys()},\n\t{other.keys()}"
                     raise EquivalenceError(msg)  # noqa: TRY301
