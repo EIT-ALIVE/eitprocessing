@@ -22,7 +22,7 @@ Classes
 
    Mixin class that adds an equality and equivalence check.
 
-   .. py:method:: __eq__(other: typing_extensions.Self)
+   .. py:method:: __eq__(other: typing_extensions.Self) -> bool
 
       Return self==value.
 

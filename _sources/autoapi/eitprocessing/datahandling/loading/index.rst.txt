@@ -45,7 +45,7 @@ Functions
 .. py:class:: DataCollection(data_type: type[V], *args, **kwargs)
 
 
-   Bases: :py:obj:`collections.UserDict`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`collections.UserDict`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
 
    A collection of a single type of data with unique labels.
 
