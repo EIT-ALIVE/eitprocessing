@@ -83,6 +83,7 @@ class Equivalence:
                 raise EquivalenceError(msg)  # noqa: TRY301
 
             # check keys in collection
+            # TODO: check whether this is still necessary for dicts #185
             if isinstance(self, dict | UserDict):
                 if set(self.keys()) != set(other.keys()):
                     msg = f"Keys don't match:\n\t{self.keys()},\n\t{other.keys()}"
