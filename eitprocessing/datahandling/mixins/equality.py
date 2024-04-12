@@ -22,32 +22,31 @@ class Equivalence:
             return False
 
         if is_dataclass(self):
-            t1 = vars(self).values()
-            t2 = vars(other).values()
-            if len(t1) != len(t2):
+            attrs_self = vars(self).values()
+            attrs_other = vars(other).values()
+            if len(attrs_self) != len(attrs_other):
                 return False
-            return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2, strict=True))
-
-        if isinstance(self, UserDict):
-            try:
-                keys_from_both = set(self.keys()) | set(other.keys())
-                return all(Equivalence.__eq__(self[key], other[key]) for key in keys_from_both)
-            except KeyError:
-                return False
+            return all(Equivalence._array_safe_eq(s, o) for s, o in zip(attrs_self, attrs_other, strict=True))
 
         return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
-    def _array_safe_eq(a: Any, b: Any) -> bool:  # noqa: ANN401
+    def _array_safe_eq(a: Any, b: Any) -> bool:  # noqa: ANN401, PLR0911
         """Check if a and b are equal, even if they are numpy arrays containing nans."""
-        if isinstance(a, np.ndarray) and isinstance(b, np.ndarray):
-            return a.shape == b.shape and np.array_equal(a, b, equal_nan=True)
+        if type(a) != type(b):
+            return False
 
-        if not isinstance(a, Equivalence) and not isinstance(b, Equivalence):
+        if isinstance(a, np.ndarray):
+            return np.shape(a) == np.shape(b) and np.array_equal(a, b, equal_nan=True)
+
+        if not isinstance(a, Equivalence):
             return a == b
 
-        if isinstance(a, dict) and isinstance(b, dict):
+        if isinstance(a, dict):  # TODO: check whether this is still necessary for dicts #185
             return dict.__eq__(a, b)
+
+        if isinstance(a, UserDict):
+            return UserDict.__eq__(a, b)
 
         try:
             # `a == b` could trigger an infinite loop when called on an instance of Equivalence
@@ -55,7 +54,7 @@ class Equivalence:
             return object.__eq__(a, b)
 
         except TypeError:
-            return NotImplemented
+            return False
 
     def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901
         """Test whether the data structure between two objects are equivalent.
