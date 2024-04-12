@@ -134,7 +134,10 @@ ignore = [
 
 # Set autofixing.
 fixable = ["ALL"]
-unfixable = ["F401"] # unused imports (should not disappear while editing)
+unfixable = [
+    "F401", # unused imports (should not disappear while editing)
+    "B905", # autofill strictness of zip (think about preferred behavior)
+]
 extend-safe-fixes = [
     "D415",   # First line should end with a period, question mark, or exclamation point
     "D300",   # Use triple double quotes `"""`
