@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
 V = TypeVar("V", EITData, ContinuousData, SparseData)
 
 
-class DataCollection(UserDict, Equivalence, Generic[V]):
+class DataCollection(UserDict, Equivalence, HasTimeIndexer, Generic[V]):
     """A collection of a single type of data with unique labels.
 
     This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
@@ -112,3 +113,16 @@ class DataCollection(UserDict, Equivalence, Generic[V]):
             concatenated[key] = self[key].concatenate(other[key])
 
         return concatenated
+
+    def select_by_time(
+        self,
+        start_time: float | None,
+        end_time: float | None,
+        start_inclusive: bool = True,
+        end_inclusive: bool = False,
+    ) -> Self:
+        """Return a DataCollection containing sliced copies of the items."""
+        return DataCollection(
+            self.data_type,
+            **{k: v.select_by_time(start_time, end_time, start_inclusive, end_inclusive) for k, v in self.items()},
+        )

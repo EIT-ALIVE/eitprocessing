@@ -34,10 +34,10 @@ class ContinuousData(Equivalence, SelectByTime):
     unit: str
     category: str
     description: str = ""
-    parameters: dict[str, Any] = field(default_factory=dict)
-    derived_from: Any | list[Any] = field(default_factory=list)
-    time: np.ndarray = field(kw_only=True)
-    values: np.ndarray = field(kw_only=True)
+    parameters: dict[str, Any] = field(default_factory=dict, repr=False)
+    derived_from: Any | list[Any] = field(default_factory=list, repr=False)
+    time: np.ndarray = field(kw_only=True, repr=False)
+    values: np.ndarray = field(kw_only=True, repr=False)
 
     def __post_init__(self) -> None:
         if self.loaded:

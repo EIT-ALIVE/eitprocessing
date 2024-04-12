@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
-    from numpy.typing import NDArray
     from typing_extensions import Self
 
 
@@ -79,10 +78,27 @@ class SelectByIndex(ABC):
         ...
 
 
-class SelectByTime(SelectByIndex):
-    """Adds methods for slicing by time rather than index."""
+class HasTimeIndexer:
+    """Gives access to a TimeIndexer object that can be used to slice by time."""
 
-    time: NDArray
+    @property
+    def t(self) -> TimeIndexer:
+        """Slicing an object using the time axis instead of indices.
+
+        Example:
+        ```
+        >>> sequence = load_eit_data(<path>, ...)
+        >>> time_slice1 = sequence.t[tp_start:tp_end]
+        >>> time_slice2 = sequence.select_by_time(tp_start, tp_end)
+        >>> time_slice1 == time_slice2
+        True
+        ```
+        """
+        return TimeIndexer(self)
+
+
+class SelectByTime(SelectByIndex, HasTimeIndexer):
+    """Adds methods for slicing by time rather than index."""
 
     def select_by_time(  # noqa: D417
         self,
@@ -147,11 +163,6 @@ class SelectByTime(SelectByIndex):
             label=label,
         )
 
-    @property
-    def t(self) -> TimeIndexer:
-        """Time Indexer property."""  # TODO: add a short explanation of what this is used for.
-        return TimeIndexer(self)
-
 
 @dataclass
 class TimeIndexer:
@@ -159,12 +170,10 @@ class TimeIndexer:
 
     Example:
     ```
-    >>> data = EITData.from_path(<path>, ...)
-    >>> tp_start = data.time[1]
-    >>> tp_end = data.time[4]
-    >>> time_slice = data.t[tp_start:tp_end]
-    >>> index_slice = data[1:4]
-    >>> time_slice == index_slice
+    >>> sequence = load_eit_data(<path>, ...)
+    >>> time_slice1 = sequence.t[tp_start:tp_end]
+    >>> time_slice2 = sequence.select_by_time(tp_start, tp_end)
+    >>> time_slice1 == time_slice2
     True
     ```
     """
@@ -176,10 +185,10 @@ class TimeIndexer:
             if key.step:
                 msg = "Can't slice by time using specific step sizes."
                 raise ValueError(msg)
-            return self.obj.select_by_time(key.start, key.stop)
+            return self.obj.select_by_time(start_time=key.start, end_time=key.stop)
 
         if isinstance(key, int | float):
-            return self.obj.select_by_time(start=key, end=key, end_inclusive=True)
+            return self.obj.select_by_time(start_time=key, end_time=key, end_inclusive=True)
 
         msg = f"Invalid slicing input. Should be `slice` or `int` or `float`, not {type(key)}."
         raise TypeError(msg)
