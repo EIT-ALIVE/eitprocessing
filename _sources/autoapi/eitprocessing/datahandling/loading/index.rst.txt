@@ -272,7 +272,7 @@ Functions
 .. py:class:: Sequence
 
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
 
    Sequence of timepoints containing respiratory data.
 
@@ -297,12 +297,6 @@ Functions
       :type: numpy.ndarray
 
       Time axis from either EITData or ContinuousData.
-
-   .. py:property:: t
-
-      Time indexer.
-
-      See slicing.TimeIndexer.
 
    .. py:attribute:: label
       :type: str | None

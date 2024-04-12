@@ -61,7 +61,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.sequence.Sequence">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.sequence.</span></span><span class="sig-name descname"><span class="pre">Sequence</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sequence.html#Sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.sequence.Sequence" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.HasTimeIndexer</span></code></a></p>
 <p>Sequence of timepoints containing respiratory data.</p>
 <p>A Sequence object is a representation of data points over time. These data can consist of any combination of EIT
 frames (<cite>EITData</cite>), waveform data (<cite>ContinuousData</cite>) from different sources, or individual events (<cite>SparseData</cite>)
@@ -87,13 +87,6 @@ merged together to form a single Sequence.</p>
 <dt class="sig sig-object py" id="eitprocessing.datahandling.sequence.Sequence.time">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sequence.html#Sequence.time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.sequence.Sequence.time" title="Link to this definition">¶</a></dt>
 <dd><p>Time axis from either EITData or ContinuousData.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.sequence.Sequence.t">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sequence.html#Sequence.t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.sequence.Sequence.t" title="Link to this definition">¶</a></dt>
-<dd><p>Time indexer.</p>
-<p>See slicing.TimeIndexer.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -183,7 +176,6 @@ indices.</p>
 <li><a class="reference internal" href="#classes">Classes</a><ul>
 <li><a class="reference internal" href="#eitprocessing.datahandling.sequence.Sequence"><code class="docutils literal notranslate"><span class="pre">Sequence</span></code></a><ul>
 <li><a class="reference internal" href="#eitprocessing.datahandling.sequence.Sequence.time"><code class="docutils literal notranslate"><span class="pre">Sequence.time</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.sequence.Sequence.t"><code class="docutils literal notranslate"><span class="pre">Sequence.t</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.sequence.Sequence.label"><code class="docutils literal notranslate"><span class="pre">Sequence.label</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.sequence.Sequence.name"><code class="docutils literal notranslate"><span class="pre">Sequence.name</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.sequence.Sequence.description"><code class="docutils literal notranslate"><span class="pre">Sequence.description</span></code></a></li>
