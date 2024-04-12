@@ -3,7 +3,9 @@ import os
 import numpy as np
 import pytest
 
-from eitprocessing.eit_data.draeger import DraegerEITData
+from eitprocessing.datahandling.sequence import Sequence
+from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.loading import load_eit_data
 # TODO: remove line below to activate linting
 # ruff: noqa
 
@@ -20,12 +22,12 @@ dummy_file = os.path.join(data_directory, "not_a_file.dummy")
 
 @pytest.fixture(scope="module")
 def draeger_data1():
-    return DraegerEITData.from_path(draeger_file1)
+    return load_eit_data(draeger_file1, vendor="draeger")
 
 
 def test_slicing(draeger_data1):
     cutoff = 10
-    data: DraegerEITData = draeger_data1
+    data: EITData = draeger_data1
 
     assert data[cutoff] == data[cutoff]
     assert data[0:cutoff] == data[:cutoff]

@@ -4,10 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from eitprocessing.eit_data import EITData, Vendor
-from eitprocessing.eit_data.draeger import DraegerEITData
-from eitprocessing.eit_data.timpel import TimpelEITData
-from eitprocessing.sequence import Sequence
+from eitprocessing.datahandling.eitdata import EITData, Vendor
+from eitprocessing.datahandling.loading import load_eit_data
+from eitprocessing.datahandling.sequence import Sequence
 
 environment = os.environ.get(
     "EIT_PROCESSING_TEST_DATA",
@@ -22,27 +21,27 @@ dummy_file = Path(data_directory) / "not_a_file.dummy"
 
 @pytest.fixture(scope="module")
 def draeger_data1():
-    return Sequence(EITData.from_path(draeger_file1, vendor="draeger"))
+    return load_eit_data(draeger_file1, vendor="draeger", label="draeger1")
 
 
 @pytest.fixture(scope="module")
 def draeger_data2():
-    return Sequence(EITData.from_path(draeger_file2, vendor="draeger"))
+    return load_eit_data(draeger_file2, vendor="draeger", label="draeger2")
 
 
 @pytest.fixture(scope="module")
 def draeger_data_both():
-    return Sequence(EITData.from_path([draeger_file2, draeger_file1], vendor="draeger"))
+    return load_eit_data([draeger_file2, draeger_file1], vendor="draeger", label="draeger_both")
 
 
 @pytest.fixture(scope="module")
 def timpel_data():
-    return Sequence(EITData.from_path(timpel_file, vendor="timpel"))
+    return load_eit_data(timpel_file, vendor="timpel", label="timpel")
 
 
-@pytest.fixture()
-def timpel_data_double():
-    return Sequence(EITData.from_path([timpel_file, timpel_file], vendor="timpel"))
+# @pytest.fixture()
+# def timpel_data_double():
+#     return load_eit_data([timpel_file, timpel_file], vendor="timpel", label="timpel_double")
 
 
 def test_from_path_draeger(
@@ -51,7 +50,7 @@ def test_from_path_draeger(
     draeger_data_both: Sequence,
 ):
     assert isinstance(draeger_data1, Sequence)
-    assert isinstance(draeger_data1.eit_data["raw"], DraegerEITData)
+    assert isinstance(draeger_data1.eit_data["raw"], EITData)
     assert draeger_data1.eit_data["raw"].framerate == 20  # noqa: PLR2004
     assert len(draeger_data1.eit_data["raw"]) == len(draeger_data1.eit_data["raw"].time)
     assert len(draeger_data2.eit_data["raw"].time) == 20740  # noqa: PLR2004
@@ -63,9 +62,9 @@ def test_from_path_draeger(
         draeger_data2.eit_data["raw"],
     )
 
-    # draeger_inverted = Sequence(EITData.from_path([draeger_file1, draeger_file2], vendor="draeger"))  #noqa: ERA001
-    # assert len(draeger_data_both) == len(draeger_inverted)  #noqa: ERA001
-    # assert draeger_data_both != draeger_inverted  #noqa: ERA001
+    # draeger_inverted = load_eit_data([draeger_file1, draeger_file2], vendor="draeger", label="inverted")
+    # assert len(draeger_data_both) == len(draeger_inverted)
+    # assert draeger_data_both != draeger_inverted
 
 
 def test_from_path_timpel(
@@ -73,10 +72,10 @@ def test_from_path_timpel(
     timpel_data: Sequence,
     # timpel_data_double: Sequence,  # does not currently work, because it won't load due to the time axes overlapping
 ):
-    using_vendor = Sequence(EITData.from_path(timpel_file, vendor=Vendor.TIMPEL))
+    using_vendor = load_eit_data(timpel_file, vendor=Vendor.TIMPEL, label="timpel")
     assert timpel_data == using_vendor
     assert isinstance(timpel_data, Sequence)
-    assert isinstance(timpel_data.eit_data["raw"], TimpelEITData)
+    assert isinstance(timpel_data.eit_data["raw"], EITData)
     assert timpel_data.eit_data["raw"].vendor != draeger_data1.eit_data["raw"].vendor
 
     # Load multiple
@@ -84,17 +83,17 @@ def test_from_path_timpel(
     # assert len(timpel_data_double) == 2 * len(timpel_data)  #noqa: ERA001
 
 
-def test_illegal_from_path():
+def test_illegal_load_eit_data():
     # non existing
     for vendor in ["draeger", "timpel"]:
         with pytest.raises(FileNotFoundError):
-            _ = Sequence(EITData.from_path(dummy_file, vendor=vendor))
+            _ = load_eit_data(dummy_file, vendor=vendor)
 
     # incorrect vendor
     with pytest.raises(OSError):
-        _ = Sequence(EITData.from_path(draeger_file1, vendor="timpel"))
+        _ = load_eit_data(draeger_file1, vendor="timpel")
     with pytest.raises(OSError):
-        _ = Sequence(EITData.from_path(timpel_file, vendor="draeger"))
+        _ = load_eit_data(timpel_file, vendor="draeger")
 
 
 def test_merge(
@@ -102,7 +101,7 @@ def test_merge(
     draeger_data2: Sequence,
     draeger_data_both: Sequence,
     timpel_data: Sequence,
-    # timpel_data_double: Sequence,
+    timpel_data_double: Sequence,
 ):
     merged_draeger = Sequence.concatenate(draeger_data2, draeger_data1)
     assert len(merged_draeger.eit_data["raw"]) == len(draeger_data2.eit_data["raw"]) + len(
@@ -112,20 +111,20 @@ def test_merge(
     added_draeger = draeger_data2 + draeger_data1
     assert added_draeger == merged_draeger
 
-    draeger_load_double = Sequence(EITData.from_path([draeger_file1, draeger_file1], "draeger"))
+    draeger_load_double = load_eit_data([draeger_file1, draeger_file1], "draeger")
     draeger_merge_double = Sequence.merge(draeger_data1, draeger_data1)
     assert draeger_load_double == draeger_merge_double
     added_draeger_double = draeger_data1 + draeger_data1
     assert added_draeger_double == draeger_merge_double
 
     draeger_merged_twice = Sequence.merge(draeger_merge_double, draeger_merge_double)
-    draeger_load_four_times = Sequence(EITData.from_path([draeger_file1] * 4, "draeger"))
+    draeger_load_four_times = load_eit_data([draeger_file1] * 4, "draeger")
     assert isinstance(draeger_merged_twice.path, list)
     assert len(draeger_merged_twice.path) == 4  # noqa: PLR2004
     assert draeger_merged_twice == draeger_load_four_times
 
     draeger_merge_thrice = Sequence.merge(draeger_merge_double, draeger_data1)
-    draeger_load_thrice = Sequence(EITData.from_path([draeger_file1] * 3, "draeger"))
+    draeger_load_thrice = load_eit_data([draeger_file1] * 3, "draeger")
     assert isinstance(draeger_merge_thrice.path, list)
     assert len(draeger_merge_thrice.path) == 3  # noqa: PLR2004
     assert draeger_merge_thrice == draeger_load_thrice
@@ -235,8 +234,8 @@ def test_load_partial(
     # file for this situation.
 
     # Timpel
-    timpel_first_part = Sequence(EITData.from_path(timpel_file, "timpel", max_frames=cutoff))
-    timpel_second_part = Sequence(EITData.from_path(timpel_file, "timpel", first_frame=cutoff))
+    timpel_first_part = load_eit_data(timpel_file, "timpel", max_frames=cutoff)
+    timpel_second_part = load_eit_data(timpel_file, "timpel", first_frame=cutoff)
 
     assert timpel_first_part == timpel_data[:cutoff]
     assert timpel_second_part == timpel_data[cutoff:]
@@ -244,15 +243,8 @@ def test_load_partial(
     assert Sequence.merge(timpel_second_part, timpel_first_part) != timpel_data
 
     # Draeger
-    draeger_first_part = Sequence(EITData.from_path(draeger_file2, "draeger", max_frames=cutoff))
-    draeger_second_part = Sequence(
-        "",
-        EITData.from_path(
-            draeger_file2,
-            "draeger",
-            first_frame=cutoff,
-        ),
-    )
+    draeger_first_part = load_eit_data(draeger_file2, "draeger", max_frames=cutoff)
+    draeger_second_part = load_eit_data(draeger_file2, "draeger", first_frame=cutoff)
 
     assert draeger_first_part == draeger_data2[:cutoff]
     assert draeger_second_part == draeger_data2[cutoff:]
@@ -263,10 +255,10 @@ def test_load_partial(
 def test_illegal_first():
     for ff in [0.5, -1, "fdw"]:
         with pytest.raises((TypeError, ValueError)):
-            _ = Sequence(EITData.from_path(draeger_file1, "draeger", first_frame=ff))
+            _ = load_eit_data(draeger_file1, "draeger", first_frame=ff)
 
     for ff2 in [0, 0.0, 1.0, None]:
-        _ = Sequence(EITData.from_path(draeger_file1, "draeger", first_frame=ff2))
+        _ = load_eit_data(draeger_file1, "draeger", first_frame=ff2)
 
 
 def test_select_by_time(
@@ -364,13 +356,13 @@ def test_label(
 
     assert draeger_data1.label != draeger_data2.label, "different data has identical label"
 
-    timpel_1 = Sequence(EITData.from_path(timpel_file, vendor="timpel"))
-    timpel_2 = Sequence(EITData.from_path(timpel_file, vendor="timpel"))
+    timpel_1 = load_eit_data(timpel_file, vendor="timpel")
+    timpel_2 = load_eit_data(timpel_file, vendor="timpel")
     assert timpel_1.label != timpel_2.label, "reloaded data has identical label"
 
     test_label = "test_label"
-    timpel_3 = Sequence(EITData.from_path(timpel_file, vendor="timpel", label=test_label))
-    timpel_4 = Sequence(EITData.from_path(timpel_file, vendor="timpel", label=test_label))
+    timpel_3 = load_eit_data(timpel_file, vendor="timpel", label=test_label)
+    timpel_4 = load_eit_data(timpel_file, vendor="timpel", label=test_label)
     assert timpel_3.label == test_label, "label attribute does not match given label"
     assert timpel_3.label == timpel_4.label, "re-used test label not recognized as identical"
 
