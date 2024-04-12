@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from enum import auto
 from pathlib import Path
@@ -133,6 +134,19 @@ class EITData(SelectByTime, Equivalence):
     def _calculate_global_impedance(self) -> np.ndarray:
         """Return the global impedance, i.e. the sum of all pixels at each frame."""
         return np.nansum(self.pixel_impedance, axis=(1, 2))
+
+    @property
+    def global_impedance(self) -> np.ndarray:
+        """Return the global impedance, i.e. the sum of all pixels at each frame."""
+        # TODO: remove this property in the future
+        warnings.warn(
+            (
+                f'Use sequence.continuous_data["global_impedance_({self.label})"]'
+                " or `_calculate_global_impedance()` instead."
+            ),
+            DeprecationWarning,
+        )
+        return self._calculate_global_impedance()
 
 
 class Vendor(LowercaseStrEnum):
