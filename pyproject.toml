@@ -106,6 +106,7 @@ ignore = [
     "S105",   # Possible hardcoded password
     "S311",   # insecure random generators
     "PT011",  # pytest-raises-too-broad
+    "PD011",  # Use of .values. Assumes .values refers to pandas dataframes, not object attributes
     "TD",     # TODOs
     "FIX002", # Resolve TODOs
     "B028",   # No explicit `stacklevel` keyword argument found in warning
