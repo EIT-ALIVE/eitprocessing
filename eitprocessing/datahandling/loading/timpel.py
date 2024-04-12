@@ -95,36 +95,36 @@ def load_from_single_path(
     continuous_data_collection = DataCollection(ContinuousData)
     continuous_data_collection.add(
         ContinuousData(
-            "airway_pressure_(timpel)",
-            "Airway pressure",
-            "cmH2O",
-            "pressure",
-            "Airway pressure measured by Timpel device",
-            loaded=True,
+            label="airway_pressure_(timpel)",
+            name="Airway pressure",
+            unit="cmH2O",
+            category="pressure",
+            description="Airway pressure measured by Timpel device",
+            time=time,
             values=data[:, 1024],
         ),
     )
 
     continuous_data_collection.add(
         ContinuousData(
-            "flow_(timpel)",
-            "Flow",
-            "L/s",
-            "flow",
-            "FLow measures by Timpel device",
-            loaded=True,
+            label="flow_(timpel)",
+            name="Flow",
+            unit="L/s",
+            category="flow",
+            description="Flow measures by Timpel device",
+            time=time,
             values=data[:, 1025],
         ),
     )
 
     continuous_data_collection.add(
         ContinuousData(
-            "volume_(timpel)",
-            "Volume",
-            "L",
-            "volume",
-            "Volume measured by Timpel device",
-            loaded=True,
+            label="volume_(timpel)",
+            name="Volume",
+            unit="L",
+            category="volume",
+            description="Volume measured by Timpel device",
+            time=time,
             values=data[:, 1026],
         ),
     )

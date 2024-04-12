@@ -46,7 +46,7 @@ class EITData(SelectByTime, Equivalence):
     def __post_init__(self):
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
-        self._check_equivalence = ["vendor", "framerate"]
+        self._check_equivalence = ["label", "vendor", "framerate"]
 
     @staticmethod
     def ensure_path_list(path: str | Path | list[str | Path]) -> list[Path]:

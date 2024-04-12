@@ -44,7 +44,7 @@ def timpel_data():
 #     return load_eit_data([timpel_file, timpel_file], vendor="timpel", label="timpel_double")
 
 
-def test_from_path_draeger(
+def test_loading_draeger(
     draeger_data1: Sequence,
     draeger_data2: Sequence,
     draeger_data_both: Sequence,
@@ -55,6 +55,8 @@ def test_from_path_draeger(
     assert len(draeger_data1.eit_data["raw"]) == len(draeger_data1.eit_data["raw"].time)
     assert len(draeger_data2.eit_data["raw"].time) == 20740  # noqa: PLR2004
 
+    assert draeger_data1 == load_eit_data(draeger_file1, vendor="draeger", label="draeger1")
+    assert draeger_data1 != load_eit_data(draeger_file1, vendor="draeger", label="something_else")
     assert draeger_data1 != draeger_data2
 
     # Load multiple
@@ -67,7 +69,7 @@ def test_from_path_draeger(
     # assert draeger_data_both != draeger_inverted
 
 
-def test_from_path_timpel(
+def test_loading_timpel(
     draeger_data1: Sequence,
     timpel_data: Sequence,
     # timpel_data_double: Sequence,  # does not currently work, because it won't load due to the time axes overlapping
@@ -79,11 +81,11 @@ def test_from_path_timpel(
     assert timpel_data.eit_data["raw"].vendor != draeger_data1.eit_data["raw"].vendor
 
     # Load multiple
-    # assert isinstance(timpel_data_double, Sequence)  #noqa: ERA001
-    # assert len(timpel_data_double) == 2 * len(timpel_data)  #noqa: ERA001
+    # assert isinstance(timpel_data_double, Sequence)
+    # assert len(timpel_data_double) == 2 * len(timpel_data)
 
 
-def test_illegal_load_eit_data():
+def test_loading_illegal():
     # non existing
     for vendor in ["draeger", "timpel"]:
         with pytest.raises(FileNotFoundError):
