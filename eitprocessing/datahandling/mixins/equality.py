@@ -28,8 +28,12 @@ class Equivalence:
                 return False
             return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2, strict=True))
 
-        if isinstance(self, UserDict) and isinstance(other, UserDict):
-            return all(Equivalence.__eq__(self[key], other[key]) for key in self)
+        if isinstance(self, UserDict):
+            try:
+                keys_from_both = set(self.keys()) | set(other.keys())
+                return all(Equivalence.__eq__(self[key], other[key]) for key in keys_from_both)
+            except KeyError:
+                return False
 
         return Equivalence._array_safe_eq(self, other)
 
