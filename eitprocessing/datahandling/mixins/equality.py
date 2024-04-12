@@ -18,9 +18,10 @@ class Equivalence:
         if self is other:
             return True
 
+        if type(self) is not type(other):
+            return False
+
         if is_dataclass(self):
-            if self.__class__ is not other.__class__:
-                return NotImplemented
             t1 = vars(self).values()
             t2 = vars(other).values()
             if len(t1) != len(t2):
