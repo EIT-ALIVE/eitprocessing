@@ -45,7 +45,7 @@ Functions
 .. py:class:: DataCollection(data_type: type[V], *args, **kwargs)
 
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`collections.UserDict`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
+   Bases: :py:obj:`collections.UserDict`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
 
    A collection of a single type of data with unique labels.
 
@@ -114,6 +114,11 @@ Functions
       Each item of self of concatenated with the item of other with the same key.
 
 
+   .. py:method:: select_by_time(start_time: float | None, end_time: float | None, start_inclusive: bool = True, end_inclusive: bool = False) -> typing_extensions.Self
+
+      Return a DataCollection containing sliced copies of the items.
+
+
 
 .. py:class:: EITData
 
@@ -172,7 +177,7 @@ Functions
       
 
    .. py:attribute:: time
-      :type: numpy.typing.NDArray
+      :type: numpy.ndarray
 
       
 
@@ -202,7 +207,7 @@ Functions
       
 
    .. py:attribute:: pixel_impedance
-      :type: numpy.typing.NDArray
+      :type: numpy.ndarray
 
       
 
@@ -293,6 +298,12 @@ Functions
 
       Time axis from either EITData or ContinuousData.
 
+   .. py:property:: t
+
+      Time indexer.
+
+      See slicing.TimeIndexer.
+
    .. py:attribute:: label
       :type: str | None
 
@@ -345,6 +356,13 @@ Functions
 
       Must return a copy of self object with all attached data within selected
       indices.
+
+
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None, name: str | None = None, description: str | None = '') -> typing_extensions.Self
+
+      Return a sliced version of the Sequence.
+
+      See SelectByTime.select_by_time().
 
 
 
