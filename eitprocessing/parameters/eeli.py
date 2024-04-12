@@ -1,60 +1,60 @@
-from collections.abc import Callable
+from dataclasses import dataclass, field
 
 import numpy as np
 
-from eitprocessing.features import BreathDetection
+from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.sequence import Sequence
+from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.parameters import ParameterExtraction
 
 
+@dataclass
 class EELI(ParameterExtraction):
-    def __init__(
-        self,
-        regions: list[np.ndarray] | None = None,
-        detect_breaths_method: str = "Extreme values",
-        summary_stats: dict[str, Callable[[np.ndarray], float]] | None = None,
-    ):
-        if summary_stats is None:
-            summary_stats = {
-                "per breath": lambda x: x,
-                "mean": np.mean,
-                "standard deviation": np.std,
-                "median": np.median,
-            }
-        self.detect_breaths_method = detect_breaths_method
-        self.regions = regions
-        self.summary_stats = summary_stats
+    """Compute the end-expiratory lung impedance (EELI) per breath."""
 
-    def compute_parameter(self, sequence, frameset_name: str) -> dict | list[dict]:
-        """Computes the end-expiratory lung impedance (EELI) per breath in the
-        global impedance.
+    method: str = "extremes"
+    summary_stats: dict = field(
+        default_factory=lambda: {
+            "values": lambda v: v,
+            "mean": np.mean,
+            "standard deviation": np.std,
+            "median": np.median,
+        },
+    )
+    breath_detection_kwargs: dict = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        pass
+
+    def compute_parameter(self, sequence: Sequence, data_label: str) -> dict | list[dict]:
+        """Compute the EELI per breath.
+
+        Args:
+            sequence: the sequence containing the data.
+            data_label: the label of the continuous data in the sequence to determine the EELI of.
+            breaths_label: the label of the breaths in the sequence.
         """
-        breath_detector = BreathDetection(
-            sequence.framerate,
-            **self.breath_detection_kwargs,
-        )
-        breaths = breath_detector.find_breaths(global_impedance)
+        if self.method != "extremes":
+            msg = f"Method {self.method} is not implemented."
+            raise NotImplementedError(msg)
 
-        _, _, end_indices = (np.array(indices) for indices in zip(breaths, strict=False))
+        continuousdata = sequence.continuous_data[data_label]
+        eitdata = next(filter(lambda x: isinstance(x, EITData), continuousdata.derived_from))
+        data = continuousdata.values
 
-        if self.regions is None:
-            global_impedance = sequence.framesets[frameset_name].global_impedance
-            global_eelis: np.ndarray = global_impedance[end_indices]
+        bd_kwargs = self.breath_detection_kwargs.copy()
+        bd_kwargs["sample_frequency"] = eitdata.framerate
+        breath_detection = BreathDetection(**bd_kwargs)
+        breaths = breath_detection.find_breaths(data)
 
-            global_eeli = {}
-            for name, function in self.summary_stats.items():
-                global_eeli[name] = function(global_eelis)
+        _, _, eeli_indices = zip(*breaths, strict=True)
+        eeli_indices = list(eeli_indices)
+        eeli_values = data[eeli_indices]
 
-            return global_eeli
-        else:
-            pixel_impedance = sequence.framesets[frameset_name].pixel_values
-            regional_eeli = []
-            for region in self.regions:
-                regional_pixel_impedance = np.matmul(pixel_impedance, region)
-                regional_impedance = np.nansum(regional_pixel_impedance, axis=(0, 1))
-                regional_eelis: np.ndarray = regional_impedance[end_indices]
-                results = {}
-                for name, function in self.summary_stats.items():
-                    results[name] = function(regional_eelis)
-                regional_eeli.append(results)
+        result = {}
+        for name, function in self.summary_stats.items():
+            result[name] = function(eeli_values)
 
-            return regional_eeli
+        result["indices"] = eeli_indices
+
+        return result
