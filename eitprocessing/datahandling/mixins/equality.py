@@ -22,19 +22,20 @@ class Equivalence:
             return False
 
         if is_dataclass(self):
-            attrs_self = vars(self).values()
-            attrs_other = vars(other).values()
-            if len(attrs_self) != len(attrs_other):
+            attrs_self = Equivalence._remove_naming_info(vars(self)).values()
+            attrs_other = Equivalence._remove_naming_info(vars(other)).values()
+            try:
+                return all(Equivalence._array_safe_eq(s, o) for s, o in zip(attrs_self, attrs_other, strict=True))
+            except ValueError:  # different lengths
                 return False
-            return all(Equivalence._array_safe_eq(s, o) for s, o in zip(attrs_self, attrs_other, strict=True))
 
         return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
     def _array_safe_eq(a: Any, b: Any) -> bool:  # noqa: ANN401, PLR0911
         """Check if a and b are equal, even if they are numpy arrays containing nans."""
-        if type(a) != type(b):
-            return False
+        if not isinstance(b, type(a)):
+            return NotImplemented
 
         if isinstance(a, np.ndarray):
             return np.shape(a) == np.shape(b) and np.array_equal(a, b, equal_nan=True)
@@ -56,7 +57,13 @@ class Equivalence:
         except TypeError:
             return False
 
-    def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901
+    @staticmethod
+    def _remove_naming_info(d: dict | UserDict) -> dict | UserDict:
+        for x in ["label", "name", "description"]:
+            _ = d.pop(x, None)
+        return d
+
+    def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901, PLR0912
         """Test whether the data structure between two objects are equivalent.
 
         Equivalence, in this case means that objects are compatible e.g. to be
@@ -81,6 +88,12 @@ class Equivalence:
             return True
 
         try:
+            if self == other:
+                return True
+        except Exception:  # noqa: S110, BLE001
+            pass
+
+        try:
             # check whether types match
             if type(self) is not type(other):
                 msg = f"Types don't match: {type(self)}, {type(other)}"
@@ -103,7 +116,7 @@ class Equivalence:
                 self._check_equivalence: list[str]
                 for attr in self._check_equivalence:
                     if (s := getattr(self, attr)) != (o := getattr(other, attr)):
-                        raise f"{attr.capitalize()}s don't match: {s}, {o}"
+                        raise f"Attribute {attr} doesn't match: {s}, {o}"
 
         # raise or return if a check fails
         except EquivalenceError:
