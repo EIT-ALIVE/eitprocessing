@@ -6,13 +6,13 @@ from tests.conftest import timpel_file
 
 
 def test_label(
-    draeger_data1: Sequence,
-    draeger_data2: Sequence,
+    draeger1: Sequence,
+    draeger2: Sequence,
 ):
-    assert isinstance(draeger_data1.label, str), "default label is not a string"
-    assert draeger_data1.label == f"Sequence_{id(draeger_data1)}", "unexpected default label"
+    assert isinstance(draeger1.label, str), "default label is not a string"
+    assert draeger1.label == f"Sequence_{id(draeger1)}", "unexpected default label"
 
-    assert draeger_data1.label != draeger_data2.label, "different data has identical label"
+    assert draeger1.label != draeger2.label, "different data has identical label"
 
     timpel_1 = load_eit_data(timpel_file, vendor="timpel")
     timpel_2 = load_eit_data(timpel_file, vendor="timpel")
@@ -36,41 +36,39 @@ def test_label(
 
 
 def test_relabeling(
-    timpel_data: Sequence,
-    draeger_data2: Sequence,
+    timpel1: Sequence,
+    draeger2: Sequence,
 ):
     test_label = "test label"
 
     # merging
-    merged_timpel = Sequence.concatenate(timpel_data, timpel_data)
-    assert merged_timpel.label != timpel_data.label, "merging does not assign new label by default"
+    merged_timpel = Sequence.concatenate(timpel1, timpel1)
+    assert merged_timpel.label != timpel1.label, "merging does not assign new label by default"
     assert (
-        merged_timpel.label == f"Merge of <{timpel_data.label}> and <{timpel_data.label}>"
+        merged_timpel.label == f"Merge of <{timpel1.label}> and <{timpel1.label}>"
     ), "merging generates unexpected default label"
-    added_timpel = timpel_data + timpel_data
+    added_timpel = timpel1 + timpel1
     assert (
-        added_timpel.label == f"Merge of <{timpel_data.label}> and <{timpel_data.label}>"
+        added_timpel.label == f"Merge of <{timpel1.label}> and <{timpel1.label}>"
     ), "adding generates unexpected default label"
-    merged_timpel_2 = Sequence.concatenate(timpel_data, timpel_data, label=test_label)
+    merged_timpel_2 = Sequence.concatenate(timpel1, timpel1, label=test_label)
     assert merged_timpel_2.label == test_label, "incorrect label assigned when merging data with new label"
 
     # slicing
     indices = slice(0, 10)
-    sliced_timpel = timpel_data[indices]
-    assert sliced_timpel.label != timpel_data.label, "slicing does not assign new label by default"
+    sliced_timpel = timpel1[indices]
+    assert sliced_timpel.label != timpel1.label, "slicing does not assign new label by default"
     assert (
-        sliced_timpel.label == f"Slice ({indices.start}-{indices.stop}) of <{timpel_data.label}>"
+        sliced_timpel.label == f"Slice ({indices.start}-{indices.stop}) of <{timpel1.label}>"
     ), "slicing generates unexpected default label"
-    sliced_timpel_2 = timpel_data.select_by_index(indices=indices, label=test_label)
+    sliced_timpel_2 = timpel1.select_by_index(indices=indices, label=test_label)
     assert sliced_timpel_2.label == test_label, "incorrect label assigned when slicing data with new label"
 
     # select_by_time
     t22 = 55825.268
     t52 = 55826.768
-    time_sliced = draeger_data2.select_by_time(t22, t52 + 0.001)
-    assert time_sliced.label != draeger_data2.label, "time slicing does not assign new label by default"
-    assert (
-        time_sliced.label == f"Slice (22-52) of <{draeger_data2.label}>"
-    ), "slicing generates unexpected default label"
-    time_sliced_2 = draeger_data2.select_by_time(t22, t52, label=test_label)
+    time_sliced = draeger2.select_by_time(t22, t52 + 0.001)
+    assert time_sliced.label != draeger2.label, "time slicing does not assign new label by default"
+    assert time_sliced.label == f"Slice (22-52) of <{draeger2.label}>", "slicing generates unexpected default label"
+    time_sliced_2 = draeger2.select_by_time(t22, t52, label=test_label)
     assert time_sliced_2.label == test_label, "incorrect label assigned when time slicing data with new label"

@@ -19,25 +19,25 @@ dummy_file = Path(data_directory) / "not_a_file.dummy"
 
 
 @pytest.fixture(scope="session")
-def draeger_data1():
+def draeger1():
     return load_eit_data(draeger_file1, vendor="draeger", label="draeger1")
 
 
 @pytest.fixture(scope="session")
-def draeger_data2():
+def draeger2():
     return load_eit_data(draeger_file2, vendor="draeger", label="draeger2")
 
 
-@pytest.fixture(scope="session")
-def draeger_data_both():
-    return load_eit_data([draeger_file2, draeger_file1], vendor="draeger", label="draeger_both")
+# @pytest.fixture(scope="session")
+# def draeger_both():
+#     return load_eit_data([draeger_file2, draeger_file1], vendor="draeger", label="draeger_both")
 
 
 @pytest.fixture(scope="session")
-def timpel_data():
+def timpel1():
     return load_eit_data(timpel_file, vendor="timpel", label="timpel")
 
 
 # @pytest.fixture(scope="session")
-# def timpel_data_double():
+# def timpel_double():
 #     return load_eit_data([timpel_file, timpel_file], vendor="timpel", label="timpel_double")

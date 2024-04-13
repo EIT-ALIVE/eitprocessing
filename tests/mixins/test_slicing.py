@@ -11,9 +11,9 @@ if TYPE_CHECKING:
     from eitprocessing.datahandling.eitdata import EITData
 
 
-def test_slicing(draeger_data1: Sequence):
+def test_slicing(draeger1: Sequence):
     cutoff = 10
-    data: EITData = draeger_data1
+    data: EITData = draeger1
 
     assert data[cutoff] == data[cutoff]
     assert data[0:cutoff] == data[:cutoff]
@@ -27,13 +27,13 @@ def test_slicing(draeger_data1: Sequence):
 
 
 def test_slicing2(
-    draeger_data1: Sequence,
-    timpel_data: Sequence,
+    draeger1: Sequence,
+    timpel1: Sequence,
 ):
     cutoff = 100
 
     data: Sequence
-    for data in [draeger_data1, timpel_data]:
+    for data in [draeger1, timpel1]:
         assert data[0:cutoff] == data[:cutoff]
         assert data[cutoff : len(data)] == data[cutoff:]
 
@@ -47,11 +47,11 @@ def test_slicing2(
 
 
 def test_select_by_time(
-    draeger_data2: Sequence,
+    draeger2: Sequence,
 ):
     # TODO (#82): this function is kinda ugly. Would be nice to refactor it
     # but I am struggling to think of a logical way to loop through.
-    data = draeger_data2
+    data = draeger2
     t22 = 55825.268
     t52 = 55826.768
     ms = 0.001
@@ -133,24 +133,24 @@ def test_select_by_time(
 
 
 def test_concatenate_sequence(
-    draeger_data1: Sequence,
-    draeger_data2: Sequence,
-    draeger_data_both: Sequence,
-    timpel_data: Sequence,
-    timpel_data_double: Sequence,
+    draeger1: Sequence,
+    draeger2: Sequence,
+    draeger_both: Sequence,
+    timpel1: Sequence,
+    timpel_double: Sequence,
 ):
-    merged_draeger = Sequence.concatenate(draeger_data2, draeger_data1)
-    assert len(merged_draeger.eit_data["raw"]) == len(draeger_data2.eit_data["raw"]) + len(
-        draeger_data1.eit_data["raw"],
+    merged_draeger = Sequence.concatenate(draeger2, draeger1)
+    assert len(merged_draeger.eit_data["raw"]) == len(draeger2.eit_data["raw"]) + len(
+        draeger1.eit_data["raw"],
     )
-    assert merged_draeger == draeger_data_both
-    added_draeger = draeger_data2 + draeger_data1
+    assert merged_draeger == draeger_both
+    added_draeger = draeger2 + draeger1
     assert added_draeger == merged_draeger
 
     draeger_load_double = load_eit_data([draeger_file1, draeger_file1], "draeger")
-    draeger_merge_double = Sequence.concatenate(draeger_data1, draeger_data1)
+    draeger_merge_double = Sequence.concatenate(draeger1, draeger1)
     assert draeger_load_double == draeger_merge_double
-    added_draeger_double = draeger_data1 + draeger_data1
+    added_draeger_double = draeger1 + draeger1
     assert added_draeger_double == draeger_merge_double
 
     draeger_merged_twice = Sequence.concatenate(draeger_merge_double, draeger_merge_double)
@@ -159,29 +159,29 @@ def test_concatenate_sequence(
     assert len(draeger_merged_twice.path) == 4
     assert draeger_merged_twice == draeger_load_four_times
 
-    draeger_merge_thrice = Sequence.concatenate(draeger_merge_double, draeger_data1)
+    draeger_merge_thrice = Sequence.concatenate(draeger_merge_double, draeger1)
     draeger_load_thrice = load_eit_data([draeger_file1] * 3, "draeger")
     assert isinstance(draeger_merge_thrice.eit_data.path, list)
     assert len(draeger_merge_thrice.path) == 3
     assert draeger_merge_thrice == draeger_load_thrice
-    added_draeger_triple = draeger_data1 + draeger_data1 + draeger_data1
+    added_draeger_triple = draeger1 + draeger1 + draeger1
     assert draeger_merge_thrice == added_draeger_triple
 
-    merged_timpel = Sequence.concatenate(timpel_data, timpel_data)
-    assert len(merged_timpel) == 2 * len(timpel_data)
-    assert timpel_data_double == merged_timpel
-    added_timpel = timpel_data + timpel_data
+    merged_timpel = Sequence.concatenate(timpel1, timpel1)
+    assert len(merged_timpel) == 2 * len(timpel1)
+    assert timpel_double == merged_timpel
+    added_timpel = timpel1 + timpel1
     assert added_timpel == merged_timpel
 
     with pytest.raises(TypeError):
-        _ = Sequence.concatenate(timpel_data, draeger_data1)
+        _ = Sequence.concatenate(timpel1, draeger1)
 
-    draeger_data1.framerate = 50
+    draeger1.framerate = 50
     with pytest.raises(ValueError):
-        _ = Sequence.concatenate(draeger_data1, draeger_data2)
+        _ = Sequence.concatenate(draeger1, draeger2)
 
-    draeger_data1.vendor = Vendor.TIMPEL
+    draeger1.vendor = Vendor.TIMPEL
     with pytest.raises(ValueError):
         # TODO (#77): update this to AttributeError, once equivalence check for
         # framesets is implemented.
-        _ = Sequence.concatenate(draeger_data1, timpel_data)
+        _ = Sequence.concatenate(draeger1, timpel1)

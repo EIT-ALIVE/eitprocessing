@@ -15,21 +15,21 @@ def test_eq():
 
 
 def test_copy(
-    draeger_data1: Sequence,
-    timpel_data: Sequence,
+    draeger1: Sequence,
+    timpel1: Sequence,
 ):
     data: Sequence
-    for data in [draeger_data1, timpel_data]:
+    for data in [draeger1, timpel1]:
         data_copy = deepcopy(data)
         assert data == data_copy
 
 
 def test_equals(
-    draeger_data1: Sequence,
-    timpel_data: Sequence,
+    draeger1: Sequence,
+    timpel1: Sequence,
 ):
     data: Sequence
-    for data in [draeger_data1, timpel_data]:
+    for data in [draeger1, timpel1]:
         data_copy = Sequence()
         data_copy.path = deepcopy(data.path)
         data_copy.time = deepcopy(data.time)
