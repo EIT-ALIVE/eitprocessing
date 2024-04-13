@@ -1,30 +1,10 @@
-# OLD FILE. TESTS NOT YET FUNCTIONAL
-# TODO: remove line below to activate linting
-# ruff: noqa
+from copy import deepcopy
 
-import bisect
-import os
-from dataclasses import dataclass, is_dataclass
-from pprint import pprint
-from pathlib import Path
-import numpy as np
-import pytest
-from typing_extensions import Self
+import pytest  # noqa: F401 (needed for fixtures)
 
-from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.loading import load_eit_data
-from eitprocessing.datahandling.eitdata import EITData, Vendor
-from eitprocessing.datahandling.mixins.slicing import SelectByIndex
-
-environment = os.environ.get(
-    "EIT_PROCESSING_TEST_DATA",
-    Path.resolve(Path(__file__).parent.parent),
-)
-data_directory = Path(environment) / "tests" / "test_data"
-draeger_file1 = Path(data_directory) / "Draeger_Test3.bin"
-draeger_file2 = Path(data_directory) / "Draeger_Test.bin"
-timpel_file = Path(data_directory) / "Timpel_Test.txt"
-dummy_file = Path(data_directory) / "not_a_file.dummy"
+from eitprocessing.datahandling.sequence import Sequence
+from tests.conftest import draeger_file1
 
 
 def test_eq():
@@ -32,3 +12,51 @@ def test_eq():
     data2 = load_eit_data(draeger_file1, vendor="draeger")
 
     data.isequivalent(data2)
+
+
+def test_copy(
+    draeger_data1: Sequence,
+    timpel_data: Sequence,
+):
+    data: Sequence
+    for data in [draeger_data1, timpel_data]:
+        data_copy = deepcopy(data)
+        assert data == data_copy
+
+
+def test_equals(
+    draeger_data1: Sequence,
+    timpel_data: Sequence,
+):
+    data: Sequence
+    for data in [draeger_data1, timpel_data]:
+        data_copy = Sequence()
+        data_copy.path = deepcopy(data.path)
+        data_copy.time = deepcopy(data.time)
+        data_copy.nframes = deepcopy(data.nframes)
+        data_copy.framerate = deepcopy(data.framerate)
+        data_copy.framesets = deepcopy(data.framesets)
+        data_copy.events = deepcopy(data.events)
+        data_copy.timing_errors = deepcopy(data.timing_errors)
+        data_copy.phases = deepcopy(data.phases)
+        data_copy.vendor = deepcopy(data.vendor)
+
+        assert data_copy == data
+
+        # test whether a difference in phases fails equality test
+        data_copy.phases.append(data_copy.phases[-1])
+        assert data != data_copy
+        data_copy.phases = deepcopy(data.phases)
+
+        data_copy.phases[0].index += 1
+        assert data != data_copy
+        data_copy.phases = deepcopy(data.phases)
+
+        # test wheter a difference in framesets fails equality test
+        data_copy.framesets["test"] = data_copy.framesets["raw"].deepcopy()
+        assert data != data_copy
+        data_copy.framesets = deepcopy(data.framesets)
+
+        data_copy.framesets["raw"].name += "_"
+        assert data != data_copy
+        data_copy.framesets = deepcopy(data.framesets)

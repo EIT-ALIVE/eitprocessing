@@ -158,8 +158,9 @@ isort.known-first-party = ["eitprocessing"]
 [tool.ruff.lint.per-file-ignores]
 "*.ipynb" = ["ERA001"] # Commented out code
 "tests/*" = [
-    "S101",   # Use of `assert` detected
-    "ANN201", # Missing return type
-    "D103",   # Missing function docstring
+    "S101",    # Use of `assert` detected
+    "ANN201",  # Missing return type
+    "D103",    # Missing function docstring
+    "PLR2004", # Comparison against unnamed value
 ]
 "docs/*" = ["ALL"]

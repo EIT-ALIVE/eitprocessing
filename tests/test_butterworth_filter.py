@@ -13,8 +13,6 @@ from eitprocessing.filters.butterworth_filters import (
 )
 
 SpecifiedFilter: TypeAlias = type[LowPassFilter | HighPassFilter | BandPassFilter | BandStopFilter]
-# TODO: remove line below to activate linting
-# ruff: noqa
 
 
 @pytest.fixture()
@@ -27,7 +25,7 @@ def filter_arguments():
     }
 
 
-def check_filter_attributes(filter_, kwargs):
+def check_filter_attributes(filter_, kwargs):  # noqa: ANN001
     for key, value in kwargs.items():
         assert getattr(filter_, key) == value
 
@@ -36,12 +34,12 @@ def check_filter_attributes(filter_, kwargs):
     assert filter_.available_in_gui
 
 
-def test_create_butterworth_filter(filter_arguments):
+def test_create_butterworth_filter(filter_arguments: dict):
     filter_ = ButterworthFilter(**filter_arguments)
     check_filter_attributes(filter_, filter_arguments)
 
 
-def test_butterworth_order(filter_arguments):
+def test_butterworth_order(filter_arguments: dict):
     del filter_arguments["order"]
 
     with pytest.raises(TypeError):
@@ -54,7 +52,7 @@ def test_butterworth_order(filter_arguments):
         ButterworthFilter(**filter_arguments, order=0)
 
 
-def test_butterworth_range(filter_arguments):
+def test_butterworth_range(filter_arguments: dict):
     # Tests whether an out-of-range order raises AttributeError
     filter_arguments["order"] = 11
 
@@ -69,13 +67,13 @@ def test_butterworth_range(filter_arguments):
     assert filter_.order == 11
 
 
-def test_butterworth_filter_type(filter_arguments):
+def test_butterworth_filter_type(filter_arguments: dict):
     filter_arguments["filter_type"] = "invalid"
     with pytest.raises(ValueError):
         ButterworthFilter(**filter_arguments)
 
 
-def test_butterworth_cutoff_frequency_scalar(filter_arguments):
+def test_butterworth_cutoff_frequency_scalar(filter_arguments: dict):
     del filter_arguments["cutoff_frequency"]
 
     invalid_bandpass_cutoffs = [("not a number", TypeError), ((10, 20), TypeError)]
@@ -89,7 +87,7 @@ def test_butterworth_cutoff_frequency_scalar(filter_arguments):
         pytest.fail("Unexpected error")
 
 
-def test_butterworth_cutoff_frequency_sequence(filter_arguments):
+def test_butterworth_cutoff_frequency_sequence(filter_arguments: dict):
     del filter_arguments["cutoff_frequency"]
     filter_arguments["filter_type"] = "bandpass"
 
@@ -114,7 +112,7 @@ def test_butterworth_cutoff_frequency_sequence(filter_arguments):
         pytest.fail("Unexpected error")
 
 
-def test_butterworth_sample_frequency(filter_arguments):
+def test_butterworth_sample_frequency(filter_arguments: dict):
     del filter_arguments["sample_frequency"]
 
     with pytest.raises(TypeError):
@@ -129,7 +127,7 @@ def test_butterworth_sample_frequency(filter_arguments):
         pytest.fail("Unexpected error")
 
 
-def test_create_specified_filter(filter_arguments):
+def test_create_specified_filter(filter_arguments: dict):
     lp_filter = LowPassFilter(**filter_arguments)
 
     with pytest.raises(TypeError):
@@ -156,7 +154,7 @@ def test_create_specified_filter(filter_arguments):
     assert bs_filter.filter_type == "bandstop"
 
 
-def test_specified_butterworth_equivalence(filter_arguments):
+def test_specified_butterworth_equivalence(filter_arguments: dict):
     del filter_arguments["filter_type"]
 
     filter1 = ButterworthFilter(**filter_arguments, filter_type="lowpass")
@@ -217,15 +215,14 @@ def test_butterworth_functionality():
     # create a matrix containing signal1 multiplied by a scalar in each row
     signal2 = np.array([[10], [20], [30], [40], [50]]) @ np.expand_dims(signal1.T, 0)
 
-    def compare_filters(
+    def compare_filters(  # noqa:D417
         cutoff: float | tuple[float, float],
         filter_type: Literal["lowpass", "highpass", "bandpass", "bandstop"],
         class_: SpecifiedFilter,
         data: np.ndarray,
         axis: int,
     ) -> None:
-        """Compare filters created using ButterworthFilter to filters created using the
-        corresponding subclass.
+        """Compare filters created using ButterworthFilter to filters created using the corresponding subclass.
 
         This function creates two filter instances, one using the ButterworthFilter, and one using
         either of the four subclasses. It then compares whether those filters are equal, and have
