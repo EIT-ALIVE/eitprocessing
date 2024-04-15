@@ -33,6 +33,11 @@ class Equivalence:
                 for field in compare_fields
             )
 
+        if isinstance(self, UserDict):
+            if set(self.keys()) != set(other.keys()):
+                return False
+            return all(Equivalence.__eq__(self[key], other[key]) for key in set(self.keys()))
+
         return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
