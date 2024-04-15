@@ -33,10 +33,6 @@ Classes
       Check if a and b are equal, even if they are numpy arrays containing nans.
 
 
-   .. py:method:: _remove_naming_info(d: dict | collections.UserDict) -> dict | collections.UserDict
-      :staticmethod:
-
-
    .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
 
       Test whether the data structure between two objects are equivalent.

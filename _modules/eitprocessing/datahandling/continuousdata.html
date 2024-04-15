@@ -38,7 +38,7 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -50,13 +50,8 @@
 
     <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Self</span>
 
-<div class="viewcode-block" id="T">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.T">[docs]</a>
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;ContinuousData&quot;</span><span class="p">)</span></div>
 
-
-
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nd">@dataclass</span>
 <div class="viewcode-block" id="ContinuousData">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData">[docs]</a>
 <span class="k">class</span> <span class="nc">ContinuousData</span><span class="p">(</span><span class="n">Equivalence</span><span class="p">,</span> <span class="n">SelectByTime</span><span class="p">):</span>
@@ -71,7 +66,7 @@
 <span class="sd">        parameters: Parameters used to derive this data.</span>
 <span class="sd">        derived_from: Traceback of intermediates from which the current data was derived.</span>
 <span class="sd">        values: Data points.</span>
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># TODO: update docstring</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ContinuousData.label">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.label">[docs]</a>
@@ -165,33 +160,6 @@
         <span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">obj</span></div>
-
-
-<div class="viewcode-block" id="ContinuousData.__add__">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.__add__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="ContinuousData.concatenate">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.concatenate">[docs]</a>
-    <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">newlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>  <span class="c1"># noqa: D102, will be removed soon</span>
-        <span class="c1"># Check that data can be concatenated</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">isequivalent</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">raise_</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">other</span><span class="si">}</span><span class="s2"> (b) starts before </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> (a) ends.&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-
-        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
-
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">newlabel</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
-            <span class="n">category</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">)),</span>
-            <span class="n">values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">)),</span>
-        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ContinuousData.derive">
@@ -334,6 +302,8 @@
         <span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="ContinuousData.concatenate">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.concatenate">[docs]</a>
     <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Concatenate two sets of continuous data.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
@@ -347,6 +317,7 @@
             <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">)),</span>
             <span class="n">values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">)),</span>
         <span class="p">)</span></div>
+</div>
 
 </pre></div>
 

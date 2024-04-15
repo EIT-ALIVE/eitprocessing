@@ -83,17 +83,10 @@
 <p>Container for EIT data.</p>
 <p>This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
 class is meant to hold data from (part of) a singular continuous measurement.</p>
-<p>This class can’t be initialized directly. Instead, use <cite>load_eit_data(&lt;path&gt;, vendor=&lt;vendor&gt;)</cite> to load data from
-disk.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – the path of list of paths of the source from which data was derived.</p></li>
-<li><p><strong>nframes</strong> – number of frames</p></li>
-<li><p><strong>time</strong> – </p></li>
-</ul>
-</dd>
-</dl>
+<p>This class can’t be initialized directly. Instead, use <cite>EITData.from_path(…)</cite> to load data from disk.
+Currently, loading data from three vendors is supported. You can either pass the vendor when using
+<cite>EITData.from_path(…, vendor=”timpel”)</cite>, or use one of the available subclasses of EITData:
+<cite>SentecEITData.from_path(…)</cite>.</p>
 <p>Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.global_baseline">
@@ -192,7 +185,7 @@ list of Path objects given either a str/Path or list of str/Paths.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.concatenate">
-<span class="sig-name descname"><span class="pre">concatenate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.concatenate" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">concatenate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.concatenate" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

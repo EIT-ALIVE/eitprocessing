@@ -67,16 +67,13 @@
 <span class="sd">    This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The</span>
 <span class="sd">    class is meant to hold data from (part of) a singular continuous measurement.</span>
 
-<span class="sd">    This class can&#39;t be initialized directly. Instead, use `load_eit_data(&lt;path&gt;, vendor=&lt;vendor&gt;)` to load data from</span>
-<span class="sd">    disk.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        path: the path of list of paths of the source from which data was derived.</span>
-<span class="sd">        nframes: number of frames</span>
-<span class="sd">        time:</span>
+<span class="sd">    This class can&#39;t be initialized directly. Instead, use `EITData.from_path(...)` to load data from disk.</span>
+<span class="sd">    Currently, loading data from three vendors is supported. You can either pass the vendor when using</span>
+<span class="sd">    `EITData.from_path(..., vendor=&quot;timpel&quot;)`, or use one of the available subclasses of EITData:</span>
+<span class="sd">    `SentecEITData.from_path(...)`.</span>
 
 <span class="sd">    Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.</span>
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># TODO: fix docstring</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="EITData.path">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.eitdata.EITData.path">[docs]</a>
@@ -120,7 +117,7 @@
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_equivalence</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;vendor&quot;</span><span class="p">,</span> <span class="s2">&quot;framerate&quot;</span><span class="p">]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_equivalence</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;vendor&quot;</span><span class="p">,</span> <span class="s2">&quot;framerate&quot;</span><span class="p">]</span></div>
 
 
     <span class="nd">@staticmethod</span>
@@ -145,26 +142,42 @@
 
 <div class="viewcode-block" id="EITData.concatenate">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/loading/index.html#eitprocessing.datahandling.eitdata.EITData.concatenate">[docs]</a>
-    <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">newlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>  <span class="c1"># noqa: D102, will be moved to mixin in future</span>
-        <span class="c1"># Check that data can be concatenated</span>
+    <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>  <span class="c1"># noqa: D102, will be removed soon</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">isequivalent</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">raise_</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">a_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ensure_path_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">b_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ensure_path_list</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">a_path</span> <span class="o">+</span> <span class="n">b_path</span>
+
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">):</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">other</span><span class="si">}</span><span class="s2"> (b) starts before </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> (a) ends.&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
 
-        <span class="n">self_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensure_path_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-        <span class="n">other_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensure_path_list</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">pixel_impedance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_impedance</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">pixel_impedance</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Can&#39;t concatenate data with different labels.&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+        <span class="n">framerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerate</span>
+        <span class="n">nframes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">nframes</span>
+
+        <span class="n">phases</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phases</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">phases</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">events</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
             <span class="n">vendor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vendor</span><span class="p">,</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">self_path</span> <span class="o">+</span> <span class="n">other_path</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">newlabel</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="n">framerate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">framerate</span><span class="p">,</span>
-            <span class="n">nframes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">nframes</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">)),</span>
-            <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">pixel_impedance</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">pixel_impedance</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-            <span class="n">phases</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phases</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">phases</span><span class="p">,</span>
-            <span class="n">events</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">events</span><span class="p">,</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
+            <span class="n">nframes</span><span class="o">=</span><span class="n">nframes</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">pixel_impedance</span><span class="p">,</span>
+            <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span>
+            <span class="n">events</span><span class="o">=</span><span class="n">events</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
