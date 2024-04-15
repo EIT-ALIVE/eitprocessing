@@ -59,9 +59,8 @@ class Equivalence:
 
     @staticmethod
     def _remove_naming_info(d: dict | UserDict) -> dict | UserDict:
-        for x in ["label", "name", "description"]:
-            _ = d.pop(x, None)
-        return d
+        x = ["label", "name", "description"]
+        return {k: v for k, v in d.items() if k not in x}
 
     def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901, PLR0912
         """Test whether the data structure between two objects are equivalent.
