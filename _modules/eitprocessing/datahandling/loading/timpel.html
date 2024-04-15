@@ -147,36 +147,36 @@
     <span class="n">continuous_data_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">ContinuousData</span><span class="p">)</span>
     <span class="n">continuous_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">ContinuousData</span><span class="p">(</span>
-            <span class="s2">&quot;airway_pressure_(timpel)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Airway pressure&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;cmH2O&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;pressure&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Airway pressure measured by Timpel device&quot;</span><span class="p">,</span>
-            <span class="n">loaded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;airway_pressure_(timpel)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Airway pressure&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;cmH2O&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;pressure&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Airway pressure measured by Timpel device&quot;</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
             <span class="n">values</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1024</span><span class="p">],</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
     <span class="n">continuous_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">ContinuousData</span><span class="p">(</span>
-            <span class="s2">&quot;flow_(timpel)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Flow&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;L/s&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;flow&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;FLow measures by Timpel device&quot;</span><span class="p">,</span>
-            <span class="n">loaded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;flow_(timpel)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Flow&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;L/s&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;flow&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Flow measures by Timpel device&quot;</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
             <span class="n">values</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1025</span><span class="p">],</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
     <span class="n">continuous_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">ContinuousData</span><span class="p">(</span>
-            <span class="s2">&quot;volume_(timpel)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Volume&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;L&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;volume&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Volume measured by Timpel device&quot;</span><span class="p">,</span>
-            <span class="n">loaded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;volume_(timpel)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Volume&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;L&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;volume&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Volume measured by Timpel device&quot;</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
             <span class="n">values</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1026</span><span class="p">],</span>
         <span class="p">),</span>
     <span class="p">)</span>

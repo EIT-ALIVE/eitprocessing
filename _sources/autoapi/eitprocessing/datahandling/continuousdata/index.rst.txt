@@ -17,6 +17,18 @@ Classes
 
 
 
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.continuousdata.T
+
+
+.. py:data:: T
+
+   
+
 .. py:class:: ContinuousData
 
 
@@ -104,6 +116,12 @@ Classes
       Create a copy.
 
       Whenever data is altered, it should probably be copied first. The alterations should then be made in the copy.
+
+
+   .. py:method:: __add__(other: T) -> T
+
+
+   .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
 
 
    .. py:method:: derive(label: str, function: collections.abc.Callable, func_args: dict, **kwargs) -> typing_extensions.Self
