@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import UserDict
 from dataclasses import is_dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -13,17 +14,25 @@ class Equivalence:
     """Mixin class that adds an equality and equivalence check."""
 
     # inspired by: https://stackoverflow.com/a/51743960/5170442
-    def __eq__(self, other: Self):
+    def __eq__(self, other: Self) -> bool:
         if self is other:
             return True
+
+        if type(self) is not type(other):
+            return False
+
         if is_dataclass(self):
-            if self.__class__ is not other.__class__:
-                return NotImplemented
             t1 = vars(self).values()
             t2 = vars(other).values()
             if len(t1) != len(t2):
                 return False
             return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2, strict=True))
+
+        if isinstance(self, UserDict):
+            if set(self.keys()) != set(other.keys()):
+                return False
+            return all(Equivalence.__eq__(self[key], other[key]) for key in set(self.keys()))
+
         return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
@@ -77,7 +86,8 @@ class Equivalence:
                 raise EquivalenceError(msg)  # noqa: TRY301
 
             # check keys in collection
-            if isinstance(self, dict):
+            # TODO: check whether this is still necessary for dicts #185
+            if isinstance(self, dict | UserDict):
                 if set(self.keys()) != set(other.keys()):
                     msg = f"Keys don't match:\n\t{self.keys()},\n\t{other.keys()}"
                     raise EquivalenceError(msg)  # noqa: TRY301
