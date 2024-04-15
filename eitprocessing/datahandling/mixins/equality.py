@@ -26,11 +26,12 @@ class Equivalence:
             attrs_other = Equivalence._remove_naming_info(vars(other))
             if set(attrs_self.keys()) != set(attrs_other.keys()):
                 return False
-            return all(
-                Equivalence._array_safe_eq(
-                    (attrs_self[k], attrs_other[k]) for k in attrs_self
-                )
-            )
+            return all(Equivalence._array_safe_eq((attrs_self[k], attrs_other[k]) for k in attrs_self))
+
+        if isinstance(self, UserDict):
+            if set(self.keys()) != set(other.keys()):
+                return False
+            return all(Equivalence.__eq__(self[key], other[key]) for key in set(self.keys()))
 
         return Equivalence._array_safe_eq(self, other)
 
@@ -47,7 +48,8 @@ class Equivalence:
             return a == b
 
         if isinstance(
-            a, dict
+            a,
+            dict,
         ):  # TODO: check whether this is still necessary for dicts #185
             return dict.__eq__(a, b)
 
