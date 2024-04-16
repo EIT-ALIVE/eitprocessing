@@ -56,7 +56,7 @@ class Equivalence:
             return False
 
     @staticmethod
-    def _remove_naming_info(d: dict | UserDict) -> dict | UserDict:
+    def _remove_naming_info(d: dict | UserDict) -> dict:
         x = ["label", "name", "description"]
         return {k: v for k, v in d.items() if k not in x}
 
