@@ -22,13 +22,11 @@ class Equivalence:
             return False
 
         if is_dataclass(self):
-            attrs_self = Equivalence._remove_naming_info(vars(self)).values()
-            attrs_other = Equivalence._remove_naming_info(vars(other)).values()
-            try:
-                return all(Equivalence._array_safe_eq(s, o) for s, o in zip(attrs_self, attrs_other, strict=True))
-            except ValueError:  # different lengths
+            attrs_self = Equivalence._remove_naming_info(vars(self))
+            attrs_other = Equivalence._remove_naming_info(vars(other))
+            if set(attrs_self.keys()) != set(attrs_other.keys()):
                 return False
-
+            return all(Equivalence._array_safe_eq((attrs_self[k], attrs_other[k]) for k in attrs_self))
         return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
