@@ -109,11 +109,11 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
 
         sliced_sparse = DataCollection(SparseData)
         for value in self.sparse_data.values():
-            sliced_sparse.add(value.t[time[0], time[-1]])
+            sliced_sparse.add(value.t[time[0] : time[-1]])
 
         sliced_interval = DataCollection(IntervalData)
         for value in self.interval_data.values():
-            sliced_interval.add(value.t[time[0], time[-1]])
+            sliced_interval.add(value.t[time[0] : time[-1]])
 
         return self.__class__(
             label=self.label,  # newlabel gives errors
