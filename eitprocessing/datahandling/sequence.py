@@ -86,7 +86,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
 
         return a.__class__(eit_data=concat_eit, continuous_data=concat_continuous, sparse_data=concat_sparse)
 
-    def _sliced_copy(self, start_index: int, end_index: int, label: str) -> Self:
+    def _sliced_copy(self, start_index: int, end_index: int, newlabel: str) -> Self:
         if not self.eit_data:
             sliced_eit = self.eit_data
         else:
@@ -114,7 +114,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
                 sliced_sparse.add(value.t[time[0], time[-1]])
 
         return self.__class__(
-            label=label,
+            label=newlabel,
             name=f"Sliced copy of <{self.name}>",
             description=f"Sliced copy of <{self.description}>",
             eit_data=sliced_eit,

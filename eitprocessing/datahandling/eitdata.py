@@ -91,7 +91,7 @@ class EITData(SelectByTime, Equivalence):
         self,
         start_index: int,
         end_index: int,
-        label: str,
+        newlabel: str,
     ) -> Self:
         cls = self.__class__
         time = self.time[start_index:end_index]
@@ -110,7 +110,7 @@ class EITData(SelectByTime, Equivalence):
             framerate=self.framerate,
             phases=phases,
             events=events,
-            label=label,
+            label=newlabel,
             pixel_impedance=pixel_impedance,
         )
 

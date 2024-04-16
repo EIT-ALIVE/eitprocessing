@@ -210,7 +210,7 @@ class ContinuousData(Equivalence, SelectByTime):
         self,
         start_index: int,
         end_index: int,
-        label: str,
+        newlabel: str,
     ) -> Self:
         # TODO: check correct implementation
         cls = self.__class__
@@ -219,7 +219,7 @@ class ContinuousData(Equivalence, SelectByTime):
         description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
 
         return cls(
-            label=label,
+            label=newlabel,
             name=self.name,
             unit=self.unit,
             category=self.category,

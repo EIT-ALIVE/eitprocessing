@@ -42,7 +42,7 @@ class SelectByIndex(ABC):
         self,
         start: int | None = None,
         end: int | None = None,
-        label: str | None = None,
+        newlabel: str | None = None,
     ) -> Self:
         """De facto implementation of the `__getitem__ function.
 
@@ -58,17 +58,17 @@ class SelectByIndex(ABC):
         if end is None:
             end = len(self)
 
-        if label is None:
-            label = self.label
+        if newlabel is None:
+            newlabel = self.label
 
-        return self._sliced_copy(start_index=start, end_index=end, label=label)
+        return self._sliced_copy(start_index=start, end_index=end, newabel=newlabel)
 
     @abstractmethod
     def _sliced_copy(
         self,
         start_index: int,
         end_index: int,
-        label: str,
+        newlabel: str,
     ) -> Self:
         """Slicing method that must be implemented by all subclasses.
 
