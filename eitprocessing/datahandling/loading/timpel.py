@@ -180,10 +180,50 @@ def load_from_single_path(
         ),
     )
 
-    gi = continuousdata_collection["global_impedance_(raw)"].values  # noqa: PD011
-    # TODO: replace next section with BreathDetection._remove_doubles() and BreathDetection._remove_edge_cases() from
-    # 41_breath_detection_psomhorst; this code was directly copied from b59ac54
+    gi = continuousdata_collection["global_impedance_(raw)"].values
 
+    time_ranges, breaths = _make_breaths(time, min_indices, max_indices, gi)
+    intervaldata_collection = DataCollection(IntervalData)
+    intervaldata_collection.add(
+        IntervalData(
+            label="breaths_(timpel)",
+            name="Breaths (Timpel)",
+            unit=None,
+            category="breaths",
+            time_ranges=time_ranges,
+            values=breaths,
+            partial_inclusion=False,
+        ),
+    )
+
+    qrs_indices = np.nonzero(data[:, 1029] == 1)[0]
+    sparsedata_collection.add(
+        SparseData(
+            label="qrscomplexes_(timpel)",
+            name="QRS complexes detected by Timpel device",
+            unit=None,
+            category="qrs_complex",
+            derived_from=[eit_data],
+            time=time[qrs_indices],
+        ),
+    )
+
+    return {
+        "eitdata_collection": eitdata_collection,
+        "continuousdata_collection": continuousdata_collection,
+        "sparsedata_collection": sparsedata_collection,
+        "intervaldata_collection": intervaldata_collection,
+    }
+
+
+def _make_breaths(
+    time: np.ndarray,
+    min_indices: np.ndarray,
+    max_indices: np.ndarray,
+    gi: np.ndarray,
+) -> tuple[tuple[int, int], list[Breath]]:
+    # TODO: replace section with BreathDetection._remove_doubles() and BreathDetection._remove_edge_cases() from
+    # 41_breath_detection_psomhorst; this code was directly copied from b59ac54
     valley_indices = min_indices.copy()
     peak_indices = max_indices.copy()
 
@@ -232,34 +272,4 @@ def load_from_single_path(
         breaths.append(((time[start], time[end]), Breath(time[start], time[middle], time[end])))
 
     time_ranges, values = zip(*breaths, strict=True)
-    intervaldata_collection = DataCollection(IntervalData)
-    intervaldata_collection.add(
-        IntervalData(
-            label="breaths_(timpel)",
-            name="Breaths (Timpel)",
-            unit=None,
-            category="breaths",
-            time_ranges=time_ranges,
-            values=values,
-            partial_inclusion=False,
-        ),
-    )
-
-    qrs_indices = np.nonzero(data[:, 1029] == 1)[0]
-    sparsedata_collection.add(
-        SparseData(
-            label="qrscomplexes_(timpel)",
-            name="QRS complexes detected by Timpel device",
-            unit=None,
-            category="qrs_complex",
-            derived_from=[eit_data],
-            time=time[qrs_indices],
-        ),
-    )
-
-    return {
-        "eitdata_collection": eitdata_collection,
-        "continuousdata_collection": continuousdata_collection,
-        "sparsedata_collection": sparsedata_collection,
-        "intervaldata_collection": intervaldata_collection,
-    }
+    return time_ranges, values
