@@ -51,7 +51,6 @@ class Equivalence:
             # `a == b` could trigger an infinite loop when called on an instance of Equivalence
             # object.__eq__() works for most objects, except those implemented seperately above
             return object.__eq__(a, b)
-
         except TypeError:
             return False
 
@@ -60,7 +59,7 @@ class Equivalence:
         x = ["label", "name", "description"]
         return {k: v for k, v in d.items() if k not in x}
 
-    def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901, PLR0912
+    def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901
         """Test whether the data structure between two objects are equivalent.
 
         Equivalence, in this case means that objects are compatible e.g. to be
@@ -81,14 +80,8 @@ class Equivalence:
         Returns:
             bool describing result of equivalence comparison.
         """
-        if self is other:
+        if self == other:
             return True
-
-        try:
-            if self == other:
-                return True
-        except Exception:  # noqa: S110, BLE001
-            pass
 
         try:
             # check whether types match
