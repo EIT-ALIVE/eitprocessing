@@ -87,8 +87,9 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         return a.__class__(eit_data=concat_eit, continuous_data=concat_continuous, sparse_data=concat_sparse)
 
     def _sliced_copy(self, start_index: int, end_index: int, newlabel: str) -> Self:
+        # TODO: consider if the if not parts below are required
         if not self.eit_data:
-            sliced_eit = self.eit_data
+            sliced_eit = DataCollection(EITData)
         else:
             sliced_eit = DataCollection(EITData)
             for value in self.eit_data.values():

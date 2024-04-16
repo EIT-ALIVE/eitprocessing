@@ -93,6 +93,7 @@ class ContinuousData(Equivalence, SelectByTime):
         return self.concatenate(self, other)
 
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be removed soon
+        # TODO: compare both concatenate methods and check what is needed from both and merge into one
         # Check that data can be concatenated
         self.isequivalent(other, raise_=True)
         if np.min(other.time) <= np.max(self.time):
