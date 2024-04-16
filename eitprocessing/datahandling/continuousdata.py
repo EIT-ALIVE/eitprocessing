@@ -87,7 +87,7 @@ class ContinuousData(Equivalence, SelectByTime):
         obj.unlock()
         return obj
 
-    def derive(self, label: str, function: Callable, func_args: dict, **kwargs) -> Self:
+    def derive(self, label: str, function: Callable, func_args: dict | None = None, **kwargs) -> Self:
         """Create a copy deriving data from values attribute.
 
         Args:
@@ -117,7 +117,7 @@ class ContinuousData(Equivalence, SelectByTime):
         ```
         """
         copy = self.copy(label, **kwargs)
-        copy.values = function(copy.values, **func_args)
+        copy.values = function(copy.values, **func_args or {})
         return copy
 
     def lock(self, *attr: str) -> None:
