@@ -5,7 +5,7 @@ from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sequence import Sequence
 from tests.conftest import draeger_file1, draeger_file2, dummy_file, timpel_file
 
-# ruff: noqa: ERA001
+# ruff: noqa: ERA001  #TODO: remove this line
 
 
 def test_loading_draeger(
@@ -84,9 +84,9 @@ def test_load_partial(
     assert len(timpel_part1) == cutoff
     assert len(timpel_part2) == len(timpel1) - cutoff
     # TODO: once slicing and concatenation works, the asserts below should be turned back on
-    # assert timpel_part1 == timpel1[:cutoff]
-    # assert timpel_part2 == timpel1[cutoff:]
-    # assert Sequence.concatenate(timpel_part1, timpel_part2) == timpel1
+    assert timpel_part1 == timpel1[:cutoff]
+    assert timpel_part2 == timpel1[cutoff:]
+    assert Sequence.concatenate(timpel_part1, timpel_part2) == timpel1
     # assert Sequence.concatenate(timpel_part2, timpel_part1) != timpel1
 
     # Draeger
@@ -96,9 +96,9 @@ def test_load_partial(
     assert len(draeger2_part1) == cutoff
     assert len(draeger2_part2) == len(draeger2) - cutoff
     # TODO: once slicing and concatenation works, the asserts below should be turned back on
-    # assert draeger2_part1 == draeger2[:cutoff]
-    # assert draeger2_part2 == draeger2[cutoff:]
-    # assert Sequence.concatenate(draeger2_part1, draeger2_part2) == draeger2
+    assert draeger2_part1 == draeger2[:cutoff]
+    assert draeger2_part2 == draeger2[cutoff:]
+    assert Sequence.concatenate(draeger2_part1, draeger2_part2) == draeger2
     # assert Sequence.concatenate(draeger2_part2, draeger2_part1) != draeger2
 
 

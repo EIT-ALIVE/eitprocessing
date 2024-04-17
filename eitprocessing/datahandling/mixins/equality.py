@@ -22,15 +22,11 @@ class Equivalence:
             return False
 
         if is_dataclass(self):
-            attrs_self = Equivalence._remove_naming_info(vars(self))
-            attrs_other = Equivalence._remove_naming_info(vars(other))
+            attrs_self = Equivalence._allowed_inequality(vars(self))
+            attrs_other = Equivalence._allowed_inequality(vars(other))
             if set(attrs_self.keys()) != set(attrs_other.keys()):
                 return False
-            return all(
-                Equivalence._array_safe_eq(
-                    (attrs_self[k], attrs_other[k]) for k in attrs_self
-                )
-            )
+            return all(Equivalence._array_safe_eq(attrs_self[k], attrs_other[k]) for k in attrs_self)
 
         return Equivalence._array_safe_eq(self, other)
 
@@ -47,7 +43,8 @@ class Equivalence:
             return a == b
 
         if isinstance(
-            a, dict
+            a,
+            dict,
         ):  # TODO: check whether this is still necessary for dicts #185
             return dict.__eq__(a, b)
 
@@ -62,7 +59,7 @@ class Equivalence:
             return False
 
     @staticmethod
-    def _remove_naming_info(d: dict | UserDict) -> dict:
+    def _allowed_inequality(d: dict | UserDict) -> dict:
         x = ["label", "name", "description"]
         return {k: v for k, v in d.items() if k not in x}
 
@@ -72,7 +69,6 @@ class Equivalence:
         Equivalence, in this case means that objects are compatible e.g. to be
         merged. Data content can vary, but e.g. the category of data (e.g.
         airway pressure, flow, tidal volume) and unit, etc., must match.
-
 
         Args:
             other: object that will be compared to self.
@@ -113,7 +109,8 @@ class Equivalence:
                 self._check_equivalence: list[str]
                 for attr in self._check_equivalence:
                     if (s := getattr(self, attr)) != (o := getattr(other, attr)):
-                        raise f"Attribute {attr} doesn't match: {s}, {o}"
+                        msg = f"Attribute {attr} doesn't match: {s}, {o}"
+                        raise EquivalenceError(msg)  # noqa: TRY301
 
         # raise or return if a check fails
         except EquivalenceError:

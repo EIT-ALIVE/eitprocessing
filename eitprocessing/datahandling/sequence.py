@@ -67,11 +67,12 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
     def __add__(self, other: Sequence) -> Sequence:
         return self.concatenate(self, other)
 
-    @classmethod
+    @classmethod  # TODO: why is this a class method? In other cases it's instance method
     def concatenate(
         cls,
         a: Sequence,
         b: Sequence,
+        newlabel: str | None = None,
     ) -> Sequence:
         """Create a merge of two Sequence objects."""
         # TODO: rewrite
@@ -82,9 +83,15 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         )
         concat_sparse = a.sparse_data.concatenate(b.sparse_data) if a.sparse_data and b.sparse_data else None
 
+        newlabel = newlabel or f"Merge of <{a.label}> and <{b.label}>"
         # TODO: add concatenation of other attached objects
 
-        return a.__class__(eit_data=concat_eit, continuous_data=concat_continuous, sparse_data=concat_sparse)
+        return a.__class__(
+            eit_data=concat_eit,
+            continuous_data=concat_continuous,
+            sparse_data=concat_sparse,
+            label=newlabel,
+        )
 
     def _sliced_copy(self, start_index: int, end_index: int, newlabel: str) -> Self:
         # TODO: consider if the if not parts below are required
