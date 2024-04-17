@@ -44,11 +44,13 @@ class EITData(SelectByTime, Equivalence):
     phases: list = field(default_factory=list, repr=False)
     events: list = field(default_factory=list, repr=False)
     label: str | None = None
+    name: str | None = None
     pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
 
     def __post_init__(self):
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
+        self.name = self.name or self.label
         self._check_equivalence = ["label", "vendor", "framerate"]
 
     @staticmethod
@@ -69,16 +71,17 @@ class EITData(SelectByTime, Equivalence):
         # Check that data can be concatenated
         self.isequivalent(other, raise_=True)
         if np.min(other.time) <= np.max(self.time):
-            msg = f"{other} (b) starts before {self} (a) ends."
+            msg = f"Concatenation a+b failed because {other.name} (b) starts before {self.name} (a) ends."
             raise ValueError(msg)
 
         self_path = self.ensure_path_list(self.path)
         other_path = self.ensure_path_list(other.path)
+        newlabel = newlabel or f"Merge of <{self.label}> and <{other.label}>"
 
         return self.__class__(
             vendor=self.vendor,
             path=self_path + other_path,
-            label=newlabel or self.label,
+            label=self.label,  # TODO: using newlabel leads to errors
             framerate=self.framerate,
             nframes=self.nframes + other.nframes,
             time=np.concatenate((self.time, other.time)),
@@ -97,8 +100,8 @@ class EITData(SelectByTime, Equivalence):
         time = self.time[start_index:end_index]
         nframes = len(time)
 
-        phases = list(filter(lambda p: start_index <= p.index < end_index, self.phases))
-        events = list(filter(lambda e: start_index <= e.index < end_index, self.events))
+        phases = None  # TODO: phases will disappear anyway in #168 (see https://github.com/EIT-ALIVE/eitprocessing/issues/188#issuecomment-2058332227)
+        events = None  # I believe as above; list(filter(lambda e: start_index <= e.index < end_index, self.events))
 
         pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
 
