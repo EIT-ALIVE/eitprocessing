@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 
@@ -13,8 +13,10 @@ if TYPE_CHECKING:
 
     from typing_extensions import Any, Self
 
+T = TypeVar("T", bound="ContinuousData")
 
-@dataclass
+
+@dataclass(eq=False)
 class ContinuousData(Equivalence, SelectByTime):
     """Data class for (non-EIT) data with a continuous time axis.
 
@@ -27,7 +29,7 @@ class ContinuousData(Equivalence, SelectByTime):
         parameters: Parameters used to derive this data.
         derived_from: Traceback of intermediates from which the current data was derived.
         values: Data points.
-    """
+    """  # TODO: update docstring
 
     label: str
     name: str
@@ -86,6 +88,28 @@ class ContinuousData(Equivalence, SelectByTime):
         )
         obj.unlock()
         return obj
+
+    def __add__(self: T, other: T) -> T:
+        return self.concatenate(self, other)
+
+    def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be removed soon
+        # TODO: compare both concatenate methods and check what is needed from both and merge into one
+        # Check that data can be concatenated
+        self.isequivalent(other, raise_=True)
+        if np.min(other.time) <= np.max(self.time):
+            msg = f"{other} (b) starts before {self} (a) ends."
+            raise ValueError(msg)
+
+        cls = self.__class__
+
+        return cls(
+            name=self.name,
+            label=newlabel or self.label,
+            unit=self.unit,
+            category=self.category,
+            time=np.concatenate((self.time, other.time)),
+            values=np.concatenate((self.values, other.values)),
+        )
 
     def derive(self, label: str, function: Callable, func_args: dict, **kwargs) -> Self:
         """Create a copy deriving data from values attribute.
@@ -187,7 +211,7 @@ class ContinuousData(Equivalence, SelectByTime):
         self,
         start_index: int,
         end_index: int,
-        label: str,
+        newlabel: str,
     ) -> Self:
         # TODO: check correct implementation
         cls = self.__class__
@@ -196,7 +220,7 @@ class ContinuousData(Equivalence, SelectByTime):
         description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
 
         return cls(
-            label=label,
+            label=newlabel,
             name=self.name,
             unit=self.unit,
             category=self.category,

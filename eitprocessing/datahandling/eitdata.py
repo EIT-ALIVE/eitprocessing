@@ -25,13 +25,16 @@ class EITData(SelectByTime, Equivalence):
     This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
     class is meant to hold data from (part of) a singular continuous measurement.
 
-    This class can't be initialized directly. Instead, use `EITData.from_path(...)` to load data from disk.
-    Currently, loading data from three vendors is supported. You can either pass the vendor when using
-    `EITData.from_path(..., vendor="timpel")`, or use one of the available subclasses of EITData:
-    `SentecEITData.from_path(...)`.
+    This class can't be initialized directly. Instead, use `load_eit_data(<path>, vendor=<vendor>)` to load data from
+    disk.
+
+    Args:
+        path: the path of list of paths of the source from which data was derived.
+        nframes: number of frames
+        time:
 
     Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
-    """
+    """  # TODO: fix docstring
 
     path: Path | list[Path]
     nframes: int
@@ -46,7 +49,7 @@ class EITData(SelectByTime, Equivalence):
     def __post_init__(self):
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
-        self._check_equivalence = ["vendor", "framerate"]
+        self._check_equivalence = ["label", "vendor", "framerate"]
 
     @staticmethod
     def ensure_path_list(path: str | Path | list[str | Path]) -> list[Path]:
@@ -62,49 +65,33 @@ class EITData(SelectByTime, Equivalence):
     def __add__(self: T, other: T) -> T:
         return self.concatenate(self, other)
 
-    def concatenate(self: T, other: T, label: str | None = None) -> T:  # noqa: D102, will be removed soon
-        cls = self.__class__
+    def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be moved to mixin in future
+        # Check that data can be concatenated
         self.isequivalent(other, raise_=True)
-
-        a_path = cls.ensure_path_list(self.path)
-        b_path = cls.ensure_path_list(other.path)
-        path = a_path + b_path
-
         if np.min(other.time) <= np.max(self.time):
             msg = f"{other} (b) starts before {self} (a) ends."
             raise ValueError(msg)
-        time = np.concatenate((self.time, other.time))
 
-        pixel_impedance = np.concatenate((self.pixel_impedance, other.pixel_impedance), axis=0)
-
-        if self.label != other.label:
-            msg = "Can't concatenate data with different labels."
-            raise ValueError(msg)
-
-        label = self.label
-        framerate = self.framerate
-        nframes = self.nframes + other.nframes
-
-        phases = self.phases + other.phases
-        events = self.events + other.events
+        self_path = self.ensure_path_list(self.path)
+        other_path = self.ensure_path_list(other.path)
 
         return self.__class__(
             vendor=self.vendor,
-            path=path,
-            label=label,
-            framerate=framerate,
-            nframes=nframes,
-            time=time,
-            pixel_impedance=pixel_impedance,
-            phases=phases,
-            events=events,
+            path=self_path + other_path,
+            label=newlabel or self.label,
+            framerate=self.framerate,
+            nframes=self.nframes + other.nframes,
+            time=np.concatenate((self.time, other.time)),
+            pixel_impedance=np.concatenate((self.pixel_impedance, other.pixel_impedance), axis=0),
+            phases=self.phases + other.phases,
+            events=self.events + other.events,
         )
 
     def _sliced_copy(
         self,
         start_index: int,
         end_index: int,
-        label: str,
+        newlabel: str,
     ) -> Self:
         cls = self.__class__
         time = self.time[start_index:end_index]
@@ -123,7 +110,7 @@ class EITData(SelectByTime, Equivalence):
             framerate=self.framerate,
             phases=phases,
             events=events,
-            label=label,
+            label=newlabel,
             pixel_impedance=pixel_impedance,
         )
 

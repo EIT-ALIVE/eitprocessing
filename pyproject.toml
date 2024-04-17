@@ -134,7 +134,11 @@ ignore = [
 
 # Set autofixing.
 fixable = ["ALL"]
-unfixable = ["F401"] # unused imports (should not disappear while editing)
+unfixable = [
+    "F401",   # unused imports (should not disappear while editing)
+    "RUF100", # unused noqa (should not disappear while editing)
+    "B905",   # autofill strictness of zip (think about preferred behavior)
+]
 extend-safe-fixes = [
     "D415",   # First line should end with a period, question mark, or exclamation point
     "D300",   # Use triple double quotes `"""`
@@ -155,8 +159,9 @@ isort.known-first-party = ["eitprocessing"]
 [tool.ruff.lint.per-file-ignores]
 "*.ipynb" = ["ERA001"] # Commented out code
 "tests/*" = [
-    "S101",   # Use of `assert` detected
-    "ANN201", # Missing return type
-    "D103",   # Missing function docstring
+    "S101",    # Use of `assert` detected
+    "ANN201",  # Missing return type
+    "D103",    # Missing function docstring
+    "PLR2004", # Comparison against unnamed value
 ]
 "docs/*" = ["ALL"]

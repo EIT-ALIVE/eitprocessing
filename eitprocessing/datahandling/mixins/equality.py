@@ -22,38 +22,43 @@ class Equivalence:
             return False
 
         if is_dataclass(self):
-            t1 = vars(self).values()
-            t2 = vars(other).values()
-            if len(t1) != len(t2):
+            attrs_self = Equivalence._remove_naming_info(vars(self))
+            attrs_other = Equivalence._remove_naming_info(vars(other))
+            if set(attrs_self.keys()) != set(attrs_other.keys()):
                 return False
-            return all(Equivalence._array_safe_eq(a1, a2) for a1, a2 in zip(t1, t2, strict=True))
+            return all(Equivalence._array_safe_eq((attrs_self[k], attrs_other[k]) for k in attrs_self))
 
-        if isinstance(self, UserDict):
-            if set(self.keys()) != set(other.keys()):
-                return False
-            return all(Equivalence.__eq__(self[key], other[key]) for key in set(self.keys()))
-
-        return Equivalence._array_safe_eq(self, other)
+          return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
-    def _array_safe_eq(a: Any, b: Any) -> bool:  # noqa: ANN401
+    def _array_safe_eq(a: Any, b: Any) -> bool:  # noqa: ANN401, PLR0911
         """Check if a and b are equal, even if they are numpy arrays containing nans."""
-        if isinstance(a, np.ndarray) and isinstance(b, np.ndarray):
-            return a.shape == b.shape and np.array_equal(a, b, equal_nan=True)
+        if not isinstance(b, type(a)):
+            return NotImplemented
 
-        if not isinstance(a, Equivalence) and not isinstance(b, Equivalence):
+        if isinstance(a, np.ndarray):
+            return np.shape(a) == np.shape(b) and np.array_equal(a, b, equal_nan=True)
+
+        if not isinstance(a, Equivalence):
             return a == b
 
-        if isinstance(a, dict) and isinstance(b, dict):
+        if isinstance(a, dict):  # TODO: check whether this is still necessary for dicts #185
             return dict.__eq__(a, b)
+
+        if isinstance(a, UserDict):
+            return UserDict.__eq__(a, b)
 
         try:
             # `a == b` could trigger an infinite loop when called on an instance of Equivalence
             # object.__eq__() works for most objects, except those implemented seperately above
             return object.__eq__(a, b)
-
         except TypeError:
-            return NotImplemented
+            return False
+
+    @staticmethod
+    def _remove_naming_info(d: dict | UserDict) -> dict:
+        x = ["label", "name", "description"]
+        return {k: v for k, v in d.items() if k not in x}
 
     def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901
         """Test whether the data structure between two objects are equivalent.
@@ -76,7 +81,7 @@ class Equivalence:
         Returns:
             bool describing result of equivalence comparison.
         """
-        if self is other:
+        if self == other:
             return True
 
         try:
@@ -102,7 +107,7 @@ class Equivalence:
                 self._check_equivalence: list[str]
                 for attr in self._check_equivalence:
                     if (s := getattr(self, attr)) != (o := getattr(other, attr)):
-                        raise f"{attr.capitalize()}s don't match: {s}, {o}"
+                        raise f"Attribute {attr} doesn't match: {s}, {o}"
 
         # raise or return if a check fails
         except EquivalenceError:
