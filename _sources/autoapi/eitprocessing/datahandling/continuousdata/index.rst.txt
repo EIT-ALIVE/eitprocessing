@@ -17,6 +17,18 @@ Classes
 
 
 
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.continuousdata.T
+
+
+.. py:data:: T
+
+   
+
 .. py:class:: ContinuousData
 
 
@@ -106,6 +118,12 @@ Classes
       Whenever data is altered, it should probably be copied first. The alterations should then be made in the copy.
 
 
+   .. py:method:: __add__(other: T) -> T
+
+
+   .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
+
+
    .. py:method:: derive(label: str, function: collections.abc.Callable, func_args: dict, **kwargs) -> typing_extensions.Self
 
       Create a copy deriving data from values attribute.
@@ -178,7 +196,7 @@ Classes
    .. py:method:: __len__()
 
 
-   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
 
       Slicing method that must be implemented by all subclasses.
 

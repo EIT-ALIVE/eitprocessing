@@ -130,10 +130,12 @@ Functions
    This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
    class is meant to hold data from (part of) a singular continuous measurement.
 
-   This class can't be initialized directly. Instead, use `EITData.from_path(...)` to load data from disk.
-   Currently, loading data from three vendors is supported. You can either pass the vendor when using
-   `EITData.from_path(..., vendor="timpel")`, or use one of the available subclasses of EITData:
-   `SentecEITData.from_path(...)`.
+   This class can't be initialized directly. Instead, use `load_eit_data(<path>, vendor=<vendor>)` to load data from
+   disk.
+
+   :param path: the path of list of paths of the source from which data was derived.
+   :param nframes: number of frames
+   :param time:
 
    Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
 
@@ -226,10 +228,10 @@ Functions
    .. py:method:: __add__(other: T) -> T
 
 
-   .. py:method:: concatenate(other: T, label: str | None = None) -> T
+   .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
 
 
-   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
 
       Slicing method that must be implemented by all subclasses.
 
@@ -344,7 +346,7 @@ Functions
       Create a merge of two Sequence objects.
 
 
-   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
 
       Slicing method that must be implemented by all subclasses.
 

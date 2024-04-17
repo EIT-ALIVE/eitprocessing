@@ -92,7 +92,7 @@ Classes
       Create a merge of two Sequence objects.
 
 
-   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
 
       Slicing method that must be implemented by all subclasses.
 

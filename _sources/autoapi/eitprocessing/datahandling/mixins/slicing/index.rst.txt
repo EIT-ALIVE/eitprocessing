@@ -40,7 +40,7 @@ Classes
    .. py:method:: __getitem__(key: slice | int)
 
 
-   .. py:method:: select_by_index(start: int | None = None, end: int | None = None, label: str | None = None) -> typing_extensions.Self
+   .. py:method:: select_by_index(start: int | None = None, end: int | None = None, newlabel: str | None = None) -> typing_extensions.Self
 
       De facto implementation of the `__getitem__ function.
 
@@ -49,7 +49,7 @@ Classes
       object is attached.
 
 
-   .. py:method:: _sliced_copy(start_index: int, end_index: int, label: str) -> typing_extensions.Self
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
       :abstractmethod:
 
       Slicing method that must be implemented by all subclasses.
