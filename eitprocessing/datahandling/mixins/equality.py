@@ -26,9 +26,13 @@ class Equivalence:
             attrs_other = Equivalence._remove_naming_info(vars(other))
             if set(attrs_self.keys()) != set(attrs_other.keys()):
                 return False
-            return all(Equivalence._array_safe_eq((attrs_self[k], attrs_other[k]) for k in attrs_self))
+            return all(
+                Equivalence._array_safe_eq(
+                    (attrs_self[k], attrs_other[k]) for k in attrs_self
+                )
+            )
 
-          return Equivalence._array_safe_eq(self, other)
+        return Equivalence._array_safe_eq(self, other)
 
     @staticmethod
     def _array_safe_eq(a: Any, b: Any) -> bool:  # noqa: ANN401, PLR0911
@@ -42,7 +46,9 @@ class Equivalence:
         if not isinstance(a, Equivalence):
             return a == b
 
-        if isinstance(a, dict):  # TODO: check whether this is still necessary for dicts #185
+        if isinstance(
+            a, dict
+        ):  # TODO: check whether this is still necessary for dicts #185
             return dict.__eq__(a, b)
 
         if isinstance(a, UserDict):
