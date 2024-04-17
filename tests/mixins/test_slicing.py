@@ -118,7 +118,7 @@ def test_concatenate(
     draeger1: Sequence,
     draeger2: Sequence,
     draeger_both: Sequence,
-    # timpel1: Sequence,
+    timpel1: Sequence,
     # timpel_double: Sequence,
 ):
     merged_draeger = Sequence.concatenate(draeger2, draeger1)
@@ -128,6 +128,13 @@ def test_concatenate(
     assert merged_draeger == draeger_both
     added_draeger = draeger2 + draeger1
     assert added_draeger == merged_draeger
+
+    # slice and concatenate
+    pytest.skip("slice and concatenate doesn't work")
+    cutoff_pont = 100
+    part1 = timpel1[:cutoff_pont]
+    part2 = timpel1[cutoff_pont:]
+    assert timpel1 == Sequence.concatenate(part1, part2)
 
     # TODO: add tests for:
     # - concatenating a third Sequence on top (or two double-sequences), also checking that path attribute is flat list

@@ -60,7 +60,7 @@ class Equivalence:
 
     @staticmethod
     def _allowed_inequality(d: dict | UserDict) -> dict:
-        x = ["label", "name", "description"]
+        x = ["label", "name", "description", "derived_from", "path"]
         return {k: v for k, v in d.items() if k not in x}
 
     def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901

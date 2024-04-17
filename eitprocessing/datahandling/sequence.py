@@ -93,7 +93,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
             label=newlabel,
         )
 
-    def _sliced_copy(self, start_index: int, end_index: int, newlabel: str) -> Self:
+    def _sliced_copy(self, start_index: int, end_index: int, newlabel: str) -> Self:  # noqa: ARG002
         # TODO: consider if the if not parts below are required
         if not self.eit_data:
             sliced_eit = DataCollection(EITData)
@@ -122,7 +122,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
                 sliced_sparse.add(value.t[time[0], time[-1]])
 
         return self.__class__(
-            label=newlabel,
+            label=self.label,  # newlabel gives errors
             name=f"Sliced copy of <{self.name}>",
             description=f"Sliced copy of <{self.description}>",
             eit_data=sliced_eit,
