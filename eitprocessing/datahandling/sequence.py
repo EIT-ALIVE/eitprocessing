@@ -94,32 +94,22 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         )
 
     def _sliced_copy(self, start_index: int, end_index: int, newlabel: str) -> Self:  # noqa: ARG002
-        # TODO: consider if the if not parts below are required
-        if not self.eit_data:
-            sliced_eit = DataCollection(EITData)
-        else:
-            sliced_eit = DataCollection(EITData)
-            for value in self.eit_data.values():
-                sliced_eit.add(value[start_index:end_index])
+        if start_index >= len(self.time):
+            msg = "start_index larger than length of time axis"
+            raise ValueError(msg)
+        time = self.time[start_index:end_index]
 
-        if not self.continuous_data:
-            sliced_continuous = self.continuous_data
-        else:
-            sliced_continuous = DataCollection(ContinuousData)
-            for value in self.continuous_data.values():
-                sliced_continuous.add(value[start_index:end_index])
+        sliced_eit = DataCollection(EITData)
+        for value in self.eit_data.values():
+            sliced_eit.add(value[start_index:end_index])
 
-        if not self.sparse_data:
-            sliced_sparse = self.sparse_data
-        else:
-            sliced_sparse = DataCollection(SparseData)
-            if start_index >= len(self.time):
-                msg = "start_index larger than length of time axis"
-                raise ValueError(msg)
+        sliced_continuous = DataCollection(ContinuousData)
+        for value in self.continuous_data.values():
+            sliced_continuous.add(value[start_index:end_index])
 
-            time = self.time[start_index:end_index]
-            for value in self.sparse_data.values():
-                sliced_sparse.add(value.t[time[0], time[-1]])
+        sliced_sparse = DataCollection(SparseData)
+        for value in self.sparse_data.values():
+            sliced_sparse.add(value.t[time[0], time[-1]])
 
         return self.__class__(
             label=self.label,  # newlabel gives errors
