@@ -100,10 +100,10 @@ class EITData(SelectByTime, Equivalence):
         time = self.time[start_index:end_index]
         nframes = len(time)
 
-        phases = self.phases  # TODO: phases will disappear anyway in #168 (see https://github.com/EIT-ALIVE/eitprocessing/issues/188#issuecomment-2058332227)
-        events = self.events  # TODO: I believe as above
-        # phases = list(filter(lambda p: start_index <= p.index < end_index, self.phases))  #noqa: ERA001
-        # events = list(filter(lambda e: start_index <= e.index < end_index, self.events))  #noqa: ERA001
+        # phases = self.phases  # TODO: phases will disappear anyway in #168 (see https://github.com/EIT-ALIVE/eitprocessing/issues/188#issuecomment-2058332227)
+        # events = self.events  # TODO: I believe as above
+        phases = list(filter(lambda p: start_index <= p.index < end_index, self.phases))  # noqa: ERA001
+        events = list(filter(lambda e: start_index <= e.index < end_index, self.events))  # noqa: ERA001
 
         pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
 
