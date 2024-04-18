@@ -93,19 +93,19 @@ def load_from_single_path(
         framerate = DRAEGER_FRAMERATE
 
     eit_data_collection = DataCollection(EITData)
-    eit_data_collection.add(
-        EITData(
-            vendor=Vendor.DRAEGER,
-            path=path,
-            framerate=framerate,
-            nframes=n_frames,
-            time=time,
-            phases=phases,
-            events=events,
-            label="raw",
-            pixel_impedance=pixel_impedance,
-        ),
+    eit_data = EITData(
+        vendor=Vendor.DRAEGER,
+        path=path,
+        framerate=framerate,
+        nframes=n_frames,
+        time=time,
+        phases=phases,
+        events=events,
+        label="raw",
+        pixel_impedance=pixel_impedance,
     )
+    eit_data_collection.add(eit_data)
+
     (
         continuous_data_collection,
         sparse_data_collection,
@@ -123,6 +123,38 @@ def load_from_single_path(
             derived_from=[eit_data_collection["raw"]],
             time=eit_data_collection["raw"].time,
             values=eit_data_collection["raw"]._calculate_global_impedance(),  # noqa: SLF001
+        ),
+    )
+    sparse_data_collection.add(
+        SparseData(
+            label="minvalues_(draeger)",
+            name="Minimum values detected by Draeger device.",
+            unit=None,
+            category="minvalue",
+            derived_from=[eit_data],
+            time=[t for t, d in phases if d == -1],
+        ),
+    )
+    sparse_data_collection.add(
+        SparseData(
+            label="maxvalues_(draeger)",
+            name="Maximum values detected by Draeger device.",
+            unit=None,
+            category="maxvalue",
+            derived_from=[eit_data],
+            time=[t for t, d in phases if d == 1],
+        ),
+    )
+    time, events = zip(*events, strict=True)
+    sparse_data_collection.add(
+        SparseData(
+            label="events_(draeger)",
+            name="Events loaded from Draeger data",
+            unit=None,
+            category="event",
+            derived_from=[eit_data],
+            time=np.array(time),
+            values=list(events),
         ),
     )
 
@@ -203,14 +235,12 @@ def _read_frame(
     # Therefore, check whether the event marker has changed with
     # respect to the most recent event. If so, create a new event.
     if (previous_marker is not None) and (event_marker > previous_marker):
-        events.append(Event(index + first_frame, frame_time, event_marker, event_text))
+        events.append((frame_time, Event(event_marker, event_text)))
     if timing_error:
         warnings.warn("A timing error was encountered during loading.")
         # TODO: expand on what timing errors are in some documentation.
-    if min_max_flag == 1:
-        phases.append(MaxValue(index + first_frame, frame_time))
-    elif min_max_flag == -1:
-        phases.append(MinValue(index + first_frame, frame_time))
+    if min_max_flag in (1, -1):
+        phases.append((frame_time, min_max_flag))
 
     return event_marker
 
