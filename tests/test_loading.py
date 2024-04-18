@@ -67,7 +67,6 @@ def test_load_partial(
     draeger2: Sequence,
     timpel1: Sequence,
 ):
-    pytest.skip("sliced eit data doesn't match partially loaded data...")
     cutoff = 58
     # Keep cutoff at 58 for draeger2 as there is an event mark at this
     # timepoint. Starting the load specifically at the timepoint of an event
