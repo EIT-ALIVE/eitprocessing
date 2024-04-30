@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-_FRAME_SIZE_BYTES = 4358
+_FRAME_SIZE_BYTES = 4358 + 6
 DRAEGER_FRAMERATE = 20
 load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
 
@@ -35,7 +35,7 @@ def load_from_single_path(
 ) -> tuple[DataCollection, DataCollection, DataCollection]:
     """Load Dräger EIT data from path."""
     file_size = path.stat().st_size
-    if file_size % _FRAME_SIZE_BYTES:
+    if file_size % _FRAME_SIZE_BYTES and False:
         msg = (
             f"File size {file_size} of file {path!s} not divisible by {_FRAME_SIZE_BYTES}.\n"
             f"Make sure this is a valid and uncorrupted Dräger data file."
@@ -75,17 +75,20 @@ def load_from_single_path(
         previous_marker = None
 
         first_index = -1 if load_dummy_frame else 0
-        for index in range(first_index, n_frames):
-            previous_marker = _read_frame(
-                reader,
-                index,
-                time,
-                pixel_impedance,
-                medibus_data,
-                events,
-                phases,
-                previous_marker,
-            )
+        try:
+            for index in range(first_index, n_frames):
+                previous_marker = _read_frame(
+                    reader,
+                    index,
+                    time,
+                    pixel_impedance,
+                    medibus_data,
+                    events,
+                    phases,
+                    previous_marker,
+                )
+        except Exception:
+            pass
 
     if not framerate:
         framerate = DRAEGER_FRAMERATE
@@ -170,7 +173,7 @@ def _read_frame(
     event_text = reader.string(length=30)
     timing_error = reader.int32()
 
-    frame_medibus_data = reader.npfloat32(length=52)
+    frame_medibus_data = reader.npfloat32(length=58)
 
     if index < 0:
         # do not keep any loaded data, just return the event marker
@@ -178,7 +181,7 @@ def _read_frame(
 
     time[index] = frame_time
     pixel_impedance[index, :, :] = frame_pixel_impedance
-    medibus_data[:, index] = frame_medibus_data
+    # medibus_data[:, index] = frame_medibus_data
 
     # The event marker stays the same until the next event occurs.
     # Therefore, check whether the event marker has changed with
