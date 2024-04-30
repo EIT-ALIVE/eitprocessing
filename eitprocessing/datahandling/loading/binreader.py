@@ -69,7 +69,7 @@ class BinReader:
         data = self._read_full_type_code(full_type_code)
         return np.array(data, dtype=cast)
 
-    def read_string(self, length: int = 1) -> str:
+    def read_string(self, length: int = 1, encoding: str = "utf-8") -> str:
         """Read and return a string with a given length.
 
         Reads `length` characters of type code 's' and returns as a string. When length is not provided, a single
@@ -77,10 +77,11 @@ class BinReader:
 
         Args:
             length: number of characters.
+            encoding: defaults to 'utf-8'.
         """
         full_type_code = f"{length}s"
         data = self._read_full_type_code(full_type_code)
-        return data[0].decode().rstrip()
+        return data[0].decode(encoding).rstrip()
 
     string = read_string
 
