@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-_FRAME_SIZE_BYTES = 4358 + 6
+_FRAME_SIZE_BYTES = 4358 + 6 * 4
 DRAEGER_FRAMERATE = 20
 load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
 
@@ -35,7 +35,7 @@ def load_from_single_path(
 ) -> tuple[DataCollection, DataCollection, DataCollection]:
     """Load Dräger EIT data from path."""
     file_size = path.stat().st_size
-    if file_size % _FRAME_SIZE_BYTES and False:
+    if file_size % _FRAME_SIZE_BYTES:
         msg = (
             f"File size {file_size} of file {path!s} not divisible by {_FRAME_SIZE_BYTES}.\n"
             f"Make sure this is a valid and uncorrupted Dräger data file."
