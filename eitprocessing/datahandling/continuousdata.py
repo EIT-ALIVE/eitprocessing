@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Literal, TypeVar
 
 import numpy as np
 
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
+from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
     from typing_extensions import Any, Self
+
 
 T = TypeVar("T", bound="ContinuousData")
 
@@ -242,4 +245,64 @@ class ContinuousData(Equivalence, SelectByTime):
             derived_from=[*self.derived_from, *other.derived_from, self, other],
             time=np.concatenate((self.time, other.time)),
             values=np.concatenate((self.values, other.values)),
+        )
+
+    def to_intervaldata(self, method: Literal["onchange"] = "onchange") -> IntervalData:
+        """Convert the continuous data to interval data.
+
+        Args:
+            method: Method to use for conversion. Defaults to "onchange".
+
+        Returns:
+            IntervalData: Interval data representation of the continuous data.
+        """
+        if method == "onchange":
+            change_indices = np.flatnonzero(np.diff(self.values)) + 1
+            new_value_indices = np.concatenate(([0], change_indices))
+            start_times = self.time[new_value_indices]
+            end_times = np.concatenate((self.time[new_value_indices[1:]], self.time[-1]))
+            new_values = self.values[new_value_indices]
+
+        else:
+            msg = f"Method '{method}' not recognized."
+            raise ValueError(msg)
+
+        return IntervalData(
+            label=self.label,
+            name=self.name,
+            unit=self.unit,
+            description=self.description,
+            category=self.category,
+            derived_from=[*self.derived_from, self],
+            values=new_values,
+            time_ranges=zip(start_times, end_times, strict=True),
+        )
+
+    def to_sparsedata(self, method: Literal["onchange"] = "onchange") -> SparseData:
+        """Convert the continuous data to sparse data.
+
+        Args:
+            method: Method to use for conversion. Defaults to "onchange".
+
+        Returns:
+            SparseData: Sparse data representation of the continuous data.
+        """
+        if method == "onchange":
+            change_indices = np.flatnonzero(np.diff(self.values)) + 1
+            new_value_indices = np.concatenate(([0], change_indices))
+            new_time = self.time[new_value_indices]
+            new_values = self.values[new_value_indices]
+        else:
+            msg = f"Method '{method}' not recognized."
+            raise ValueError(msg)
+
+        return SparseData(
+            label=self.label,
+            name=self.name,
+            unit=self.unit,
+            description=self.description,
+            category=self.category,
+            derived_from=[*self.derived_from, self],
+            values=new_values,
+            time=new_time,
         )
