@@ -8,8 +8,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
-    <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../../../_static/documentation_options.js?v=7026087e"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -136,6 +134,7 @@
                 <span class="n">events</span><span class="p">,</span>
                 <span class="n">phases</span><span class="p">,</span>
                 <span class="n">previous_marker</span><span class="p">,</span>
+                <span class="n">first_frame</span><span class="p">,</span>
             <span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">framerate</span><span class="p">:</span>
@@ -210,6 +209,7 @@
     <span class="n">events</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
     <span class="n">phases</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
     <span class="n">previous_marker</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read frame by frame data from DRAEGER files.</span>
 
@@ -241,14 +241,14 @@
     <span class="c1"># Therefore, check whether the event marker has changed with</span>
     <span class="c1"># respect to the most recent event. If so, create a new event.</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">previous_marker</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">event_marker</span> <span class="o">&gt;</span> <span class="n">previous_marker</span><span class="p">):</span>
-        <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">,</span> <span class="n">event_marker</span><span class="p">,</span> <span class="n">event_text</span><span class="p">))</span>
+        <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">,</span> <span class="n">event_marker</span><span class="p">,</span> <span class="n">event_text</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">timing_error</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;A timing error was encountered during loading.&quot;</span><span class="p">)</span>
         <span class="c1"># TODO: expand on what timing errors are in some documentation.</span>
     <span class="k">if</span> <span class="n">min_max_flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MaxValue</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">))</span>
+        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MaxValue</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">))</span>
     <span class="k">elif</span> <span class="n">min_max_flag</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MinValue</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">))</span>
+        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MinValue</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">event_marker</span></div>
 
@@ -372,7 +372,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>

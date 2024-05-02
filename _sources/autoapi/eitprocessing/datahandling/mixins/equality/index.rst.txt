@@ -33,7 +33,7 @@ Classes
       Check if a and b are equal, even if they are numpy arrays containing nans.
 
 
-   .. py:method:: _remove_naming_info(d: dict | collections.UserDict) -> dict
+   .. py:method:: _allowed_inequality(d: dict | collections.UserDict) -> dict
       :staticmethod:
 
 
@@ -44,7 +44,6 @@ Classes
       Equivalence, in this case means that objects are compatible e.g. to be
       merged. Data content can vary, but e.g. the category of data (e.g.
       airway pressure, flow, tidal volume) and unit, etc., must match.
-
 
       :param other: object that will be compared to self.
       :param raise_: sets this method's behavior in case of non-equivalence. If

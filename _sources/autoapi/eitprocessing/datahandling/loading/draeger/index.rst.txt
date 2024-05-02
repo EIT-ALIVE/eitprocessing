@@ -60,7 +60,7 @@ Attributes
 .. py:function:: _convert_medibus_data(medibus_data: numpy.typing.NDArray, time: numpy.typing.NDArray) -> tuple[eitprocessing.datahandling.datacollection.DataCollection, eitprocessing.datahandling.datacollection.DataCollection]
 
 
-.. py:function:: _read_frame(reader: eitprocessing.datahandling.loading.binreader.BinReader, index: int, time: numpy.typing.NDArray, pixel_impedance: numpy.typing.NDArray, medibus_data: numpy.typing.NDArray, events: list, phases: list, previous_marker: int | None) -> int
+.. py:function:: _read_frame(reader: eitprocessing.datahandling.loading.binreader.BinReader, index: int, time: numpy.typing.NDArray, pixel_impedance: numpy.typing.NDArray, medibus_data: numpy.typing.NDArray, events: list, phases: list, previous_marker: int | None, first_frame: int = 0) -> int
 
    Read frame by frame data from DRAEGER files.
 

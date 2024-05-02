@@ -208,6 +208,11 @@ Functions
 
       
 
+   .. py:attribute:: name
+      :type: str | None
+
+      
+
    .. py:attribute:: pixel_impedance
       :type: numpy.ndarray
 
@@ -340,7 +345,7 @@ Functions
    .. py:method:: __add__(other: Sequence) -> Sequence
 
 
-   .. py:method:: concatenate(a: Sequence, b: Sequence) -> Sequence
+   .. py:method:: concatenate(a: Sequence, b: Sequence, newlabel: str | None = None) -> Sequence
       :classmethod:
 
       Create a merge of two Sequence objects.

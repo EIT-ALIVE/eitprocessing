@@ -118,6 +118,11 @@ Attributes
 
       
 
+   .. py:attribute:: name
+      :type: str | None
+
+      
+
    .. py:attribute:: pixel_impedance
       :type: numpy.ndarray
 

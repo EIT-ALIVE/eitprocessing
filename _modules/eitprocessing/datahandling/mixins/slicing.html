@@ -8,8 +8,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
-    <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../../../_static/documentation_options.js?v=7026087e"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -39,7 +37,6 @@
   <h1>Source code for eitprocessing.datahandling.mixins.slicing</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span> <span class="nn">bisect</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
@@ -49,6 +46,9 @@
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
+
+<span class="c1"># TODO: when slice by time is implemented, remove line below to activate linting</span>
+<span class="c1"># ruff: noqa</span>
 
 
 <div class="viewcode-block" id="SelectByIndex">
@@ -104,13 +104,10 @@
             <span class="k">return</span> <span class="bp">self</span>
 
         <span class="n">start</span> <span class="o">=</span> <span class="n">start</span> <span class="ow">or</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">end</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">end</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">newlabel</span> <span class="o">=</span> <span class="n">newlabel</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;Slice (</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">] of &lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
-        <span class="k">if</span> <span class="n">newlabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">newlabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sliced_copy</span><span class="p">(</span><span class="n">start_index</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end_index</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">newabel</span><span class="o">=</span><span class="n">newlabel</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sliced_copy</span><span class="p">(</span><span class="n">start_index</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end_index</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">newlabel</span><span class="o">=</span><span class="n">newlabel</span><span class="p">)</span></div>
 
 
     <span class="nd">@abstractmethod</span>
@@ -164,29 +161,30 @@
 
 <div class="viewcode-block" id="SelectByTime.select_by_time">
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime.select_by_time">[docs]</a>
-    <span class="k">def</span> <span class="nf">select_by_time</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
+    <span class="k">def</span> <span class="nf">select_by_time</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">end_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">start_inclusive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">end_inclusive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">n_before</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">n_after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="c1"># start_behavior: Literal[&quot;force_inclusive&quot;, &quot;inclusive&quot;, &quot;exclusive&quot;] = &quot;inclusive&quot;,</span>
+        <span class="c1"># end_behavior: Literal[&quot;force_exclusive&quot;, &quot;exclusive&quot;, &quot;inclusive&quot;] = &quot;exclusive&quot;,</span>
         <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a slice from start to end time stamps.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Slice object according to time stamps (i.e. its value, not its index).</span>
 
-<span class="sd">        Given a start and end time stamp (i.e. its value, not its index),</span>
-<span class="sd">        return a slice of the original object, which must contain a time axis.</span>
+<span class="sd">        The sliced object must contain a time axis.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            start_time: first time point to include. Defaults to first frame of sequence.</span>
-<span class="sd">            end_time: last time point. Defaults to last frame of sequence.</span>
-<span class="sd">            start_inclusive (default: `True`), end_inclusive (default `False`):</span>
-<span class="sd">                these arguments control the behavior if the given time stamp</span>
-<span class="sd">                does not match exactly with an existing time stamp of the input.</span>
-<span class="sd">                if `True`: the given time stamp will be inside the sliced object.</span>
-<span class="sd">                if `False`: the given time stamp will be outside the sliced object.</span>
-<span class="sd">            label: Description. Defaults to None, which will create a label based</span>
-<span class="sd">                on the original object label and the frames by which it is sliced.</span>
+<span class="sd">            start_time: Start time of new object (inclusive). Unless it is lower than the first timepoint, `start_time`</span>
+<span class="sd">                will be present in the time axis of the sliced object. This means that the first timepoint of the sliced</span>
+<span class="sd">                object will be equal to `start_time` if it exists on the unsliced object, and otherwise the last</span>
+<span class="sd">                timepoint preceding `start_time`.</span>
+<span class="sd">                Defaults to None, which is the first time point of the object.</span>
+<span class="sd">            end_time: End time of new object (exclusive). The final timepoint of the sliced object will be the last</span>
+<span class="sd">                timepoint preceding `end_time`, irrespective of whether it exists in the unsliced object.</span>
+<span class="sd">            n_before: Additional time points to include (or exclude if negative) before first time point defined above.</span>
+<span class="sd">            n_after: Additional time points to include (or exclude if negative) after last time point defined above.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            TypeError: if `self` does not contain a `time` attribute.</span>
@@ -195,39 +193,46 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Slice of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># work in progress...</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
         <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Object </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> has no time axis.&quot;</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">start_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No starting or end timepoint was selected.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">):</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Time stamps for </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> are not sorted and therefore data cannot be selected by time.&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">start_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No starting or end timepoint was selected.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">start_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">start_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="n">start_index</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">elif</span> <span class="n">start_inclusive</span><span class="p">:</span>
-            <span class="n">start_index</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_right</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">start_index</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">start_time</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">end_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">end_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">end_inclusive</span><span class="p">:</span>
-            <span class="n">end_index</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">end_index</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_by_index</span><span class="p">(</span>
-            <span class="n">start</span><span class="o">=</span><span class="n">start_index</span><span class="p">,</span>
-            <span class="n">end</span><span class="o">=</span><span class="n">end_index</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
-        <span class="p">)</span></div>
+            <span class="n">start_index</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">n_before</span><span class="p">)</span></div>
 </div>
 
+
+        <span class="c1"># elif start_inclusive:</span>
+        <span class="c1">#     start_index = bisect.bisect_right(self.time, start_time) - 1</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     start_index = bisect.bisect_left(self.time, start_time)</span>
+
+        <span class="c1"># if end_time is None:</span>
+        <span class="c1">#     end_index = len(self.time)</span>
+        <span class="c1"># elif end_inclusive:</span>
+        <span class="c1">#     end_index = bisect.bisect_left(self.time, end_time) + 1</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     end_index = bisect.bisect_left(self.time, end_time)</span>
+
+        <span class="c1"># return self.select_by_index(</span>
+        <span class="c1">#     start=start_index,</span>
+        <span class="c1">#     end=end_index,</span>
+        <span class="c1">#     label=label,</span>
+        <span class="c1"># )</span>
 
 
 <span class="nd">@dataclass</span>
@@ -305,7 +310,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>
