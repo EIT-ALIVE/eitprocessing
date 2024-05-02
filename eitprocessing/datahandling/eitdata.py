@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 from strenum import LowercaseStrEnum
+from tifffile import imwrite
 from typing_extensions import Self
 
 from eitprocessing.datahandling.mixins.equality import Equivalence
@@ -116,6 +117,21 @@ class EITData(SelectByTime, Equivalence):
 
     def __len__(self):
         return self.pixel_impedance.shape[0]
+
+    def export_pixel_data(
+        self,
+        fname: str | Path,
+    ) -> None:
+        """Save pixel impedance data as 3D tiff stack.
+
+        Args:
+            fname: Output file name.
+        """
+        # TODO: add metadata (at the very least time)
+        # TODO: add standardization for output paths
+        # TODO: allow different file formats??
+        # output_path = Path((self.path[0]).parent() / fname) if isinstance(fname, str) else fname #noqa: ERA001
+        imwrite(fname, self.pixel_impedance)
 
     @property
     def global_baseline(self) -> np.ndarray:

@@ -31,8 +31,9 @@ env3
 venv
 venv3
 
-# temporary test data
+# test data
 
 **/test_data/*
 .helpers/dock_test_data/*
 .helpers/dock_test_add/*
+tests/images
