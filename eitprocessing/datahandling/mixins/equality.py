@@ -33,8 +33,8 @@ class Equivalence:
     @staticmethod
     def _array_safe_eq(a: Any, b: Any) -> bool:  # noqa: ANN401, PLR0911
         """Check if a and b are equal, even if they are numpy arrays containing nans."""
-        if not isinstance(b, type(a)):
-            return NotImplemented
+        if not isinstance(b, type(a)) and not isinstance(a, type(b)):
+            return False
 
         if isinstance(a, np.ndarray):
             return np.shape(a) == np.shape(b) and np.array_equal(a, b, equal_nan=True)
