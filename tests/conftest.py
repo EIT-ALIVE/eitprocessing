@@ -14,7 +14,7 @@ environment = os.environ.get(
 data_directory = Path(environment) / "tests" / "test_data"
 draeger_file1 = Path(data_directory) / "Draeger_Test3.bin"
 draeger_file2 = Path(data_directory) / "Draeger_Test.bin"
-timpel_file = Path(data_directory) / "Timpel_Test.txt"
+timpel_file = Path(data_directory) / "Timpel_test.txt"
 dummy_file = Path(data_directory) / "not_a_file.dummy"
 
 
