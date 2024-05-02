@@ -77,11 +77,9 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         """Create a merge of two Sequence objects."""
         # TODO: rewrite
 
-        concat_eit = a.eit_data.concatenate(b.eit_data) if a.eit_data and b.eit_data else None
-        concat_continuous = (
-            a.continuous_data.concatenate(b.continuous_data) if a.continuous_data and b.continuous_data else None
-        )
-        concat_sparse = a.sparse_data.concatenate(b.sparse_data) if a.sparse_data and b.sparse_data else None
+        concat_eit = a.eit_data.concatenate(b.eit_data)
+        concat_continuous = a.continuous_data.concatenate(b.continuous_data)
+        concat_sparse = a.sparse_data.concatenate(b.sparse_data)
 
         newlabel = newlabel or f"Merge of <{a.label}> and <{b.label}>"
         # TODO: add concatenation of other attached objects
