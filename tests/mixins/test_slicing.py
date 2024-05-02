@@ -130,7 +130,6 @@ def test_concatenate(
     assert added_draeger == merged_draeger
 
     # slice and concatenate
-    pytest.skip("slice and concatenate doesn't work")
     cutoff_pont = 100
     part1 = timpel1[:cutoff_pont]
     part2 = timpel1[cutoff_pont:]
