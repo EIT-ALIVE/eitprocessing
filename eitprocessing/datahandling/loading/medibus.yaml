@@ -1,0 +1,261 @@
+MV_CO2:
+  continuous: false
+  signal_name: CO2 flow
+  unit: mL/min
+  import_names: [V'CO2]
+CO2_(%):
+  continuous: true
+  signal_name: CO2
+  unit: '%'
+  import_names: [CO2]
+CO2_(kPa):
+  continuous: true
+  signal_name: CO2
+  unit: kPa
+  import_names: [CO2]
+CO2_(mmHg):
+  continuous: true
+  signal_name: CO2
+  unit: mmHg
+  import_names: [CO2]
+P0.1:
+  continuous: false
+  signal_name: P0.1
+  unit: mbar
+  import_names: [P0.1]
+PEEP:
+  continuous: false
+  signal_name: PEEP
+  unit: mbar
+  import_names: [PEEP]
+P_aw:
+  continuous: true
+  signal_name: airway pressure
+  unit: mbar
+  import_names: [Paw]
+T_aw:
+  continuous: false
+  signal_name: airway temperature
+  unit: degrees C
+  import_names: [Taw]
+V_ds:
+  continuous: false
+  signal_name: dead space volume
+  unit: mL
+  import_names: [Vds]
+C_dyn:
+  continuous: false
+  signal_name: dynamic compliance
+  unit: mL/mbar
+  import_names: [Cdyn]
+E:
+  continuous: false
+  signal_name: elastance
+  unit: mbar/L
+  import_names: [E]
+P_EI:
+  continuous: false
+  signal_name: end-inspiratory pressure
+  unit: mbar
+  import_names: [EIP]
+etCO2_(%):
+  continuous: false
+  signal_name: end-tidal CO2
+  unit: '%'
+  import_names: [etCO2]
+etCO2_(kPa):
+  continuous: false
+  signal_name: end-tidal CO2
+  unit: kPa
+  import_names: [etCO2]
+etCO2_(mmHg):
+  continuous: false
+  signal_name: end-tidal CO2
+  unit: mmHg
+  import_names: [etCO2]
+TV_exp:
+  continuous: false
+  signal_name: expiratory tidal volume
+  unit: mL
+  import_names: [VTe]
+flow:
+  continuous: true
+  signal_name: flow
+  unit: L/min
+  import_names: [Flow]
+FiO2:
+  continuous: false
+  signal_name: fraction inspired O2
+  unit: '%'
+  import_names: [FiO2]
+IE_ratio:
+  continuous: false
+  signal_name: inspiratory:expiratory ratio
+  unit: ''
+  import_names: [I:E]
+PEEPi:
+  continuous: false
+  signal_name: intrinsic PEEP
+  unit: mbar
+  import_names: [PEEPi]
+MV_leak:
+  continuous: false
+  signal_name: leak minute volume
+  unit: L/min
+  import_names: [MVleak]
+leak_(%):
+  continuous: false
+  signal_name: leak percentage
+  unit: '%'
+  import_names: ["% leak"]
+TV_exp_mand:
+  continuous: false
+  signal_name: mandatory expiratory tidal volume
+  unit: mL
+  import_names: [VTemand]
+TV_insp_mand:
+  continuous: false
+  signal_name: mandatory inspiratory tidal volume
+  unit: mL
+  import_names: [VTimand]
+MV_mand:
+  continuous: false
+  signal_name: mandatory minute volume
+  unit: L/min
+  import_names: [MVmand]
+RR_mand:
+  continuous: false
+  signal_name: mandatory respiratory rate
+  unit: /min
+  import_names: [RRmand]
+TV_mand:
+  continuous: false
+  signal_name: mandatory tidal volume
+  unit: L
+  import_names: [VTmand]
+P_mean:
+  continuous: false
+  signal_name: mean pressure
+  unit: mbar
+  import_names: [Pmean]
+P_min:
+  continuous: false
+  signal_name: minimal pressure
+  unit: mbar
+  import_names: [Pmin]
+MV:
+  continuous: false
+  signal_name: minute volume
+  unit: L/min
+  import_names: [MV]
+NIF:
+  continuous: false
+  signal_name: negative inspiratory force
+  unit: mbar
+  import_names: [NIF]
+P_peak:
+  continuous: false
+  signal_name: peak inspiratory pressure
+  unit: mbar
+  import_names: [PIP]
+F_ds:
+  continuous: false
+  signal_name: percentage dead space of expiratory tidal volume
+  unit: '%'
+  import_names: [Vds/VTe]
+MV_spon_(%):
+  continuous: false
+  signal_name: percentage of spontaneous minute volume
+  unit: '%'
+  import_names: ["% MVspon"]
+P_plat:
+  continuous: false
+  signal_name: plateau pressure
+  unit: mbar
+  import_names: [Pplat]
+r^2:
+  continuous: false
+  signal_name: r^2
+  unit: ''
+  import_names: [r²]
+RSBI:
+  continuous: false
+  signal_name: rapid shallow breating index
+  unit: 1/min/L
+  import_names: [RSB]
+C20/Cdyn:
+  continuous: false
+  signal_name: ratio between upper 20% pressure range and total dynamic compliance
+  unit: ''
+  import_names: [C20/Cdyn]
+R:
+  continuous: false
+  signal_name: resistance
+  unit: mbar/L/s
+  import_names: [R]
+RR:
+  continuous: false
+  signal_name: respiratory rate
+  unit: /min
+  import_names: [RR]
+TV_exp_spon:
+  continuous: false
+  signal_name: spontaneous expiratory tidal volume
+  unit: mL
+  import_names: [VTespon]
+TV_insp_spon:
+  continuous: false
+  signal_name: spontaneous inspiratory tidal volume
+  unit: mL
+  import_names: [VTispon]
+t_insp_spon:
+  continuous: false
+  signal_name: spontaneous inspiratory time
+  unit: s
+  import_names: [Tispon]
+IE_ratio_spon:
+  continuous: false
+  signal_name: spontaneous inspiratory:expiratory ratio
+  unit: ''
+  import_names: [I:Espon]
+MV_spon:
+  continuous: false
+  signal_name: spontaneous minute volume
+  unit: L/min
+  import_names: [MVspon]
+RR_spon:
+  continuous: false
+  signal_name: spontaneous respiratory rate
+  unit: /min
+  import_names: [RRspon]
+TV_spon:
+  continuous: false
+  signal_name: spontaneous tidal volume
+  unit: L
+  import_names: [VTspon]
+TV:
+  continuous: false
+  signal_name: tidal volume
+  unit: mL
+  import_names: [VT]
+t_low:
+  continuous: false
+  signal_name: time at low pressure
+  unit: s
+  import_names: [Tlow]
+TC:
+  continuous: false
+  signal_name: time constant
+  unit: s
+  import_names: [TC]
+V_trapped:
+  continuous: false
+  signal_name: trapped volume
+  unit: mL
+  import_names: [Vtrap]
+V:
+  continuous: true
+  signal_name: volume
+  unit: mL
+  import_names: [Volume]
+
