@@ -36,6 +36,13 @@ dependencies = [
     "tqdm >= 4.65.0",
     "strenum >= 0.4.10",
     "ruff >= 0.3",
+    "dcor",
+    "joblib",
+    "llvmlite",
+    "numba",
+    "sparse",
+    "tabulate",
+    "emd"
 ]
 
 [project.optional-dependencies]
