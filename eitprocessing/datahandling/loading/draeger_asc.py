@@ -16,18 +16,26 @@ from eitprocessing.datahandling.sparsedata import SparseData
 column_unit_pattern = re.compile(r"^(?P<continuous>~?)(?P<quantity>.+?)(\ \[(?P<unit>.+?)\])?$")
 
 # %%
-path = Path("tests/test_data/Draeger_Test_4.asc")
+path = Path("tests/test_data/test.asc")
 
 
 # %%
-def load_draeger_asc_file(path: Path):
+def load_draeger_asc_file(path: Path) -> Sequence:
+    """Load a Draeger ASC file.
+
+    Args:
+        path: Path to the file.
+
+    Returns:
+        Sequence containing the parsed data.
+    """
     start_of_table = _find_start_of_data(path)
     data = pd.read_csv(
         path,
         skiprows=start_of_table,
         delimiter="\t",
         decimal=",",
-        encoding="latin1",
+        encoding="iso8859_1",
         na_values="-",
         index_col=False,
     )
@@ -40,44 +48,63 @@ def load_draeger_asc_file(path: Path):
     sparse_data_collection = DataCollection(SparseData)
     interval_data_collection = DataCollection(IntervalData)
 
-    data = _parse_minmax_values(data, time, sparse_data_collection)
-    data = _parse_events(data, time, sparse_data_collection)
+    _parse_minmax_values(data, time, sparse_data_collection)
+    _parse_events(data, time, sparse_data_collection)
+    data = data.drop(columns=["MinMax", "Event", "EventText"])
 
     for column_name, column_data in data.items():
-        if not (match := column_unit_pattern.match(column_name)):
-            msg = f"Could not parse column name {column_name}"
-            raise ValueError(msg)
-
-        unit = match.group("unit")
-        quantity = match.group("quantity")
-        is_continuous = bool(match.group("continuous"))
-        is_interval = False
-
-        if quantity.startswith(("Local ",)) or quantity == "Global":
-            is_continuous = True
-            unit = "a.u."
-
-        continuous_data = ContinuousData(
-            label=quantity,
-            name=quantity.capitalize(),
-            description="",
-            unit=unit,
-            time=time,
-            values=column_data.to_numpy(),
-            category="",
+        _parse_column(
+            column_name,
+            column_data,
+            time,
+            continuous_data_collection,
+            sparse_data_collection,
+            interval_data_collection,
         )
-        if is_continuous:
-            continuous_data_collection.add(continuous_data)
-        elif is_interval:
-            interval_data_collection.add(continuous_data.to_intervaldata())
-        else:
-            sparse_data_collection.add(continuous_data.to_sparsedata())
 
     return Sequence(
         continuous_data=continuous_data_collection,
         sparse_data=sparse_data_collection,
         interval_data=interval_data_collection,
-    ), data
+    )
+
+
+def _parse_column(
+    column_name: str,
+    column_data: pd.Series,
+    time: np.ndarray,
+    continuous_data_collection: DataCollection[ContinuousData],
+    sparse_data_collection: DataCollection[SparseData],
+    interval_data_collection: DataCollection[IntervalData],
+):
+    if not (match := column_unit_pattern.match(column_name)):
+        msg = f"Could not parse column name {column_name}"
+        raise ValueError(msg)
+
+    unit = match.group("unit")
+    quantity = match.group("quantity")
+    is_continuous = bool(match.group("continuous"))
+    is_interval = False
+
+    if quantity.startswith(("Local ",)) or quantity == "Global":
+        is_continuous = True
+        unit = "a.u."
+
+    continuous_data = ContinuousData(
+        label=quantity,
+        name=quantity.capitalize(),
+        description="",
+        unit=unit,
+        time=time,
+        values=column_data.to_numpy(),
+        category="",
+    )
+    if is_continuous:
+        continuous_data_collection.add(continuous_data)
+    elif is_interval:
+        interval_data_collection.add(continuous_data.to_intervaldata())
+    else:
+        sparse_data_collection.add(continuous_data.to_sparsedata())
 
 
 # %%
@@ -121,8 +148,6 @@ def _parse_minmax_values(
         ),
     )
 
-    return data.drop(columns="MinMax")
-
 
 def _parse_events(data: pd.DataFrame, time: np.ndarray, sparse_data_collection: DataCollection[SparseData]) -> None:
     event_indices = np.flatnonzero(data["Event"].diff() == 1)
@@ -140,8 +165,6 @@ def _parse_events(data: pd.DataFrame, time: np.ndarray, sparse_data_collection: 
             values=event_texts,
         ),
     )
-
-    return data.drop(columns=["Event", "EventText"])
 
 
 # %%
