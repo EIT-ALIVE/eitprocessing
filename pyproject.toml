@@ -42,7 +42,8 @@ dependencies = [
     "numba",
     "sparse",
     "tabulate",
-    "emd"
+    "emd",
+    "pywavelets"
 ]
 
 [project.optional-dependencies]
