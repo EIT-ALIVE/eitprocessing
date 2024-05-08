@@ -104,9 +104,9 @@
 
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Equivalence._allowed_inequality">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence._allowed_inequality">[docs]</a>
-    <span class="k">def</span> <span class="nf">_allowed_inequality</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">UserDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<div class="viewcode-block" id="Equivalence._return_equality_attributes">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence._return_equality_attributes">[docs]</a>
+    <span class="k">def</span> <span class="nf">_return_equality_attributes</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">UserDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;derived_from&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">}</span></div>
 

@@ -33,7 +33,7 @@ Classes
       Check if a and b are equal, even if they are numpy arrays containing nans.
 
 
-   .. py:method:: _allowed_inequality(d: dict | collections.UserDict) -> dict
+   .. py:method:: _return_equality_attributes(d: dict | collections.UserDict) -> dict
       :staticmethod:
 
 
