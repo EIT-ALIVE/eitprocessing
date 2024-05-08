@@ -22,8 +22,8 @@ class Equivalence:
             return False
 
         if is_dataclass(self):
-            attrs_self = Equivalence._allowed_inequality(vars(self))
-            attrs_other = Equivalence._allowed_inequality(vars(other))
+            attrs_self = Equivalence._return_equality_attributes(vars(self))
+            attrs_other = Equivalence._return_equality_attributes(vars(other))
             if set(attrs_self.keys()) != set(attrs_other.keys()):
                 return False
             return all(Equivalence._array_safe_eq(attrs_self[k], attrs_other[k]) for k in attrs_self)
@@ -59,7 +59,7 @@ class Equivalence:
             return False
 
     @staticmethod
-    def _allowed_inequality(d: dict | UserDict) -> dict:
+    def _return_equality_attributes(d: dict | UserDict) -> dict:
         x = ["label", "name", "description", "derived_from", "path"]
         return {k: v for k, v in d.items() if k not in x}
 
