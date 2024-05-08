@@ -71,7 +71,7 @@ class EITData(SelectByTime, Equivalence):
         # Check that data can be concatenated
         self.isequivalent(other, raise_=True)
         if np.min(other.time) <= np.max(self.time):
-            msg = f"Concatenation a+b failed because {other.name} (b) starts before {self.name} (a) ends."
+            msg = f"Concatenation failed. Second dataset ({other.name}) may not start before first ({self.name}) ends."
             raise ValueError(msg)
 
         self_path = self.ensure_path_list(self.path)
