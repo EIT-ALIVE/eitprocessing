@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -9,9 +10,6 @@ import numpy as np
 
 if TYPE_CHECKING:
     from typing_extensions import Self
-
-# TODO: when slice by time is implemented, remove line below to activate linting
-# ruff: noqa
 
 
 class SelectByIndex(ABC):
@@ -99,30 +97,29 @@ class HasTimeIndexer:
 class SelectByTime(SelectByIndex, HasTimeIndexer):
     """Adds methods for slicing by time rather than index."""
 
-    def select_by_time(
+    def select_by_time(  # noqa: D417
         self,
         start_time: float | None = None,
         end_time: float | None = None,
-        n_before: int = 0,
-        n_after: int = 0,
-        # start_behavior: Literal["force_inclusive", "inclusive", "exclusive"] = "inclusive",
-        # end_behavior: Literal["force_exclusive", "exclusive", "inclusive"] = "exclusive",
+        start_inclusive: bool = True,
+        end_inclusive: bool = False,
         label: str | None = None,
     ) -> Self:
-        """Slice object according to time stamps (i.e. its value, not its index).
+        """Get a slice from start to end time stamps.
 
-        The sliced object must contain a time axis.
+        Given a start and end time stamp (i.e. its value, not its index),
+        return a slice of the original object, which must contain a time axis.
 
         Args:
-            start_time: Start time of new object (inclusive). Unless it is lower than the first timepoint, `start_time`
-                will be present in the time axis of the sliced object. This means that the first timepoint of the sliced
-                object will be equal to `start_time` if it exists on the unsliced object, and otherwise the last
-                timepoint preceding `start_time`.
-                Defaults to None, which is the first time point of the object.
-            end_time: End time of new object (exclusive). The final timepoint of the sliced object will be the last
-                timepoint preceding `end_time`, irrespective of whether it exists in the unsliced object.
-            n_before: Additional time points to include (or exclude if negative) before first time point defined above.
-            n_after: Additional time points to include (or exclude if negative) after last time point defined above.
+            start_time: first time point to include. Defaults to first frame of sequence.
+            end_time: last time point. Defaults to last frame of sequence.
+            start_inclusive (default: `True`), end_inclusive (default `False`):
+                these arguments control the behavior if the given time stamp
+                does not match exactly with an existing time stamp of the input.
+                if `True`: the given time stamp will be inside the sliced object.
+                if `False`: the given time stamp will be outside the sliced object.
+            label: Description. Defaults to None, which will create a label based
+                on the original object label and the frames by which it is sliced.
 
         Raises:
             TypeError: if `self` does not contain a `time` attribute.
@@ -131,44 +128,37 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
         Returns:
             Slice of self.
         """
-        # work in progress...
-        raise NotImplementedError
-
         if "time" not in vars(self):
             msg = f"Object {self} has no time axis."
             raise TypeError(msg)
-
-        if not np.all(np.sort(self.time) == self.time):
-            msg = f"Time stamps for {self} are not sorted and therefore data cannot be selected by time."
-            raise ValueError(msg)
 
         if start_time is None and end_time is None:
             warnings.warn("No starting or end timepoint was selected.")
             return self
 
-        start_time = np.round(start_time, 7)
-        end_time = np.round(end_time, 7)
+        if not np.all(np.sort(self.time) == self.time):
+            msg = f"Time stamps for {self} are not sorted and therefore data cannot be selected by time."
+            raise ValueError(msg)
 
         if start_time is None or start_time < self.time[0]:
-            start_index = max(0, -n_before)
+            start_index = 0
+        elif start_inclusive:
+            start_index = bisect.bisect_right(self.time, start_time) - 1
+        else:
+            start_index = bisect.bisect_left(self.time, start_time)
 
-        # elif start_inclusive:
-        #     start_index = bisect.bisect_right(self.time, start_time) - 1
-        # else:
-        #     start_index = bisect.bisect_left(self.time, start_time)
+        if end_time is None:
+            end_index = len(self.time)
+        elif end_inclusive:
+            end_index = bisect.bisect_left(self.time, end_time) + 1
+        else:
+            end_index = bisect.bisect_left(self.time, end_time)
 
-        # if end_time is None:
-        #     end_index = len(self.time)
-        # elif end_inclusive:
-        #     end_index = bisect.bisect_left(self.time, end_time) + 1
-        # else:
-        #     end_index = bisect.bisect_left(self.time, end_time)
-
-        # return self.select_by_index(
-        #     start=start_index,
-        #     end=end_index,
-        #     label=label,
-        # )
+        return self.select_by_index(
+            start=start_index,
+            end=end_index,
+            label=label,
+        )
 
 
 @dataclass
