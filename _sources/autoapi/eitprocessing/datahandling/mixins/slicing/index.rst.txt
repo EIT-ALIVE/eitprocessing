@@ -86,22 +86,22 @@ Classes
 
    Adds methods for slicing by time rather than index.
 
-   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, n_before: int = 0, n_after: int = 0, label: str | None = None) -> typing_extensions.Self
-      :abstractmethod:
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
 
-      Slice object according to time stamps (i.e. its value, not its index).
+      Get a slice from start to end time stamps.
 
-      The sliced object must contain a time axis.
+      Given a start and end time stamp (i.e. its value, not its index),
+      return a slice of the original object, which must contain a time axis.
 
-      :param start_time: Start time of new object (inclusive). Unless it is lower than the first timepoint, `start_time`
-                         will be present in the time axis of the sliced object. This means that the first timepoint of the sliced
-                         object will be equal to `start_time` if it exists on the unsliced object, and otherwise the last
-                         timepoint preceding `start_time`.
-                         Defaults to None, which is the first time point of the object.
-      :param end_time: End time of new object (exclusive). The final timepoint of the sliced object will be the last
-                       timepoint preceding `end_time`, irrespective of whether it exists in the unsliced object.
-      :param n_before: Additional time points to include (or exclude if negative) before first time point defined above.
-      :param n_after: Additional time points to include (or exclude if negative) after last time point defined above.
+      :param start_time: first time point to include. Defaults to first frame of sequence.
+      :param end_time: last time point. Defaults to last frame of sequence.
+      :param start_inclusive (default: `True`), end_inclusive (default `False`):
+                                       these arguments control the behavior if the given time stamp
+                                       does not match exactly with an existing time stamp of the input.
+                                       if `True`: the given time stamp will be inside the sliced object.
+                                       if `False`: the given time stamp will be outside the sliced object.
+      :param label: Description. Defaults to None, which will create a label based
+                    on the original object label and the frames by which it is sliced.
 
       :raises TypeError: if `self` does not contain a `time` attribute.
       :raises ValueError: if time stamps are not sorted.
