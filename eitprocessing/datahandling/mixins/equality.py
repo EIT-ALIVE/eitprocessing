@@ -106,8 +106,22 @@ class Equivalence:
 
             # check attributes of data
             else:
-                self._check_equivalence: list[str]
-                for attr in self._check_equivalence:
+                if is_dataclass(self):
+                    check_equivalence_fields = filter(
+                        lambda x: "check_equivalence" in x.metadata and x.metadata["check_equivalence"],
+                        fields(self),
+                    )
+                    attrs = [field.name for field in check_equivalence_fields]
+
+                else:
+                    self._check_equivalence: list[str]
+                    attrs = self._check_equivalence
+
+                for attr in attrs:
+                    if (s := getattr(self, attr)) != (o := getattr(other, attr)):
+                        msg = f"Attribute {attr} doesn't match: {s}, {o}"
+                        raise EquivalenceError(msg)  # noqa: TRY301
+
                     if (s := getattr(self, attr)) != (o := getattr(other, attr)):
                         msg = f"Attribute {attr} doesn't match: {s}, {o}"
                         raise EquivalenceError(msg)  # noqa: TRY301

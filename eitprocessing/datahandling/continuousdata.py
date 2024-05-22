@@ -31,12 +31,12 @@ class ContinuousData(Equivalence, SelectByTime):
         values: Data points.
     """  # TODO: update docstring
 
-    unit: str
-    category: str
-    parameters: dict[str, Any] = field(default_factory=dict, repr=False)
     label: str = field(compare=False)
     name: str = field(compare=False)
+    unit: str = field(metadata={"check_equivalence": True})
+    category: str = field(metadata={"check_equivalence": True})
     description: str = field(default="", compare=False)
+    parameters: dict[str, Any] = field(default_factory=dict, repr=False, metadata={"check_equivalence": True})
     derived_from: Any | list[Any] = field(default_factory=list, repr=False, compare=False)
     time: np.ndarray = field(kw_only=True, repr=False)
     values: np.ndarray = field(kw_only=True, repr=False)
@@ -45,7 +45,6 @@ class ContinuousData(Equivalence, SelectByTime):
         if self.loaded:
             self.lock()
         self.lock("time")
-        self._check_equivalence = ["unit", "category", "parameters"]
 
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
         try:
