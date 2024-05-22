@@ -36,15 +36,15 @@ class EITData(SelectByTime, Equivalence):
     Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
     """  # TODO: fix docstring
 
-    path: Path | list[Path]
+    path: Path | list[Path] = field(compare=False)
     nframes: int
     time: np.ndarray = field(repr=False)
     framerate: float
     vendor: Vendor
     phases: list = field(default_factory=list, repr=False)
     events: list = field(default_factory=list, repr=False)
-    label: str | None = None
-    name: str | None = None
+    label: str | None = field(default=None, compare=False)
+    name: str | None = field(default=None, compare=False)
     pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
 
     def __post_init__(self):

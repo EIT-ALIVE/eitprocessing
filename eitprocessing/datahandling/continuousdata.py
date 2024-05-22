@@ -31,13 +31,13 @@ class ContinuousData(Equivalence, SelectByTime):
         values: Data points.
     """  # TODO: update docstring
 
-    label: str
-    name: str
     unit: str
     category: str
-    description: str = ""
     parameters: dict[str, Any] = field(default_factory=dict, repr=False)
-    derived_from: Any | list[Any] = field(default_factory=list, repr=False)
+    label: str = field(compare=False)
+    name: str = field(compare=False)
+    description: str = field(default="", compare=False)
+    derived_from: Any | list[Any] = field(default_factory=list, repr=False, compare=False)
     time: np.ndarray = field(kw_only=True, repr=False)
     values: np.ndarray = field(kw_only=True, repr=False)
 
