@@ -1,11 +1,14 @@
+import copy
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, TypeVar
 
 import numpy as np
 from typing_extensions import Self
 
 from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
+
+T = TypeVar("T", bound="SparseData")
 
 
 @dataclass(eq=False)
@@ -74,4 +77,38 @@ class SparseData(Equivalence, SelectByTime):
             derived_from=[*self.derived_from, self],
             time=time,
             values=values,
+        )
+
+    def concatenate(self: T, other: T, newlabel: str | None = None) -> T:
+        self.isequivalent(other, raise_=True)
+
+        # TODO: make proper copy functions
+        if not len(self):
+            return copy.deepcopy(other)
+        if not len(other):
+            return copy.deepcopy(self)
+
+        if np.min(other.time) <= np.max(self.time):
+            msg = f"{other} (b) starts before {self} (a) ends."
+            raise ValueError(msg)
+
+        cls = type(self)
+        newlabel = newlabel or f"Concatenation of <{self.label}> and <{other.label}>."
+
+        if isinstance(self.values, list | tuple):
+            new_values = self.values + other.values
+        elif isinstance(self.values, np.ndarray):
+            new_values = np.concatenate((self.values, other.values))
+        elif self.values is None:
+            new_values = None
+
+        return cls(
+            label=newlabel,
+            name=self.name,
+            unit=self.unit,
+            category=self.category,
+            description=self.description,
+            derived_from=[*self.derived_from, *other.derived_from, self, other],
+            time=np.concatenate((self.time, other.time)),
+            values=new_values,
         )
