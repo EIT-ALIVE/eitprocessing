@@ -41,8 +41,6 @@ class EITData(SelectByTime, Equivalence):
     time: np.ndarray = field(repr=False)
     framerate: float = field(metadata={"check_equivalence": True})
     vendor: Vendor = field(metadata={"check_equivalence": True})
-    phases: list = field(default_factory=list, repr=False)
-    events: list = field(default_factory=list, repr=False)
     label: str | None = field(default=None, compare=False, metadata={"check_equivalence": True})
     name: str | None = field(default=None, compare=False)
     pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
@@ -85,8 +83,6 @@ class EITData(SelectByTime, Equivalence):
             nframes=self.nframes + other.nframes,
             time=np.concatenate((self.time, other.time)),
             pixel_impedance=np.concatenate((self.pixel_impedance, other.pixel_impedance), axis=0),
-            phases=self.phases + other.phases,
-            events=self.events + other.events,
         )
 
     def _sliced_copy(
@@ -99,9 +95,6 @@ class EITData(SelectByTime, Equivalence):
         time = self.time[start_index:end_index]
         nframes = len(time)
 
-        phases = list(filter(lambda p: start_index <= p.index < end_index, self.phases))
-        events = list(filter(lambda e: start_index <= e.index < end_index, self.events))
-
         pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
 
         return cls(
@@ -110,8 +103,6 @@ class EITData(SelectByTime, Equivalence):
             vendor=self.vendor,
             time=time,
             framerate=self.framerate,
-            phases=phases,
-            events=events,
             label=self.label,  # newlabel gives errors
             pixel_impedance=pixel_impedance,
         )

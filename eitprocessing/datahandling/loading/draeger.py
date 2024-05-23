@@ -99,8 +99,6 @@ def load_from_single_path(
         framerate=framerate,
         nframes=n_frames,
         time=time,
-        phases=phases,
-        events=events,
         label="raw",
         pixel_impedance=pixel_impedance,
     )

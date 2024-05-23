@@ -40,21 +40,10 @@ def test_equals(
         data_copy.nframes = deepcopy(data.nframes)
         data_copy.framerate = deepcopy(data.framerate)
         data_copy.framesets = deepcopy(data.framesets)
-        data_copy.events = deepcopy(data.events)
         data_copy.timing_errors = deepcopy(data.timing_errors)
-        data_copy.phases = deepcopy(data.phases)
         data_copy.vendor = deepcopy(data.vendor)
 
         assert data_copy == data
-
-        # test whether a difference in phases fails equality test
-        data_copy.phases.append(data_copy.phases[-1])
-        assert data != data_copy
-        data_copy.phases = deepcopy(data.phases)
-
-        data_copy.phases[0].index += 1
-        assert data != data_copy
-        data_copy.phases = deepcopy(data.phases)
 
         # test wheter a difference in framesets fails equality test
         data_copy.framesets["test"] = data_copy.framesets["raw"].deepcopy()
