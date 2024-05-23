@@ -111,7 +111,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
 
         concatenated = self.__class__(self.data_type)
         for key in self:
-            concatenated[key] = self[key].concatenate(other[key])
+            concatenated.add(self[key].concatenate(other[key]))
 
         return concatenated
 
