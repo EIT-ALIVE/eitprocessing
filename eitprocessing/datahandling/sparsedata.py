@@ -50,6 +50,9 @@ class SparseData(Equivalence, SelectByTime):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.label}')"
 
+    def __len__(self) -> int:
+        return len(self.time)
+
     def _sliced_copy(
         self,
         start_index: int,
