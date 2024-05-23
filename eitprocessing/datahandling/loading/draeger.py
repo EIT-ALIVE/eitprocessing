@@ -145,7 +145,12 @@ def load_from_single_path(
             time=[t for t, d in phases if d == 1],
         ),
     )
-    time, events = zip(*events, strict=True)
+    if len(events):
+        time_, events_ = zip(*events, strict=True)
+        time = np.array(time_)
+        events = list(events_)
+    else:
+        time, events = np.ndarray([]), []
     sparse_data_collection.add(
         SparseData(
             label="events_(draeger)",
@@ -153,8 +158,8 @@ def load_from_single_path(
             unit=None,
             category="event",
             derived_from=[eit_data],
-            time=np.array(time),
-            values=list(events),
+            time=time,
+            values=events,
         ),
     )
 
