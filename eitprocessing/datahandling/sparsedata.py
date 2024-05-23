@@ -4,11 +4,12 @@ from typing import Any
 import numpy as np
 from typing_extensions import Self
 
+from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 
-@dataclass
-class SparseData(SelectByTime):
+@dataclass(eq=False)
+class SparseData(Equivalence, SelectByTime):
     """Container for data occuring at unpredictable time points.
 
     In sparse data the time points are not necessarily evenly spaced. Data can consist time-value pairs or only time
@@ -44,7 +45,7 @@ class SparseData(SelectByTime):
     values: Any | None = None
 
     def __post_init__(self) -> None:
-        pass
+        self._check_equivalence = ["unit", "category", "parameters"]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.label}')"
