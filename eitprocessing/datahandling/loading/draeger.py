@@ -150,7 +150,7 @@ def load_from_single_path(
         time = np.array(time_)
         events = list(events_)
     else:
-        time, events = np.ndarray([]), []
+        time, events = np.array([]), []
     sparse_data_collection.add(
         SparseData(
             label="events_(draeger)",
