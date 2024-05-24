@@ -41,7 +41,7 @@ class SparseData(Equivalence, SelectByTime):
     name: str
     unit: str | None
     category: str
-    time: np.ndarray | None
+    time: np.ndarray
     description: str = ""
     parameters: dict[str, Any] = field(default_factory=dict)
     derived_from: list[Any] = field(default_factory=list)
@@ -95,12 +95,16 @@ class SparseData(Equivalence, SelectByTime):
         cls = type(self)
         newlabel = newlabel or self.label
 
-        if isinstance(self.values, list | tuple):
+        new_values: Any
+        if isinstance(self.values, list) and isinstance(other.values, list):
             new_values = self.values + other.values
-        elif isinstance(self.values, np.ndarray):
+        elif isinstance(self.values, np.ndarray) and isinstance(other.values, np.ndarray):
             new_values = np.concatenate((self.values, other.values))
-        elif self.values is None:
+        elif self.values is None and other.values is None:
             new_values = None
+        else:
+            msg = "Value types of self and other do not match."
+            raise TypeError(msg)
 
         return cls(
             label=newlabel,
