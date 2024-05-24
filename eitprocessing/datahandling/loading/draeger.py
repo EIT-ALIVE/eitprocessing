@@ -32,7 +32,7 @@ def load_from_single_path(
     framerate: float | None = 20,
     first_frame: int = 0,
     max_frames: int | None = None,
-) -> tuple[DataCollection, DataCollection, DataCollection]:
+) -> dict[str, DataCollection]:
     """Load Dräger EIT data from path."""
     file_size = path.stat().st_size
     if file_size % _FRAME_SIZE_BYTES:
@@ -65,8 +65,8 @@ def load_from_single_path(
 
     pixel_impedance = np.zeros((n_frames, 32, 32))
     time = np.zeros((n_frames,))
-    events = []
-    phases = []
+    events: list = []
+    phases: list = []
     medibus_data = np.zeros((52, n_frames))
 
     with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
@@ -128,7 +128,7 @@ def load_from_single_path(
             unit=None,
             category="minvalue",
             derived_from=[eit_data],
-            time=[t for t, d in phases if d == -1],
+            time=np.array([t for t, d in phases if d == -1]),
         ),
     )
     sparse_data_collection.add(
@@ -138,7 +138,7 @@ def load_from_single_path(
             unit=None,
             category="maxvalue",
             derived_from=[eit_data],
-            time=[t for t, d in phases if d == 1],
+            time=np.array([t for t, d in phases if d == 1]),
         ),
     )
     if len(events):

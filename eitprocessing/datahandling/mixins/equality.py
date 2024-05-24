@@ -21,16 +21,20 @@ class Equivalence:
         if type(self) is not type(other):
             return False
 
-        if is_dataclass(self):
-            return self._dataclass_eq(other)
+        if is_dataclass(self) and isinstance(self, Equivalence):
+            return self._eq_dataclass(other)
 
         if isinstance(self, UserDict):
-            return self._userdict_eq(other)
+            return self._eq_userdict(other)
 
         return Equivalence._array_safe_eq(self, other)
 
-    def _dataclass_eq(self, other: object) -> bool:
+    def _eq_dataclass(self, other: object) -> bool:
         """Compare two dataclasses for equality."""
+        if not is_dataclass(self) or not is_dataclass(other):
+            msg = "self or other is not a Dataclass"
+            raise TypeError(msg)
+
         field_names = {field.name for field in fields(self)}
         if set(vars(self).keys()) != field_names or set(vars(other).keys()) != field_names:
             return False
@@ -42,8 +46,12 @@ class Equivalence:
             for field in compare_fields
         )
 
-    def _userdict_eq(self, other: object) -> bool:
+    def _eq_userdict(self, other: object) -> bool:
         """Compare two userdicts for equality."""
+        if not isinstance(self, UserDict) or not isinstance(other, UserDict):
+            msg = "self or other is not a Userdict"
+            raise TypeError(msg)
+
         if set(self.keys()) != set(other.keys()):
             return False
         return all(Equivalence.__eq__(self[key], other[key]) for key in set(self.keys()))

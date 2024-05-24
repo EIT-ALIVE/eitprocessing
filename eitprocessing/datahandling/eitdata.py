@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import auto
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar
+from typing import TypeVar
 
 import numpy as np
 from strenum import LowercaseStrEnum
@@ -11,9 +11,6 @@ from typing_extensions import Self
 
 from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
-
-if TYPE_CHECKING:
-    from eitprocessing.datahandling.eitdata import Vendor
 
 T = TypeVar("T", bound="EITData")
 
@@ -36,7 +33,7 @@ class EITData(SelectByTime, Equivalence):
     Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
     """  # TODO: fix docstring
 
-    path: Path | list[Path] = field(compare=False)
+    path: str | Path | list[Path | str] | list[Path] | list[str] = field(compare=False)
     nframes: int
     time: np.ndarray = field(repr=False)
     framerate: float = field(metadata={"check_equivalence": True})
@@ -48,10 +45,14 @@ class EITData(SelectByTime, Equivalence):
     def __post_init__(self):
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
+        if isinstance(self.path, str):
+            self.path = Path(self.path)
+        elif isinstance(self.path, list):
+            self.path = [Path(p) for p in self.path]
         self.name = self.name or self.label
 
     @staticmethod
-    def ensure_path_list(path: str | Path | list[str | Path]) -> list[Path]:
+    def ensure_path_list(path: str | Path | list[str | Path] | list[str] | list[Path]) -> list[Path]:
         """Return the path or paths as a list.
 
         The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a

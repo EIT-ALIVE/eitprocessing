@@ -31,14 +31,14 @@ def load_from_single_path(  # noqa: C901, PLR0912
     framerate: float | None = 50.2,
     first_frame: int = 0,
     max_frames: int | None = None,
-) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
+) -> dict[str, DataCollection]:
     """Load Sentec EIT data from path."""
     with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
         file_length = os.fstat(fo.fileno()).st_size
         reader = BinReader(fh, endian="little")
         version = reader.uint8()
 
-        time = []
+        time: list[float] = []
         max_n_images = int(file_length / 32 / 32 / 4)
         image = np.full(shape=(max_n_images, 32, 32), fill_value=np.nan)
         index = 0
@@ -126,7 +126,7 @@ def load_from_single_path(  # noqa: C901, PLR0912
 
 
 def _read_frame(
-    fh: BinaryIO,
+    fh: BinaryIO | mmap.mmap,
     version: int,
     index: int,
     payload_size: int,

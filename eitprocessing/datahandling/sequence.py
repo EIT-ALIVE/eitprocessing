@@ -58,7 +58,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         if len(self.eit_data):
             return self.eit_data["raw"].time
         if len(self.continuous_data):
-            return next(self.continuous_data.values())
+            return next(iter(self.continuous_data.values()))
 
         msg = "Sequence has no timed data"
         raise AttributeError(msg)
@@ -135,7 +135,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         end_inclusive: bool = False,
         label: str | None = None,
         name: str | None = None,
-        description: str | None = "",
+        description: str = "",
     ) -> Self:
         """Return a sliced version of the Sequence.
 

@@ -1,6 +1,7 @@
 import io
 import struct
 from dataclasses import dataclass
+from mmap import mmap
 from typing import Any, Literal, TypeVar
 
 import numpy as np
@@ -19,7 +20,7 @@ class BinReader:
         endian: the endianness of the binary data. Either 'little' or 'big', or None.
     """
 
-    file_handle: io.BufferedReader
+    file_handle: io.BufferedReader | mmap
     endian: Literal["little", "big"] | None = None
 
     def read_single(self, type_code: str, cast: type[T]) -> T:

@@ -13,6 +13,7 @@ from eitprocessing.datahandling.sparsedata import SparseData
 if TYPE_CHECKING:
     from typing_extensions import Self
 
+V_classes = (EITData, ContinuousData, SparseData, IntervalData)
 V = TypeVar("V", EITData, ContinuousData, SparseData, IntervalData)
 
 
@@ -36,7 +37,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
     data_type: type
 
     def __init__(self, data_type: type[V], *args, **kwargs):
-        if not any(issubclass(data_type, cls) for cls in V.__constraints__):
+        if not any(issubclass(data_type, cls) for cls in V_classes):
             msg = f"Type {data_type} not expected to be stored in a DataCollection."
             raise ValueError(msg)
         self.data_type = data_type
@@ -102,7 +103,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
         """Return all data that was derived from any source."""
         return {k: v for k, v in self.items() if v.derived_from}
 
-    def concatenate(self: Self[V], other: Self[V]) -> Self[V]:
+    def concatenate(self: Self, other: Self) -> Self:
         """Concatenate this collection with an equivalent collection.
 
         Each item of self of concatenated with the item of other with the same key.
@@ -121,7 +122,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
         end_time: float | None,
         start_inclusive: bool = True,
         end_inclusive: bool = False,
-    ) -> Self:
+    ) -> DataCollection:
         """Return a DataCollection containing sliced copies of the items."""
         if self.data_type is IntervalData:
             return DataCollection(

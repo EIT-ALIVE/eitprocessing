@@ -1,4 +1,5 @@
 import copy
+import itertools
 from dataclasses import dataclass, field
 from typing import Any, NamedTuple, TypeVar
 
@@ -120,7 +121,10 @@ class IntervalData(Equivalence, HasTimeIndexer):
             end_time_ = min(time_range.end_time, end_time)
             return TimeRange(start_time_, end_time_)
 
-        time_range_value_pairs = zip(self.time_ranges, self.values, strict=True)
+        has_values = self.values is not None
+        iter_values = self.values or itertools.repeat(None)
+
+        time_range_value_pairs: Any = zip(self.time_ranges, iter_values, strict=True)
         time_range_value_pairs = filter(keep_starting_on_or_before_end, time_range_value_pairs)
         time_range_value_pairs = list(filter(keep_ending_on_or_after_start, time_range_value_pairs))
 
@@ -140,7 +144,7 @@ class IntervalData(Equivalence, HasTimeIndexer):
             category=self.category,
             derived_from=[*self.derived_from, self],
             time_ranges=list(time_ranges),
-            values=list(values),
+            values=list(values) if has_values else None,
         )
 
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be moved to mixin in future
@@ -159,12 +163,15 @@ class IntervalData(Equivalence, HasTimeIndexer):
         cls = type(self)
         newlabel = newlabel or self.label
 
-        if isinstance(self.values, list | tuple):
+        if isinstance(self.values, list | tuple) and isinstance(other.values, list | tuple):
             new_values = self.values + other.values
-        elif isinstance(self.values, np.ndarray):
+        elif isinstance(self.values, np.ndarray) and isinstance(other.values, np.ndarray):
             new_values = np.concatenate((self.values, other.values))
-        elif self.values is None:
+        elif self.values is None and other.values is None:
             new_values = None
+        else:
+            msg = "self and other have different value types"
+            raise TypeError(msg)
 
         return cls(
             label=newlabel,
@@ -173,6 +180,6 @@ class IntervalData(Equivalence, HasTimeIndexer):
             category=self.category,
             description=self.description,
             derived_from=[*self.derived_from, *other.derived_from, self, other],
-            time=self.time_ranges + other.time_ranges,
+            time_ranges=self.time_ranges + other.time_ranges,
             values=new_values,
         )

@@ -161,7 +161,7 @@ class ContinuousData(Equivalence, SelectByTime):
         """
         if not len(attr):
             # default values are not allowed when using *attr, so set a default here if none is supplied
-            attr = ["values"]
+            attr = ("values",)
         for attr_ in attr:
             getattr(self, attr_).flags["WRITEABLE"] = False
 
@@ -188,7 +188,7 @@ class ContinuousData(Equivalence, SelectByTime):
         """
         if not len(attr):
             # default values are not allowed when using *attr, so set a default here if none is supplied
-            attr = ["values"]
+            attr = ("values",)
         for attr_ in attr:
             getattr(self, attr_).flags["WRITEABLE"] = True
 

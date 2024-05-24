@@ -5,7 +5,7 @@ import copy
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -62,6 +62,9 @@ class SelectByIndex(ABC):
         return self._sliced_copy(start_index=start, end_index=end, newlabel=newlabel)
 
     @abstractmethod
+    def __len__(self): ...
+
+    @abstractmethod
     def _sliced_copy(
         self,
         start_index: int,
@@ -93,6 +96,9 @@ class HasTimeIndexer:
         ```
         """
         return TimeIndexer(self)
+
+    @abstractmethod
+    def select_by_time(self, *args, **kwargs) -> Self: ...  # noqa: D102
 
 
 class SelectByTime(SelectByIndex, HasTimeIndexer):
@@ -129,7 +135,7 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
         Returns:
             Slice of self.
         """
-        if "time" not in vars(self):
+        if not hasattr(self, "time"):
             msg = f"Object {self} has no time axis."
             raise TypeError(msg)
 
@@ -180,7 +186,7 @@ class TimeIndexer:
     ```
     """
 
-    obj: SelectByTime
+    obj: HasTimeIndexer
 
     def __getitem__(self, key: slice | float):
         if isinstance(key, slice):

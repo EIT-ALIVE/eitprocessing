@@ -34,7 +34,7 @@ def load_from_single_path(
     framerate: float | None = 20,
     first_frame: int = 0,
     max_frames: int | None = None,
-) -> DataCollection | tuple[DataCollection, DataCollection, DataCollection]:
+) -> dict[str, DataCollection]:
     """Load Timpel EIT data from path."""
     if not framerate:
         framerate = TIMPEL_FRAMERATE
@@ -221,7 +221,7 @@ def _make_breaths(
     min_indices: np.ndarray,
     max_indices: np.ndarray,
     gi: np.ndarray,
-) -> tuple[list[tuple[int, int]], list[Breath]]:
+) -> tuple[list[tuple[float, float]], list[Breath]]:
     # TODO: replace section with BreathDetection._remove_doubles() and BreathDetection._remove_edge_cases() from
     # 41_breath_detection_psomhorst; this code was directly copied from b59ac54
 
