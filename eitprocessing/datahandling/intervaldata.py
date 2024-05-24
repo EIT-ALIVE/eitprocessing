@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass, field
 from typing import Any, NamedTuple, TypeVar
 
@@ -140,4 +141,38 @@ class IntervalData(Equivalence, HasTimeIndexer):
             derived_from=[*self.derived_from, self],
             time_ranges=time_ranges,
             values=values,
+        )
+
+    def concatenate(self: T, other: T, newlabel: str | None = None) -> T:
+        self.isequivalent(other, raise_=True)
+
+        # TODO: make proper copy functions
+        if not len(self):
+            return copy.deepcopy(other)
+        if not len(other):
+            return copy.deepcopy(self)
+
+        if other.time_ranges[0].start_time < self.time_ranges[-1].end_time:
+            msg = f"{other} (b) starts before {self} (a) ends."
+            raise ValueError(msg)
+
+        cls = type(self)
+        newlabel = newlabel or self.label
+
+        if isinstance(self.values, list | tuple):
+            new_values = self.values + other.values
+        elif isinstance(self.values, np.ndarray):
+            new_values = np.concatenate((self.values, other.values))
+        elif self.values is None:
+            new_values = None
+
+        return cls(
+            label=newlabel,
+            name=self.name,
+            unit=self.unit,
+            category=self.category,
+            description=self.description,
+            derived_from=[*self.derived_from, *other.derived_from, self, other],
+            time=self.time_ranges + other.time_ranges,
+            values=new_values,
         )
