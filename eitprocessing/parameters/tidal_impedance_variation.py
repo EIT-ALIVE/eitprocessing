@@ -59,7 +59,7 @@ class TIV(ParameterExtraction):
 
         if tiv_method == 'expiratory':
             start_expiratory_values = data[middle_indices]
-            end_expiratory_values = data[start_indices]
+            end_expiratory_values = data[end_indices]
             tiv_values = start_expiratory_values - end_expiratory_values
 
         if tiv_method == 'triangular':
