@@ -45,16 +45,16 @@ class IntervalData(Equivalence, HasTimeIndexer):
     Note that when selecting by time, the end time is included in the selection.
 
     Args:
-      label: a computer-readable name
-      name: a human-readable name
-      unit: the unit associated with the data
-      category: the category of data
-      time_ranges: a list of time ranges (tuples containing a start time and end time)
-      values: an optional list of values with the same length as time_ranges
-      parameters: parameters used to derive the data
-      derived_from: list of data sets this data was derived from
-      description: extended human readible description of the data
-      partial_inclusion: whether to include a trimmed version of a time range when selecting data
+        label: a computer-readable name
+        name: a human-readable name
+        unit: the unit associated with the data
+        category: the category of data
+        time_ranges: a list of time ranges (tuples containing a start time and end time)
+        values: an optional list of values with the same length as time_ranges
+        parameters: parameters used to derive the data
+        derived_from: list of data sets this data was derived from
+        description: extended human readible description of the data
+        partial_inclusion: whether to include a trimmed version of a time range when selecting data
     """
 
     label: str
