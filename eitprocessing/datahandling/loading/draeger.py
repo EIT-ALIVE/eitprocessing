@@ -15,7 +15,6 @@ from eitprocessing.datahandling.event import Event
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.loading.binreader import BinReader
-from eitprocessing.datahandling.phases import MaxValue, MinValue
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -86,7 +85,6 @@ def load_from_single_path(
                 events,
                 phases,
                 previous_marker,
-                first_frame,
             )
 
     if not framerate:
@@ -206,7 +204,6 @@ def _read_frame(
     events: list,
     phases: list,
     previous_marker: int | None,
-    first_frame: int = 0,
 ) -> int:
     """Read frame by frame data from DRAEGER files.
 
