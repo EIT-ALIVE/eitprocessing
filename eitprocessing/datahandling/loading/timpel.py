@@ -224,6 +224,10 @@ def _make_breaths(
 ) -> tuple[tuple[int, int], list[Breath]]:
     # TODO: replace section with BreathDetection._remove_doubles() and BreathDetection._remove_edge_cases() from
     # 41_breath_detection_psomhorst; this code was directly copied from b59ac54
+
+    if len(min_indices) < 2 or len(max_indices) < 1:
+        return [], []
+
     valley_indices = min_indices.copy()
     peak_indices = max_indices.copy()
 
