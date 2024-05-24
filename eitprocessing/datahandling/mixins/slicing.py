@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import bisect
+import copy
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -131,6 +132,10 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
         if "time" not in vars(self):
             msg = f"Object {self} has no time axis."
             raise TypeError(msg)
+
+        if len(self.time) == 0:
+            # TODO: make proper new instances when not slicing
+            return copy.deepcopy(self)
 
         if start_time is None and end_time is None:
             warnings.warn("No starting or end timepoint was selected.")
