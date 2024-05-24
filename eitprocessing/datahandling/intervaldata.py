@@ -139,8 +139,8 @@ class IntervalData(Equivalence, HasTimeIndexer):
             unit=self.unit,
             category=self.category,
             derived_from=[*self.derived_from, self],
-            time_ranges=time_ranges,
-            values=values,
+            time_ranges=list(time_ranges),
+            values=list(values),
         )
 
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:

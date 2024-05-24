@@ -221,7 +221,7 @@ def _make_breaths(
     min_indices: np.ndarray,
     max_indices: np.ndarray,
     gi: np.ndarray,
-) -> tuple[tuple[int, int], list[Breath]]:
+) -> tuple[list[tuple[int, int]], list[Breath]]:
     # TODO: replace section with BreathDetection._remove_doubles() and BreathDetection._remove_edge_cases() from
     # 41_breath_detection_psomhorst; this code was directly copied from b59ac54
 
@@ -276,4 +276,4 @@ def _make_breaths(
         breaths.append(((time[start], time[end]), Breath(time[start], time[middle], time[end])))
 
     time_ranges, values = zip(*breaths, strict=True)
-    return time_ranges, values
+    return list(time_ranges), list(values)
