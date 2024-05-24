@@ -130,9 +130,9 @@ def test_concatenate(
     assert added_draeger == merged_draeger
 
     # slice and concatenate
-    cutoff_pont = 100
-    part1 = timpel1[:cutoff_pont]
-    part2 = timpel1[cutoff_pont:]
+    cutoff_point = 100
+    part1 = timpel1[:cutoff_point]
+    part2 = timpel1[cutoff_point:]
     assert timpel1 == Sequence.concatenate(part1, part2)
 
     # TODO: add tests for:
