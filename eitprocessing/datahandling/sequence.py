@@ -83,7 +83,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         concat_continuous = a.continuous_data.concatenate(b.continuous_data)
         concat_sparse = a.sparse_data.concatenate(b.sparse_data)
 
-        newlabel = newlabel or f"Merge of <{a.label}> and <{b.label}>"
+        newlabel = newlabel or a.label
         # TODO: add concatenation of other attached objects
 
         return a.__class__(

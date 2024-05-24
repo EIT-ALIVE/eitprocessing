@@ -56,7 +56,7 @@ class SelectByIndex(ABC):
 
         start = start or 0
         end = end or len(self)
-        newlabel = newlabel or f"Slice ({start}-{end}] of <{self.label}>"
+        newlabel = newlabel or self.label
 
         return self._sliced_copy(start_index=start, end_index=end, newlabel=newlabel)
 
@@ -157,7 +157,7 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
         return self.select_by_index(
             start=start_index,
             end=end_index,
-            label=label,
+            newlabel=label,
         )
 
 

@@ -60,7 +60,7 @@ class SparseData(Equivalence, SelectByTime):
         self,
         start_index: int,
         end_index: int,
-        label: str,
+        newlabel: str,
     ) -> Self:
         # TODO: check correct implementation
         cls = self.__class__
@@ -69,7 +69,7 @@ class SparseData(Equivalence, SelectByTime):
         description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
 
         return cls(
-            label=label,
+            label=newlabel,
             name=self.name,
             unit=self.unit,
             category=self.category,
@@ -93,7 +93,7 @@ class SparseData(Equivalence, SelectByTime):
             raise ValueError(msg)
 
         cls = type(self)
-        newlabel = newlabel or f"Concatenation of <{self.label}> and <{other.label}>."
+        newlabel = newlabel or self.label
 
         if isinstance(self.values, list | tuple):
             new_values = self.values + other.values

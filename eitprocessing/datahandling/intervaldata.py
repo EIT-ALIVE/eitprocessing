@@ -71,7 +71,7 @@ class IntervalData:
         start_time: float | None = None,
         end_time: float | None = None,
         partial_inclusion: bool | None = None,
-        label: str | None = None,
+        newlabel: str | None = None,
     ) -> Self:
         """Return only period data that overlaps (partly) with start and end time.
 
@@ -81,7 +81,7 @@ class IntervalData:
         """
         if partial_inclusion is None:
             partial_inclusion = self.partial_inclusion
-        label = label or f"Sliced version of <{self.label}>"
+        newlabel = newlabel or self.label
 
         if start_time is None:
             start_time = self.time_ranges[0].start_time
@@ -120,7 +120,7 @@ class IntervalData:
         time_ranges = list(map(replace_start_end_time, time_ranges))
 
         return self.__class__(
-            label=label,
+            label=newlabel,
             name=self.name,
             unit=self.unit,
             category=self.category,

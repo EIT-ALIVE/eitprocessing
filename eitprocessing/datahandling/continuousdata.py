@@ -100,7 +100,7 @@ class ContinuousData(Equivalence, SelectByTime):
             raise ValueError(msg)
 
         cls = self.__class__
-        newlabel = newlabel or f"Merge of <{self.label}> and <{other.label}>"
+        newlabel = newlabel or self.label
 
         return cls(
             name=self.name,
