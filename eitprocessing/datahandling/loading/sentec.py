@@ -122,7 +122,11 @@ def load_from_single_path(  # noqa: C901, PLR0912
         ),
     )
 
-    return eit_data_collection, DataCollection(ContinuousData), DataCollection(SparseData)
+    return {
+        "eitdata_collection": eit_data_collection,
+        "continuousdata_collection": DataCollection(ContinuousData),
+        "sparsedata_collection": DataCollection(SparseData),
+    }
 
 
 def _read_frame(
