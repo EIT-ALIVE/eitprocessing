@@ -82,6 +82,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         concat_eit = a.eit_data.concatenate(b.eit_data)
         concat_continuous = a.continuous_data.concatenate(b.continuous_data)
         concat_sparse = a.sparse_data.concatenate(b.sparse_data)
+        concat_interval = a.interval_data.concatenate(b.interval_data)
 
         newlabel = newlabel or a.label
         # TODO: add concatenation of other attached objects
@@ -90,6 +91,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
             eit_data=concat_eit,
             continuous_data=concat_continuous,
             sparse_data=concat_sparse,
+            interval_data=concat_interval,
             label=newlabel,
         )
 
