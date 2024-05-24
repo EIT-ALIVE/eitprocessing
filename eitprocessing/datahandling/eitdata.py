@@ -62,7 +62,7 @@ class EITData(SelectByTime, Equivalence):
         return [Path(path)]
 
     def __add__(self: T, other: T) -> T:
-        return self.concatenate(self, other)
+        return self.concatenate(other)
 
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be moved to mixin in future
         # Check that data can be concatenated

@@ -89,7 +89,7 @@ class ContinuousData(Equivalence, SelectByTime):
         return obj
 
     def __add__(self: T, other: T) -> T:
-        return self.concatenate(self, other)
+        return self.concatenate(other)
 
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be removed soon
         # TODO: compare both concatenate methods and check what is needed from both and merge into one
