@@ -1,7 +1,13 @@
 from dataclasses import dataclass, field
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, TypeVar
 
+import numpy as np
 from typing_extensions import Self
+
+from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer
+
+T = TypeVar("T", bound="IntervalData")
 
 
 class TimeRange(NamedTuple):
@@ -11,8 +17,8 @@ class TimeRange(NamedTuple):
     end_time: float
 
 
-@dataclass
-class IntervalData:
+@dataclass(eq=False)
+class IntervalData(Equivalence, HasTimeIndexer):
     """Container for interval data existing over a period of time.
 
     Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
@@ -62,9 +68,13 @@ class IntervalData:
 
     def __post_init__(self) -> None:
         self.time_ranges = [TimeRange._make(time_range) for time_range in self.time_ranges]
+        self._check_equivalence = ["unit", "category", "parameters", "partial_inclusion"]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.label}')"
+
+    def __len__(self) -> int:
+        return len(self.time_ranges)
 
     def select_by_time(  # noqa: C901
         self,
