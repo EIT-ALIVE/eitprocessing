@@ -45,7 +45,7 @@ class EELI(ParameterExtraction):
         bd_kwargs = self.breath_detection_kwargs.copy()
         bd_kwargs["sample_frequency"] = eitdata.framerate
         breath_detection = BreathDetection(**bd_kwargs)
-        breaths = breath_detection.find_breaths(data)
+        breaths = breath_detection.find_breaths_1d(data)
 
         _, _, eeli_indices = zip(*breaths, strict=True)
         eeli_indices = list(eeli_indices)
