@@ -26,13 +26,14 @@ class TIV(ParameterExtraction):
     def __post_init__(self) -> None:
         pass
 
-    def compute_parameter(self, sequence: Sequence, data_label: str, tiv_method = 'inspiratory') -> dict | list[dict]:
+
+    def compute_global_parameter(self, sequence: Sequence, data_label: str, tiv_method = 'inspiratory') -> dict | list[dict]:
         """Compute the tidal impedance variation per breath.
 
         Args:
             sequence: the sequence containing the data.
             data_label: the label of the continuous data in the sequence to determine the TIV of.
-            breaths_label: the label of the breaths in the sequence.
+            tiv_method: the label of which part of the breath the TIV should be determined on (inspiratory, expiratory or mean)
         """
         if self.method != "extremes":
             msg = f"Method {self.method} is not implemented."
@@ -62,9 +63,11 @@ class TIV(ParameterExtraction):
             end_expiratory_values = data[end_indices]
             tiv_values = start_expiratory_values - end_expiratory_values
 
-        if tiv_method == 'triangular':
-            msg = f"Method {tiv_method} is not implemented."
-            raise NotImplementedError(msg)
+        if tiv_method == 'mean':
+            start_inspiratory_values = data[start_indices]
+            end_inspiratory_values = data[middle_indices]
+            end_expiratory_values = data[end_indices]
+            tiv_values = end_inspiratory_values - [np.mean(k) for k in zip(start_inspiratory_values, end_expiratory_values)]
 
         result = {}
         for name, function in self.summary_stats.items():
