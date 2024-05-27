@@ -295,7 +295,7 @@ class BreathDetection:
 
         return breaths
 
-    def find_breaths(self, data: np.ndarray) -> list[Breath]:
+    def find_breaths_1d(self, data: np.ndarray) -> list[Breath]:
         """Find breaths in the data.
 
         This method attempts to find peaks and valleys in the data in a
@@ -355,3 +355,62 @@ class BreathDetection:
         ]
 
         return self._remove_breaths_around_invalid_data(breaths, data)
+
+
+    def find_breaths_2d(self, data: np.ndarray) -> np.ndarray:
+        """Find breaths in the 2D time series data (pixel row, pixel column).
+
+        This method applies the breath finding process to each time series at each
+        pixel location and stores the results in a 2D array where each element is
+        a list of Breath objects.
+
+        Args:
+            data (np.ndarray): a 2D array containing the time series data to find breaths in
+                            with shape (pixel row, pixel column).
+
+        Returns:
+            np.ndarray: a 2D array of size (pixel row, pixel column) containing
+                        lists of Breath objects.
+        """
+        _, rows, cols = data.shape
+        breaths_array = np.empty((rows, cols), dtype=object)
+
+        for row in range(rows):
+            for col in range(cols):
+                time_series = data[:, row, col]
+
+                window_size = int(self.sample_frequency * self.averaging_window_length)
+                averager = MovingAverage(window_size=window_size, window_fun=np.bartlett)
+                moving_average = averager.apply(time_series)
+
+                peak_indices, peak_values = self._find_features(time_series, moving_average)
+                valley_indices, valley_values = self._find_features(time_series, moving_average, invert=True)
+
+                # Skip iteration if no peaks or valleys are detected
+                if len(peak_indices) == 0 or len(valley_indices) == 0:
+                    breaths_array[row, col] = []
+                    continue
+
+                peak_valley_data = _PeakValleyData(
+                    peak_indices,
+                    peak_values,
+                    valley_indices,
+                    valley_values,
+                )
+                peak_valley_data = self._remove_edge_cases(*peak_valley_data, time_series, moving_average)
+                peak_valley_data = self._remove_doubles(*peak_valley_data)
+                peak_valley_data = self._remove_low_amplitudes(*peak_valley_data)
+
+                breaths = [
+                    Breath(int(start), int(middle), int(end))
+                    for middle, (start, end) in zip(
+                        peak_valley_data.peak_indices,
+                        itertools.pairwise(peak_valley_data.valley_indices),
+                        strict=True,
+                    )
+                ]
+
+                breaths = self._remove_breaths_around_invalid_data(breaths, time_series)
+                breaths_array[row, col] = breaths
+
+        return breaths_array
