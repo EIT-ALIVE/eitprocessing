@@ -63,7 +63,7 @@ class Equivalence:
         except TypeError:
             return False
 
-    def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901
+    def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901, PLR0912
         """Test whether the data structure between two objects are equivalent.
 
         Equivalence, in this case means that objects are compatible e.g. to be
