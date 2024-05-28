@@ -16,13 +16,13 @@ import subprocess
 import sys
 
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # -- Project information -----------------------------------------------------
 
-project = u"eitprocessing"
-copyright = u"2023, Netherlands eScience Center, Erasmus MC"
-author = u"Dani Bodor"
+project = "eitprocessing"
+copyright = "2023, Netherlands eScience Center, Erasmus MC"
+author = "Dani Bodor"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -34,16 +34,22 @@ author = u"Dani Bodor"
 ##release = version
 
 try:
-    tag = subprocess.check_output([
-        'git',
-        '--no-pager',
-        'describe',
-        '--abbrev=0',
-        '--tags',
-    ]).strip().decode()
+    tag = (
+        subprocess.check_output(
+            [
+                "git",
+                "--no-pager",
+                "describe",
+                "--abbrev=0",
+                "--tags",
+            ]
+        )
+        .strip()
+        .decode()
+    )
 except subprocess.CalledProcessError as e:
     print(e.output)
-    tag = 'v0.0.0'
+    tag = "v0.0.0"
 
 release = tag[1:]
 # -- General configuration ------------------------------------------------
@@ -77,7 +83,7 @@ todo_include_todos = False
 
 # -- Use autoapi.extension to run sphinx-apidoc -------
 
-autoapi_dirs = ['../eitprocessing']
+autoapi_dirs = ["../eitprocessing"]
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -94,11 +100,12 @@ html_theme = "nature"
 
 # -- Options for Intersphinx
 
-intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
-                       # Commonly used libraries, uncomment when used in package
-                       # 'numpy': ('http://docs.scipy.org/doc/numpy/', None),
-                       # 'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
-                       # 'scikit-learn': ('https://scikit-learn.org/stable/', None),
-                       # 'matplotlib': ('https://matplotlib.org/stable/', None),
-                       # 'pandas': ('http://pandas.pydata.org/docs/', None),
-                       }
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    # Commonly used libraries, uncomment when used in package
+    # 'numpy': ('http://docs.scipy.org/doc/numpy/', None),
+    # 'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
+    # 'scikit-learn': ('https://scikit-learn.org/stable/', None),
+    # 'matplotlib': ('https://matplotlib.org/stable/', None),
+    # 'pandas': ('http://pandas.pydata.org/docs/', None),
+}
