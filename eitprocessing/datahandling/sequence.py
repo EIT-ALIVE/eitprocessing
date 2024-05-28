@@ -67,55 +67,50 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
     def __add__(self, other: Sequence) -> Sequence:
         return self.concatenate(self, other)
 
-    @classmethod
+    @classmethod  # TODO: why is this a class method? In other cases it's instance method
     def concatenate(
         cls,
         a: Sequence,
         b: Sequence,
+        newlabel: str | None = None,
     ) -> Sequence:
         """Create a merge of two Sequence objects."""
         # TODO: rewrite
 
-        concat_eit = a.eit_data.concatenate(b.eit_data) if a.eit_data and b.eit_data else None
-        concat_continuous = (
-            a.continuous_data.concatenate(b.continuous_data) if a.continuous_data and b.continuous_data else None
-        )
-        concat_sparse = a.sparse_data.concatenate(b.sparse_data) if a.sparse_data and b.sparse_data else None
+        concat_eit = a.eit_data.concatenate(b.eit_data)
+        concat_continuous = a.continuous_data.concatenate(b.continuous_data)
+        concat_sparse = a.sparse_data.concatenate(b.sparse_data)
 
+        newlabel = newlabel or f"Merge of <{a.label}> and <{b.label}>"
         # TODO: add concatenation of other attached objects
 
-        return a.__class__(eit_data=concat_eit, continuous_data=concat_continuous, sparse_data=concat_sparse)
+        return a.__class__(
+            eit_data=concat_eit,
+            continuous_data=concat_continuous,
+            sparse_data=concat_sparse,
+            label=newlabel,
+        )
 
-    def _sliced_copy(self, start_index: int, end_index: int, newlabel: str) -> Self:
-        # TODO: consider if the if not parts below are required
-        if not self.eit_data:
-            sliced_eit = DataCollection(EITData)
-        else:
-            sliced_eit = DataCollection(EITData)
-            for value in self.eit_data.values():
-                sliced_eit.add(value[start_index:end_index])
+    def _sliced_copy(self, start_index: int, end_index: int, newlabel: str) -> Self:  # noqa: ARG002
+        if start_index >= len(self.time):
+            msg = "start_index larger than length of time axis"
+            raise ValueError(msg)
+        time = self.time[start_index:end_index]
 
-        if not self.continuous_data:
-            sliced_continuous = self.continuous_data
-        else:
-            sliced_continuous = DataCollection(ContinuousData)
-            for value in self.continuous_data.values():
-                sliced_continuous.add(value[start_index:end_index])
+        sliced_eit = DataCollection(EITData)
+        for value in self.eit_data.values():
+            sliced_eit.add(value[start_index:end_index])
 
-        if not self.sparse_data:
-            sliced_sparse = self.sparse_data
-        else:
-            sliced_sparse = DataCollection(SparseData)
-            if start_index >= len(self.time):
-                msg = "start_index larger than length of time axis"
-                raise ValueError(msg)
+        sliced_continuous = DataCollection(ContinuousData)
+        for value in self.continuous_data.values():
+            sliced_continuous.add(value[start_index:end_index])
 
-            time = self.time[start_index:end_index]
-            for value in self.sparse_data.values():
-                sliced_sparse.add(value.t[time[0], time[-1]])
+        sliced_sparse = DataCollection(SparseData)
+        for value in self.sparse_data.values():
+            sliced_sparse.add(value.t[time[0], time[-1]])
 
         return self.__class__(
-            label=newlabel,
+            label=self.label,  # newlabel gives errors
             name=f"Sliced copy of <{self.name}>",
             description=f"Sliced copy of <{self.description}>",
             eit_data=sliced_eit,

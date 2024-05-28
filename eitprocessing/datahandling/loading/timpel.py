@@ -132,13 +132,13 @@ def load_from_single_path(
     # extract breath start, breath end and QRS marks
     phases = []
     for index in np.flatnonzero(data[:, 1027] == 1):
-        phases.append(MinValue(index, time[int(index)]))  # noqa: PERF401
+        phases.append(MinValue(index + first_frame, time[int(index)]))  # noqa: PERF401
 
     for index in np.flatnonzero(data[:, 1028] == 1):
-        phases.append(MaxValue(index, time[int(index)]))  # noqa: PERF401
+        phases.append(MaxValue(index + first_frame, time[int(index)]))  # noqa: PERF401
 
     for index in np.flatnonzero(data[:, 1029] == 1):
-        phases.append(QRSMark(index, time[int(index)]))  # noqa: PERF401
+        phases.append(QRSMark(index + first_frame, time[int(index)]))  # noqa: PERF401
 
     phases.sort(key=lambda x: x.index)
 

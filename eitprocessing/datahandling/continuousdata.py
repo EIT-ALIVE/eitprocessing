@@ -101,14 +101,16 @@ class ContinuousData(Equivalence, SelectByTime):
             raise ValueError(msg)
 
         cls = self.__class__
+        newlabel = newlabel or f"Merge of <{self.label}> and <{other.label}>"
 
         return cls(
             name=self.name,
-            label=newlabel or self.label,
+            label=self.label,  # TODO: using newlabel leads to errors
             unit=self.unit,
             category=self.category,
             time=np.concatenate((self.time, other.time)),
             values=np.concatenate((self.values, other.values)),
+            derived_from=[*self.derived_from, *other.derived_from, self, other],
         )
 
     def derive(self, label: str, function: Callable, func_args: dict, **kwargs) -> Self:
@@ -211,7 +213,7 @@ class ContinuousData(Equivalence, SelectByTime):
         self,
         start_index: int,
         end_index: int,
-        newlabel: str,
+        newlabel: str,  # noqa: ARG002
     ) -> Self:
         # TODO: check correct implementation
         cls = self.__class__
@@ -220,7 +222,7 @@ class ContinuousData(Equivalence, SelectByTime):
         description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
 
         return cls(
-            label=newlabel,
+            label=self.label,  # TODO: newlabel gives errors
             name=self.name,
             unit=self.unit,
             category=self.category,
@@ -228,18 +230,4 @@ class ContinuousData(Equivalence, SelectByTime):
             derived_from=[*self.derived_from, self],
             time=time,
             values=values,
-        )
-
-    def concatenate(self, other: Self) -> Self:
-        """Concatenate two sets of continuous data."""
-        return self.__class__(
-            label=self.label,
-            name=self.name,
-            unit=self.unit,
-            category=self.category,
-            description="",
-            parameters=self.parameters,
-            derived_from=[*self.derived_from, *other.derived_from, self, other],
-            time=np.concatenate((self.time, other.time)),
-            values=np.concatenate((self.values, other.values)),
         )

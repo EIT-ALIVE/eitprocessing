@@ -5,13 +5,13 @@ from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sequence import Sequence
 from tests.conftest import draeger_file1, draeger_file2, dummy_file, timpel_file
 
-# ruff: noqa: ERA001
+# ruff: noqa: ERA001  #TODO: remove this line
 
 
 def test_loading_draeger(
     draeger1: Sequence,
     draeger2: Sequence,
-    # draeger_both: Sequence,
+    draeger_both: Sequence,
 ):
     assert isinstance(draeger1, Sequence)
     assert isinstance(draeger1.eit_data["raw"], EITData)
@@ -23,11 +23,12 @@ def test_loading_draeger(
     assert draeger1 == load_eit_data(draeger_file1, vendor="draeger", label="something_else")
     assert draeger1 != draeger2
 
-    # # Load multiple
-    # assert len(draeger_both.eit_data["raw"]) == len(draeger1.eit_data["raw"]) + len(
-    #     draeger2.eit_data["raw"],
-    # )
+    # Load multiple
+    assert len(draeger_both.eit_data["raw"]) == len(draeger1.eit_data["raw"]) + len(
+        draeger2.eit_data["raw"],
+    )
 
+    # test below not possible due to requirement of axis 1 ending before axis b starts
     # draeger_inverted = load_eit_data([draeger_file1, draeger_file2], vendor="draeger", label="inverted")
     # assert len(draeger_both) == len(draeger_inverted)
     # assert draeger_both != draeger_inverted
@@ -82,10 +83,9 @@ def test_load_partial(
 
     assert len(timpel_part1) == cutoff
     assert len(timpel_part2) == len(timpel1) - cutoff
-    # TODO: once slicing and concatenation works, the asserts below should be turned back on
-    # assert timpel_part1 == timpel1[:cutoff]
-    # assert timpel_part2 == timpel1[cutoff:]
-    # assert Sequence.concatenate(timpel_part1, timpel_part2) == timpel1
+    assert timpel_part1 == timpel1[:cutoff]
+    assert timpel_part2 == timpel1[cutoff:]
+    assert Sequence.concatenate(timpel_part1, timpel_part2) == timpel1
     # assert Sequence.concatenate(timpel_part2, timpel_part1) != timpel1
 
     # Draeger
@@ -94,10 +94,9 @@ def test_load_partial(
 
     assert len(draeger2_part1) == cutoff
     assert len(draeger2_part2) == len(draeger2) - cutoff
-    # TODO: once slicing and concatenation works, the asserts below should be turned back on
-    # assert draeger2_part1 == draeger2[:cutoff]
-    # assert draeger2_part2 == draeger2[cutoff:]
-    # assert Sequence.concatenate(draeger2_part1, draeger2_part2) == draeger2
+    assert draeger2_part1 == draeger2[:cutoff]
+    assert draeger2_part2 == draeger2[cutoff:]
+    assert Sequence.concatenate(draeger2_part1, draeger2_part2) == draeger2
     # assert Sequence.concatenate(draeger2_part2, draeger2_part1) != draeger2
 
 

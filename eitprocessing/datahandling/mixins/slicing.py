@@ -55,13 +55,10 @@ class SelectByIndex(ABC):
             return self
 
         start = start or 0
-        if end is None:
-            end = len(self)
+        end = end or len(self)
+        newlabel = newlabel or f"Slice ({start}-{end}] of <{self.label}>"
 
-        if newlabel is None:
-            newlabel = self.label
-
-        return self._sliced_copy(start_index=start, end_index=end, newabel=newlabel)
+        return self._sliced_copy(start_index=start, end_index=end, newlabel=newlabel)
 
     @abstractmethod
     def _sliced_copy(

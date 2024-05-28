@@ -85,6 +85,7 @@ def load_from_single_path(
                 events,
                 phases,
                 previous_marker,
+                first_frame,
             )
 
     if not framerate:
@@ -153,6 +154,7 @@ def _read_frame(
     events: list,
     phases: list,
     previous_marker: int | None,
+    first_frame: int = 0,
 ) -> int:
     """Read frame by frame data from DRAEGER files.
 
@@ -184,14 +186,14 @@ def _read_frame(
     # Therefore, check whether the event marker has changed with
     # respect to the most recent event. If so, create a new event.
     if (previous_marker is not None) and (event_marker > previous_marker):
-        events.append(Event(index, frame_time, event_marker, event_text))
+        events.append(Event(index + first_frame, frame_time, event_marker, event_text))
     if timing_error:
         warnings.warn("A timing error was encountered during loading.")
         # TODO: expand on what timing errors are in some documentation.
     if min_max_flag == 1:
-        phases.append(MaxValue(index, frame_time))
+        phases.append(MaxValue(index + first_frame, frame_time))
     elif min_max_flag == -1:
-        phases.append(MinValue(index, frame_time))
+        phases.append(MinValue(index + first_frame, frame_time))
 
     return event_marker
 

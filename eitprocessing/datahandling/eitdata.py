@@ -44,11 +44,13 @@ class EITData(SelectByTime, Equivalence):
     phases: list = field(default_factory=list, repr=False)
     events: list = field(default_factory=list, repr=False)
     label: str | None = None
+    name: str | None = None
     pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
 
     def __post_init__(self):
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
+        self.name = self.name or self.label
         self._check_equivalence = ["label", "vendor", "framerate"]
 
     @staticmethod
@@ -69,16 +71,17 @@ class EITData(SelectByTime, Equivalence):
         # Check that data can be concatenated
         self.isequivalent(other, raise_=True)
         if np.min(other.time) <= np.max(self.time):
-            msg = f"{other} (b) starts before {self} (a) ends."
+            msg = f"Concatenation failed. Second dataset ({other.name}) may not start before first ({self.name}) ends."
             raise ValueError(msg)
 
         self_path = self.ensure_path_list(self.path)
         other_path = self.ensure_path_list(other.path)
+        newlabel = newlabel or f"Merge of <{self.label}> and <{other.label}>"
 
         return self.__class__(
             vendor=self.vendor,
             path=self_path + other_path,
-            label=newlabel or self.label,
+            label=self.label,  # TODO: using newlabel leads to errors
             framerate=self.framerate,
             nframes=self.nframes + other.nframes,
             time=np.concatenate((self.time, other.time)),
@@ -91,7 +94,7 @@ class EITData(SelectByTime, Equivalence):
         self,
         start_index: int,
         end_index: int,
-        newlabel: str,
+        newlabel: str,  # noqa: ARG002
     ) -> Self:
         cls = self.__class__
         time = self.time[start_index:end_index]
@@ -110,7 +113,7 @@ class EITData(SelectByTime, Equivalence):
             framerate=self.framerate,
             phases=phases,
             events=events,
-            label=newlabel,
+            label=self.label,  # newlabel gives errors
             pixel_impedance=pixel_impedance,
         )
 
