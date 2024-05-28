@@ -1,16 +1,16 @@
-:py:mod:`eitprocessing.plotting`
-================================
+eitprocessing.plotting
+======================
 
 .. py:module:: eitprocessing.plotting
 
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   animate/index.rst
-   plot/index.rst
+   /autoapi/eitprocessing/plotting/animate/index
+   /autoapi/eitprocessing/plotting/plot/index
 
 

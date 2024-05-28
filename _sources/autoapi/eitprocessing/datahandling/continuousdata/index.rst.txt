@@ -1,38 +1,112 @@
-:py:mod:`eitprocessing.datahandling.continuousdata`
-===================================================
+eitprocessing.datahandling.continuousdata
+=========================================
 
 .. py:module:: eitprocessing.datahandling.continuousdata
 
 
-Module Contents
----------------
-
-Classes
-~~~~~~~
-
-.. autoapisummary::
-
-   eitprocessing.datahandling.continuousdata.ContinuousData
-
-
-
-
 Attributes
-~~~~~~~~~~
+----------
 
 .. autoapisummary::
 
    eitprocessing.datahandling.continuousdata.T
 
 
-.. py:data:: T
+Classes
+-------
 
-   
+.. autoapisummary::
+
+   eitprocessing.datahandling.continuousdata.Equivalence
+   eitprocessing.datahandling.continuousdata.SelectByTime
+   eitprocessing.datahandling.continuousdata.ContinuousData
+
+
+Module Contents
+---------------
+
+.. py:class:: Equivalence
+
+   Mixin class that adds an equality and equivalence check.
+
+
+   .. py:method:: __eq__(other: typing_extensions.Self) -> bool
+
+      Return self==value.
+
+
+
+   .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
+      :staticmethod:
+
+
+      Check if a and b are equal, even if they are numpy arrays containing nans.
+
+
+
+   .. py:method:: _return_equality_attributes(d: dict | collections.UserDict) -> dict
+      :staticmethod:
+
+
+
+   .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
+
+      Test whether the data structure between two objects are equivalent.
+
+      Equivalence, in this case means that objects are compatible e.g. to be
+      merged. Data content can vary, but e.g. the category of data (e.g.
+      airway pressure, flow, tidal volume) and unit, etc., must match.
+
+      :param other: object that will be compared to self.
+      :param raise_: sets this method's behavior in case of non-equivalence. If
+                     True, an `EquivalenceError` is raised, otherwise `False` is
+                     returned.
+
+      :raises EquivalenceError: if `raise_ == True` and the objects are not
+      :raises equivalent.:
+
+      :returns: bool describing result of equivalence comparison.
+
+
+
+.. py:class:: SelectByTime
+
+   Bases: :py:obj:`SelectByIndex`, :py:obj:`HasTimeIndexer`
+
+
+   Adds methods for slicing by time rather than index.
+
+
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
+
+      Get a slice from start to end time stamps.
+
+      Given a start and end time stamp (i.e. its value, not its index),
+      return a slice of the original object, which must contain a time axis.
+
+      :param start_time: first time point to include. Defaults to first frame of sequence.
+      :param end_time: last time point. Defaults to last frame of sequence.
+      :param start_inclusive (default: `True`), end_inclusive (default `False`):
+                                       these arguments control the behavior if the given time stamp
+                                       does not match exactly with an existing time stamp of the input.
+                                       if `True`: the given time stamp will be inside the sliced object.
+                                       if `False`: the given time stamp will be outside the sliced object.
+      :param label: Description. Defaults to None, which will create a label based
+                    on the original object label and the frames by which it is sliced.
+
+      :raises TypeError: if `self` does not contain a `time` attribute.
+      :raises ValueError: if time stamps are not sorted.
+
+      :returns: Slice of self.
+
+
+
+.. py:data:: T
 
 .. py:class:: ContinuousData
 
-
    Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
+
 
    Data class for (non-EIT) data with a continuous time axis.
 
@@ -45,63 +119,44 @@ Attributes
    :param derived_from: Traceback of intermediates from which the current data was derived.
    :param values: Data points.
 
-   .. py:property:: locked
-      :type: bool
-
-      Return whether the values attribute is locked.
-
-      See lock().
-
-   .. py:property:: loaded
-      :type: bool
-
-      Return whether the data was loaded from disk, or derived from elsewhere.
 
    .. py:attribute:: label
-      :type: str
+      :type:  str
 
-      
 
    .. py:attribute:: name
-      :type: str
+      :type:  str
 
-      
 
    .. py:attribute:: unit
-      :type: str
+      :type:  str
 
-      
 
    .. py:attribute:: category
-      :type: str
+      :type:  str
 
-      
 
    .. py:attribute:: description
-      :type: str
+      :type:  str
       :value: ''
 
-      
+
 
    .. py:attribute:: parameters
-      :type: dict[str, typing_extensions.Any]
+      :type:  dict[str, typing_extensions.Any]
 
-      
 
    .. py:attribute:: derived_from
-      :type: typing_extensions.Any | list[typing_extensions.Any]
+      :type:  typing_extensions.Any | list[typing_extensions.Any]
 
-      
 
    .. py:attribute:: time
-      :type: numpy.ndarray
+      :type:  numpy.ndarray
 
-      
 
    .. py:attribute:: values
-      :type: numpy.ndarray
+      :type:  numpy.ndarray
 
-      
 
    .. py:method:: __post_init__() -> None
 
@@ -111,11 +166,13 @@ Attributes
       Implement setattr(self, name, value).
 
 
+
    .. py:method:: copy(label: str, *, name: str | None = None, unit: str | None = None, description: str | None = None, parameters: dict | None = None) -> typing_extensions.Self
 
       Create a copy.
 
       Whenever data is altered, it should probably be copied first. The alterations should then be made in the copy.
+
 
 
    .. py:method:: __add__(other: T) -> T
@@ -154,6 +211,7 @@ Attributes
       ```
 
 
+
    .. py:method:: lock(*attr: str) -> None
 
       Lock attributes, essentially rendering them read-only.
@@ -168,6 +226,7 @@ Attributes
       >>> data.lock()
       >>> data.values = [1, 2, 3] # will result in an AttributeError
       >>> data.values[0] = 1      # will result in a RuntimeError
+
 
 
    .. py:method:: unlock(*attr: str) -> None
@@ -191,6 +250,21 @@ Attributes
       >>> data.values[0] = 1      # will result in a RuntimeError
       >>> print(data.values)
       1
+
+
+
+   .. py:property:: locked
+      :type: bool
+
+      Return whether the values attribute is locked.
+
+      See lock().
+
+
+   .. py:property:: loaded
+      :type: bool
+
+      Return whether the data was loaded from disk, or derived from elsewhere.
 
 
    .. py:method:: __len__()

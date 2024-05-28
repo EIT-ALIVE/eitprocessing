@@ -1,14 +1,11 @@
-:py:mod:`eitprocessing.datahandling.mixins.slicing`
-===================================================
+eitprocessing.datahandling.mixins.slicing
+=========================================
 
 .. py:module:: eitprocessing.datahandling.mixins.slicing
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -18,12 +15,13 @@ Classes
    eitprocessing.datahandling.mixins.slicing.TimeIndexer
 
 
-
+Module Contents
+---------------
 
 .. py:class:: SelectByIndex
 
-
    Bases: :py:obj:`abc.ABC`
+
 
    Adds slicing functionality to subclass by implementing `__getitem__`.
 
@@ -32,10 +30,10 @@ Classes
    slice between square brackets (as e.g. done for lists) then return the
    expected sliced object.
 
-   .. py:attribute:: label
-      :type: str
 
-      
+   .. py:attribute:: label
+      :type:  str
+
 
    .. py:method:: __getitem__(key: slice | int)
 
@@ -49,8 +47,10 @@ Classes
       object is attached.
 
 
+
    .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
       :abstractmethod:
+
 
       Slicing method that must be implemented by all subclasses.
 
@@ -61,8 +61,8 @@ Classes
 
 .. py:class:: HasTimeIndexer
 
-
    Gives access to a TimeIndexer object that can be used to slice by time.
+
 
    .. py:property:: t
       :type: TimeIndexer
@@ -81,10 +81,11 @@ Classes
 
 .. py:class:: SelectByTime
 
-
    Bases: :py:obj:`SelectByIndex`, :py:obj:`HasTimeIndexer`
 
+
    Adds methods for slicing by time rather than index.
+
 
    .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
 
@@ -112,7 +113,6 @@ Classes
 
 .. py:class:: TimeIndexer
 
-
    Helper class for slicing an object using the time axis instead of indices.
 
    Example:
@@ -124,12 +124,11 @@ Classes
    True
    ```
 
-   .. py:attribute:: obj
-      :type: SelectByTime
 
-      
+   .. py:attribute:: obj
+      :type:  SelectByTime
+
 
    .. py:method:: __getitem__(key: slice | float)
-
 
 

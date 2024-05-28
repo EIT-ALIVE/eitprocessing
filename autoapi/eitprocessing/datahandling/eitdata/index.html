@@ -34,9 +34,9 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >API Reference</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing</span></code></a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="../index.html" accesskey="U"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling</span></code></a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.eitdata</span></code></a></li> 
+          <li class="nav-item nav-item-2"><a href="../../index.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../index.html" accesskey="U">eitprocessing.datahandling</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.eitdata</a></li> 
       </ul>
     </div>  
 
@@ -46,13 +46,27 @@
           <div class="body" role="main">
             
   <section id="module-eitprocessing.datahandling.eitdata">
-<span id="eitprocessing-datahandling-eitdata"></span><h1><a class="reference internal" href="#module-eitprocessing.datahandling.eitdata" title="eitprocessing.datahandling.eitdata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.eitdata</span></code></a><a class="headerlink" href="#module-eitprocessing.datahandling.eitdata" title="Link to this heading">¶</a></h1>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-<section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h3>
+<span id="eitprocessing-datahandling-eitdata"></span><h1>eitprocessing.datahandling.eitdata<a class="headerlink" href="#module-eitprocessing.datahandling.eitdata" title="Link to this heading">¶</a></h1>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.eitdata.T" title="eitprocessing.datahandling.eitdata.T"><code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence" title="eitprocessing.datahandling.eitdata.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Equivalence</span></code></a></p></td>
+<td><p>Mixin class that adds an equality and equivalence check.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.eitdata.SelectByTime" title="eitprocessing.datahandling.eitdata.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByTime</span></code></a></p></td>
+<td><p>Adds methods for slicing by time rather than index.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData" title="eitprocessing.datahandling.eitdata.EITData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EITData</span></code></a></p></td>
 <td><p>Container for EIT data.</p></td>
 </tr>
@@ -62,15 +76,98 @@
 </tbody>
 </table>
 </section>
-<section id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h3>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.eitdata.T" title="eitprocessing.datahandling.eitdata.T"><code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.eitdata.</span></span><span class="sig-name descname"><span class="pre">Equivalence</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence" title="Link to this definition">¶</a></dt>
+<dd><p>Mixin class that adds an equality and equivalence check.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence.__eq__" title="Link to this definition">¶</a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence._array_safe_eq">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_array_safe_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._array_safe_eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence._array_safe_eq" title="Link to this definition">¶</a></dt>
+<dd><p>Check if a and b are equal, even if they are numpy arrays containing nans.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence._return_equality_attributes">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_return_equality_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.UserDict" title="(in Python v3.12)"><span class="pre">collections.UserDict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._return_equality_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence._return_equality_attributes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence.isequivalent">
+<span class="sig-name descname"><span class="pre">isequivalent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence.isequivalent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence.isequivalent" title="Link to this definition">¶</a></dt>
+<dd><p>Test whether the data structure between two objects are equivalent.</p>
+<p>Equivalence, in this case means that objects are compatible e.g. to be
+merged. Data content can vary, but e.g. the category of data (e.g.
+airway pressure, flow, tidal volume) and unit, etc., must match.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> – object that will be compared to self.</p></li>
+<li><p><strong>raise</strong> – sets this method’s behavior in case of non-equivalence. If
+True, an <cite>EquivalenceError</cite> is raised, otherwise <cite>False</cite> is
+returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.EquivalenceError" title="eitprocessing.datahandling.mixins.equality.EquivalenceError"><strong>EquivalenceError</strong></a> – if <cite>raise_ == True</cite> and the objects are not</p></li>
+<li><p><strong>equivalent.</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool describing result of equivalence comparison.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.SelectByTime">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.eitdata.</span></span><span class="sig-name descname"><span class="pre">SelectByTime</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.SelectByTime" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByIndex</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></p>
+<p>Adds methods for slicing by time rather than index.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.SelectByTime.select_by_time">
+<span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_inclusive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_inclusive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.SelectByTime.select_by_time" title="Link to this definition">¶</a></dt>
+<dd><p>Get a slice from start to end time stamps.</p>
+<p>Given a start and end time stamp (i.e. its value, not its index),
+return a slice of the original object, which must contain a time axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_time</strong> – first time point to include. Defaults to first frame of sequence.</p></li>
+<li><p><strong>end_time</strong> – last time point. Defaults to last frame of sequence.</p></li>
+<li><p><strong>(</strong><strong>default</strong> (<em>start_inclusive</em>) – <cite>True</cite>), end_inclusive (default <cite>False</cite>):
+these arguments control the behavior if the given time stamp
+does not match exactly with an existing time stamp of the input.
+if <cite>True</cite>: the given time stamp will be inside the sliced object.
+if <cite>False</cite>: the given time stamp will be outside the sliced object.</p></li>
+<li><p><strong>label</strong> – Description. Defaults to None, which will create a label based
+on the original object label and the frames by which it is sliced.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.12)"><strong>TypeError</strong></a> – if <cite>self</cite> does not contain a <cite>time</cite> attribute.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if time stamps are not sorted.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Slice of self.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py data">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.T">
 <span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.eitdata.</span></span><span class="sig-name descname"><span class="pre">T</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#T"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.T" title="Link to this definition">¶</a></dt>
@@ -95,38 +192,6 @@ disk.</p>
 </dd>
 </dl>
 <p>Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.</p>
-<dl class="py property">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.global_baseline">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">global_baseline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.global_baseline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.global_baseline" title="Link to this definition">¶</a></dt>
-<dd><p>Return the global baseline, i.e. the minimum pixel impedance across all pixels.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.pixel_impedance_global_offset">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_impedance_global_offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.pixel_impedance_global_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.pixel_impedance_global_offset" title="Link to this definition">¶</a></dt>
-<dd><p>Return the pixel impedance with the global baseline removed.</p>
-<p>In the resulting array the minimum impedance across all pixels is set to 0.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.pixel_baseline">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_baseline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.pixel_baseline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.pixel_baseline" title="Link to this definition">¶</a></dt>
-<dd><p>Return the lowest value in each individual pixel over time.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.pixel_impedance_individual_offset">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_impedance_individual_offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.pixel_impedance_individual_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.pixel_impedance_individual_offset" title="Link to this definition">¶</a></dt>
-<dd><p>Return the pixel impedance with the baseline of each individual pixel removed.</p>
-<p>Each pixel in the resulting array has a minimum value of 0.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.global_impedance">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">global_impedance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.global_impedance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.global_impedance" title="Link to this definition">¶</a></dt>
-<dd><p>Return the global impedance, i.e. the sum of all pixels at each frame.</p>
-</dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.path">
 <span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.path" title="Link to this definition">¶</a></dt>
@@ -164,12 +229,12 @@ disk.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.label">
-<span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.label" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.label" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.name" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.name" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -213,6 +278,38 @@ indices.</p>
 <span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.__len__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.global_baseline">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">global_baseline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.global_baseline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.global_baseline" title="Link to this definition">¶</a></dt>
+<dd><p>Return the global baseline, i.e. the minimum pixel impedance across all pixels.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.pixel_impedance_global_offset">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_impedance_global_offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.pixel_impedance_global_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.pixel_impedance_global_offset" title="Link to this definition">¶</a></dt>
+<dd><p>Return the pixel impedance with the global baseline removed.</p>
+<p>In the resulting array the minimum impedance across all pixels is set to 0.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.pixel_baseline">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_baseline</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.pixel_baseline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.pixel_baseline" title="Link to this definition">¶</a></dt>
+<dd><p>Return the lowest value in each individual pixel over time.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.pixel_impedance_individual_offset">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_impedance_individual_offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.pixel_impedance_individual_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.pixel_impedance_individual_offset" title="Link to this definition">¶</a></dt>
+<dd><p>Return the pixel impedance with the baseline of each individual pixel removed.</p>
+<p>Each pixel in the resulting array has a minimum value of 0.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.global_impedance">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">global_impedance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.global_impedance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.global_impedance" title="Link to this definition">¶</a></dt>
+<dd><p>Return the global impedance, i.e. the sum of all pixels at each frame.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -249,7 +346,6 @@ indices.</p>
 
 </section>
 </section>
-</section>
 
 
             <div class="clearer"></div>
@@ -261,17 +357,23 @@ indices.</p>
   <div>
     <h3><a href="../../../../index.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.eitdata</span></code></a><ul>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#">eitprocessing.datahandling.eitdata</a><ul>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#attributes">Attributes</a><ul>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence"><code class="docutils literal notranslate"><span class="pre">Equivalence</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence.__eq__"><code class="docutils literal notranslate"><span class="pre">Equivalence.__eq__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence._array_safe_eq"><code class="docutils literal notranslate"><span class="pre">Equivalence._array_safe_eq()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence._return_equality_attributes"><code class="docutils literal notranslate"><span class="pre">Equivalence._return_equality_attributes()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence.isequivalent"><code class="docutils literal notranslate"><span class="pre">Equivalence.isequivalent()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.SelectByTime"><code class="docutils literal notranslate"><span class="pre">SelectByTime</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.SelectByTime.select_by_time"><code class="docutils literal notranslate"><span class="pre">SelectByTime.select_by_time()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.T"><code class="docutils literal notranslate"><span class="pre">T</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData"><code class="docutils literal notranslate"><span class="pre">EITData</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.global_baseline"><code class="docutils literal notranslate"><span class="pre">EITData.global_baseline</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.pixel_impedance_global_offset"><code class="docutils literal notranslate"><span class="pre">EITData.pixel_impedance_global_offset</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.pixel_baseline"><code class="docutils literal notranslate"><span class="pre">EITData.pixel_baseline</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.pixel_impedance_individual_offset"><code class="docutils literal notranslate"><span class="pre">EITData.pixel_impedance_individual_offset</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.global_impedance"><code class="docutils literal notranslate"><span class="pre">EITData.global_impedance</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.path"><code class="docutils literal notranslate"><span class="pre">EITData.path</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.nframes"><code class="docutils literal notranslate"><span class="pre">EITData.nframes</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.time"><code class="docutils literal notranslate"><span class="pre">EITData.time</span></code></a></li>
@@ -288,6 +390,11 @@ indices.</p>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.concatenate"><code class="docutils literal notranslate"><span class="pre">EITData.concatenate()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData._sliced_copy"><code class="docutils literal notranslate"><span class="pre">EITData._sliced_copy()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.__len__"><code class="docutils literal notranslate"><span class="pre">EITData.__len__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.global_baseline"><code class="docutils literal notranslate"><span class="pre">EITData.global_baseline</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.pixel_impedance_global_offset"><code class="docutils literal notranslate"><span class="pre">EITData.pixel_impedance_global_offset</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.pixel_baseline"><code class="docutils literal notranslate"><span class="pre">EITData.pixel_baseline</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.pixel_impedance_individual_offset"><code class="docutils literal notranslate"><span class="pre">EITData.pixel_impedance_individual_offset</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.global_impedance"><code class="docutils literal notranslate"><span class="pre">EITData.global_impedance</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Vendor"><code class="docutils literal notranslate"><span class="pre">Vendor</span></code></a><ul>
@@ -303,19 +410,17 @@ indices.</p>
 </ul>
 </li>
 </ul>
-</li>
-</ul>
 
   </div>
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="../datacollection/index.html"
-                          title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.datacollection</span></code></a></p>
+                          title="previous chapter">eitprocessing.datahandling.datacollection</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
     <p class="topless"><a href="../event/index.html"
-                          title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.event</span></code></a></p>
+                          title="next chapter">eitprocessing.datahandling.event</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -355,9 +460,9 @@ indices.</p>
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >API Reference</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing</span></code></a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling</span></code></a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.eitdata</span></code></a></li> 
+          <li class="nav-item nav-item-2"><a href="../../index.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../index.html" >eitprocessing.datahandling</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.eitdata</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

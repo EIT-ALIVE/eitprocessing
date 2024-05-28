@@ -1,45 +1,38 @@
-:py:mod:`eitprocessing.datahandling.event`
-==========================================
+eitprocessing.datahandling.event
+================================
 
 .. py:module:: eitprocessing.datahandling.event
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    eitprocessing.datahandling.event.Event
 
 
-
+Module Contents
+---------------
 
 .. py:class:: Event
 
-
    Single time point event registered during an EIT measurement.
 
-   .. py:attribute:: index
-      :type: int
 
-      
+   .. py:attribute:: index
+      :type:  int
+
 
    .. py:attribute:: time
-      :type: float
+      :type:  float
 
-      
 
    .. py:attribute:: marker
-      :type: int
+      :type:  int
 
-      
 
    .. py:attribute:: text
-      :type: str
-
-      
+      :type:  str
 
 

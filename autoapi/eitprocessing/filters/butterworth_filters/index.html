@@ -34,9 +34,9 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >API Reference</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing</span></code></a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="../index.html" accesskey="U"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.filters</span></code></a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.filters.butterworth_filters</span></code></a></li> 
+          <li class="nav-item nav-item-2"><a href="../../index.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../index.html" accesskey="U">eitprocessing.filters</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.filters.butterworth_filters</a></li> 
       </ul>
     </div>  
 
@@ -46,33 +46,9 @@
           <div class="body" role="main">
             
   <section id="module-eitprocessing.filters.butterworth_filters">
-<span id="eitprocessing-filters-butterworth-filters"></span><h1><a class="reference internal" href="#module-eitprocessing.filters.butterworth_filters" title="eitprocessing.filters.butterworth_filters"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.filters.butterworth_filters</span></code></a><a class="headerlink" href="#module-eitprocessing.filters.butterworth_filters" title="Link to this heading">¶</a></h1>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-<section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h3>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.ButterworthFilter" title="eitprocessing.filters.butterworth_filters.ButterworthFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ButterworthFilter</span></code></a></p></td>
-<td><p>Butterworth filter for filtering in the time domain.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.LowPassFilter" title="eitprocessing.filters.butterworth_filters.LowPassFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LowPassFilter</span></code></a></p></td>
-<td><p>Low-pass Butterworth filter for filtering in the time domain.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.HighPassFilter" title="eitprocessing.filters.butterworth_filters.HighPassFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HighPassFilter</span></code></a></p></td>
-<td><p>High-pass Butterworth filter for filtering in the time domain.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.BandStopFilter" title="eitprocessing.filters.butterworth_filters.BandStopFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BandStopFilter</span></code></a></p></td>
-<td><p>Band-stop Butterworth filter for filtering in the time domain.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.BandPassFilter" title="eitprocessing.filters.butterworth_filters.BandPassFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BandPassFilter</span></code></a></p></td>
-<td><p>Band-pass Butterworth filter for filtering in the time domain.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
+<span id="eitprocessing-filters-butterworth-filters"></span><h1>eitprocessing.filters.butterworth_filters<a class="headerlink" href="#module-eitprocessing.filters.butterworth_filters" title="Link to this heading">¶</a></h1>
 <section id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h3>
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.MAX_ORDER" title="eitprocessing.filters.butterworth_filters.MAX_ORDER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_ORDER</span></code></a></p></td>
@@ -83,6 +59,52 @@
 </tr>
 </tbody>
 </table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.TimeDomainFilter" title="eitprocessing.filters.butterworth_filters.TimeDomainFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeDomainFilter</span></code></a></p></td>
+<td><p>Parent class for time domain filters.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.ButterworthFilter" title="eitprocessing.filters.butterworth_filters.ButterworthFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ButterworthFilter</span></code></a></p></td>
+<td><p>Butterworth filter for filtering in the time domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.LowPassFilter" title="eitprocessing.filters.butterworth_filters.LowPassFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LowPassFilter</span></code></a></p></td>
+<td><p>Low-pass Butterworth filter for filtering in the time domain.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.HighPassFilter" title="eitprocessing.filters.butterworth_filters.HighPassFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HighPassFilter</span></code></a></p></td>
+<td><p>High-pass Butterworth filter for filtering in the time domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.BandStopFilter" title="eitprocessing.filters.butterworth_filters.BandStopFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BandStopFilter</span></code></a></p></td>
+<td><p>Band-stop Butterworth filter for filtering in the time domain.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.BandPassFilter" title="eitprocessing.filters.butterworth_filters.BandPassFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BandPassFilter</span></code></a></p></td>
+<td><p>Band-pass Butterworth filter for filtering in the time domain.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.filters.butterworth_filters.TimeDomainFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.filters.butterworth_filters.</span></span><span class="sig-name descname"><span class="pre">TimeDomainFilter</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/filters.html#TimeDomainFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.TimeDomainFilter" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>Parent class for time domain filters.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.filters.butterworth_filters.TimeDomainFilter.available_in_gui">
+<span class="sig-name descname"><span class="pre">available_in_gui</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.TimeDomainFilter.available_in_gui" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.filters.butterworth_filters.TimeDomainFilter.apply_filter">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">apply_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.typing.ArrayLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/filters.html#TimeDomainFilter.apply_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.TimeDomainFilter.apply_filter" title="Link to this definition">¶</a></dt>
+<dd><p>Apply the filter to the input data.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.filters.butterworth_filters.ButterworthFilter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.filters.butterworth_filters.</span></span><span class="sig-name descname"><span class="pre">ButterworthFilter</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#ButterworthFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.ButterworthFilter" title="Link to this definition">¶</a></dt>
@@ -132,7 +154,7 @@ can result in unstable or incorrect filtering.</p></li>
 </div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.filters.butterworth_filters.ButterworthFilter.filter_type">
-<span class="sig-name descname"><span class="pre">filter_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="pre">lowpass</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">highpass</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bandpass</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bandstop</span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#ButterworthFilter.filter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.ButterworthFilter.filter_type" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">filter_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'lowpass'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'highpass'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'bandpass'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'bandstop'</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#ButterworthFilter.filter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.ButterworthFilter.filter_type" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -223,7 +245,7 @@ assuming this to be the time axis of the input data.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.filters.butterworth_filters.LowPassFilter.filter_type">
-<span class="sig-name descname"><span class="pre">filter_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="pre">lowpass</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lowpass'</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#LowPassFilter.filter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.LowPassFilter.filter_type" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">filter_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'lowpass'</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lowpass'</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#LowPassFilter.filter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.LowPassFilter.filter_type" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -242,7 +264,7 @@ assuming this to be the time axis of the input data.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.filters.butterworth_filters.HighPassFilter.filter_type">
-<span class="sig-name descname"><span class="pre">filter_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="pre">highpass</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'highpass'</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#HighPassFilter.filter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.HighPassFilter.filter_type" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">filter_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'highpass'</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'highpass'</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#HighPassFilter.filter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.HighPassFilter.filter_type" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -261,7 +283,7 @@ assuming this to be the time axis of the input data.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.filters.butterworth_filters.BandStopFilter.filter_type">
-<span class="sig-name descname"><span class="pre">filter_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="pre">bandstop</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'bandstop'</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#BandStopFilter.filter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.BandStopFilter.filter_type" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">filter_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'bandstop'</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'bandstop'</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#BandStopFilter.filter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.BandStopFilter.filter_type" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -280,7 +302,7 @@ assuming this to be the time axis of the input data.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.filters.butterworth_filters.BandPassFilter.filter_type">
-<span class="sig-name descname"><span class="pre">filter_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="pre">bandpass</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'bandpass'</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#BandPassFilter.filter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.BandPassFilter.filter_type" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">filter_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'bandpass'</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'bandpass'</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/filters/butterworth_filters.html#BandPassFilter.filter_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.filters.butterworth_filters.BandPassFilter.filter_type" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -297,7 +319,6 @@ assuming this to be the time axis of the input data.</p></li>
 
 </section>
 </section>
-</section>
 
 
             <div class="clearer"></div>
@@ -309,10 +330,15 @@ assuming this to be the time axis of the input data.</p></li>
   <div>
     <h3><a href="../../../../index.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.filters.butterworth_filters</span></code></a><ul>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#">eitprocessing.filters.butterworth_filters</a><ul>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#attributes">Attributes</a><ul>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.TimeDomainFilter"><code class="docutils literal notranslate"><span class="pre">TimeDomainFilter</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.TimeDomainFilter.available_in_gui"><code class="docutils literal notranslate"><span class="pre">TimeDomainFilter.available_in_gui</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.TimeDomainFilter.apply_filter"><code class="docutils literal notranslate"><span class="pre">TimeDomainFilter.apply_filter()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.ButterworthFilter"><code class="docutils literal notranslate"><span class="pre">ButterworthFilter</span></code></a><ul>
 <li><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.ButterworthFilter.filter_type"><code class="docutils literal notranslate"><span class="pre">ButterworthFilter.filter_type</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.filters.butterworth_filters.ButterworthFilter.cutoff_frequency"><code class="docutils literal notranslate"><span class="pre">ButterworthFilter.cutoff_frequency</span></code></a></li>
@@ -352,19 +378,17 @@ assuming this to be the time axis of the input data.</p></li>
 </ul>
 </li>
 </ul>
-</li>
-</ul>
 
   </div>
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="../index.html"
-                          title="previous chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.filters</span></code></a></p>
+                          title="previous chapter">eitprocessing.filters</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
     <p class="topless"><a href="../../plotting/index.html"
-                          title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.plotting</span></code></a></p>
+                          title="next chapter">eitprocessing.plotting</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -404,9 +428,9 @@ assuming this to be the time axis of the input data.</p></li>
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >API Reference</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing</span></code></a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="../index.html" ><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.filters</span></code></a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.filters.butterworth_filters</span></code></a></li> 
+          <li class="nav-item nav-item-2"><a href="../../index.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../index.html" >eitprocessing.filters</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.filters.butterworth_filters</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

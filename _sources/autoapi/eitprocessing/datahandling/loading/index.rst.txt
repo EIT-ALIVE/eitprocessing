@@ -1,26 +1,23 @@
-:py:mod:`eitprocessing.datahandling.loading`
-============================================
+eitprocessing.datahandling.loading
+==================================
 
 .. py:module:: eitprocessing.datahandling.loading
 
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   binreader/index.rst
-   draeger/index.rst
-   sentec/index.rst
-   timpel/index.rst
+   /autoapi/eitprocessing/datahandling/loading/binreader/index
+   /autoapi/eitprocessing/datahandling/loading/draeger/index
+   /autoapi/eitprocessing/datahandling/loading/sentec/index
+   /autoapi/eitprocessing/datahandling/loading/timpel/index
 
-
-Package Contents
-----------------
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -30,9 +27,8 @@ Classes
    eitprocessing.datahandling.loading.Sequence
 
 
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
@@ -41,11 +37,13 @@ Functions
    eitprocessing.datahandling.loading._ensure_vendor
 
 
+Package Contents
+----------------
 
 .. py:class:: DataCollection(data_type: type[V], *args, **kwargs)
 
-
    Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`collections.UserDict`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
+
 
    A collection of a single type of data with unique labels.
 
@@ -61,10 +59,10 @@ Functions
    :param data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or
    :param SparseData.:
 
-   .. py:attribute:: data_type
-      :type: type
 
-      
+   .. py:attribute:: data_type
+      :type:  type
+
 
    .. py:method:: __setitem__(__key: str, __value: V) -> None
 
@@ -72,6 +70,7 @@ Functions
    .. py:method:: add(*item: V, overwrite: bool = False) -> None
 
       Add one or multiple item(s) to the collection.
+
 
 
    .. py:method:: _check_item(item: V, key: str | None = None, overwrite: bool = False) -> None
@@ -92,9 +91,11 @@ Functions
       :raises overwrite is set to False.:
 
 
+
    .. py:method:: get_loaded_data() -> dict[str, V]
 
       Return all data that was directly loaded from disk.
+
 
 
    .. py:method:: get_data_derived_from(obj: V) -> dict[str, V]
@@ -102,9 +103,11 @@ Functions
       Return all data that was derived from a specific source.
 
 
+
    .. py:method:: get_derived_data() -> dict[str, V]
 
       Return all data that was derived from any source.
+
 
 
    .. py:method:: concatenate(other: typing_extensions.Self[V]) -> typing_extensions.Self[V]
@@ -112,6 +115,7 @@ Functions
       Concatenate this collection with an equivalent collection.
 
       Each item of self of concatenated with the item of other with the same key.
+
 
 
    .. py:method:: select_by_time(start_time: float | None, end_time: float | None, start_inclusive: bool = True, end_inclusive: bool = False) -> typing_extensions.Self
@@ -122,8 +126,8 @@ Functions
 
 .. py:class:: EITData
 
-
    Bases: :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`
+
 
    Container for EIT data.
 
@@ -139,84 +143,50 @@ Functions
 
    Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
 
-   .. py:property:: global_baseline
-      :type: numpy.ndarray
-
-      Return the global baseline, i.e. the minimum pixel impedance across all pixels.
-
-   .. py:property:: pixel_impedance_global_offset
-      :type: numpy.ndarray
-
-      Return the pixel impedance with the global baseline removed.
-
-      In the resulting array the minimum impedance across all pixels is set to 0.
-
-   .. py:property:: pixel_baseline
-      :type: numpy.ndarray
-
-      Return the lowest value in each individual pixel over time.
-
-   .. py:property:: pixel_impedance_individual_offset
-      :type: numpy.ndarray
-
-      Return the pixel impedance with the baseline of each individual pixel removed.
-
-      Each pixel in the resulting array has a minimum value of 0.
-
-   .. py:property:: global_impedance
-      :type: numpy.ndarray
-
-      Return the global impedance, i.e. the sum of all pixels at each frame.
 
    .. py:attribute:: path
-      :type: pathlib.Path | list[pathlib.Path]
+      :type:  pathlib.Path | list[pathlib.Path]
 
-      
 
    .. py:attribute:: nframes
-      :type: int
+      :type:  int
 
-      
 
    .. py:attribute:: time
-      :type: numpy.ndarray
+      :type:  numpy.ndarray
 
-      
 
    .. py:attribute:: framerate
-      :type: float
+      :type:  float
 
-      
 
    .. py:attribute:: vendor
-      :type: Vendor
+      :type:  Vendor
 
-      
 
    .. py:attribute:: phases
-      :type: list
+      :type:  list
 
-      
 
    .. py:attribute:: events
-      :type: list
+      :type:  list
 
-      
 
    .. py:attribute:: label
-      :type: str | None
+      :type:  str | None
+      :value: None
 
-      
+
 
    .. py:attribute:: name
-      :type: str | None
+      :type:  str | None
+      :value: None
 
-      
+
 
    .. py:attribute:: pixel_impedance
-      :type: numpy.ndarray
+      :type:  numpy.ndarray
 
-      
 
    .. py:method:: __post_init__()
 
@@ -224,10 +194,12 @@ Functions
    .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
       :staticmethod:
 
+
       Return the path or paths as a list.
 
       The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
       list of Path objects given either a str/Path or list of str/Paths.
+
 
 
    .. py:method:: __add__(other: T) -> T
@@ -244,42 +216,71 @@ Functions
       indices.
 
 
+
    .. py:method:: __len__()
 
+
+   .. py:property:: global_baseline
+      :type: numpy.ndarray
+
+      Return the global baseline, i.e. the minimum pixel impedance across all pixels.
+
+
+   .. py:property:: pixel_impedance_global_offset
+      :type: numpy.ndarray
+
+      Return the pixel impedance with the global baseline removed.
+
+      In the resulting array the minimum impedance across all pixels is set to 0.
+
+
+   .. py:property:: pixel_baseline
+      :type: numpy.ndarray
+
+      Return the lowest value in each individual pixel over time.
+
+
+   .. py:property:: pixel_impedance_individual_offset
+      :type: numpy.ndarray
+
+      Return the pixel impedance with the baseline of each individual pixel removed.
+
+      Each pixel in the resulting array has a minimum value of 0.
+
+
+   .. py:property:: global_impedance
+      :type: numpy.ndarray
+
+      Return the global impedance, i.e. the sum of all pixels at each frame.
 
 
 .. py:class:: Vendor
 
-
    Bases: :py:obj:`strenum.LowercaseStrEnum`
+
 
    Enum indicating the vendor (manufacturer) of the source EIT device.
 
+
    .. py:attribute:: DRAEGER
 
-      
 
    .. py:attribute:: TIMPEL
 
-      
 
    .. py:attribute:: SENTEC
 
-      
 
    .. py:attribute:: DRAGER
 
-      
 
    .. py:attribute:: DRÄGER
-
-      
 
 
 .. py:class:: Sequence
 
-
    Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
+
 
    Sequence of timepoints containing respiratory data.
 
@@ -300,43 +301,44 @@ Functions
    :param continuous_data: Collection of one or more sets of continuous data points.
    :param sparse_data: Collection of one or more sets of individual data points.
 
+
+   .. py:attribute:: label
+      :type:  str | None
+      :value: None
+
+
+
+   .. py:attribute:: name
+      :type:  str | None
+      :value: None
+
+
+
+   .. py:attribute:: description
+      :type:  str
+      :value: ''
+
+
+
+   .. py:attribute:: eit_data
+      :type:  eitprocessing.datahandling.datacollection.DataCollection
+
+
+   .. py:attribute:: continuous_data
+      :type:  eitprocessing.datahandling.datacollection.DataCollection
+
+
+   .. py:attribute:: sparse_data
+      :type:  eitprocessing.datahandling.datacollection.DataCollection
+
+
+   .. py:method:: __post_init__()
+
+
    .. py:property:: time
       :type: numpy.ndarray
 
       Time axis from either EITData or ContinuousData.
-
-   .. py:attribute:: label
-      :type: str | None
-
-      
-
-   .. py:attribute:: name
-      :type: str | None
-
-      
-
-   .. py:attribute:: description
-      :type: str
-      :value: ''
-
-      
-
-   .. py:attribute:: eit_data
-      :type: eitprocessing.datahandling.datacollection.DataCollection
-
-      
-
-   .. py:attribute:: continuous_data
-      :type: eitprocessing.datahandling.datacollection.DataCollection
-
-      
-
-   .. py:attribute:: sparse_data
-      :type: eitprocessing.datahandling.datacollection.DataCollection
-
-      
-
-   .. py:method:: __post_init__()
 
 
    .. py:method:: __len__()
@@ -348,7 +350,9 @@ Functions
    .. py:method:: concatenate(a: Sequence, b: Sequence, newlabel: str | None = None) -> Sequence
       :classmethod:
 
+
       Create a merge of two Sequence objects.
+
 
 
    .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
@@ -357,6 +361,7 @@ Functions
 
       Must return a copy of self object with all attached data within selected
       indices.
+
 
 
    .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None, name: str | None = None, description: str | None = '') -> typing_extensions.Self
@@ -404,7 +409,6 @@ Functions
 
 
 .. py:function:: _check_first_frame(first_frame: int | None) -> int
-
 
 .. py:function:: _ensure_vendor(vendor: eitprocessing.datahandling.eitdata.Vendor | str) -> eitprocessing.datahandling.eitdata.Vendor
 

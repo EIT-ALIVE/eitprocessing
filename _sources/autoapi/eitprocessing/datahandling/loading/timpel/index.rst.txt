@@ -1,24 +1,11 @@
-:py:mod:`eitprocessing.datahandling.loading.timpel`
-===================================================
+eitprocessing.datahandling.loading.timpel
+=========================================
 
 .. py:module:: eitprocessing.datahandling.loading.timpel
 
 
-Module Contents
----------------
-
-
-Functions
-~~~~~~~~~
-
-.. autoapisummary::
-
-   eitprocessing.datahandling.loading.timpel.load_from_single_path
-
-
-
 Attributes
-~~~~~~~~~~
+----------
 
 .. autoapisummary::
 
@@ -28,23 +15,522 @@ Attributes
    eitprocessing.datahandling.loading.timpel.load_timpel_data
 
 
+Classes
+-------
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.loading.timpel.ContinuousData
+   eitprocessing.datahandling.loading.timpel.DataCollection
+   eitprocessing.datahandling.loading.timpel.EITData
+   eitprocessing.datahandling.loading.timpel.Vendor
+   eitprocessing.datahandling.loading.timpel.MaxValue
+   eitprocessing.datahandling.loading.timpel.MinValue
+   eitprocessing.datahandling.loading.timpel.QRSMark
+   eitprocessing.datahandling.loading.timpel.SparseData
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.loading.timpel.load_eit_data
+   eitprocessing.datahandling.loading.timpel.load_from_single_path
+
+
+Module Contents
+---------------
+
+.. py:class:: ContinuousData
+
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
+
+
+   Data class for (non-EIT) data with a continuous time axis.
+
+   :param label: Computer readable naming of the instance.
+   :param name: Human readable naming of the instance.
+   :param unit: Unit for the data.
+   :param category: Category the data falls into, e.g. 'airway pressure'.
+   :param description: Human readable extended description of the data.
+   :param parameters: Parameters used to derive this data.
+   :param derived_from: Traceback of intermediates from which the current data was derived.
+   :param values: Data points.
+
+
+   .. py:attribute:: label
+      :type:  str
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+   .. py:attribute:: category
+      :type:  str
+
+
+   .. py:attribute:: description
+      :type:  str
+      :value: ''
+
+
+
+   .. py:attribute:: parameters
+      :type:  dict[str, typing_extensions.Any]
+
+
+   .. py:attribute:: derived_from
+      :type:  typing_extensions.Any | list[typing_extensions.Any]
+
+
+   .. py:attribute:: time
+      :type:  numpy.ndarray
+
+
+   .. py:attribute:: values
+      :type:  numpy.ndarray
+
+
+   .. py:method:: __post_init__() -> None
+
+
+   .. py:method:: __setattr__(attr: str, value: typing_extensions.Any)
+
+      Implement setattr(self, name, value).
+
+
+
+   .. py:method:: copy(label: str, *, name: str | None = None, unit: str | None = None, description: str | None = None, parameters: dict | None = None) -> typing_extensions.Self
+
+      Create a copy.
+
+      Whenever data is altered, it should probably be copied first. The alterations should then be made in the copy.
+
+
+
+   .. py:method:: __add__(other: T) -> T
+
+
+   .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
+
+
+   .. py:method:: derive(label: str, function: collections.abc.Callable, func_args: dict, **kwargs) -> typing_extensions.Self
+
+      Create a copy deriving data from values attribute.
+
+      :param label: New label for the derived object.
+      :param function: Function that takes the values and returns the derived values.
+      :param func_args: Arguments to pass to function.
+      :param \*\*kwargs: New values for attributes of
+
+      Example:
+      ```
+      def convert_data(x, add=None, subtract=None, multiply=None, divide=None):
+          if add:
+              x += add
+          if subtract:
+              x -= subtract
+          if multiply:
+              x *= multiply
+          if divide:
+              x /= divide
+          return x
+
+
+      data = ContinuousData(
+          name="Lung volume (in mL)", label="volume_mL", unit="mL", category="volume", values=some_loaded_data
+      )
+      derived = data.derive("volume_L", convert_data, {"divide": 1000}, name="Lung volume (in L)", unit="L")
+      ```
+
+
+
+   .. py:method:: lock(*attr: str) -> None
+
+      Lock attributes, essentially rendering them read-only.
+
+      Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.
+
+      :param \*attr: any number of attributes can be passed here, all of which will be locked. Defaults to "values".
+
+      .. rubric:: Examples
+
+      >>> # lock the `values` attribute of `data`
+      >>> data.lock()
+      >>> data.values = [1, 2, 3] # will result in an AttributeError
+      >>> data.values[0] = 1      # will result in a RuntimeError
+
+
+
+   .. py:method:: unlock(*attr: str) -> None
+
+      Unlock attributes, rendering them editable.
+
+      Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.
+
+      :param \*attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to "values".
+
+      .. rubric:: Examples
+
+      >>> # lock the `values` attribute of `data`
+      >>> data.lock()
+      >>> data.values = [1, 2, 3] # will result in an AttributeError
+      >>> data.values[0] = 1      # will result in a RuntimeError
+      >>> data.unlock()
+      >>> data.values = [1, 2, 3]
+      >>> print(data.values)
+      [1,2,3]
+      >>> data.values[0] = 1      # will result in a RuntimeError
+      >>> print(data.values)
+      1
+
+
+
+   .. py:property:: locked
+      :type: bool
+
+      Return whether the values attribute is locked.
+
+      See lock().
+
+
+   .. py:property:: loaded
+      :type: bool
+
+      Return whether the data was loaded from disk, or derived from elsewhere.
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+
+.. py:class:: DataCollection(data_type: type[V], *args, **kwargs)
+
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`collections.UserDict`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`, :py:obj:`Generic`\ [\ :py:obj:`V`\ ]
+
+
+   A collection of a single type of data with unique labels.
+
+   This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
+   ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects
+   added to the collection need to have a `label` attribute and a `concatenate()` method.
+
+   When adding an item to the collection, the type of the value has to match the data type of the collection.
+   Furthermore, the key has to match the attribute 'label' attached to the value.
+
+   The convenience method `add()` adds an item by setting the key to `value.label`.
+
+   :param data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or
+   :param SparseData.:
+
+
+   .. py:attribute:: data_type
+      :type:  type
+
+
+   .. py:method:: __setitem__(__key: str, __value: V) -> None
+
+
+   .. py:method:: add(*item: V, overwrite: bool = False) -> None
+
+      Add one or multiple item(s) to the collection.
+
+
+
+   .. py:method:: _check_item(item: V, key: str | None = None, overwrite: bool = False) -> None
+
+      Check whether the item can be added to the collection.
+
+      In order to be added to the collection, the data type of the item has to match the data type set in the
+      collection. They key that is used to store the item in the collection has to match the label of the item itself.
+      By default, existing keys can not be overridden.
+
+      :param item: Object to be added to the collection.
+      :param key: Key of the item. Has to match `item.label`.
+      :param overwrite: If False, the key can not already exist in the collection. Set to True to allow overwriting an
+      :param existing object in the collection.:
+
+      :raises TypeError: If the type of the item does not match the type set in the collection.
+      :raises KeyError: If the key does not match `item.label`, or when the key already exists in de collection and
+      :raises overwrite is set to False.:
+
+
+
+   .. py:method:: get_loaded_data() -> dict[str, V]
+
+      Return all data that was directly loaded from disk.
+
+
+
+   .. py:method:: get_data_derived_from(obj: V) -> dict[str, V]
+
+      Return all data that was derived from a specific source.
+
+
+
+   .. py:method:: get_derived_data() -> dict[str, V]
+
+      Return all data that was derived from any source.
+
+
+
+   .. py:method:: concatenate(other: typing_extensions.Self[V]) -> typing_extensions.Self[V]
+
+      Concatenate this collection with an equivalent collection.
+
+      Each item of self of concatenated with the item of other with the same key.
+
+
+
+   .. py:method:: select_by_time(start_time: float | None, end_time: float | None, start_inclusive: bool = True, end_inclusive: bool = False) -> typing_extensions.Self
+
+      Return a DataCollection containing sliced copies of the items.
+
+
+
+.. py:class:: EITData
+
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`
+
+
+   Container for EIT data.
+
+   This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
+   class is meant to hold data from (part of) a singular continuous measurement.
+
+   This class can't be initialized directly. Instead, use `load_eit_data(<path>, vendor=<vendor>)` to load data from
+   disk.
+
+   :param path: the path of list of paths of the source from which data was derived.
+   :param nframes: number of frames
+   :param time:
+
+   Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
+
+
+   .. py:attribute:: path
+      :type:  pathlib.Path | list[pathlib.Path]
+
+
+   .. py:attribute:: nframes
+      :type:  int
+
+
+   .. py:attribute:: time
+      :type:  numpy.ndarray
+
+
+   .. py:attribute:: framerate
+      :type:  float
+
+
+   .. py:attribute:: vendor
+      :type:  Vendor
+
+
+   .. py:attribute:: phases
+      :type:  list
+
+
+   .. py:attribute:: events
+      :type:  list
+
+
+   .. py:attribute:: label
+      :type:  str | None
+      :value: None
+
+
+
+   .. py:attribute:: name
+      :type:  str | None
+      :value: None
+
+
+
+   .. py:attribute:: pixel_impedance
+      :type:  numpy.ndarray
+
+
+   .. py:method:: __post_init__()
+
+
+   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
+      :staticmethod:
+
+
+      Return the path or paths as a list.
+
+      The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
+      list of Path objects given either a str/Path or list of str/Paths.
+
+
+
+   .. py:method:: __add__(other: T) -> T
+
+
+   .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+
+   .. py:method:: __len__()
+
+
+   .. py:property:: global_baseline
+      :type: numpy.ndarray
+
+      Return the global baseline, i.e. the minimum pixel impedance across all pixels.
+
+
+   .. py:property:: pixel_impedance_global_offset
+      :type: numpy.ndarray
+
+      Return the pixel impedance with the global baseline removed.
+
+      In the resulting array the minimum impedance across all pixels is set to 0.
+
+
+   .. py:property:: pixel_baseline
+      :type: numpy.ndarray
+
+      Return the lowest value in each individual pixel over time.
+
+
+   .. py:property:: pixel_impedance_individual_offset
+      :type: numpy.ndarray
+
+      Return the pixel impedance with the baseline of each individual pixel removed.
+
+      Each pixel in the resulting array has a minimum value of 0.
+
+
+   .. py:property:: global_impedance
+      :type: numpy.ndarray
+
+      Return the global impedance, i.e. the sum of all pixels at each frame.
+
+
+.. py:class:: Vendor
+
+   Bases: :py:obj:`strenum.LowercaseStrEnum`
+
+
+   Enum indicating the vendor (manufacturer) of the source EIT device.
+
+
+   .. py:attribute:: DRAEGER
+
+
+   .. py:attribute:: TIMPEL
+
+
+   .. py:attribute:: SENTEC
+
+
+   .. py:attribute:: DRAGER
+
+
+   .. py:attribute:: DRÄGER
+
+
+.. py:function:: load_eit_data(path: str | pathlib.Path | list[str | pathlib.Path], vendor: eitprocessing.datahandling.eitdata.Vendor | str, label: str | None = None, name: str | None = None, description: str = '', framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None) -> eitprocessing.datahandling.sequence.Sequence
+
+   Load EIT data from path(s).
+
+   :param path: relative or absolute path(s) to data file.
+   :param vendor: vendor indicating the device used.
+                  Note: for load functions of specific vendors (e.g. `load_draeger_data`), this argument is defaulted to the
+                  correct vendor.
+   :param label: short description of sequence for computer interpretation.
+                 Defaults to "Sequence_<unique_id>".
+   :param name: short description of sequence for human interpretation.
+                Defaults to the same value as label.
+   :param description: long description of sequence for human interpretation.
+   :param framerate: framerate at which the data was recorded.
+                     Default for Draeger: 20
+                     Default for Timpel: 50
+                     Default for Sentec: 50.2
+   :param first_frame: index of first frame to load.
+                       Defaults to 0.
+   :param max_frames: maximum number of frames to load.
+                      The actual number of frames can be lower than this if this
+                      would surpass the final frame.
+
+   :raises NotImplementedError: is raised when there is no loading method for
+   :raises the given vendor.:
+
+   :returns: a Sequence with the given label, name and description, containing the loaded data.
+   :rtype: Sequence
+
+   Example:
+   ```
+   sequence = load_data(["path/to/file1", "path/to/file2"], vendor="sentec", label="initial_measurement")
+   pixel_impedance = sequence.eit_data["raw"].pixel_impedance
+   ```
+
+
+.. py:class:: MaxValue
+
+   Bases: :py:obj:`PhaseIndicator`
+
+
+   Automatically registered local maximum of an EIT measurement.
+
+
+.. py:class:: MinValue
+
+   Bases: :py:obj:`PhaseIndicator`
+
+
+   Automatically registered local minimum of an EIT measurement.
+
+
+.. py:class:: QRSMark
+
+   Bases: :py:obj:`PhaseIndicator`
+
+
+   Automatically registered QRS mark an EIT measurement from a Timpel device.
+
+
+.. py:class:: SparseData
+
+   SparseData.
+
+
 .. py:data:: _COLUMN_WIDTH
    :value: 1030
 
-   
 
 .. py:data:: _NAN_VALUE
-
-   
 
 .. py:data:: TIMPEL_FRAMERATE
    :value: 50
 
-   
 
 .. py:data:: load_timpel_data
-
-   
 
 .. py:function:: load_from_single_path(path: pathlib.Path, framerate: float | None = 20, first_frame: int = 0, max_frames: int | None = None) -> eitprocessing.datahandling.datacollection.DataCollection | tuple[eitprocessing.datahandling.datacollection.DataCollection, eitprocessing.datahandling.datacollection.DataCollection, eitprocessing.datahandling.datacollection.DataCollection]
 

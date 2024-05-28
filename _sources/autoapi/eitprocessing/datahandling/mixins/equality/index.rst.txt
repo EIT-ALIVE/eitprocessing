@@ -1,40 +1,50 @@
-:py:mod:`eitprocessing.datahandling.mixins.equality`
-====================================================
+eitprocessing.datahandling.mixins.equality
+==========================================
 
 .. py:module:: eitprocessing.datahandling.mixins.equality
 
 
-Module Contents
----------------
+Exceptions
+----------
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.mixins.equality.EquivalenceError
+
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    eitprocessing.datahandling.mixins.equality.Equivalence
 
 
-
+Module Contents
+---------------
 
 .. py:class:: Equivalence
 
-
    Mixin class that adds an equality and equivalence check.
+
 
    .. py:method:: __eq__(other: typing_extensions.Self) -> bool
 
       Return self==value.
 
 
+
    .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
       :staticmethod:
+
 
       Check if a and b are equal, even if they are numpy arrays containing nans.
 
 
+
    .. py:method:: _return_equality_attributes(d: dict | collections.UserDict) -> dict
       :staticmethod:
+
 
 
    .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
@@ -59,8 +69,8 @@ Classes
 
 .. py:exception:: EquivalenceError
 
-
    Bases: :py:obj:`TypeError`, :py:obj:`ValueError`
+
 
    Raised if objects are not equivalent.
 

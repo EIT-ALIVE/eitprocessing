@@ -1,16 +1,16 @@
-:py:mod:`eitprocessing.datahandling.mixins`
-===========================================
+eitprocessing.datahandling.mixins
+=================================
 
 .. py:module:: eitprocessing.datahandling.mixins
 
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   equality/index.rst
-   slicing/index.rst
+   /autoapi/eitprocessing/datahandling/mixins/equality/index
+   /autoapi/eitprocessing/datahandling/mixins/slicing/index
 
 

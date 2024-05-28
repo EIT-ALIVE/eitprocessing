@@ -1,39 +1,113 @@
-:py:mod:`eitprocessing.datahandling.eitdata`
-============================================
+eitprocessing.datahandling.eitdata
+==================================
 
 .. py:module:: eitprocessing.datahandling.eitdata
 
 
-Module Contents
----------------
-
-Classes
-~~~~~~~
-
-.. autoapisummary::
-
-   eitprocessing.datahandling.eitdata.EITData
-   eitprocessing.datahandling.eitdata.Vendor
-
-
-
-
 Attributes
-~~~~~~~~~~
+----------
 
 .. autoapisummary::
 
    eitprocessing.datahandling.eitdata.T
 
 
-.. py:data:: T
+Classes
+-------
 
-   
+.. autoapisummary::
+
+   eitprocessing.datahandling.eitdata.Equivalence
+   eitprocessing.datahandling.eitdata.SelectByTime
+   eitprocessing.datahandling.eitdata.EITData
+   eitprocessing.datahandling.eitdata.Vendor
+
+
+Module Contents
+---------------
+
+.. py:class:: Equivalence
+
+   Mixin class that adds an equality and equivalence check.
+
+
+   .. py:method:: __eq__(other: typing_extensions.Self) -> bool
+
+      Return self==value.
+
+
+
+   .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
+      :staticmethod:
+
+
+      Check if a and b are equal, even if they are numpy arrays containing nans.
+
+
+
+   .. py:method:: _return_equality_attributes(d: dict | collections.UserDict) -> dict
+      :staticmethod:
+
+
+
+   .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
+
+      Test whether the data structure between two objects are equivalent.
+
+      Equivalence, in this case means that objects are compatible e.g. to be
+      merged. Data content can vary, but e.g. the category of data (e.g.
+      airway pressure, flow, tidal volume) and unit, etc., must match.
+
+      :param other: object that will be compared to self.
+      :param raise_: sets this method's behavior in case of non-equivalence. If
+                     True, an `EquivalenceError` is raised, otherwise `False` is
+                     returned.
+
+      :raises EquivalenceError: if `raise_ == True` and the objects are not
+      :raises equivalent.:
+
+      :returns: bool describing result of equivalence comparison.
+
+
+
+.. py:class:: SelectByTime
+
+   Bases: :py:obj:`SelectByIndex`, :py:obj:`HasTimeIndexer`
+
+
+   Adds methods for slicing by time rather than index.
+
+
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
+
+      Get a slice from start to end time stamps.
+
+      Given a start and end time stamp (i.e. its value, not its index),
+      return a slice of the original object, which must contain a time axis.
+
+      :param start_time: first time point to include. Defaults to first frame of sequence.
+      :param end_time: last time point. Defaults to last frame of sequence.
+      :param start_inclusive (default: `True`), end_inclusive (default `False`):
+                                       these arguments control the behavior if the given time stamp
+                                       does not match exactly with an existing time stamp of the input.
+                                       if `True`: the given time stamp will be inside the sliced object.
+                                       if `False`: the given time stamp will be outside the sliced object.
+      :param label: Description. Defaults to None, which will create a label based
+                    on the original object label and the frames by which it is sliced.
+
+      :raises TypeError: if `self` does not contain a `time` attribute.
+      :raises ValueError: if time stamps are not sorted.
+
+      :returns: Slice of self.
+
+
+
+.. py:data:: T
 
 .. py:class:: EITData
 
-
    Bases: :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`
+
 
    Container for EIT data.
 
@@ -49,84 +123,50 @@ Attributes
 
    Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
 
-   .. py:property:: global_baseline
-      :type: numpy.ndarray
-
-      Return the global baseline, i.e. the minimum pixel impedance across all pixels.
-
-   .. py:property:: pixel_impedance_global_offset
-      :type: numpy.ndarray
-
-      Return the pixel impedance with the global baseline removed.
-
-      In the resulting array the minimum impedance across all pixels is set to 0.
-
-   .. py:property:: pixel_baseline
-      :type: numpy.ndarray
-
-      Return the lowest value in each individual pixel over time.
-
-   .. py:property:: pixel_impedance_individual_offset
-      :type: numpy.ndarray
-
-      Return the pixel impedance with the baseline of each individual pixel removed.
-
-      Each pixel in the resulting array has a minimum value of 0.
-
-   .. py:property:: global_impedance
-      :type: numpy.ndarray
-
-      Return the global impedance, i.e. the sum of all pixels at each frame.
 
    .. py:attribute:: path
-      :type: pathlib.Path | list[pathlib.Path]
+      :type:  pathlib.Path | list[pathlib.Path]
 
-      
 
    .. py:attribute:: nframes
-      :type: int
+      :type:  int
 
-      
 
    .. py:attribute:: time
-      :type: numpy.ndarray
+      :type:  numpy.ndarray
 
-      
 
    .. py:attribute:: framerate
-      :type: float
+      :type:  float
 
-      
 
    .. py:attribute:: vendor
-      :type: Vendor
+      :type:  Vendor
 
-      
 
    .. py:attribute:: phases
-      :type: list
+      :type:  list
 
-      
 
    .. py:attribute:: events
-      :type: list
+      :type:  list
 
-      
 
    .. py:attribute:: label
-      :type: str | None
+      :type:  str | None
+      :value: None
 
-      
+
 
    .. py:attribute:: name
-      :type: str | None
+      :type:  str | None
+      :value: None
 
-      
+
 
    .. py:attribute:: pixel_impedance
-      :type: numpy.ndarray
+      :type:  numpy.ndarray
 
-      
 
    .. py:method:: __post_init__()
 
@@ -134,10 +174,12 @@ Attributes
    .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
       :staticmethod:
 
+
       Return the path or paths as a list.
 
       The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
       list of Path objects given either a str/Path or list of str/Paths.
+
 
 
    .. py:method:: __add__(other: T) -> T
@@ -154,35 +196,64 @@ Attributes
       indices.
 
 
+
    .. py:method:: __len__()
 
+
+   .. py:property:: global_baseline
+      :type: numpy.ndarray
+
+      Return the global baseline, i.e. the minimum pixel impedance across all pixels.
+
+
+   .. py:property:: pixel_impedance_global_offset
+      :type: numpy.ndarray
+
+      Return the pixel impedance with the global baseline removed.
+
+      In the resulting array the minimum impedance across all pixels is set to 0.
+
+
+   .. py:property:: pixel_baseline
+      :type: numpy.ndarray
+
+      Return the lowest value in each individual pixel over time.
+
+
+   .. py:property:: pixel_impedance_individual_offset
+      :type: numpy.ndarray
+
+      Return the pixel impedance with the baseline of each individual pixel removed.
+
+      Each pixel in the resulting array has a minimum value of 0.
+
+
+   .. py:property:: global_impedance
+      :type: numpy.ndarray
+
+      Return the global impedance, i.e. the sum of all pixels at each frame.
 
 
 .. py:class:: Vendor
 
-
    Bases: :py:obj:`strenum.LowercaseStrEnum`
+
 
    Enum indicating the vendor (manufacturer) of the source EIT device.
 
+
    .. py:attribute:: DRAEGER
 
-      
 
    .. py:attribute:: TIMPEL
 
-      
 
    .. py:attribute:: SENTEC
 
-      
 
    .. py:attribute:: DRAGER
 
-      
 
    .. py:attribute:: DRÄGER
-
-      
 
 

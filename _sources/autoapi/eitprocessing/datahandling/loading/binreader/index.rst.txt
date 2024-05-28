@@ -1,24 +1,11 @@
-:py:mod:`eitprocessing.datahandling.loading.binreader`
-======================================================
+eitprocessing.datahandling.loading.binreader
+============================================
 
 .. py:module:: eitprocessing.datahandling.loading.binreader
 
 
-Module Contents
----------------
-
-Classes
-~~~~~~~
-
-.. autoapisummary::
-
-   eitprocessing.datahandling.loading.binreader.BinReader
-
-
-
-
 Attributes
-~~~~~~~~~~
+----------
 
 .. autoapisummary::
 
@@ -26,35 +13,38 @@ Attributes
    eitprocessing.datahandling.loading.binreader.N
 
 
-.. py:data:: T
+Classes
+-------
 
-   
+.. autoapisummary::
+
+   eitprocessing.datahandling.loading.binreader.BinReader
+
+
+Module Contents
+---------------
+
+.. py:data:: T
 
 .. py:data:: N
 
-   
-
 .. py:class:: BinReader
-
 
    Helper class for reading binary files from disk.
 
    :param file_handle: a buffered reader handle, e.g. the result of the `open()` function.
    :param endian: the endianness of the binary data. Either 'little' or 'big', or None.
 
-   .. py:attribute:: file_handle
-      :type: io.BufferedReader
 
-      
+   .. py:attribute:: file_handle
+      :type:  io.BufferedReader
+
 
    .. py:attribute:: endian
-      :type: Literal[little, big] | None
+      :type:  Literal['little', 'big'] | None
+      :value: None
 
-      
 
-   .. py:attribute:: string
-
-      
 
    .. py:method:: read_single(type_code: str, cast: type[T]) -> T
 
@@ -73,6 +63,7 @@ Attributes
       :param cast: the associated type.
 
 
+
    .. py:method:: read_list(type_code: str, cast: type[T], length: int) -> list[T]
 
       Read multiple values of the same type and return as list.
@@ -84,11 +75,13 @@ Attributes
       :param length: number of values to be read.
 
 
+
    .. py:method:: read_array(type_code: str, cast: type[N], length: int) -> numpy.typing.NDArray[N]
 
       Read multiple values of the same type and return as NumPy array.
 
       See `read_list()`.
+
 
 
    .. py:method:: read_string(length: int = 1) -> str
@@ -101,9 +94,14 @@ Attributes
       :param length: number of characters.
 
 
+
+   .. py:attribute:: string
+
+
    .. py:method:: _read_full_type_code(full_type_code: str) -> tuple[Any, Ellipsis]
 
       Read the data associated with the type code.
+
 
 
    .. py:method:: float32() -> float
@@ -111,9 +109,11 @@ Attributes
       Read and return a single signed 32-bit floating point value.
 
 
+
    .. py:method:: float64() -> float
 
       Read and return a single signed 64-bit floating point value.
+
 
 
    .. py:method:: npfloat32(length: int = 1) -> numpy.typing.NDArray[numpy.float32]
@@ -121,9 +121,11 @@ Attributes
       Read and return an array of signed 32-bit floating point values.
 
 
+
    .. py:method:: npfloat64(length: int = 1) -> numpy.typing.NDArray[numpy.float64]
 
       Read and return an array of signed 64-bit floating point values.
+
 
 
    .. py:method:: int32() -> int
@@ -131,9 +133,11 @@ Attributes
       Read and return a single signed 32-bit integer value.
 
 
+
    .. py:method:: npint32(length: int = 1) -> numpy.typing.NDArray[numpy.int32]
 
       Read and return an array of signed 32-bit integer values.
+
 
 
    .. py:method:: uint8() -> int
@@ -141,14 +145,17 @@ Attributes
       Read and return a single unsigned 8-bit integer value.
 
 
+
    .. py:method:: uint16() -> int
 
       Read and return a single unsigned 16-bit integer value.
 
 
+
    .. py:method:: uint32() -> int
 
       Read and return a single unsigned 32-bit integer value.
+
 
 
    .. py:method:: uint64() -> int

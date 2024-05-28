@@ -1,22 +1,19 @@
-:py:mod:`eitprocessing.plotting.animate`
-========================================
+eitprocessing.plotting.animate
+==============================
 
 .. py:module:: eitprocessing.plotting.animate
 
 
-Module Contents
----------------
-
-
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
    eitprocessing.plotting.animate.animate_EITDataVariant
 
 
+Module Contents
+---------------
 
 .. py:function:: animate_EITDataVariant(eit_data_variant: eitprocessing.eit_data.eit_data_variant.EITDataVariant, cmap: str = 'plasma', show_progress: bool | str = 'notebook', waveforms: bool | list[str] = False) -> None
-
 

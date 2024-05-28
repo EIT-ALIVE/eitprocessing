@@ -1,31 +1,31 @@
-:py:mod:`eitprocessing.datahandling`
-====================================
+eitprocessing.datahandling
+==========================
 
 .. py:module:: eitprocessing.datahandling
 
 
 Subpackages
 -----------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 3
 
-   loading/index.rst
-   mixins/index.rst
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/eitprocessing/datahandling/loading/index
+   /autoapi/eitprocessing/datahandling/mixins/index
 
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   continuousdata/index.rst
-   datacollection/index.rst
-   eitdata/index.rst
-   event/index.rst
-   phases/index.rst
-   sequence/index.rst
-   sparsedata/index.rst
+   /autoapi/eitprocessing/datahandling/continuousdata/index
+   /autoapi/eitprocessing/datahandling/datacollection/index
+   /autoapi/eitprocessing/datahandling/eitdata/index
+   /autoapi/eitprocessing/datahandling/event/index
+   /autoapi/eitprocessing/datahandling/phases/index
+   /autoapi/eitprocessing/datahandling/sequence/index
+   /autoapi/eitprocessing/datahandling/sparsedata/index
 
 
