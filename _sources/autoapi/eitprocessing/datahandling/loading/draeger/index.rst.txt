@@ -81,6 +81,8 @@ Module Contents
 
    .. py:attribute:: description
       :type:  str
+      :value: ''
+
 
 
    .. py:attribute:: parameters
@@ -354,10 +356,14 @@ Module Contents
 
    .. py:attribute:: label
       :type:  str | None
+      :value: None
+
 
 
    .. py:attribute:: name
       :type:  str | None
+      :value: None
+
 
 
    .. py:attribute:: pixel_impedance

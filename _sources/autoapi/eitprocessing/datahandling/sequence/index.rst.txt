@@ -57,6 +57,8 @@ Module Contents
 
    .. py:attribute:: description
       :type:  str
+      :value: ''
+
 
 
    .. py:attribute:: parameters
@@ -330,10 +332,14 @@ Module Contents
 
    .. py:attribute:: label
       :type:  str | None
+      :value: None
+
 
 
    .. py:attribute:: name
       :type:  str | None
+      :value: None
+
 
 
    .. py:attribute:: pixel_impedance
@@ -411,7 +417,7 @@ Module Contents
    Mixin class that adds an equality and equivalence check.
 
 
-   .. py:method:: __eq__(other: object) -> bool
+   .. py:method:: __eq__(other: typing_extensions.Self) -> bool
 
       Return self==value.
 
@@ -422,6 +428,11 @@ Module Contents
 
 
       Check if a and b are equal, even if they are numpy arrays containing nans.
+
+
+
+   .. py:method:: _return_equality_attributes(d: dict | collections.UserDict) -> dict
+      :staticmethod:
 
 
 
@@ -529,14 +540,20 @@ Module Contents
 
    .. py:attribute:: label
       :type:  str | None
+      :value: None
+
 
 
    .. py:attribute:: name
       :type:  str | None
+      :value: None
+
 
 
    .. py:attribute:: description
       :type:  str
+      :value: ''
+
 
 
    .. py:attribute:: eit_data

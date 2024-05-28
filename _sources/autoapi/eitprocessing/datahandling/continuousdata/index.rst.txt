@@ -30,7 +30,7 @@ Module Contents
    Mixin class that adds an equality and equivalence check.
 
 
-   .. py:method:: __eq__(other: object) -> bool
+   .. py:method:: __eq__(other: typing_extensions.Self) -> bool
 
       Return self==value.
 
@@ -41,6 +41,11 @@ Module Contents
 
 
       Check if a and b are equal, even if they are numpy arrays containing nans.
+
+
+
+   .. py:method:: _return_equality_attributes(d: dict | collections.UserDict) -> dict
+      :staticmethod:
 
 
 
@@ -133,6 +138,8 @@ Module Contents
 
    .. py:attribute:: description
       :type:  str
+      :value: ''
+
 
 
    .. py:attribute:: parameters
