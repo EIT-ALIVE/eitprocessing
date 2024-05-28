@@ -298,8 +298,8 @@ class BreathDetection:
                 breaths.remove(breath)
 
         return breaths
-
-    def find_breaths(self, data: np.ndarray) -> list[Breath]:
+    
+    def _breath_finder(self, data: np.ndarray) -> list[Breath]:
         """Find breaths in the data.
 
         This method attempts to find peaks and valleys in the data in a
@@ -361,28 +361,35 @@ class BreathDetection:
         return self._remove_breaths_around_invalid_data(breaths, data)
 
 
-    def find_breaths_2d(self, data: np.ndarray) -> np.ndarray:
-        """Find breaths in the 2D time series data (pixel row, pixel column).
+    def find_breaths(self, data: np.ndarray) -> np.ndarray:
+        """Find breaths in the 1D (time) or 2D time series data (time, pixel row, pixel column).
 
         This method applies the breath finding process to each time series at each
-        pixel location and stores the results in a 2D array where each element is
+        pixel location and stores the results in a 1D or 2D array where each element is
         a list of Breath objects.
 
         Args:
-            data (np.ndarray): a 2D array containing the time series data to find breaths in
-                            with shape (pixel row, pixel column).
+            data (np.ndarray): array containing the time series data to find breaths in
 
         Returns:
-            np.ndarray: a 2D array of size (pixel row, pixel column) containing
-                        lists of Breath objects.
+            np.ndarray: array containing lists of Breath objects.
         """
-        _, rows, cols = data.shape
-        breaths_array = np.empty((rows, cols), dtype=object)
+        data_dimensions = data.ndim
 
-        for row in range(rows):
-            for col in range(cols):
-                time_series = data[:, row, col]
-                breaths = self.find_breaths(time_series)
-                breaths_array[row, col] = breaths
+        if data_dimensions == 1:
+            breaths = self._breath_finder(data)
+            return breaths
 
-        return breaths_array
+        elif data_dimensions == 3:
+            _, rows, cols = data.shape
+            breaths_array = np.empty((rows, cols), dtype=object)
+
+            for row in range(rows):
+                for col in range(cols):
+                    time_series = data[:, row, col]
+                    breaths = self._breath_finder(time_series)
+                    breaths_array[row, col] = breaths
+            return breaths_array
+
+        else:
+            raise ValueError(f"Expected data with 1 or 3 dimensions, but got {data_dimensions} dimensions.")
