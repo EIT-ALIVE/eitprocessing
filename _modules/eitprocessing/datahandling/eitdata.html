@@ -80,7 +80,7 @@
 
 <div class="viewcode-block" id="EITData.path">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.datacollection.EITData.path">[docs]</a>
-    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span></div>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EITData.nframes">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.datacollection.EITData.nframes">[docs]</a>
@@ -92,11 +92,11 @@
 
 <div class="viewcode-block" id="EITData.framerate">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.datacollection.EITData.framerate">[docs]</a>
-    <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span></div>
+    <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="EITData.vendor">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.datacollection.EITData.vendor">[docs]</a>
-    <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span></div>
+    <span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="EITData.phases">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.datacollection.EITData.phases">[docs]</a>
@@ -108,11 +108,11 @@
 
 <div class="viewcode-block" id="EITData.label">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.datacollection.EITData.label">[docs]</a>
-    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="EITData.name">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.datacollection.EITData.name">[docs]</a>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EITData.pixel_impedance">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.datacollection.EITData.pixel_impedance">[docs]</a>
@@ -124,8 +124,7 @@
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_equivalence</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;vendor&quot;</span><span class="p">,</span> <span class="s2">&quot;framerate&quot;</span><span class="p">]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span></div>
 
 
     <span class="nd">@staticmethod</span>

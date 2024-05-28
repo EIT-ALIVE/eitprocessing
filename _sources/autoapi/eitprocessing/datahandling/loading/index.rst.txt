@@ -174,14 +174,10 @@ Package Contents
 
    .. py:attribute:: label
       :type:  str | None
-      :value: None
-
 
 
    .. py:attribute:: name
       :type:  str | None
-      :value: None
-
 
 
    .. py:attribute:: pixel_impedance
@@ -304,20 +300,14 @@ Package Contents
 
    .. py:attribute:: label
       :type:  str | None
-      :value: None
-
 
 
    .. py:attribute:: name
       :type:  str | None
-      :value: None
-
 
 
    .. py:attribute:: description
       :type:  str
-      :value: ''
-
 
 
    .. py:attribute:: eit_data
