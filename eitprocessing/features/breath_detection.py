@@ -124,27 +124,28 @@ class BreathDetection:
             A tuple (peak_indices, peak_values, valley_indices, valley_values)
             with edge cases removed.
         """
-        if max(data[: valley_indices[0]]) < moving_average[valley_indices[0]]:
-            # remove the first valley, if the data before that valley is not
-            # high enough to be sure it's a valley
-            valley_indices = np.delete(valley_indices, 0)
-            valley_values = np.delete(valley_values, 0)
+        if peak_indices.size > 0 or valley_indices.size > 0:
+            if max(data[: valley_indices[0]]) < moving_average[valley_indices[0]]:
+                # remove the first valley, if the data before that valley is not
+                # high enough to be sure it's a valley
+                valley_indices = np.delete(valley_indices, 0)
+                valley_values = np.delete(valley_values, 0)
 
-        if max(data[valley_indices[-1] :]) < moving_average[valley_indices[-1]]:
-            # remove the last valley, if the data after that valley is not high
-            # enough to be sure it's a valley
-            valley_indices = np.delete(valley_indices, -1)
-            valley_values = np.delete(valley_values, -1)
+            if max(data[valley_indices[-1] :]) < moving_average[valley_indices[-1]]:
+                # remove the last valley, if the data after that valley is not high
+                # enough to be sure it's a valley
+                valley_indices = np.delete(valley_indices, -1)
+                valley_values = np.delete(valley_values, -1)
 
-        # remove peaks that come before the first valley
-        keep_peaks = peak_indices > valley_indices[0]
-        peak_indices = peak_indices[keep_peaks]
-        peak_values = peak_values[keep_peaks]
+            # remove peaks that come before the first valley
+            keep_peaks = peak_indices > valley_indices[0]
+            peak_indices = peak_indices[keep_peaks]
+            peak_values = peak_values[keep_peaks]
 
-        # remove peak that come after the last valley
-        keep_peaks = peak_indices < valley_indices[-1]
-        peak_indices = peak_indices[keep_peaks]
-        peak_values = peak_values[keep_peaks]
+            # remove peak that come after the last valley
+            keep_peaks = peak_indices < valley_indices[-1]
+            peak_indices = peak_indices[keep_peaks]
+            peak_values = peak_values[keep_peaks]
 
         return _PeakValleyData(peak_indices, peak_values, valley_indices, valley_values)
 
@@ -178,36 +179,38 @@ class BreathDetection:
             A tuple (peak_indices, peak_values, valley_indices, valley_values)
             with double peaks/valleys removed.
         """
-        current_valley_index = 0
-        while current_valley_index < len(valley_indices) - 1:
-            start_index = valley_indices[current_valley_index]
-            end_index = valley_indices[current_valley_index + 1]
-            peaks_between_valleys = np.argwhere(
-                (peak_indices > start_index) & (peak_indices < end_index),
-            )
-            if not len(peaks_between_valleys):
-                # no peak between valleys, remove highest valley
-                delete_valley_index = (
-                    current_valley_index
-                    if valley_values[current_valley_index] > valley_values[current_valley_index + 1]
-                    else current_valley_index + 1
-                )
-                valley_indices = np.delete(valley_indices, delete_valley_index)
-                valley_values = np.delete(valley_values, delete_valley_index)
-                continue
+        if peak_indices.size > 0 or valley_indices.size > 0:
 
-            if len(peaks_between_valleys) > 1:
-                # multiple peaks between valleys, remove lowest peak
-                delete_peak_index = (
-                    peaks_between_valleys[0]
-                    if peak_values[peaks_between_valleys[0]] < peak_values[peaks_between_valleys[1]]
-                    else peaks_between_valleys[1]
+            current_valley_index = 0
+            while current_valley_index < len(valley_indices) - 1:
+                start_index = valley_indices[current_valley_index]
+                end_index = valley_indices[current_valley_index + 1]
+                peaks_between_valleys = np.argwhere(
+                    (peak_indices > start_index) & (peak_indices < end_index),
                 )
-                peak_indices = np.delete(peak_indices, delete_peak_index)
-                peak_values = np.delete(peak_values, delete_peak_index)
-                continue
+                if not len(peaks_between_valleys):
+                    # no peak between valleys, remove highest valley
+                    delete_valley_index = (
+                        current_valley_index
+                        if valley_values[current_valley_index] > valley_values[current_valley_index + 1]
+                        else current_valley_index + 1
+                    )
+                    valley_indices = np.delete(valley_indices, delete_valley_index)
+                    valley_values = np.delete(valley_values, delete_valley_index)
+                    continue
 
-            current_valley_index += 1
+                if len(peaks_between_valleys) > 1:
+                    # multiple peaks between valleys, remove lowest peak
+                    delete_peak_index = (
+                        peaks_between_valleys[0]
+                        if peak_values[peaks_between_valleys[0]] < peak_values[peaks_between_valleys[1]]
+                        else peaks_between_valleys[1]
+                    )
+                    peak_indices = np.delete(peak_indices, delete_peak_index)
+                    peak_values = np.delete(peak_values, delete_peak_index)
+                    continue
+
+                current_valley_index += 1
 
         return _PeakValleyData(peak_indices, peak_values, valley_indices, valley_values)
 
@@ -241,24 +244,25 @@ class BreathDetection:
             A tuple (peak_indices, peak_values, valley_indices, valley_values)
             with low-amplitude breaths removed.
         """
-        if not self.amplitude_cutoff_fraction:
-            return _PeakValleyData(peak_indices, peak_values, valley_indices, valley_values)
+        if peak_indices.size > 0 or valley_indices.size > 0:
+            if not self.amplitude_cutoff_fraction:
+                return _PeakValleyData(peak_indices, peak_values, valley_indices, valley_values)
 
-        inspiratory_amplitude = peak_values - valley_values[:-1]
-        expiratory_amplitude = peak_values - valley_values[1:]
-        amplitude = (inspiratory_amplitude + expiratory_amplitude) / 2
+            inspiratory_amplitude = peak_values - valley_values[:-1]
+            expiratory_amplitude = peak_values - valley_values[1:]
+            amplitude = (inspiratory_amplitude + expiratory_amplitude) / 2
 
-        amplitude_cutoff = self.amplitude_cutoff_fraction * np.median(amplitude)
-        delete_peaks = np.argwhere(amplitude < amplitude_cutoff)
+            amplitude_cutoff = self.amplitude_cutoff_fraction * np.median(amplitude)
+            delete_peaks = np.argwhere(amplitude < amplitude_cutoff)
 
-        peak_indices = np.delete(peak_indices, delete_peaks)
-        peak_values = np.delete(peak_values, delete_peaks)
+            peak_indices = np.delete(peak_indices, delete_peaks)
+            peak_values = np.delete(peak_values, delete_peaks)
 
-        peak_indices, peak_values, valley_indices, valley_values = self._remove_doubles(
-            peak_indices,
-            peak_values,
-            valley_indices,
-            valley_values,
+            peak_indices, peak_values, valley_indices, valley_values = self._remove_doubles(
+                peak_indices,
+                peak_values,
+                valley_indices,
+                valley_values,
         )
 
         return _PeakValleyData(peak_indices, peak_values, valley_indices, valley_values)
@@ -295,7 +299,7 @@ class BreathDetection:
 
         return breaths
 
-    def find_breaths_1d(self, data: np.ndarray) -> list[Breath]:
+    def find_breaths(self, data: np.ndarray) -> list[Breath]:
         """Find breaths in the data.
 
         This method attempts to find peaks and valleys in the data in a
@@ -378,39 +382,7 @@ class BreathDetection:
         for row in range(rows):
             for col in range(cols):
                 time_series = data[:, row, col]
-
-                window_size = int(self.sample_frequency * self.averaging_window_length)
-                averager = MovingAverage(window_size=window_size, window_fun=np.bartlett)
-                moving_average = averager.apply(time_series)
-
-                peak_indices, peak_values = self._find_features(time_series, moving_average)
-                valley_indices, valley_values = self._find_features(time_series, moving_average, invert=True)
-
-                # Skip iteration if no peaks or valleys are detected
-                if len(peak_indices) == 0 or len(valley_indices) == 0:
-                    breaths_array[row, col] = []
-                    continue
-
-                peak_valley_data = _PeakValleyData(
-                    peak_indices,
-                    peak_values,
-                    valley_indices,
-                    valley_values,
-                )
-                peak_valley_data = self._remove_edge_cases(*peak_valley_data, time_series, moving_average)
-                peak_valley_data = self._remove_doubles(*peak_valley_data)
-                peak_valley_data = self._remove_low_amplitudes(*peak_valley_data)
-
-                breaths = [
-                    Breath(int(start), int(middle), int(end))
-                    for middle, (start, end) in zip(
-                        peak_valley_data.peak_indices,
-                        itertools.pairwise(peak_valley_data.valley_indices),
-                        strict=True,
-                    )
-                ]
-
-                breaths = self._remove_breaths_around_invalid_data(breaths, time_series)
+                breaths = self.find_breaths(time_series)
                 breaths_array[row, col] = breaths
 
         return breaths_array
