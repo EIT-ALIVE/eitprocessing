@@ -196,8 +196,6 @@ Module Contents
 
    .. py:attribute:: description
       :type:  str
-      :value: ''
-
 
 
    .. py:attribute:: partial_inclusion

@@ -370,8 +370,6 @@ Module Contents
 
    .. py:attribute:: description
       :type:  str
-      :value: ''
-
 
 
    .. py:attribute:: partial_inclusion
@@ -531,8 +529,6 @@ Module Contents
 
    .. py:attribute:: description
       :type:  str
-      :value: ''
-
 
 
    .. py:attribute:: parameters
@@ -547,9 +543,6 @@ Module Contents
       :type:  Any | None
       :value: None
 
-
-
-   .. py:method:: __post_init__() -> None
 
 
    .. py:method:: __repr__() -> str

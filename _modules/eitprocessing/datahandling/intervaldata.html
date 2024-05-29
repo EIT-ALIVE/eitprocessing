@@ -110,19 +110,19 @@
 
 <div class="viewcode-block" id="IntervalData.label">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/intervaldata/index.html#eitprocessing.datahandling.datacollection.IntervalData.label">[docs]</a>
-    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IntervalData.name">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/intervaldata/index.html#eitprocessing.datahandling.datacollection.IntervalData.name">[docs]</a>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IntervalData.unit">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/intervaldata/index.html#eitprocessing.datahandling.datacollection.IntervalData.unit">[docs]</a>
-    <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span></div>
+    <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="IntervalData.category">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/intervaldata/index.html#eitprocessing.datahandling.datacollection.IntervalData.category">[docs]</a>
-    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="IntervalData.time_ranges">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/intervaldata/index.html#eitprocessing.datahandling.datacollection.IntervalData.time_ranges">[docs]</a>
@@ -134,15 +134,15 @@
 
 <div class="viewcode-block" id="IntervalData.parameters">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/intervaldata/index.html#eitprocessing.datahandling.datacollection.IntervalData.parameters">[docs]</a>
-    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="IntervalData.derived_from">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/intervaldata/index.html#eitprocessing.datahandling.datacollection.IntervalData.derived_from">[docs]</a>
-    <span class="n">derived_from</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span></div>
+    <span class="n">derived_from</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IntervalData.description">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/intervaldata/index.html#eitprocessing.datahandling.datacollection.IntervalData.description">[docs]</a>
-    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IntervalData.partial_inclusion">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/intervaldata/index.html#eitprocessing.datahandling.datacollection.IntervalData.partial_inclusion">[docs]</a>
@@ -152,8 +152,7 @@
 <div class="viewcode-block" id="IntervalData.__post_init__">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData.__post_init__">[docs]</a>
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time_ranges</span> <span class="o">=</span> <span class="p">[</span><span class="n">TimeRange</span><span class="o">.</span><span class="n">_make</span><span class="p">(</span><span class="n">time_range</span><span class="p">)</span> <span class="k">for</span> <span class="n">time_range</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_ranges</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_equivalence</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="s2">&quot;parameters&quot;</span><span class="p">,</span> <span class="s2">&quot;partial_inclusion&quot;</span><span class="p">]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_ranges</span> <span class="o">=</span> <span class="p">[</span><span class="n">TimeRange</span><span class="o">.</span><span class="n">_make</span><span class="p">(</span><span class="n">time_range</span><span class="p">)</span> <span class="k">for</span> <span class="n">time_range</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_ranges</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="IntervalData.__repr__">
