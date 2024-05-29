@@ -122,10 +122,6 @@ class Equivalence:
                         msg = f"Attribute {attr} doesn't match: {s}, {o}"
                         raise EquivalenceError(msg)  # noqa: TRY301
 
-                    if (s := getattr(self, attr)) != (o := getattr(other, attr)):
-                        msg = f"Attribute {attr} doesn't match: {s}, {o}"
-                        raise EquivalenceError(msg)  # noqa: TRY301
-
         # raise or return if a check fails
         except EquivalenceError:
             if raise_:
