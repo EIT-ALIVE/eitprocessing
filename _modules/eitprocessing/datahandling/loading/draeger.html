@@ -50,9 +50,9 @@
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.datacollection</span> <span class="kn">import</span> <span class="n">DataCollection</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.eitdata</span> <span class="kn">import</span> <span class="n">EITData</span><span class="p">,</span> <span class="n">Vendor</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.event</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.intervaldata</span> <span class="kn">import</span> <span class="n">IntervalData</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.loading</span> <span class="kn">import</span> <span class="n">load_eit_data</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.loading.binreader</span> <span class="kn">import</span> <span class="n">BinReader</span>
-<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.phases</span> <span class="kn">import</span> <span class="n">MaxValue</span><span class="p">,</span> <span class="n">MinValue</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.sparsedata</span> <span class="kn">import</span> <span class="n">SparseData</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -81,7 +81,7 @@
     <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
     <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load Dräger EIT data from path.&quot;&quot;&quot;</span>
     <span class="n">file_size</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span>
     <span class="k">if</span> <span class="n">file_size</span> <span class="o">%</span> <span class="n">_FRAME_SIZE_BYTES</span><span class="p">:</span>
@@ -114,8 +114,8 @@
 
     <span class="n">pixel_impedance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_frames</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_frames</span><span class="p">,))</span>
-    <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">phases</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">events</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">phases</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">medibus_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">52</span><span class="p">,</span> <span class="n">n_frames</span><span class="p">))</span>
 
     <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;br&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">,</span> <span class="n">mmap</span><span class="o">.</span><span class="n">mmap</span><span class="p">(</span><span class="n">fo</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">length</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">access</span><span class="o">=</span><span class="n">mmap</span><span class="o">.</span><span class="n">ACCESS_READ</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
@@ -134,36 +134,86 @@
                 <span class="n">events</span><span class="p">,</span>
                 <span class="n">phases</span><span class="p">,</span>
                 <span class="n">previous_marker</span><span class="p">,</span>
-                <span class="n">first_frame</span><span class="p">,</span>
             <span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">framerate</span><span class="p">:</span>
         <span class="n">framerate</span> <span class="o">=</span> <span class="n">DRAEGER_FRAMERATE</span>
 
     <span class="n">eit_data_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">)</span>
-    <span class="n">eit_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-        <span class="n">EITData</span><span class="p">(</span>
-            <span class="n">vendor</span><span class="o">=</span><span class="n">Vendor</span><span class="o">.</span><span class="n">DRAEGER</span><span class="p">,</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-            <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
-            <span class="n">nframes</span><span class="o">=</span><span class="n">n_frames</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span>
-            <span class="n">events</span><span class="o">=</span><span class="n">events</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-            <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">pixel_impedance</span><span class="p">,</span>
-        <span class="p">),</span>
+    <span class="n">eit_data</span> <span class="o">=</span> <span class="n">EITData</span><span class="p">(</span>
+        <span class="n">vendor</span><span class="o">=</span><span class="n">Vendor</span><span class="o">.</span><span class="n">DRAEGER</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+        <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
+        <span class="n">nframes</span><span class="o">=</span><span class="n">n_frames</span><span class="p">,</span>
+        <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+        <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">pixel_impedance</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">eit_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eit_data</span><span class="p">)</span>
+
     <span class="p">(</span>
         <span class="n">continuous_data_collection</span><span class="p">,</span>
-        <span class="n">sparse_data_collections</span><span class="p">,</span>
+        <span class="n">sparse_data_collection</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">=</span> <span class="n">_convert_medibus_data</span><span class="p">(</span><span class="n">medibus_data</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
+    <span class="n">interval_data_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">IntervalData</span><span class="p">)</span>
+    <span class="c1"># TODO: move some medibus data to sparse / interval</span>
+    <span class="c1"># TODO: move phases and events to sparse / interval</span>
 
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">eit_data_collection</span><span class="p">,</span>
-        <span class="n">continuous_data_collection</span><span class="p">,</span>
-        <span class="n">sparse_data_collections</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="n">continuous_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">ContinuousData</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;global_impedance_(raw)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Global impedance (raw)&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;a.u.&quot;</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;impedance&quot;</span><span class="p">,</span>
+            <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="n">eit_data_collection</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]],</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">eit_data_collection</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">values</span><span class="o">=</span><span class="n">eit_data_collection</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_calculate_global_impedance</span><span class="p">(),</span>  <span class="c1"># noqa: SLF001</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">sparse_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">SparseData</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;minvalues_(draeger)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Minimum values detected by Draeger device.&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;minvalue&quot;</span><span class="p">,</span>
+            <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="n">eit_data</span><span class="p">],</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">phases</span> <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">sparse_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">SparseData</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;maxvalues_(draeger)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Maximum values detected by Draeger device.&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;maxvalue&quot;</span><span class="p">,</span>
+            <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="n">eit_data</span><span class="p">],</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">phases</span> <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]),</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
+        <span class="n">time_</span><span class="p">,</span> <span class="n">events_</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">events</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">time_</span><span class="p">)</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">events_</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">time</span><span class="p">,</span> <span class="n">events</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]),</span> <span class="p">[]</span>
+    <span class="n">sparse_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">SparseData</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;events_(draeger)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Events loaded from Draeger data&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;event&quot;</span><span class="p">,</span>
+            <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="n">eit_data</span><span class="p">],</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">values</span><span class="o">=</span><span class="n">events</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;eitdata_collection&quot;</span><span class="p">:</span> <span class="n">eit_data_collection</span><span class="p">,</span>
+        <span class="s2">&quot;continuousdata_collection&quot;</span><span class="p">:</span> <span class="n">continuous_data_collection</span><span class="p">,</span>
+        <span class="s2">&quot;sparsedata_collection&quot;</span><span class="p">:</span> <span class="n">sparse_data_collection</span><span class="p">,</span>
+        <span class="s2">&quot;intervaldata_collection&quot;</span><span class="p">:</span> <span class="n">interval_data_collection</span><span class="p">,</span>
+    <span class="p">}</span></div>
 
 
 
@@ -209,7 +259,6 @@
     <span class="n">events</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
     <span class="n">phases</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
     <span class="n">previous_marker</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read frame by frame data from DRAEGER files.</span>
 
@@ -241,14 +290,12 @@
     <span class="c1"># Therefore, check whether the event marker has changed with</span>
     <span class="c1"># respect to the most recent event. If so, create a new event.</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">previous_marker</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">event_marker</span> <span class="o">&gt;</span> <span class="n">previous_marker</span><span class="p">):</span>
-        <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Event</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">,</span> <span class="n">event_marker</span><span class="p">,</span> <span class="n">event_text</span><span class="p">))</span>
+        <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">frame_time</span><span class="p">,</span> <span class="n">Event</span><span class="p">(</span><span class="n">event_marker</span><span class="p">,</span> <span class="n">event_text</span><span class="p">)))</span>
     <span class="k">if</span> <span class="n">timing_error</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;A timing error was encountered during loading.&quot;</span><span class="p">)</span>
         <span class="c1"># TODO: expand on what timing errors are in some documentation.</span>
-    <span class="k">if</span> <span class="n">min_max_flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MaxValue</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">))</span>
-    <span class="k">elif</span> <span class="n">min_max_flag</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MinValue</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">min_max_flag</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">frame_time</span><span class="p">,</span> <span class="n">min_max_flag</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">event_marker</span></div>
 

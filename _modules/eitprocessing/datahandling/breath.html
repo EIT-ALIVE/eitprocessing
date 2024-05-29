@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>eitprocessing.datahandling.event &#8212; eitprocessing 0.0.0 documentation</title>
+    <title>eitprocessing.datahandling.breath &#8212; eitprocessing 0.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/nature.css?v=0f882399" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
@@ -25,7 +25,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.event</a></li> 
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.breath</a></li> 
       </ul>
     </div>  
 
@@ -34,23 +34,26 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for eitprocessing.datahandling.event</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+  <h1>Source code for eitprocessing.datahandling.breath</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">NamedTuple</span>
 
 
-<span class="nd">@dataclass</span>
-<div class="viewcode-block" id="Event">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/loading/draeger/index.html#eitprocessing.datahandling.event.Event">[docs]</a>
-<span class="k">class</span> <span class="nc">Event</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Single time point event registered during an EIT measurement.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Breath">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/loading/timpel/index.html#eitprocessing.datahandling.breath.Breath">[docs]</a>
+<span class="k">class</span> <span class="nc">Breath</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a breath with a start, middle and end index.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Event.marker">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/event/index.html#eitprocessing.datahandling.event.Event.marker">[docs]</a>
-    <span class="n">marker</span><span class="p">:</span> <span class="nb">int</span></div>
+<div class="viewcode-block" id="Breath.start_time">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/breath/index.html#eitprocessing.datahandling.breath.Breath.start_time">[docs]</a>
+    <span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span></div>
 
-<div class="viewcode-block" id="Event.text">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/event/index.html#eitprocessing.datahandling.event.Event.text">[docs]</a>
-    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span></div>
+<div class="viewcode-block" id="Breath.middle_time">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/breath/index.html#eitprocessing.datahandling.breath.Breath.middle_time">[docs]</a>
+    <span class="n">middle_time</span><span class="p">:</span> <span class="nb">float</span></div>
+
+<div class="viewcode-block" id="Breath.end_time">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/breath/index.html#eitprocessing.datahandling.breath.Breath.end_time">[docs]</a>
+    <span class="n">end_time</span><span class="p">:</span> <span class="nb">float</span></div>
 </div>
 
 </pre></div>
@@ -86,7 +89,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.event</a></li> 
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.breath</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

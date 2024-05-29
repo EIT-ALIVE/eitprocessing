@@ -4,19 +4,201 @@ eitprocessing.datahandling.sparsedata
 .. py:module:: eitprocessing.datahandling.sparsedata
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.sparsedata.T
+
+
 Classes
 -------
 
 .. autoapisummary::
 
+   eitprocessing.datahandling.sparsedata.Equivalence
+   eitprocessing.datahandling.sparsedata.SelectByTime
    eitprocessing.datahandling.sparsedata.SparseData
 
 
 Module Contents
 ---------------
 
+.. py:class:: Equivalence
+
+   Mixin class that adds an equality and equivalence check.
+
+
+   .. py:method:: __eq__(other: object) -> bool
+
+      Return self==value.
+
+
+
+   .. py:method:: _eq_dataclass(other: object) -> bool
+
+      Compare two dataclasses for equality.
+
+
+
+   .. py:method:: _eq_userdict(other: object) -> bool
+
+      Compare two userdicts for equality.
+
+
+
+   .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
+      :staticmethod:
+
+
+      Check if a and b are equal, even if they are numpy arrays containing nans.
+
+
+
+   .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
+
+      Test whether the data structure between two objects are equivalent.
+
+      Equivalence, in this case means that objects are compatible e.g. to be
+      merged. Data content can vary, but e.g. the category of data (e.g.
+      airway pressure, flow, tidal volume) and unit, etc., must match.
+
+      :param other: object that will be compared to self.
+      :param raise_: sets this method's behavior in case of non-equivalence. If
+                     True, an `EquivalenceError` is raised, otherwise `False` is
+                     returned.
+
+      :raises EquivalenceError: if `raise_ == True` and the objects are not
+      :raises equivalent.:
+
+      :returns: bool describing result of equivalence comparison.
+
+
+
+.. py:class:: SelectByTime
+
+   Bases: :py:obj:`SelectByIndex`, :py:obj:`HasTimeIndexer`
+
+
+   Adds methods for slicing by time rather than index.
+
+
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
+
+      Get a slice from start to end time stamps.
+
+      Given a start and end time stamp (i.e. its value, not its index),
+      return a slice of the original object, which must contain a time axis.
+
+      :param start_time: first time point to include. Defaults to first frame of sequence.
+      :param end_time: last time point. Defaults to last frame of sequence.
+      :param start_inclusive (default: `True`), end_inclusive (default `False`):
+                                       these arguments control the behavior if the given time stamp
+                                       does not match exactly with an existing time stamp of the input.
+                                       if `True`: the given time stamp will be inside the sliced object.
+                                       if `False`: the given time stamp will be outside the sliced object.
+      :param label: Description. Defaults to None, which will create a label based
+                    on the original object label and the frames by which it is sliced.
+
+      :raises TypeError: if `self` does not contain a `time` attribute.
+      :raises ValueError: if time stamps are not sorted.
+
+      :returns: Slice of self.
+
+
+
+.. py:data:: T
+
 .. py:class:: SparseData
 
-   SparseData.
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
+
+
+   Container for data occuring at unpredictable time points.
+
+   In sparse data the time points are not necessarily evenly spaced. Data can consist time-value pairs or only time
+   points. Values generally are numeric values in arrays, but can also be lists of different types of object.
+
+   Sparse data differs from IntervalData in that each data points is associated with a single time point rather than a
+   time range.
+
+   Examples are data points at end of inspiration/end of expiration (e.g. tidal volume, end-expiratoy lung impedance)
+   or detected time points (e.g. QRS complexes).
+
+
+
+   :param label: Computer readable name.
+   :param name: Human readable name.
+   :param unit: Unit of the data, if applicable.
+   :param category: Category the data falls into, e.g. 'airway pressure'.
+   :param description: Human readible extended description of the data.
+   :param parameters: Parameters used to derive the data.
+   :param derived_from: Traceback of intermediates from which the current data was derived.
+   :param values: List or array of values. These van be numeric data, text or Python objects.
+
+
+   .. py:attribute:: label
+      :type:  str
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: unit
+      :type:  str | None
+
+
+   .. py:attribute:: category
+      :type:  str
+
+
+   .. py:attribute:: time
+      :type:  numpy.ndarray
+
+
+   .. py:attribute:: description
+      :type:  str
+      :value: ''
+
+
+
+   .. py:attribute:: parameters
+      :type:  dict[str, Any]
+
+
+   .. py:attribute:: derived_from
+      :type:  list[Any]
+
+
+   .. py:attribute:: values
+      :type:  Any | None
+      :value: None
+
+
+
+   .. py:method:: __post_init__() -> None
+
+
+   .. py:method:: __repr__() -> str
+
+      Return repr(self).
+
+
+
+   .. py:method:: __len__() -> int
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+
+   .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
 
 

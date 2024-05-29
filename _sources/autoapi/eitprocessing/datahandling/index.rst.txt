@@ -20,10 +20,12 @@ Submodules
 .. toctree::
    :maxdepth: 1
 
+   /autoapi/eitprocessing/datahandling/breath/index
    /autoapi/eitprocessing/datahandling/continuousdata/index
    /autoapi/eitprocessing/datahandling/datacollection/index
    /autoapi/eitprocessing/datahandling/eitdata/index
    /autoapi/eitprocessing/datahandling/event/index
+   /autoapi/eitprocessing/datahandling/intervaldata/index
    /autoapi/eitprocessing/datahandling/phases/index
    /autoapi/eitprocessing/datahandling/sequence/index
    /autoapi/eitprocessing/datahandling/sparsedata/index

@@ -37,6 +37,18 @@ Module Contents
 
 
 
+   .. py:method:: _eq_dataclass(other: object) -> bool
+
+      Compare two dataclasses for equality.
+
+
+
+   .. py:method:: _eq_userdict(other: object) -> bool
+
+      Compare two userdicts for equality.
+
+
+
    .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
       :staticmethod:
 
@@ -120,7 +132,7 @@ Module Contents
 
 
    .. py:attribute:: path
-      :type:  pathlib.Path | list[pathlib.Path]
+      :type:  str | pathlib.Path | list[pathlib.Path | str] | list[pathlib.Path] | list[str]
 
 
    .. py:attribute:: nframes
@@ -139,14 +151,6 @@ Module Contents
       :type:  Vendor
 
 
-   .. py:attribute:: phases
-      :type:  list
-
-
-   .. py:attribute:: events
-      :type:  list
-
-
    .. py:attribute:: label
       :type:  str | None
 
@@ -162,7 +166,7 @@ Module Contents
    .. py:method:: __post_init__()
 
 
-   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
+   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path] | list[str] | list[pathlib.Path]) -> list[pathlib.Path]
       :staticmethod:
 
 
@@ -191,38 +195,10 @@ Module Contents
    .. py:method:: __len__()
 
 
-   .. py:property:: global_baseline
-      :type: numpy.ndarray
-
-      Return the global baseline, i.e. the minimum pixel impedance across all pixels.
-
-
-   .. py:property:: pixel_impedance_global_offset
-      :type: numpy.ndarray
-
-      Return the pixel impedance with the global baseline removed.
-
-      In the resulting array the minimum impedance across all pixels is set to 0.
-
-
-   .. py:property:: pixel_baseline
-      :type: numpy.ndarray
-
-      Return the lowest value in each individual pixel over time.
-
-
-   .. py:property:: pixel_impedance_individual_offset
-      :type: numpy.ndarray
-
-      Return the pixel impedance with the baseline of each individual pixel removed.
-
-      Each pixel in the resulting array has a minimum value of 0.
-
-
-   .. py:property:: global_impedance
-      :type: numpy.ndarray
+   .. py:method:: _calculate_global_impedance() -> numpy.ndarray
 
       Return the global impedance, i.e. the sum of all pixels at each frame.
+
 
 
 .. py:class:: Vendor

@@ -20,14 +20,6 @@ Module Contents
    Single time point event registered during an EIT measurement.
 
 
-   .. py:attribute:: index
-      :type:  int
-
-
-   .. py:attribute:: time
-      :type:  float
-
-
    .. py:attribute:: marker
       :type:  int
 

@@ -37,7 +37,7 @@ Module Contents
 
 
    .. py:attribute:: file_handle
-      :type:  io.BufferedReader
+      :type:  io.BufferedReader | mmap.mmap
 
 
    .. py:attribute:: endian

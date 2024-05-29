@@ -36,6 +36,18 @@ Module Contents
 
 
 
+   .. py:method:: _eq_dataclass(other: object) -> bool
+
+      Compare two dataclasses for equality.
+
+
+
+   .. py:method:: _eq_userdict(other: object) -> bool
+
+      Compare two userdicts for equality.
+
+
+
    .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
       :staticmethod:
 

@@ -20,13 +20,12 @@ Classes
 
 .. autoapisummary::
 
+   eitprocessing.datahandling.loading.timpel.Breath
    eitprocessing.datahandling.loading.timpel.ContinuousData
    eitprocessing.datahandling.loading.timpel.DataCollection
    eitprocessing.datahandling.loading.timpel.EITData
    eitprocessing.datahandling.loading.timpel.Vendor
-   eitprocessing.datahandling.loading.timpel.MaxValue
-   eitprocessing.datahandling.loading.timpel.MinValue
-   eitprocessing.datahandling.loading.timpel.QRSMark
+   eitprocessing.datahandling.loading.timpel.IntervalData
    eitprocessing.datahandling.loading.timpel.SparseData
 
 
@@ -37,10 +36,31 @@ Functions
 
    eitprocessing.datahandling.loading.timpel.load_eit_data
    eitprocessing.datahandling.loading.timpel.load_from_single_path
+   eitprocessing.datahandling.loading.timpel._make_breaths
 
 
 Module Contents
 ---------------
+
+.. py:class:: Breath
+
+   Bases: :py:obj:`NamedTuple`
+
+
+   Represents a breath with a start, middle and end index.
+
+
+   .. py:attribute:: start_time
+      :type:  float
+
+
+   .. py:attribute:: middle_time
+      :type:  float
+
+
+   .. py:attribute:: end_time
+      :type:  float
+
 
 .. py:class:: ContinuousData
 
@@ -286,7 +306,7 @@ Module Contents
 
 
 
-   .. py:method:: concatenate(other: typing_extensions.Self[V]) -> typing_extensions.Self[V]
+   .. py:method:: concatenate(other: typing_extensions.Self) -> typing_extensions.Self
 
       Concatenate this collection with an equivalent collection.
 
@@ -294,7 +314,7 @@ Module Contents
 
 
 
-   .. py:method:: select_by_time(start_time: float | None, end_time: float | None, start_inclusive: bool = True, end_inclusive: bool = False) -> typing_extensions.Self
+   .. py:method:: select_by_time(start_time: float | None, end_time: float | None, start_inclusive: bool = True, end_inclusive: bool = False) -> DataCollection
 
       Return a DataCollection containing sliced copies of the items.
 
@@ -321,7 +341,7 @@ Module Contents
 
 
    .. py:attribute:: path
-      :type:  pathlib.Path | list[pathlib.Path]
+      :type:  str | pathlib.Path | list[pathlib.Path | str] | list[pathlib.Path] | list[str]
 
 
    .. py:attribute:: nframes
@@ -340,14 +360,6 @@ Module Contents
       :type:  Vendor
 
 
-   .. py:attribute:: phases
-      :type:  list
-
-
-   .. py:attribute:: events
-      :type:  list
-
-
    .. py:attribute:: label
       :type:  str | None
 
@@ -363,7 +375,7 @@ Module Contents
    .. py:method:: __post_init__()
 
 
-   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
+   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path] | list[str] | list[pathlib.Path]) -> list[pathlib.Path]
       :staticmethod:
 
 
@@ -392,38 +404,10 @@ Module Contents
    .. py:method:: __len__()
 
 
-   .. py:property:: global_baseline
-      :type: numpy.ndarray
-
-      Return the global baseline, i.e. the minimum pixel impedance across all pixels.
-
-
-   .. py:property:: pixel_impedance_global_offset
-      :type: numpy.ndarray
-
-      Return the pixel impedance with the global baseline removed.
-
-      In the resulting array the minimum impedance across all pixels is set to 0.
-
-
-   .. py:property:: pixel_baseline
-      :type: numpy.ndarray
-
-      Return the lowest value in each individual pixel over time.
-
-
-   .. py:property:: pixel_impedance_individual_offset
-      :type: numpy.ndarray
-
-      Return the pixel impedance with the baseline of each individual pixel removed.
-
-      Each pixel in the resulting array has a minimum value of 0.
-
-
-   .. py:property:: global_impedance
-      :type: numpy.ndarray
+   .. py:method:: _calculate_global_impedance() -> numpy.ndarray
 
       Return the global impedance, i.e. the sum of all pixels at each frame.
+
 
 
 .. py:class:: Vendor
@@ -447,6 +431,117 @@ Module Contents
 
 
    .. py:attribute:: DRÄGER
+
+
+.. py:class:: IntervalData
+
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
+
+
+   Container for interval data existing over a period of time.
+
+   Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
+   end-expiratory pressure), the position of a patient, a maneuver (end-expiratory hold) being performed, detected
+   periods in the data, etc.
+
+   Interval data consists of a number of time range-value pairs or time ranges without associated values. E.g. interval
+   data with the label "expiratory_breath_hold" only requires time ranges for when expiratory breath holds were
+   performed. Other interval data, e.g. "set_driving_pressure" do have associated values.
+
+   Interval data can be selected by time through the `select_by_time(start_time, end_time)` method. Alternatively,
+   `t[start_time:end_time]` can be used. When the start or end time overlaps with a time range, the time range and its
+   associated value are included in the selection if `partial_inclusion` is `True`, but ignored if `partial_inclusion`
+   is `False`. If the time range is partially included, the start and end times are trimmed to the start and end time
+   of the selection.
+
+   A potential use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you might want to
+   keep the driving pressure that was set before the start of the selectioon. A use case where `partial_inclusion`
+   should be set to `False` is "detected_breaths": you might want to ignore partial breaths that started before or
+   ended after the selected period.
+
+   Note that when selecting by time, the end time is included in the selection.
+
+   :param label: a computer-readable name
+   :param name: a human-readable name
+   :param unit: the unit associated with the data
+   :param category: the category of data
+   :param time_ranges: a list of time ranges (tuples containing a start time and end time)
+   :param values: an optional list of values with the same length as time_ranges
+   :param parameters: parameters used to derive the data
+   :param derived_from: list of data sets this data was derived from
+   :param description: extended human readible description of the data
+   :param partial_inclusion: whether to include a trimmed version of a time range when selecting data
+
+
+   .. py:attribute:: label
+      :type:  str
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: unit
+      :type:  str | None
+
+
+   .. py:attribute:: category
+      :type:  str
+
+
+   .. py:attribute:: time_ranges
+      :type:  list[TimeRange | tuple[float, float]]
+
+
+   .. py:attribute:: values
+      :type:  list[Any] | None
+      :value: None
+
+
+
+   .. py:attribute:: parameters
+      :type:  dict[str, Any]
+
+
+   .. py:attribute:: derived_from
+      :type:  list[Any]
+
+
+   .. py:attribute:: description
+      :type:  str
+      :value: ''
+
+
+
+   .. py:attribute:: partial_inclusion
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: __post_init__() -> None
+
+
+   .. py:method:: __repr__() -> str
+
+      Return repr(self).
+
+
+
+   .. py:method:: __len__() -> int
+
+
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, partial_inclusion: bool | None = None, newlabel: str | None = None) -> typing_extensions.Self
+
+      Return only period data that overlaps (partly) with start and end time.
+
+      Other types of data (e.g. ContinuousData and SparseData) support the start_inclusive and end_inclusive
+      arguments. PeriodData does not. That means that selection by time of PeriodData probably works slightly
+      different than other types of selecting/slicing data.
+
+
+
+   .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
 
 
 .. py:function:: load_eit_data(path: str | pathlib.Path | list[str | pathlib.Path], vendor: eitprocessing.datahandling.eitdata.Vendor | str, label: str | None = None, name: str | None = None, description: str = '', framerate: float | None = None, first_frame: int = 0, max_frames: int | None = None) -> eitprocessing.datahandling.sequence.Sequence
@@ -485,33 +580,96 @@ Module Contents
    ```
 
 
-.. py:class:: MaxValue
-
-   Bases: :py:obj:`PhaseIndicator`
-
-
-   Automatically registered local maximum of an EIT measurement.
-
-
-.. py:class:: MinValue
-
-   Bases: :py:obj:`PhaseIndicator`
-
-
-   Automatically registered local minimum of an EIT measurement.
-
-
-.. py:class:: QRSMark
-
-   Bases: :py:obj:`PhaseIndicator`
-
-
-   Automatically registered QRS mark an EIT measurement from a Timpel device.
-
-
 .. py:class:: SparseData
 
-   SparseData.
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
+
+
+   Container for data occuring at unpredictable time points.
+
+   In sparse data the time points are not necessarily evenly spaced. Data can consist time-value pairs or only time
+   points. Values generally are numeric values in arrays, but can also be lists of different types of object.
+
+   Sparse data differs from IntervalData in that each data points is associated with a single time point rather than a
+   time range.
+
+   Examples are data points at end of inspiration/end of expiration (e.g. tidal volume, end-expiratoy lung impedance)
+   or detected time points (e.g. QRS complexes).
+
+
+
+   :param label: Computer readable name.
+   :param name: Human readable name.
+   :param unit: Unit of the data, if applicable.
+   :param category: Category the data falls into, e.g. 'airway pressure'.
+   :param description: Human readible extended description of the data.
+   :param parameters: Parameters used to derive the data.
+   :param derived_from: Traceback of intermediates from which the current data was derived.
+   :param values: List or array of values. These van be numeric data, text or Python objects.
+
+
+   .. py:attribute:: label
+      :type:  str
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: unit
+      :type:  str | None
+
+
+   .. py:attribute:: category
+      :type:  str
+
+
+   .. py:attribute:: time
+      :type:  numpy.ndarray
+
+
+   .. py:attribute:: description
+      :type:  str
+      :value: ''
+
+
+
+   .. py:attribute:: parameters
+      :type:  dict[str, Any]
+
+
+   .. py:attribute:: derived_from
+      :type:  list[Any]
+
+
+   .. py:attribute:: values
+      :type:  Any | None
+      :value: None
+
+
+
+   .. py:method:: __post_init__() -> None
+
+
+   .. py:method:: __repr__() -> str
+
+      Return repr(self).
+
+
+
+   .. py:method:: __len__() -> int
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+
+   .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
 
 
 .. py:data:: _COLUMN_WIDTH
@@ -526,8 +684,10 @@ Module Contents
 
 .. py:data:: load_timpel_data
 
-.. py:function:: load_from_single_path(path: pathlib.Path, framerate: float | None = 20, first_frame: int = 0, max_frames: int | None = None) -> eitprocessing.datahandling.datacollection.DataCollection | tuple[eitprocessing.datahandling.datacollection.DataCollection, eitprocessing.datahandling.datacollection.DataCollection, eitprocessing.datahandling.datacollection.DataCollection]
+.. py:function:: load_from_single_path(path: pathlib.Path, framerate: float | None = 20, first_frame: int = 0, max_frames: int | None = None) -> dict[str, eitprocessing.datahandling.datacollection.DataCollection]
 
    Load Timpel EIT data from path.
 
+
+.. py:function:: _make_breaths(time: numpy.ndarray, min_indices: numpy.ndarray, max_indices: numpy.ndarray, gi: numpy.ndarray) -> tuple[list[tuple[float, float]], list[eitprocessing.datahandling.breath.Breath]]
 

@@ -38,10 +38,11 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">bisect</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -101,11 +102,17 @@
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No starting or end timepoint was selected.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span>
 
-        <span class="n">start</span> <span class="o">=</span> <span class="n">start</span> <span class="ow">or</span> <span class="mi">0</span>
-        <span class="n">end</span> <span class="o">=</span> <span class="n">end</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">newlabel</span> <span class="o">=</span> <span class="n">newlabel</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;Slice (</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">] of &lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">start</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">end</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">newlabel</span> <span class="o">=</span> <span class="n">newlabel</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sliced_copy</span><span class="p">(</span><span class="n">start_index</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end_index</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">newlabel</span><span class="o">=</span><span class="n">newlabel</span><span class="p">)</span></div>
+
+
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="SelectByIndex.__len__">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/slicing/index.html#eitprocessing.datahandling.continuousdata.SelectByIndex.__len__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span></div>
 
 
     <span class="nd">@abstractmethod</span>
@@ -148,17 +155,23 @@
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">TimeIndexer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="HasTimeIndexer.select_by_time">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.HasTimeIndexer.select_by_time">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_by_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span> <span class="o">...</span>  <span class="c1"># noqa: D102</span></div>
 </div>
 
 
 
 <div class="viewcode-block" id="SelectByTime">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.SelectByTime">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.continuousdata.SelectByTime">[docs]</a>
 <span class="k">class</span> <span class="nc">SelectByTime</span><span class="p">(</span><span class="n">SelectByIndex</span><span class="p">,</span> <span class="n">HasTimeIndexer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds methods for slicing by time rather than index.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SelectByTime.select_by_time">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.SelectByTime.select_by_time">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.continuousdata.SelectByTime.select_by_time">[docs]</a>
     <span class="k">def</span> <span class="nf">select_by_time</span><span class="p">(</span>  <span class="c1"># noqa: D417</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -190,9 +203,13 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Slice of self.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">):</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Object </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> has no time axis.&quot;</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># TODO: make proper new instances when not slicing</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">start_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No starting or end timepoint was selected.&quot;</span><span class="p">)</span>
@@ -219,7 +236,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_by_index</span><span class="p">(</span>
             <span class="n">start</span><span class="o">=</span><span class="n">start_index</span><span class="p">,</span>
             <span class="n">end</span><span class="o">=</span><span class="n">end_index</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">newlabel</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
         <span class="p">)</span></div>
 </div>
 
@@ -243,7 +260,7 @@
 
 <div class="viewcode-block" id="TimeIndexer.obj">
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/slicing/index.html#eitprocessing.datahandling.continuousdata.TimeIndexer.obj">[docs]</a>
-    <span class="n">obj</span><span class="p">:</span> <span class="n">SelectByTime</span></div>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">HasTimeIndexer</span></div>
 
 
 <div class="viewcode-block" id="TimeIndexer.__getitem__">

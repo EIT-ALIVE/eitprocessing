@@ -15,7 +15,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="eitprocessing.datahandling.datacollection" href="../datacollection/index.html" />
-    <link rel="prev" title="eitprocessing.datahandling.mixins.slicing" href="../mixins/slicing/index.html" /> 
+    <link rel="prev" title="eitprocessing.datahandling.breath" href="../breath/index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -30,7 +30,7 @@
           <a href="../datacollection/index.html" title="eitprocessing.datahandling.datacollection"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../mixins/slicing/index.html" title="eitprocessing.datahandling.mixins.slicing"
+          <a href="../breath/index.html" title="eitprocessing.datahandling.breath"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >API Reference</a> &#187;</li>
@@ -83,6 +83,18 @@
 <dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Equivalence.__eq__">
 <span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Equivalence.__eq__" title="Link to this definition">¶</a></dt>
 <dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Equivalence._eq_dataclass">
+<span class="sig-name descname"><span class="pre">_eq_dataclass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._eq_dataclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Equivalence._eq_dataclass" title="Link to this definition">¶</a></dt>
+<dd><p>Compare two dataclasses for equality.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Equivalence._eq_userdict">
+<span class="sig-name descname"><span class="pre">_eq_userdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._eq_userdict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Equivalence._eq_userdict" title="Link to this definition">¶</a></dt>
+<dd><p>Compare two userdicts for equality.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -388,6 +400,8 @@ indices.</p>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Equivalence"><code class="docutils literal notranslate"><span class="pre">Equivalence</span></code></a><ul>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Equivalence.__eq__"><code class="docutils literal notranslate"><span class="pre">Equivalence.__eq__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Equivalence._eq_dataclass"><code class="docutils literal notranslate"><span class="pre">Equivalence._eq_dataclass()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Equivalence._eq_userdict"><code class="docutils literal notranslate"><span class="pre">Equivalence._eq_userdict()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Equivalence._array_safe_eq"><code class="docutils literal notranslate"><span class="pre">Equivalence._array_safe_eq()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Equivalence.isequivalent"><code class="docutils literal notranslate"><span class="pre">Equivalence.isequivalent()</span></code></a></li>
 </ul>
@@ -430,8 +444,8 @@ indices.</p>
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="../mixins/slicing/index.html"
-                          title="previous chapter">eitprocessing.datahandling.mixins.slicing</a></p>
+    <p class="topless"><a href="../breath/index.html"
+                          title="previous chapter">eitprocessing.datahandling.breath</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -472,7 +486,7 @@ indices.</p>
           <a href="../datacollection/index.html" title="eitprocessing.datahandling.datacollection"
              >next</a> |</li>
         <li class="right" >
-          <a href="../mixins/slicing/index.html" title="eitprocessing.datahandling.mixins.slicing"
+          <a href="../breath/index.html" title="eitprocessing.datahandling.breath"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >API Reference</a> &#187;</li>

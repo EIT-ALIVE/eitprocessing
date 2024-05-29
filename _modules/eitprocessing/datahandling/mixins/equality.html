@@ -48,13 +48,13 @@
 
 
 <div class="viewcode-block" id="Equivalence">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.Equivalence">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.continuousdata.Equivalence">[docs]</a>
 <span class="k">class</span> <span class="nc">Equivalence</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class that adds an equality and equivalence check.&quot;&quot;&quot;</span>
 
     <span class="c1"># inspired by: https://stackoverflow.com/a/51743960/5170442</span>
 <div class="viewcode-block" id="Equivalence.__eq__">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.Equivalence.__eq__">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.continuousdata.Equivalence.__eq__">[docs]</a>
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -62,24 +62,51 @@
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="n">field_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)}</span>
-            <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="n">field_names</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="n">field_names</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Equivalence</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq_dataclass</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
-            <span class="n">compare_fields</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">compare</span><span class="p">,</span> <span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
-
-            <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
-                <span class="n">Equivalence</span><span class="o">.</span><span class="n">_array_safe_eq</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">compare_fields</span>
-            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">UserDict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq_userdict</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">Equivalence</span><span class="o">.</span><span class="n">_array_safe_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Equivalence._eq_dataclass">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.continuousdata.Equivalence._eq_dataclass">[docs]</a>
+    <span class="k">def</span> <span class="nf">_eq_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compare two dataclasses for equality.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;self or other is not a Dataclass&quot;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">field_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="n">field_names</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="n">field_names</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">compare_fields</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">compare</span><span class="p">,</span> <span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">Equivalence</span><span class="o">.</span><span class="n">_array_safe_eq</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">compare_fields</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Equivalence._eq_userdict">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.continuousdata.Equivalence._eq_userdict">[docs]</a>
+    <span class="k">def</span> <span class="nf">_eq_userdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compare two userdicts for equality.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">UserDict</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">UserDict</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;self or other is not a Userdict&quot;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">Equivalence</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div>
+
+
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="Equivalence._array_safe_eq">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.Equivalence._array_safe_eq">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.continuousdata.Equivalence._array_safe_eq">[docs]</a>
     <span class="k">def</span> <span class="nf">_array_safe_eq</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: ANN401, PLR0911</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a and b are equal, even if they are numpy arrays containing nans.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">b</span><span class="p">)):</span>
@@ -109,7 +136,7 @@
 
 
 <div class="viewcode-block" id="Equivalence.isequivalent">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.Equivalence.isequivalent">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.continuousdata.Equivalence.isequivalent">[docs]</a>
     <span class="k">def</span> <span class="nf">isequivalent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">raise_</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: C901, PLR0912</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Test whether the data structure between two objects are equivalent.</span>
 

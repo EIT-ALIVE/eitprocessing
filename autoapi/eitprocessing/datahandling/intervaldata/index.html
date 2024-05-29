@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>eitprocessing.datahandling.intervaldata &#8212; eitprocessing 0.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
+    <script src="../../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="eitprocessing.datahandling.phases" href="../phases/index.html" />
+    <link rel="prev" title="eitprocessing.datahandling.event" href="../event/index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../phases/index.html" title="eitprocessing.datahandling.phases"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../event/index.html" title="eitprocessing.datahandling.event"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../index.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../index.html" accesskey="U">eitprocessing.datahandling</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.intervaldata</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-eitprocessing.datahandling.intervaldata">
+<span id="eitprocessing-datahandling-intervaldata"></span><h1>eitprocessing.datahandling.intervaldata<a class="headerlink" href="#module-eitprocessing.datahandling.intervaldata" title="Link to this heading">¶</a></h1>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.T" title="eitprocessing.datahandling.intervaldata.T"><code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence" title="eitprocessing.datahandling.intervaldata.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Equivalence</span></code></a></p></td>
+<td><p>Mixin class that adds an equality and equivalence check.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer" title="eitprocessing.datahandling.intervaldata.HasTimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></a></p></td>
+<td><p>Gives access to a TimeIndexer object that can be used to slice by time.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.TimeRange" title="eitprocessing.datahandling.intervaldata.TimeRange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeRange</span></code></a></p></td>
+<td><p>A tuple containing the start time and end time of a time range.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData" title="eitprocessing.datahandling.intervaldata.IntervalData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntervalData</span></code></a></p></td>
+<td><p>Container for interval data existing over a period of time.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.intervaldata.</span></span><span class="sig-name descname"><span class="pre">Equivalence</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence" title="Link to this definition">¶</a></dt>
+<dd><p>Mixin class that adds an equality and equivalence check.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence.__eq__" title="Link to this definition">¶</a></dt>
+<dd><p>Return self==value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence._eq_dataclass">
+<span class="sig-name descname"><span class="pre">_eq_dataclass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._eq_dataclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence._eq_dataclass" title="Link to this definition">¶</a></dt>
+<dd><p>Compare two dataclasses for equality.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence._eq_userdict">
+<span class="sig-name descname"><span class="pre">_eq_userdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._eq_userdict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence._eq_userdict" title="Link to this definition">¶</a></dt>
+<dd><p>Compare two userdicts for equality.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence._array_safe_eq">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_array_safe_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._array_safe_eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence._array_safe_eq" title="Link to this definition">¶</a></dt>
+<dd><p>Check if a and b are equal, even if they are numpy arrays containing nans.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence.isequivalent">
+<span class="sig-name descname"><span class="pre">isequivalent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence.isequivalent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence.isequivalent" title="Link to this definition">¶</a></dt>
+<dd><p>Test whether the data structure between two objects are equivalent.</p>
+<p>Equivalence, in this case means that objects are compatible e.g. to be
+merged. Data content can vary, but e.g. the category of data (e.g.
+airway pressure, flow, tidal volume) and unit, etc., must match.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> – object that will be compared to self.</p></li>
+<li><p><strong>raise</strong> – sets this method’s behavior in case of non-equivalence. If
+True, an <cite>EquivalenceError</cite> is raised, otherwise <cite>False</cite> is
+returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.EquivalenceError" title="eitprocessing.datahandling.mixins.equality.EquivalenceError"><strong>EquivalenceError</strong></a> – if <cite>raise_ == True</cite> and the objects are not</p></li>
+<li><p><strong>equivalent.</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool describing result of equivalence comparison.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.HasTimeIndexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.intervaldata.</span></span><span class="sig-name descname"><span class="pre">HasTimeIndexer</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#HasTimeIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer" title="Link to this definition">¶</a></dt>
+<dd><p>Gives access to a TimeIndexer object that can be used to slice by time.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.HasTimeIndexer.t">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.TimeIndexer" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer"><span class="pre">TimeIndexer</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer.t" title="Link to this definition">¶</a></dt>
+<dd><p>Slicing an object using the time axis instead of indices.</p>
+<p>Example:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">sequence</span> <span class="pre">=</span> <span class="pre">load_eit_data(&lt;path&gt;,</span> <span class="pre">...)</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">=</span> <span class="pre">sequence.t[tp_start:tp_end]</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice2</span> <span class="pre">=</span> <span class="pre">sequence.select_by_time(tp_start,</span> <span class="pre">tp_end)</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">==</span> <span class="pre">time_slice2</span>
+<span class="pre">True</span>
+<span class="pre">`</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.HasTimeIndexer.select_by_time">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#HasTimeIndexer.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer.select_by_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.T">
+<span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.intervaldata.</span></span><span class="sig-name descname"><span class="pre">T</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#T"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.T" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.TimeRange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.intervaldata.</span></span><span class="sig-name descname"><span class="pre">TimeRange</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#TimeRange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.TimeRange" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+<p>A tuple containing the start time and end time of a time range.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.TimeRange.start_time">
+<span class="sig-name descname"><span class="pre">start_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#TimeRange.start_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.TimeRange.start_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.TimeRange.end_time">
+<span class="sig-name descname"><span class="pre">end_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#TimeRange.end_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.TimeRange.end_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.intervaldata.</span></span><span class="sig-name descname"><span class="pre">IntervalData</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.HasTimeIndexer</span></code></a></p>
+<p>Container for interval data existing over a period of time.</p>
+<p>Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
+end-expiratory pressure), the position of a patient, a maneuver (end-expiratory hold) being performed, detected
+periods in the data, etc.</p>
+<p>Interval data consists of a number of time range-value pairs or time ranges without associated values. E.g. interval
+data with the label “expiratory_breath_hold” only requires time ranges for when expiratory breath holds were
+performed. Other interval data, e.g. “set_driving_pressure” do have associated values.</p>
+<p>Interval data can be selected by time through the <cite>select_by_time(start_time, end_time)</cite> method. Alternatively,
+<cite>t[start_time:end_time]</cite> can be used. When the start or end time overlaps with a time range, the time range and its
+associated value are included in the selection if <cite>partial_inclusion</cite> is <cite>True</cite>, but ignored if <cite>partial_inclusion</cite>
+is <cite>False</cite>. If the time range is partially included, the start and end times are trimmed to the start and end time
+of the selection.</p>
+<p>A potential use case where <cite>partial_inclusion</cite> should be set to <cite>True</cite> is “set_driving_pressure”: you might want to
+keep the driving pressure that was set before the start of the selectioon. A use case where <cite>partial_inclusion</cite>
+should be set to <cite>False</cite> is “detected_breaths”: you might want to ignore partial breaths that started before or
+ended after the selected period.</p>
+<p>Note that when selecting by time, the end time is included in the selection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – a computer-readable name</p></li>
+<li><p><strong>name</strong> – a human-readable name</p></li>
+<li><p><strong>unit</strong> – the unit associated with the data</p></li>
+<li><p><strong>category</strong> – the category of data</p></li>
+<li><p><strong>time_ranges</strong> – a list of time ranges (tuples containing a start time and end time)</p></li>
+<li><p><strong>values</strong> – an optional list of values with the same length as time_ranges</p></li>
+<li><p><strong>parameters</strong> – parameters used to derive the data</p></li>
+<li><p><strong>derived_from</strong> – list of data sets this data was derived from</p></li>
+<li><p><strong>description</strong> – extended human readible description of the data</p></li>
+<li><p><strong>partial_inclusion</strong> – whether to include a trimmed version of a time range when selecting data</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.label">
+<span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.label" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.unit">
+<span class="sig-name descname"><span class="pre">unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.unit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.unit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.category">
+<span class="sig-name descname"><span class="pre">category</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.category"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.category" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.time_ranges">
+<span class="sig-name descname"><span class="pre">time_ranges</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.TimeRange" title="eitprocessing.datahandling.intervaldata.TimeRange"><span class="pre">TimeRange</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.time_ranges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.time_ranges" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.values">
+<span class="sig-name descname"><span class="pre">values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.values" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.parameters" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.derived_from">
+<span class="sig-name descname"><span class="pre">derived_from</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.derived_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.derived_from" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.description"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.description" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.partial_inclusion">
+<span class="sig-name descname"><span class="pre">partial_inclusion</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.partial_inclusion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.partial_inclusion" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.__post_init__">
+<span class="sig-name descname"><span class="pre">__post_init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.__post_init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.__post_init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.__repr__" title="Link to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.__len__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.select_by_time">
+<span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_inclusion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.select_by_time" title="Link to this definition">¶</a></dt>
+<dd><p>Return only period data that overlaps (partly) with start and end time.</p>
+<p>Other types of data (e.g. ContinuousData and SparseData) support the start_inclusive and end_inclusive
+arguments. PeriodData does not. That means that selection by time of PeriodData probably works slightly
+different than other types of selecting/slicing data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.concatenate">
+<span class="sig-name descname"><span class="pre">concatenate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.concatenate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">eitprocessing.datahandling.intervaldata</a><ul>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence"><code class="docutils literal notranslate"><span class="pre">Equivalence</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence.__eq__"><code class="docutils literal notranslate"><span class="pre">Equivalence.__eq__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence._eq_dataclass"><code class="docutils literal notranslate"><span class="pre">Equivalence._eq_dataclass()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence._eq_userdict"><code class="docutils literal notranslate"><span class="pre">Equivalence._eq_userdict()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence._array_safe_eq"><code class="docutils literal notranslate"><span class="pre">Equivalence._array_safe_eq()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence.isequivalent"><code class="docutils literal notranslate"><span class="pre">Equivalence.isequivalent()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer.t"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer.t</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer.select_by_time"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer.select_by_time()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.T"><code class="docutils literal notranslate"><span class="pre">T</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.TimeRange"><code class="docutils literal notranslate"><span class="pre">TimeRange</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.TimeRange.start_time"><code class="docutils literal notranslate"><span class="pre">TimeRange.start_time</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.TimeRange.end_time"><code class="docutils literal notranslate"><span class="pre">TimeRange.end_time</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData"><code class="docutils literal notranslate"><span class="pre">IntervalData</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.label"><code class="docutils literal notranslate"><span class="pre">IntervalData.label</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.name"><code class="docutils literal notranslate"><span class="pre">IntervalData.name</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.unit"><code class="docutils literal notranslate"><span class="pre">IntervalData.unit</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.category"><code class="docutils literal notranslate"><span class="pre">IntervalData.category</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.time_ranges"><code class="docutils literal notranslate"><span class="pre">IntervalData.time_ranges</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.values"><code class="docutils literal notranslate"><span class="pre">IntervalData.values</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.parameters"><code class="docutils literal notranslate"><span class="pre">IntervalData.parameters</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.derived_from"><code class="docutils literal notranslate"><span class="pre">IntervalData.derived_from</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.description"><code class="docutils literal notranslate"><span class="pre">IntervalData.description</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.partial_inclusion"><code class="docutils literal notranslate"><span class="pre">IntervalData.partial_inclusion</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.__post_init__"><code class="docutils literal notranslate"><span class="pre">IntervalData.__post_init__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.__repr__"><code class="docutils literal notranslate"><span class="pre">IntervalData.__repr__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.__len__"><code class="docutils literal notranslate"><span class="pre">IntervalData.__len__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.select_by_time"><code class="docutils literal notranslate"><span class="pre">IntervalData.select_by_time()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData.concatenate"><code class="docutils literal notranslate"><span class="pre">IntervalData.concatenate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../event/index.html"
+                          title="previous chapter">eitprocessing.datahandling.event</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../phases/index.html"
+                          title="next chapter">eitprocessing.datahandling.phases</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/autoapi/eitprocessing/datahandling/intervaldata/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../phases/index.html" title="eitprocessing.datahandling.phases"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../event/index.html" title="eitprocessing.datahandling.event"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../index.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../index.html" >eitprocessing.datahandling</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.intervaldata</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

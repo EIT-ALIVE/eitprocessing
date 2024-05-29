@@ -44,11 +44,12 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.breath</span> <span class="kn">import</span> <span class="n">Breath</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.continuousdata</span> <span class="kn">import</span> <span class="n">ContinuousData</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.datacollection</span> <span class="kn">import</span> <span class="n">DataCollection</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.eitdata</span> <span class="kn">import</span> <span class="n">EITData</span><span class="p">,</span> <span class="n">Vendor</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.intervaldata</span> <span class="kn">import</span> <span class="n">IntervalData</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.loading</span> <span class="kn">import</span> <span class="n">load_eit_data</span>
-<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.phases</span> <span class="kn">import</span> <span class="n">MaxValue</span><span class="p">,</span> <span class="n">MinValue</span><span class="p">,</span> <span class="n">QRSMark</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.sparsedata</span> <span class="kn">import</span> <span class="n">SparseData</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -85,7 +86,7 @@
     <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
     <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataCollection</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load Timpel EIT data from path.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">framerate</span><span class="p">:</span>
         <span class="n">framerate</span> <span class="o">=</span> <span class="n">TIMPEL_FRAMERATE</span>
@@ -141,11 +142,34 @@
 
     <span class="n">pixel_impedance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pixel_impedance</span> <span class="o">==</span> <span class="n">_NAN_VALUE</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">pixel_impedance</span><span class="p">)</span>
 
+    <span class="n">eit_data</span> <span class="o">=</span> <span class="n">EITData</span><span class="p">(</span>
+        <span class="n">vendor</span><span class="o">=</span><span class="n">Vendor</span><span class="o">.</span><span class="n">TIMPEL</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+        <span class="n">nframes</span><span class="o">=</span><span class="n">nframes</span><span class="p">,</span>
+        <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
+        <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
+        <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">pixel_impedance</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">eitdata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">)</span>
+    <span class="n">eitdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eit_data</span><span class="p">)</span>
+
     <span class="c1"># extract waveform data</span>
     <span class="c1"># TODO: properly export waveform data</span>
 
-    <span class="n">continuous_data_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">ContinuousData</span><span class="p">)</span>
-    <span class="n">continuous_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">continuousdata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">ContinuousData</span><span class="p">)</span>
+    <span class="n">continuousdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">ContinuousData</span><span class="p">(</span>
+            <span class="s2">&quot;global_impedance_(raw)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Global impedance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;a.u.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;global_impedance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Global impedance calculated from raw EIT data&quot;</span><span class="p">,</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">values</span><span class="o">=</span><span class="n">eit_data</span><span class="o">.</span><span class="n">_calculate_global_impedance</span><span class="p">(),</span>  <span class="c1"># noqa: SLF001</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">continuousdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">ContinuousData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;airway_pressure_(timpel)&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Airway pressure&quot;</span><span class="p">,</span>
@@ -157,7 +181,7 @@
         <span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="n">continuous_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">continuousdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">ContinuousData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;flow_(timpel)&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Flow&quot;</span><span class="p">,</span>
@@ -169,7 +193,7 @@
         <span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="n">continuous_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">continuousdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">ContinuousData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;volume_(timpel)&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Volume&quot;</span><span class="p">,</span>
@@ -181,34 +205,133 @@
         <span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="c1"># extract breath start, breath end and QRS marks</span>
-    <span class="n">phases</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1027</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MinValue</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">,</span> <span class="n">time</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)]))</span>  <span class="c1"># noqa: PERF401</span>
+    <span class="c1"># extract sparse data</span>
+    <span class="n">sparsedata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">SparseData</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1028</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MaxValue</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">,</span> <span class="n">time</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)]))</span>  <span class="c1"># noqa: PERF401</span>
-
-    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1029</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QRSMark</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">,</span> <span class="n">time</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)]))</span>  <span class="c1"># noqa: PERF401</span>
-
-    <span class="n">phases</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-
-    <span class="n">eit_data_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">)</span>
-    <span class="n">eit_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-        <span class="n">EITData</span><span class="p">(</span>
-            <span class="n">vendor</span><span class="o">=</span><span class="n">Vendor</span><span class="o">.</span><span class="n">TIMPEL</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-            <span class="n">nframes</span><span class="o">=</span><span class="n">nframes</span><span class="p">,</span>
-            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
-            <span class="n">phases</span><span class="o">=</span><span class="n">phases</span><span class="p">,</span>
-            <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">pixel_impedance</span><span class="p">,</span>
+    <span class="n">min_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1027</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">sparsedata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">SparseData</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;minvalues_(timpel)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Minimum values detected by Timpel device.&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;minvalue&quot;</span><span class="p">,</span>
+            <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="n">eit_data</span><span class="p">],</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="n">min_indices</span><span class="p">],</span>
         <span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">eit_data_collection</span><span class="p">,</span> <span class="n">continuous_data_collection</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">SparseData</span><span class="p">)</span></div>
+    <span class="n">max_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1028</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">sparsedata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">SparseData</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;maxvalues_(timpel)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Maximum values detected by Timpel device.&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;maxvalue&quot;</span><span class="p">,</span>
+            <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="n">eit_data</span><span class="p">],</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="n">max_indices</span><span class="p">],</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">gi</span> <span class="o">=</span> <span class="n">continuousdata_collection</span><span class="p">[</span><span class="s2">&quot;global_impedance_(raw)&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="n">time_ranges</span><span class="p">,</span> <span class="n">breaths</span> <span class="o">=</span> <span class="n">_make_breaths</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">min_indices</span><span class="p">,</span> <span class="n">max_indices</span><span class="p">,</span> <span class="n">gi</span><span class="p">)</span>
+    <span class="n">intervaldata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">IntervalData</span><span class="p">)</span>
+    <span class="n">intervaldata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">IntervalData</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;breaths_(timpel)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Breaths (Timpel)&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;breaths&quot;</span><span class="p">,</span>
+            <span class="n">time_ranges</span><span class="o">=</span><span class="n">time_ranges</span><span class="p">,</span>
+            <span class="n">values</span><span class="o">=</span><span class="n">breaths</span><span class="p">,</span>
+            <span class="n">partial_inclusion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">qrs_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1029</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">sparsedata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="n">SparseData</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;qrscomplexes_(timpel)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;QRS complexes detected by Timpel device&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="s2">&quot;qrs_complex&quot;</span><span class="p">,</span>
+            <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="n">eit_data</span><span class="p">],</span>
+            <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">[</span><span class="n">qrs_indices</span><span class="p">],</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;eitdata_collection&quot;</span><span class="p">:</span> <span class="n">eitdata_collection</span><span class="p">,</span>
+        <span class="s2">&quot;continuousdata_collection&quot;</span><span class="p">:</span> <span class="n">continuousdata_collection</span><span class="p">,</span>
+        <span class="s2">&quot;sparsedata_collection&quot;</span><span class="p">:</span> <span class="n">sparsedata_collection</span><span class="p">,</span>
+        <span class="s2">&quot;intervaldata_collection&quot;</span><span class="p">:</span> <span class="n">intervaldata_collection</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="_make_breaths">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/timpel/index.html#eitprocessing.datahandling.loading.timpel._make_breaths">[docs]</a>
+<span class="k">def</span> <span class="nf">_make_breaths</span><span class="p">(</span>
+    <span class="n">time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">min_indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">max_indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">gi</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="nb">list</span><span class="p">[</span><span class="n">Breath</span><span class="p">]]:</span>
+    <span class="c1"># TODO: replace section with BreathDetection._remove_doubles() and BreathDetection._remove_edge_cases() from</span>
+    <span class="c1"># 41_breath_detection_psomhorst; this code was directly copied from b59ac54</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">min_indices</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">max_indices</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># noqa: PLR2004</span>
+        <span class="k">return</span> <span class="p">[],</span> <span class="p">[]</span>
+
+    <span class="n">valley_indices</span> <span class="o">=</span> <span class="n">min_indices</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">peak_indices</span> <span class="o">=</span> <span class="n">max_indices</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">keep_peaks</span> <span class="o">=</span> <span class="n">peak_indices</span> <span class="o">&gt;</span> <span class="n">valley_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">peak_indices</span> <span class="o">=</span> <span class="n">peak_indices</span><span class="p">[</span><span class="n">keep_peaks</span><span class="p">]</span>
+
+    <span class="n">keep_peaks</span> <span class="o">=</span> <span class="n">peak_indices</span> <span class="o">&lt;</span> <span class="n">valley_indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">peak_indices</span> <span class="o">=</span> <span class="n">peak_indices</span><span class="p">[</span><span class="n">keep_peaks</span><span class="p">]</span>
+
+    <span class="n">valley_values</span> <span class="o">=</span> <span class="n">gi</span><span class="p">[</span><span class="n">min_indices</span><span class="p">]</span>
+    <span class="n">peak_values</span> <span class="o">=</span> <span class="n">gi</span><span class="p">[</span><span class="n">max_indices</span><span class="p">]</span>
+
+    <span class="n">current_valley_index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">current_valley_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">valley_indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">start_index</span> <span class="o">=</span> <span class="n">valley_indices</span><span class="p">[</span><span class="n">current_valley_index</span><span class="p">]</span>
+        <span class="n">end_index</span> <span class="o">=</span> <span class="n">valley_indices</span><span class="p">[</span><span class="n">current_valley_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">peaks_between_valleys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">peak_indices</span> <span class="o">&gt;</span> <span class="n">start_index</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">peak_indices</span> <span class="o">&lt;</span> <span class="n">end_index</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">peaks_between_valleys</span><span class="p">):</span>
+            <span class="c1"># no peak between valleys, remove highest valley</span>
+            <span class="n">delete_valley_index</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">current_valley_index</span>
+                <span class="k">if</span> <span class="n">valley_values</span><span class="p">[</span><span class="n">current_valley_index</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">valley_values</span><span class="p">[</span><span class="n">current_valley_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span> <span class="n">current_valley_index</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="n">valley_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">valley_indices</span><span class="p">,</span> <span class="n">delete_valley_index</span><span class="p">)</span>
+            <span class="n">valley_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">valley_values</span><span class="p">,</span> <span class="n">delete_valley_index</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">peaks_between_valleys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># multiple peaks between valleys, remove lowest peak</span>
+            <span class="n">delete_peak_index</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">peaks_between_valleys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">peak_values</span><span class="p">[</span><span class="n">peaks_between_valleys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">&lt;</span> <span class="n">peak_values</span><span class="p">[</span><span class="n">peaks_between_valleys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+                <span class="k">else</span> <span class="n">peaks_between_valleys</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">peak_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">peak_indices</span><span class="p">,</span> <span class="n">delete_peak_index</span><span class="p">)</span>
+            <span class="n">peak_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">peak_values</span><span class="p">,</span> <span class="n">delete_peak_index</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">current_valley_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">breaths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">middle</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">valley_indices</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">valley_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">peak_indices</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">breaths</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">time</span><span class="p">[</span><span class="n">start</span><span class="p">],</span> <span class="n">time</span><span class="p">[</span><span class="n">end</span><span class="p">]),</span> <span class="n">Breath</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="n">start</span><span class="p">],</span> <span class="n">time</span><span class="p">[</span><span class="n">middle</span><span class="p">],</span> <span class="n">time</span><span class="p">[</span><span class="n">end</span><span class="p">])))</span>
+
+    <span class="n">time_ranges</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">breaths</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">time_ranges</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></div>
 
 </pre></div>
 

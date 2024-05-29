@@ -1,0 +1,233 @@
+eitprocessing.datahandling.intervaldata
+=======================================
+
+.. py:module:: eitprocessing.datahandling.intervaldata
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.intervaldata.T
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.intervaldata.Equivalence
+   eitprocessing.datahandling.intervaldata.HasTimeIndexer
+   eitprocessing.datahandling.intervaldata.TimeRange
+   eitprocessing.datahandling.intervaldata.IntervalData
+
+
+Module Contents
+---------------
+
+.. py:class:: Equivalence
+
+   Mixin class that adds an equality and equivalence check.
+
+
+   .. py:method:: __eq__(other: object) -> bool
+
+      Return self==value.
+
+
+
+   .. py:method:: _eq_dataclass(other: object) -> bool
+
+      Compare two dataclasses for equality.
+
+
+
+   .. py:method:: _eq_userdict(other: object) -> bool
+
+      Compare two userdicts for equality.
+
+
+
+   .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
+      :staticmethod:
+
+
+      Check if a and b are equal, even if they are numpy arrays containing nans.
+
+
+
+   .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
+
+      Test whether the data structure between two objects are equivalent.
+
+      Equivalence, in this case means that objects are compatible e.g. to be
+      merged. Data content can vary, but e.g. the category of data (e.g.
+      airway pressure, flow, tidal volume) and unit, etc., must match.
+
+      :param other: object that will be compared to self.
+      :param raise_: sets this method's behavior in case of non-equivalence. If
+                     True, an `EquivalenceError` is raised, otherwise `False` is
+                     returned.
+
+      :raises EquivalenceError: if `raise_ == True` and the objects are not
+      :raises equivalent.:
+
+      :returns: bool describing result of equivalence comparison.
+
+
+
+.. py:class:: HasTimeIndexer
+
+   Gives access to a TimeIndexer object that can be used to slice by time.
+
+
+   .. py:property:: t
+      :type: TimeIndexer
+
+      Slicing an object using the time axis instead of indices.
+
+      Example:
+      ```
+      >>> sequence = load_eit_data(<path>, ...)
+      >>> time_slice1 = sequence.t[tp_start:tp_end]
+      >>> time_slice2 = sequence.select_by_time(tp_start, tp_end)
+      >>> time_slice1 == time_slice2
+      True
+      ```
+
+
+   .. py:method:: select_by_time(*args, **kwargs) -> typing_extensions.Self
+      :abstractmethod:
+
+
+
+.. py:data:: T
+
+.. py:class:: TimeRange
+
+   Bases: :py:obj:`NamedTuple`
+
+
+   A tuple containing the start time and end time of a time range.
+
+
+   .. py:attribute:: start_time
+      :type:  float
+
+
+   .. py:attribute:: end_time
+      :type:  float
+
+
+.. py:class:: IntervalData
+
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
+
+
+   Container for interval data existing over a period of time.
+
+   Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
+   end-expiratory pressure), the position of a patient, a maneuver (end-expiratory hold) being performed, detected
+   periods in the data, etc.
+
+   Interval data consists of a number of time range-value pairs or time ranges without associated values. E.g. interval
+   data with the label "expiratory_breath_hold" only requires time ranges for when expiratory breath holds were
+   performed. Other interval data, e.g. "set_driving_pressure" do have associated values.
+
+   Interval data can be selected by time through the `select_by_time(start_time, end_time)` method. Alternatively,
+   `t[start_time:end_time]` can be used. When the start or end time overlaps with a time range, the time range and its
+   associated value are included in the selection if `partial_inclusion` is `True`, but ignored if `partial_inclusion`
+   is `False`. If the time range is partially included, the start and end times are trimmed to the start and end time
+   of the selection.
+
+   A potential use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you might want to
+   keep the driving pressure that was set before the start of the selectioon. A use case where `partial_inclusion`
+   should be set to `False` is "detected_breaths": you might want to ignore partial breaths that started before or
+   ended after the selected period.
+
+   Note that when selecting by time, the end time is included in the selection.
+
+   :param label: a computer-readable name
+   :param name: a human-readable name
+   :param unit: the unit associated with the data
+   :param category: the category of data
+   :param time_ranges: a list of time ranges (tuples containing a start time and end time)
+   :param values: an optional list of values with the same length as time_ranges
+   :param parameters: parameters used to derive the data
+   :param derived_from: list of data sets this data was derived from
+   :param description: extended human readible description of the data
+   :param partial_inclusion: whether to include a trimmed version of a time range when selecting data
+
+
+   .. py:attribute:: label
+      :type:  str
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: unit
+      :type:  str | None
+
+
+   .. py:attribute:: category
+      :type:  str
+
+
+   .. py:attribute:: time_ranges
+      :type:  list[TimeRange | tuple[float, float]]
+
+
+   .. py:attribute:: values
+      :type:  list[Any] | None
+      :value: None
+
+
+
+   .. py:attribute:: parameters
+      :type:  dict[str, Any]
+
+
+   .. py:attribute:: derived_from
+      :type:  list[Any]
+
+
+   .. py:attribute:: description
+      :type:  str
+      :value: ''
+
+
+
+   .. py:attribute:: partial_inclusion
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: __post_init__() -> None
+
+
+   .. py:method:: __repr__() -> str
+
+      Return repr(self).
+
+
+
+   .. py:method:: __len__() -> int
+
+
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, partial_inclusion: bool | None = None, newlabel: str | None = None) -> typing_extensions.Self
+
+      Return only period data that overlaps (partly) with start and end time.
+
+      Other types of data (e.g. ContinuousData and SparseData) support the start_inclusive and end_inclusive
+      arguments. PeriodData does not. That means that selection by time of PeriodData probably works slightly
+      different than other types of selecting/slicing data.
+
+
+
+   .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
+
+

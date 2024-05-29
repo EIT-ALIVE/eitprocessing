@@ -110,7 +110,7 @@ Package Contents
 
 
 
-   .. py:method:: concatenate(other: typing_extensions.Self[V]) -> typing_extensions.Self[V]
+   .. py:method:: concatenate(other: typing_extensions.Self) -> typing_extensions.Self
 
       Concatenate this collection with an equivalent collection.
 
@@ -118,7 +118,7 @@ Package Contents
 
 
 
-   .. py:method:: select_by_time(start_time: float | None, end_time: float | None, start_inclusive: bool = True, end_inclusive: bool = False) -> typing_extensions.Self
+   .. py:method:: select_by_time(start_time: float | None, end_time: float | None, start_inclusive: bool = True, end_inclusive: bool = False) -> DataCollection
 
       Return a DataCollection containing sliced copies of the items.
 
@@ -145,7 +145,7 @@ Package Contents
 
 
    .. py:attribute:: path
-      :type:  pathlib.Path | list[pathlib.Path]
+      :type:  str | pathlib.Path | list[pathlib.Path | str] | list[pathlib.Path] | list[str]
 
 
    .. py:attribute:: nframes
@@ -164,14 +164,6 @@ Package Contents
       :type:  Vendor
 
 
-   .. py:attribute:: phases
-      :type:  list
-
-
-   .. py:attribute:: events
-      :type:  list
-
-
    .. py:attribute:: label
       :type:  str | None
 
@@ -187,7 +179,7 @@ Package Contents
    .. py:method:: __post_init__()
 
 
-   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
+   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path] | list[str] | list[pathlib.Path]) -> list[pathlib.Path]
       :staticmethod:
 
 
@@ -216,38 +208,10 @@ Package Contents
    .. py:method:: __len__()
 
 
-   .. py:property:: global_baseline
-      :type: numpy.ndarray
-
-      Return the global baseline, i.e. the minimum pixel impedance across all pixels.
-
-
-   .. py:property:: pixel_impedance_global_offset
-      :type: numpy.ndarray
-
-      Return the pixel impedance with the global baseline removed.
-
-      In the resulting array the minimum impedance across all pixels is set to 0.
-
-
-   .. py:property:: pixel_baseline
-      :type: numpy.ndarray
-
-      Return the lowest value in each individual pixel over time.
-
-
-   .. py:property:: pixel_impedance_individual_offset
-      :type: numpy.ndarray
-
-      Return the pixel impedance with the baseline of each individual pixel removed.
-
-      Each pixel in the resulting array has a minimum value of 0.
-
-
-   .. py:property:: global_impedance
-      :type: numpy.ndarray
+   .. py:method:: _calculate_global_impedance() -> numpy.ndarray
 
       Return the global impedance, i.e. the sum of all pixels at each frame.
+
 
 
 .. py:class:: Vendor
@@ -322,6 +286,10 @@ Package Contents
       :type:  eitprocessing.datahandling.datacollection.DataCollection
 
 
+   .. py:attribute:: interval_data
+      :type:  eitprocessing.datahandling.datacollection.DataCollection
+
+
    .. py:method:: __post_init__()
 
 
@@ -354,7 +322,7 @@ Package Contents
 
 
 
-   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None, name: str | None = None, description: str | None = '') -> typing_extensions.Self
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None, name: str | None = None, description: str = '') -> typing_extensions.Self
 
       Return a sliced version of the Sequence.
 

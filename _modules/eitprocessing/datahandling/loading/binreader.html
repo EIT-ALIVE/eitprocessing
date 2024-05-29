@@ -39,6 +39,7 @@
 <span></span><span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">mmap</span> <span class="kn">import</span> <span class="n">mmap</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -67,7 +68,7 @@
 
 <div class="viewcode-block" id="BinReader.file_handle">
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.file_handle">[docs]</a>
-    <span class="n">file_handle</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BufferedReader</span></div>
+    <span class="n">file_handle</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BufferedReader</span> <span class="o">|</span> <span class="n">mmap</span></div>
 
 <div class="viewcode-block" id="BinReader.endian">
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.endian">[docs]</a>
