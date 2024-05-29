@@ -57,20 +57,19 @@ class IntervalData(Equivalence, HasTimeIndexer):
         partial_inclusion: whether to include a trimmed version of a time range when selecting data
     """
 
-    label: str
-    name: str
-    unit: str | None
-    category: str
+    label: str = field(compare=False)
+    name: str = field(compare=False)
+    unit: str | None = field(metadata={"check_equivalence": True})
+    category: str = field(metadata={"check_equivalence": True})
     time_ranges: list[TimeRange | tuple[float, float]]
     values: list[Any] | None = None
-    parameters: dict[str, Any] = field(default_factory=dict)
-    derived_from: list[Any] = field(default_factory=list)
-    description: str = ""
+    parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True})
+    derived_from: list[Any] = field(default_factory=list, compare=False)
+    description: str = field(compare=False, default="")
     partial_inclusion: bool = False
 
     def __post_init__(self) -> None:
         self.time_ranges = [TimeRange._make(time_range) for time_range in self.time_ranges]
-        self._check_equivalence = ["unit", "category", "parameters", "partial_inclusion"]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.label}')"

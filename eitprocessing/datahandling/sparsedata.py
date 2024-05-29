@@ -37,18 +37,15 @@ class SparseData(Equivalence, SelectByTime):
         values: List or array of values. These van be numeric data, text or Python objects.
     """
 
-    label: str
-    name: str
-    unit: str | None
-    category: str
+    label: str = field(compare=False)
+    name: str = field(compare=False)
+    unit: str | None = field(metadata={"check_equivalence": True})
+    category: str = field(metadata={"check_equivalence": True})
     time: np.ndarray
-    description: str = ""
-    parameters: dict[str, Any] = field(default_factory=dict)
-    derived_from: list[Any] = field(default_factory=list)
+    description: str = field(compare=False, default="")
+    parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True})
+    derived_from: list[Any] = field(default_factory=list, compare=False)
     values: Any | None = None
-
-    def __post_init__(self) -> None:
-        self._check_equivalence = ["unit", "category", "parameters"]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.label}')"
