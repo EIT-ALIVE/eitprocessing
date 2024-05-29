@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import UserDict
-from dataclasses import is_dataclass
+from dataclasses import fields, is_dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -14,7 +14,7 @@ class Equivalence:
     """Mixin class that adds an equality and equivalence check."""
 
     # inspired by: https://stackoverflow.com/a/51743960/5170442
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: object) -> bool:
         if self is other:
             return True
 
@@ -22,11 +22,16 @@ class Equivalence:
             return False
 
         if is_dataclass(self):
-            attrs_self = Equivalence._return_equality_attributes(vars(self))
-            attrs_other = Equivalence._return_equality_attributes(vars(other))
-            if set(attrs_self.keys()) != set(attrs_other.keys()):
+            field_names = {field.name for field in fields(self)}
+            if set(vars(self).keys()) != field_names or set(vars(other).keys()) != field_names:
                 return False
-            return all(Equivalence._array_safe_eq(attrs_self[k], attrs_other[k]) for k in attrs_self)
+
+            compare_fields = filter(lambda x: x.compare, fields(self))
+
+            return all(
+                Equivalence._array_safe_eq(getattr(self, field.name), getattr(other, field.name))
+                for field in compare_fields
+            )
 
         return Equivalence._array_safe_eq(self, other)
 
@@ -58,12 +63,7 @@ class Equivalence:
         except TypeError:
             return False
 
-    @staticmethod
-    def _return_equality_attributes(d: dict | UserDict) -> dict:
-        x = ["label", "name", "description", "derived_from", "path"]
-        return {k: v for k, v in d.items() if k not in x}
-
-    def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901
+    def isequivalent(self, other: Self, raise_: bool = False) -> bool:  # noqa: C901, PLR0912
         """Test whether the data structure between two objects are equivalent.
 
         Equivalence, in this case means that objects are compatible e.g. to be
@@ -106,8 +106,18 @@ class Equivalence:
 
             # check attributes of data
             else:
-                self._check_equivalence: list[str]
-                for attr in self._check_equivalence:
+                if is_dataclass(self):
+                    check_equivalence_fields = filter(
+                        lambda x: "check_equivalence" in x.metadata and x.metadata["check_equivalence"],
+                        fields(self),
+                    )
+                    attrs = [field.name for field in check_equivalence_fields]
+
+                else:
+                    self._check_equivalence: list[str]
+                    attrs = self._check_equivalence
+
+                for attr in attrs:
                     if (s := getattr(self, attr)) != (o := getattr(other, attr)):
                         msg = f"Attribute {attr} doesn't match: {s}, {o}"
                         raise EquivalenceError(msg)  # noqa: TRY301
