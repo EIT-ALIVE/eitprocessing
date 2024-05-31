@@ -27,7 +27,7 @@ SENTEC_FRAMERATE = 50.2
 load_sentec_data = partial(load_eit_data, vendor=Vendor.SENTEC)
 
 
-def load_from_single_path(  # noqa: C901, PLR0912
+def load_from_single_path(  # noqa: C901
     path: Path,
     framerate: float | None = 50.2,
     first_frame: int = 0,
