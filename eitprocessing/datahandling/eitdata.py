@@ -17,7 +17,7 @@ T = TypeVar("T", bound="EITData")
 
 @dataclass(eq=False)
 class EITData(SelectByTime, Equivalence):
-    """Container for EIT data.
+    """Container for EIT impedance data.
 
     This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
     class is meant to hold data from (part of) a singular continuous measurement.
