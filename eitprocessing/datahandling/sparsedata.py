@@ -53,6 +53,11 @@ class SparseData(Equivalence, SelectByTime):
     def __len__(self) -> int:
         return len(self.time)
 
+    @property
+    def has_values(self) -> bool:
+        """True if the SparseData has values, False otherwise."""
+        return self.values is not None
+
     def _sliced_copy(
         self,
         start_index: int,
@@ -62,7 +67,7 @@ class SparseData(Equivalence, SelectByTime):
         # TODO: check correct implementation
         cls = self.__class__
         time = self.time[start_index:end_index]
-        values = self.values[start_index:end_index] if self.values is not None else None
+        values = self.values[start_index:end_index] if self.has_values else None
         description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
 
         return cls(
