@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 V_classes = (EITData, ContinuousData, SparseData, IntervalData)
-V = TypeVar("V", EITData, ContinuousData, SparseData, IntervalData)
+V = TypeVar("V", *V_classes)
 
 
 class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
