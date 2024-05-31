@@ -59,15 +59,15 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
     """
 
     label: str = field(compare=False)
-    name: str = field(compare=False)
-    unit: str | None = field(metadata={"check_equivalence": True})
-    category: str = field(metadata={"check_equivalence": True})
-    intervals: list[Interval | tuple[float, float]]
-    values: list[Any] | None = None
-    parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True})
-    derived_from: list[Any] = field(default_factory=list, compare=False)
-    description: str = field(compare=False, default="")
-    default_partial_inclusion: bool = False
+    name: str = field(compare=False, repr=False)
+    unit: str | None = field(metadata={"check_equivalence": True}, repr=False)
+    category: str = field(metadata={"check_equivalence": True}, repr=False)
+    intervals: list[Interval | tuple[float, float]] = field(repr=False)
+    values: list[Any] | None = field(repr=False, default=None)
+    parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True}, repr=False)
+    derived_from: list[Any] = field(default_factory=list, compare=False, repr=False)
+    description: str = field(compare=False, default="", repr=False)
+    default_partial_inclusion: bool = field(repr=False, default=False)
 
     def __post_init__(self) -> None:
         self.intervals = [Interval._make(interval) for interval in self.intervals]

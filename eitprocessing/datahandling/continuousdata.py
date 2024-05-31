@@ -32,10 +32,10 @@ class ContinuousData(Equivalence, SelectByTime):
     """  # TODO: update docstring
 
     label: str = field(compare=False)
-    name: str = field(compare=False)
-    unit: str = field(metadata={"check_equivalence": True})
-    category: str = field(metadata={"check_equivalence": True})
-    description: str = field(default="", compare=False)
+    name: str = field(compare=False, repr=False)
+    unit: str = field(metadata={"check_equivalence": True}, repr=False)
+    category: str = field(metadata={"check_equivalence": True}, repr=False)
+    description: str = field(default="", compare=False, repr=False)
     parameters: dict[str, Any] = field(default_factory=dict, repr=False, metadata={"check_equivalence": True})
     derived_from: Any | list[Any] = field(default_factory=list, repr=False, compare=False)
     time: np.ndarray = field(kw_only=True, repr=False)

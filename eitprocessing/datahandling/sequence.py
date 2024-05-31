@@ -40,8 +40,8 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
     """  # TODO: check that docstring is up to date
 
     label: str | None = field(default=None, compare=False)
-    name: str | None = field(default=None, compare=False)
-    description: str = field(default="", compare=False)
+    name: str | None = field(default=None, compare=False, repr=False)
+    description: str = field(default="", compare=False, repr=False)
     eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData), repr=False)
     continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData), repr=False)
     sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData), repr=False)
