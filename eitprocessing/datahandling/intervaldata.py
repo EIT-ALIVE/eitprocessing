@@ -77,6 +77,11 @@ class IntervalData(Equivalence, HasTimeIndexer):
     def __len__(self) -> int:
         return len(self.time_ranges)
 
+    @property
+    def has_values(self) -> bool:
+        """True if the IntervalData has values, False otherwise."""
+        return self.values is not None
+
     def select_by_time(  # noqa: C901
         self,
         start_time: float | None = None,
@@ -120,7 +125,6 @@ class IntervalData(Equivalence, HasTimeIndexer):
             end_time_ = min(time_range.end_time, end_time)
             return TimeRange(start_time_, end_time_)
 
-        has_values = self.values is not None
         iter_values = self.values or itertools.repeat(None)
 
         time_range_value_pairs: Any = zip(self.time_ranges, iter_values, strict=True)
@@ -143,7 +147,7 @@ class IntervalData(Equivalence, HasTimeIndexer):
             category=self.category,
             derived_from=[*self.derived_from, self],
             time_ranges=list(time_ranges),
-            values=list(values) if has_values else None,
+            values=list(values) if self.has_values else None,
         )
 
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be moved to mixin in future
