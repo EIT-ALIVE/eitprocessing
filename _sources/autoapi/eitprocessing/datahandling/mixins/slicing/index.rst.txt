@@ -40,7 +40,7 @@ Module Contents
 
    .. py:method:: select_by_index(start: int | None = None, end: int | None = None, newlabel: str | None = None) -> typing_extensions.Self
 
-      De facto implementation of the `__getitem__ function.
+      De facto implementation of the `__getitem__` function.
 
       This function can also be called directly to add a label to the sliced
       object. Otherwise a default label describing the slice and original
@@ -99,7 +99,7 @@ Module Contents
 
    .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
 
-      Get a slice from start to end time stamps.
+      Get a shortened copy of the object, starting from start_time and ending at end_time.
 
       Given a start and end time stamp (i.e. its value, not its index),
       return a slice of the original object, which must contain a time axis.
@@ -117,7 +117,7 @@ Module Contents
       :raises TypeError: if `self` does not contain a `time` attribute.
       :raises ValueError: if time stamps are not sorted.
 
-      :returns: Slice of self.
+      :returns: A shortened copy of the object.
 
 
 

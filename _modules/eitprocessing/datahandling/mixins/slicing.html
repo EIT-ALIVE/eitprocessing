@@ -92,7 +92,7 @@
         <span class="n">end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">newlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;De facto implementation of the `__getitem__ function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;De facto implementation of the `__getitem__` function.</span>
 
 <span class="sd">        This function can also be called directly to add a label to the sliced</span>
 <span class="sd">        object. Otherwise a default label describing the slice and original</span>
@@ -180,7 +180,7 @@
         <span class="n">end_inclusive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a slice from start to end time stamps.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a shortened copy of the object, starting from start_time and ending at end_time.</span>
 
 <span class="sd">        Given a start and end time stamp (i.e. its value, not its index),</span>
 <span class="sd">        return a slice of the original object, which must contain a time axis.</span>
@@ -201,7 +201,7 @@
 <span class="sd">            ValueError: if time stamps are not sorted.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Slice of self.</span>
+<span class="sd">            A shortened copy of the object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">):</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Object </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> has no time axis.&quot;</span>
