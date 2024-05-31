@@ -151,8 +151,7 @@
         <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
         <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">pixel_impedance</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">eitdata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">)</span>
-    <span class="n">eitdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eit_data</span><span class="p">)</span>
+    <span class="n">eitdata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="n">eit_data</span><span class="p">)</span>
 
     <span class="c1"># extract waveform data</span>
     <span class="c1"># TODO: properly export waveform data</span>
@@ -166,7 +165,7 @@
             <span class="s2">&quot;global_impedance&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Global impedance calculated from raw EIT data&quot;</span><span class="p">,</span>
             <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">values</span><span class="o">=</span><span class="n">eit_data</span><span class="o">.</span><span class="n">_calculate_global_impedance</span><span class="p">(),</span>  <span class="c1"># noqa: SLF001</span>
+            <span class="n">values</span><span class="o">=</span><span class="n">eit_data</span><span class="o">.</span><span class="n">calculate_global_impedance</span><span class="p">(),</span>
         <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">continuousdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
@@ -242,9 +241,9 @@
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Breaths (Timpel)&quot;</span><span class="p">,</span>
             <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">category</span><span class="o">=</span><span class="s2">&quot;breaths&quot;</span><span class="p">,</span>
-            <span class="n">time_ranges</span><span class="o">=</span><span class="n">time_ranges</span><span class="p">,</span>
+            <span class="n">intervals</span><span class="o">=</span><span class="n">time_ranges</span><span class="p">,</span>
             <span class="n">values</span><span class="o">=</span><span class="n">breaths</span><span class="p">,</span>
-            <span class="n">partial_inclusion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">default_partial_inclusion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">),</span>
     <span class="p">)</span>
 

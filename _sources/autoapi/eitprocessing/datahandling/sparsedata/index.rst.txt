@@ -185,6 +185,12 @@ Module Contents
    .. py:method:: __len__() -> int
 
 
+   .. py:property:: has_values
+      :type: bool
+
+      True if the SparseData has values, False otherwise.
+
+
    .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
 
       Slicing method that must be implemented by all subclasses.

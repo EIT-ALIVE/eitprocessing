@@ -128,6 +128,14 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span></div>
 
 
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="SparseData.has_values">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData.has_values">[docs]</a>
+    <span class="k">def</span> <span class="nf">has_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;True if the SparseData has values, False otherwise.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
 <div class="viewcode-block" id="SparseData._sliced_copy">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData._sliced_copy">[docs]</a>
     <span class="k">def</span> <span class="nf">_sliced_copy</span><span class="p">(</span>
@@ -139,7 +147,7 @@
         <span class="c1"># TODO: check correct implementation</span>
         <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
         <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span>
-        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_values</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Slice (</span><span class="si">{</span><span class="n">start_index</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">end_index</span><span class="si">}</span><span class="s2">) of &lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>

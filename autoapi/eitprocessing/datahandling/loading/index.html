@@ -66,7 +66,7 @@
 <td><p>A collection of a single type of data with unique labels.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData" title="eitprocessing.datahandling.loading.EITData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EITData</span></code></a></p></td>
-<td><p>Container for EIT data.</p></td>
+<td><p>Container for EIT impedance data.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.Vendor" title="eitprocessing.datahandling.loading.Vendor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Vendor</span></code></a></p></td>
 <td><p>Enum indicating the vendor (manufacturer) of the source EIT device.</p></td>
@@ -193,7 +193,7 @@ By default, existing keys can not be overridden.</p>
 <dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.</span></span><span class="sig-name descname"><span class="pre">EITData</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a>, <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a></p>
-<p>Container for EIT data.</p>
+<p>Container for EIT impedance data.</p>
 <p>This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
 class is meant to hold data from (part of) a singular continuous measurement.</p>
 <p>This class can’t be initialized directly. Instead, use <cite>load_eit_data(&lt;path&gt;, vendor=&lt;vendor&gt;)</cite> to load data from
@@ -287,9 +287,9 @@ indices.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData._calculate_global_impedance">
-<span class="sig-name descname"><span class="pre">_calculate_global_impedance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData._calculate_global_impedance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData._calculate_global_impedance" title="Link to this definition">¶</a></dt>
-<dd><p>Return the global impedance, i.e. the sum of all pixels at each frame.</p>
+<dt class="sig sig-object py" id="eitprocessing.datahandling.loading.EITData.calculate_global_impedance">
+<span class="sig-name descname"><span class="pre">calculate_global_impedance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.calculate_global_impedance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.EITData.calculate_global_impedance" title="Link to this definition">¶</a></dt>
+<dd><p>Return the global impedance, i.e. the sum of all included pixels at each frame.</p>
 </dd></dl>
 
 </dd></dl>
@@ -533,7 +533,7 @@ would surpass the final frame.</p></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.concatenate"><code class="docutils literal notranslate"><span class="pre">EITData.concatenate()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData._sliced_copy"><code class="docutils literal notranslate"><span class="pre">EITData._sliced_copy()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.__len__"><code class="docutils literal notranslate"><span class="pre">EITData.__len__()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData._calculate_global_impedance"><code class="docutils literal notranslate"><span class="pre">EITData._calculate_global_impedance()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.loading.EITData.calculate_global_impedance"><code class="docutils literal notranslate"><span class="pre">EITData.calculate_global_impedance()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.loading.Vendor"><code class="docutils literal notranslate"><span class="pre">Vendor</span></code></a><ul>

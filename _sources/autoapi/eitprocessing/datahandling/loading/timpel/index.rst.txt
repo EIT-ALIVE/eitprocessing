@@ -325,7 +325,7 @@ Module Contents
    Bases: :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`
 
 
-   Container for EIT data.
+   Container for EIT impedance data.
 
    This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
    class is meant to hold data from (part of) a singular continuous measurement.
@@ -405,9 +405,9 @@ Module Contents
    .. py:method:: __len__()
 
 
-   .. py:method:: _calculate_global_impedance() -> numpy.ndarray
+   .. py:method:: calculate_global_impedance() -> numpy.ndarray
 
-      Return the global impedance, i.e. the sum of all pixels at each frame.
+      Return the global impedance, i.e. the sum of all included pixels at each frame.
 
 
 
@@ -436,7 +436,7 @@ Module Contents
 
 .. py:class:: IntervalData
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByIndex`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
 
 
    Container for interval data existing over a period of time.
@@ -490,8 +490,8 @@ Module Contents
       :type:  str
 
 
-   .. py:attribute:: time_ranges
-      :type:  list[TimeRange | tuple[float, float]]
+   .. py:attribute:: intervals
+      :type:  list[Interval | tuple[float, float]]
 
 
    .. py:attribute:: values
@@ -512,7 +512,7 @@ Module Contents
       :type:  str
 
 
-   .. py:attribute:: partial_inclusion
+   .. py:attribute:: default_partial_inclusion
       :type:  bool
       :value: False
 
@@ -530,6 +530,21 @@ Module Contents
    .. py:method:: __len__() -> int
 
 
+   .. py:property:: has_values
+      :type: bool
+
+      True if the IntervalData has values, False otherwise.
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+
    .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, partial_inclusion: bool | None = None, newlabel: str | None = None) -> typing_extensions.Self
 
       Return only period data that overlaps (partly) with start and end time.
@@ -537,6 +552,30 @@ Module Contents
       Other types of data (e.g. ContinuousData and SparseData) support the start_inclusive and end_inclusive
       arguments. PeriodData does not. That means that selection by time of PeriodData probably works slightly
       different than other types of selecting/slicing data.
+
+
+
+   .. py:method:: _keep_overlapping(item: tuple[Interval, Any], selection_start: float, selection_end: float) -> bool
+      :staticmethod:
+
+
+      Helper function for filtering overlapping interval-value pairs.
+
+
+
+   .. py:method:: _keep_fully_overlapping(item: tuple[Interval, Any], selection_start: float, selection_end: float) -> bool
+      :staticmethod:
+
+
+      Helper function for filtering fully overlapping interval-value pairs.
+
+
+
+   .. py:method:: _replace_start_end_time(interval: Interval, selection_start: float, selection_end: float) -> Interval
+      :staticmethod:
+
+
+      Helper function to replace start and end time after filtering interval-value pairs.
 
 
 
@@ -652,6 +691,12 @@ Module Contents
 
 
    .. py:method:: __len__() -> int
+
+
+   .. py:property:: has_values
+      :type: bool
+
+      True if the SparseData has values, False otherwise.
 
 
    .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
