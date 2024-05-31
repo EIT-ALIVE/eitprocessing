@@ -62,7 +62,7 @@ def load_eit_data(
 
     first_frame = _check_first_frame(first_frame)
 
-    paths = EITData.ensure_path_list(path)
+    paths = EITData.parse_path(path, ensure_list=True)
 
     eit_datasets: list[DataCollection] = []
     continuous_datasets: list[DataCollection] = []

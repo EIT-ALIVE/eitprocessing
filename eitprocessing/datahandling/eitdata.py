@@ -45,14 +45,16 @@ class EITData(SelectByTime, Equivalence):
     def __post_init__(self):
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
-        if isinstance(self.path, str):
-            self.path = Path(self.path)
-        elif isinstance(self.path, list):
-            self.path = [Path(p) for p in self.path]
+
+        self.path = self.parse_path(self.path, ensure_list=False)
+
         self.name = self.name or self.label
 
     @staticmethod
-    def ensure_path_list(path: str | Path | list[str | Path] | list[str] | list[Path]) -> list[Path]:
+    def parse_path(
+        path: str | Path | list[str | Path] | list[str] | list[Path],
+        ensure_list: bool = True,
+    ) -> list[Path] | Path:
         """Return the path or paths as a list.
 
         The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
@@ -60,7 +62,9 @@ class EITData(SelectByTime, Equivalence):
         """
         if isinstance(path, list):
             return [Path(p) for p in path]
-        return [Path(path)]
+        if ensure_list:
+            return [Path(path)]
+        return Path(path)
 
     def __add__(self: T, other: T) -> T:
         return self.concatenate(other)
@@ -72,8 +76,8 @@ class EITData(SelectByTime, Equivalence):
             msg = f"Concatenation failed. Second dataset ({other.name}) may not start before first ({self.name}) ends."
             raise ValueError(msg)
 
-        self_path = self.ensure_path_list(self.path)
-        other_path = self.ensure_path_list(other.path)
+        self_path = self.parse_path(self.path, ensure_list=True)
+        other_path = self.parse_path(other.path, ensure_list=True)
         newlabel = newlabel or f"Merge of <{self.label}> and <{other.label}>"
 
         return self.__class__(
