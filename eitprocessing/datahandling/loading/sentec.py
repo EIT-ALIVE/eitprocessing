@@ -12,6 +12,7 @@ import numpy as np
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.loading.binreader import BinReader
 from eitprocessing.datahandling.sparsedata import SparseData
@@ -126,6 +127,7 @@ def load_from_single_path(  # noqa: C901, PLR0912
         "eitdata_collection": eit_data_collection,
         "continuousdata_collection": DataCollection(ContinuousData),
         "sparsedata_collection": DataCollection(SparseData),
+        "intervaldata_collection": DataCollection(IntervalData),
     }
 
 
