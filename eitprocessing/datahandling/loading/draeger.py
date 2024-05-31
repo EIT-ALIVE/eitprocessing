@@ -65,8 +65,8 @@ def load_from_single_path(
 
     pixel_impedance = np.zeros((n_frames, 32, 32))
     time = np.zeros((n_frames,))
-    events: list = []
-    phases: list = []
+    events: list[tuple[float, Event]] = []
+    phases: list[tuple[float, int]] = []
     medibus_data = np.zeros((52, n_frames))
 
     with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
