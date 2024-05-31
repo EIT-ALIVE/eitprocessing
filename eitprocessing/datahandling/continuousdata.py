@@ -18,12 +18,18 @@ T = TypeVar("T", bound="ContinuousData")
 
 @dataclass(eq=False)
 class ContinuousData(Equivalence, SelectByTime):
-    """Data class for (non-EIT) data with a continuous time axis.
+    """Container for data with a continuous time axis.
+
+    Continuous data is data that was continuously measured/created at a predictable rate. Therefore, continuous data is
+    assumed to have a predictable delta between time points. A fixed delta is not enforced for two reasons: a) some
+    devices have slightly varying sampling rate (but fixed around a set rate) and b) floating point arithmetic.
+
+    Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time).
 
     Args:
         label: Computer readable naming of the instance.
         name: Human readable naming of the instance.
-        unit: Unit for the data.
+        unit: Unit of the data, if applicable.
         category: Category the data falls into, e.g. 'airway pressure'.
         description: Human readable extended description of the data.
         parameters: Parameters used to derive this data.

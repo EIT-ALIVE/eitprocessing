@@ -13,38 +13,40 @@ T = TypeVar("T", bound="SparseData")
 
 @dataclass(eq=False)
 class SparseData(Equivalence, SelectByTime):
-    """Container for data occuring at unpredictable time points.
+    """Container for data related to individual time points.
 
-    In sparse data the time points are not necessarily evenly spaced. Data can consist time-value pairs or only time
-    points. Values generally are numeric values in arrays, but can also be lists of different types of object.
+    Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs
+    or only time points. Values generally are numeric values in arrays, but can also be lists of different types of
+    object.
 
-    Sparse data differs from IntervalData in that each data points is associated with a single time point rather than a
+    Sparse data is assumed to be sequential (i.e. only a single data points at a single time point, and sorted by time).
+    Sparse data can contain zero or more time points/time-values pairs.
+
+    Sparse data differs from interval data in that each data points is associated with a single time point rather than a
     time range.
 
     Examples are data points at end of inspiration/end of expiration (e.g. tidal volume, end-expiratoy lung impedance)
     or detected time points (e.g. QRS complexes).
 
-
-
     Args:
         label: Computer readable name.
         name: Human readable name.
         unit: Unit of the data, if applicable.
-        category: Category the data falls into, e.g. 'airway pressure'.
-        description: Human readible extended description of the data.
+        category: Category the data falls into, e.g. 'detected r peak'.
+        description: Human readable extended description of the data.
         parameters: Parameters used to derive the data.
         derived_from: Traceback of intermediates from which the current data was derived.
         values: List or array of values. These van be numeric data, text or Python objects.
     """
 
     label: str = field(compare=False)
-    name: str = field(compare=False)
-    unit: str | None = field(metadata={"check_equivalence": True})
-    category: str = field(metadata={"check_equivalence": True})
-    time: np.ndarray
-    description: str = field(compare=False, default="")
-    parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True})
-    derived_from: list[Any] = field(default_factory=list, compare=False)
+    name: str = field(compare=False, repr=False)
+    unit: str | None = field(metadata={"check_equivalence": True}, repr=False)
+    category: str = field(metadata={"check_equivalence": True}, repr=False)
+    time: np.ndarray = field(repr=False)
+    description: str = field(compare=False, default="", repr=False)
+    parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True}, repr=False)
+    derived_from: list[Any] = field(default_factory=list, compare=False, repr=False)
     values: Any | None = None
 
     def __repr__(self) -> str:

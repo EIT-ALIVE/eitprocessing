@@ -30,8 +30,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
     The convenience method `add()` adds an item by setting the key to `value.label`.
 
     Args:
-        data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or
-        SparseData.
+        data_type: the type of data stored in this collection.
     """
 
     data_type: type
@@ -48,7 +47,10 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
         return super().__setitem__(__key, __value)
 
     def add(self, *item: V, overwrite: bool = False) -> None:
-        """Add one or multiple item(s) to the collection."""
+        """Add one or multiple item(s) to the collection.
+
+        The item is added to the collection using the item label as the key.
+        """
         for item_ in item:
             self._check_item(item_, overwrite=overwrite)
             super().__setitem__(item_.label, item_)

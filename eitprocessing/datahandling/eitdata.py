@@ -26,11 +26,14 @@ class EITData(SelectByTime, Equivalence):
     disk.
 
     Args:
-        path: the path of list of paths of the source from which data was derived.
-        nframes: number of frames
-        time:
-
-    Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
+        path: The path of list of paths of the source from which data was derived.
+        nframes: Number of frames.
+        time: The time of each frame (since start measurement).
+        framerate: The (average) rate at which the frames are collection, in Hz.
+        vendor: The vendor of the device the data was collected with.
+        label: Computer readable label identifying this dataset.
+        name: Human readable name for the data.
+        pixel_impedance: Impedance values for each pixel at each frame.
     """  # TODO: fix docstring
 
     path: str | Path | list[Path | str] = field(compare=False, repr=False)

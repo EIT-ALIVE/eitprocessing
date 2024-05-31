@@ -24,38 +24,31 @@ class Interval(NamedTuple):
 class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
     """Container for interval data existing over a period of time.
 
-    Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
+    Interval data is data that consists for a given time interval. Examples are a ventilator setting (e.g.
     end-expiratory pressure), the position of a patient, a maneuver (end-expiratory hold) being performed, detected
     periods in the data, etc.
 
-    Interval data consists of a number of time range-value pairs or time ranges without associated values. E.g. interval
-    data with the label "expiratory_breath_hold" only requires time ranges for when expiratory breath holds were
-    performed. Other interval data, e.g. "set_driving_pressure" do have associated values.
+    Interval data consists of a number of intervals that may or may not have values associated with them.
+
+    Examples of IntervalData with associated values are certain ventilator settings (e.g. end-expiratory pressure) and
+    the position of a patient. Examples of IntervalData without associated values are indicators of maneouvres (e.g. a
+    breath hold) or detected occurences (e.g. a breath).
+
 
     Interval data can be selected by time through the `select_by_time(start_time, end_time)` method. Alternatively,
-    `t[start_time:end_time]` can be used. When the start or end time overlaps with a time range, the time range and its
-    associated value are included in the selection if `partial_inclusion` is `True`, but ignored if `partial_inclusion`
-    is `False`. If the time range is partially included, the start and end times are trimmed to the start and end time
-    of the selection.
-
-    A potential use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you might want to
-    keep the driving pressure that was set before the start of the selectioon. A use case where `partial_inclusion`
-    should be set to `False` is "detected_breaths": you might want to ignore partial breaths that started before or
-    ended after the selected period.
-
-    Note that when selecting by time, the end time is included in the selection.
+    `t[start_time:end_time]` can be used.
 
     Args:
-        label: a computer-readable name
-        name: a human-readable name
-        unit: the unit associated with the data
-        category: the category of data
-        time_ranges: a list of time ranges (tuples containing a start time and end time)
-        values: an optional list of values with the same length as time_ranges
-        parameters: parameters used to derive the data
-        derived_from: list of data sets this data was derived from
-        description: extended human readible description of the data
-        partial_inclusion: whether to include a trimmed version of a time range when selecting data
+        label: Computer readable label identifying this dataset.
+        name: Human readable name for the data.
+        unit: The unit of the data, if applicable.
+        category: Category the data falls into, e.g. 'breath'.
+        intervals: A list of intervals (tuples containing a start time and end time).
+        values: An optional list of values associated with each interval.
+        parameters: Parameters used to derive the data.
+        derived_from: Traceback of intermediates from which the current data was derived.
+        description: Extended human readible description of the data.
+        default_partial_inclusion: Whether to include a trimmed version of an interval when selecting data
     """
 
     label: str = field(compare=False)
@@ -112,11 +105,24 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         partial_inclusion: bool | None = None,
         newlabel: str | None = None,
     ) -> Self:
-        """Return only period data that overlaps (partly) with start and end time.
+        """Get a shortened copy of the object, starting from start_time and ending at end_time.
 
-        Other types of data (e.g. ContinuousData and SparseData) support the start_inclusive and end_inclusive
-        arguments. PeriodData does not. That means that selection by time of PeriodData probably works slightly
-        different than other types of selecting/slicing data.
+        When the start or end time overlaps with an interval, the interval and its associated value are included in
+        the selection if `partial_inclusion` is `True`, but ignored if `partial_inclusion` is `False`. If the interval
+        is partially included, the start and end times are trimmed to the start and end time of the selection. A
+        potential use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you might want
+        to keep the driving pressure that was set before the start of the selectioon. A use case where
+        `partial_inclusion` should be set to `False` is "detected_breaths": you might want to ignore partial breaths
+        that started before or ended after the selected period.
+
+        Note that when selecting by time, the end time is always included in the selection if it exists in the original
+        object.
+
+        Args:
+            start_time: earliest time point to include in the copy
+            end_time: latest time point to include in the copy
+            partial_inclusion: whether to include an interval that contains the start_time or end_time
+            newlabel: new label of the copied object
         """
         if partial_inclusion is None:
             partial_inclusion = self.default_partial_inclusion
