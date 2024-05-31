@@ -62,7 +62,7 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
     name: str = field(compare=False)
     unit: str | None = field(metadata={"check_equivalence": True})
     category: str = field(metadata={"check_equivalence": True})
-    time_ranges: list[Interval | tuple[float, float]]
+    intervals: list[Interval | tuple[float, float]]
     values: list[Any] | None = None
     parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True})
     derived_from: list[Any] = field(default_factory=list, compare=False)
@@ -70,13 +70,13 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
     default_partial_inclusion: bool = False
 
     def __post_init__(self) -> None:
-        self.time_ranges = [Interval._make(time_range) for time_range in self.time_ranges]
+        self.intervals = [Interval._make(interval) for interval in self.intervals]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.label}')"
 
     def __len__(self) -> int:
-        return len(self.time_ranges)
+        return len(self.intervals)
 
     @property
     def has_values(self) -> bool:
@@ -90,7 +90,7 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         newlabel: str,
     ) -> Self:
         cls = type(self)
-        time_ranges = self.time_ranges[start_index:end_index]
+        intervals = self.intervals[start_index:end_index]
         values = self.values[start_index:end_index] if self.has_values else None
         description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
 
@@ -101,7 +101,7 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
             category=self.category,
             description=description,
             derived_from=[*self.derived_from, self],
-            time_ranges=time_ranges,
+            intervals=intervals,
             values=values,
         )
 
@@ -131,31 +131,31 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
                 copy_.label = newlabel
             return copy_
         if selection_start is None:
-            selection_start = self.time_ranges[0].start_time
+            selection_start = self.intervals[0].start_time
         if selection_end is None:
-            selection_end = self.time_ranges[-1].end_time
+            selection_end = self.intervals[-1].end_time
 
         iter_values = self.values or itertools.repeat(None)
-        time_range_value_pairs = zip(self.time_ranges, iter_values, strict=True)
+        interval_value_pairs = zip(self.intervals, iter_values, strict=True)
 
         func = self._keep_overlapping if partial_inclusion else self._keep_fully_overlapping
         filterfunc = partial(func, selection_start=selection_start, selection_end=selection_end)
-        filtered_pairs = list(filter(filterfunc, time_range_value_pairs))
+        filtered_pairs = list(filter(filterfunc, interval_value_pairs))
 
         if len(filtered_pairs):
-            time_ranges, values = zip(*filtered_pairs, strict=True)
+            intervals, values = zip(*filtered_pairs, strict=True)
             mapfun = partial(self._replace_start_end_time, selection_start=selection_start, selection_end=selection_end)
-            time_ranges = list(map(mapfun, time_ranges))
+            intervals = list(map(mapfun, intervals))
         else:
-            time_ranges, values = [], []
+            intervals, values = [], []
 
-        return self.__class__(
+        return type(self)(
             label=newlabel,
             name=self.name,
             unit=self.unit,
             category=self.category,
             derived_from=[*self.derived_from, self],
-            time_ranges=list(time_ranges),
+            intervals=list(intervals),
             values=list(values) if self.has_values else None,
         )
 
@@ -166,8 +166,8 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         selection_end: float,
     ) -> bool:
         """Helper function for filtering overlapping interval-value pairs."""
-        time_range, _ = item
-        return time_range.start_time <= selection_end and time_range.end_time >= selection_start
+        interval, _ = item
+        return interval.start_time <= selection_end and interval.end_time >= selection_start
 
     @staticmethod
     def _keep_fully_overlapping(
@@ -176,22 +176,22 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         selection_end: float,
     ) -> bool:
         """Helper function for filtering fully overlapping interval-value pairs."""
-        time_range, _ = item
-        if time_range.start_time < selection_start:
+        interval, _ = item
+        if interval.start_time < selection_start:
             return False
-        if time_range.end_time > selection_end:
+        if interval.end_time > selection_end:
             return False
         return True
 
     @staticmethod
     def _replace_start_end_time(
-        time_range: Interval,
+        interval: Interval,
         selection_start: float,
         selection_end: float,
     ) -> Interval:
         """Helper function to replace start and end time after filtering interval-value pairs."""
-        start_time_ = max(time_range.start_time, selection_start)
-        end_time_ = min(time_range.end_time, selection_end)
+        start_time_ = max(interval.start_time, selection_start)
+        end_time_ = min(interval.end_time, selection_end)
         return Interval(start_time_, end_time_)
 
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be moved to mixin in future
@@ -203,7 +203,7 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         if not len(other):
             return copy.deepcopy(self)
 
-        if other.time_ranges[0].start_time < self.time_ranges[-1].end_time:
+        if other.intervals[0].start_time < self.intervals[-1].end_time:
             msg = (
                 "Concatenation failed. "
                 f"Second dataset ({other.name}) may not start before the first ({self.name}) ends."
@@ -230,6 +230,6 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
             category=self.category,
             description=self.description,
             derived_from=[*self.derived_from, *other.derived_from, self, other],
-            time_ranges=self.time_ranges + other.time_ranges,
+            intervals=self.intervals + other.intervals,
             values=new_values,
         )

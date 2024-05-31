@@ -189,7 +189,7 @@ def load_from_single_path(
             name="Breaths (Timpel)",
             unit=None,
             category="breaths",
-            time_ranges=time_ranges,
+            intervals=time_ranges,
             values=breaths,
             default_partial_inclusion=False,
         ),
