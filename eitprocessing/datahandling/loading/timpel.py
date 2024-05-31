@@ -114,7 +114,7 @@ def load_from_single_path(
             "global_impedance",
             "Global impedance calculated from raw EIT data",
             time=time,
-            values=eit_data._calculate_global_impedance(),  # noqa: SLF001
+            values=eit_data.calculate_global_impedance(),
         ),
     )
     continuousdata_collection.add(

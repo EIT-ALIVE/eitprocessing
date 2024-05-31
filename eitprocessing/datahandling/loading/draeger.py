@@ -117,7 +117,7 @@ def load_from_single_path(
             category="impedance",
             derived_from=[eit_data],
             time=eit_data.time,
-            values=eit_data._calculate_global_impedance(),  # noqa: SLF001
+            values=eit_data.calculate_global_impedance(),
         ),
     )
     sparse_data_collection.add(
