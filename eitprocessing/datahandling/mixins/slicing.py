@@ -45,7 +45,7 @@ class SelectByIndex(ABC):
         end: int | None = None,
         newlabel: str | None = None,
     ) -> Self:
-        """De facto implementation of the `__getitem__ function.
+        """De facto implementation of the `__getitem__` function.
 
         This function can also be called directly to add a label to the sliced
         object. Otherwise a default label describing the slice and original
@@ -112,7 +112,7 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
         end_inclusive: bool = False,
         label: str | None = None,
     ) -> Self:
-        """Get a slice from start to end time stamps.
+        """Get a shortened copy of the object, starting from start_time and ending at end_time.
 
         Given a start and end time stamp (i.e. its value, not its index),
         return a slice of the original object, which must contain a time axis.
@@ -133,7 +133,7 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
             ValueError: if time stamps are not sorted.
 
         Returns:
-            Slice of self.
+            A shortened copy of the object.
         """
         if not hasattr(self, "time"):
             msg = f"Object {self} has no time axis."
