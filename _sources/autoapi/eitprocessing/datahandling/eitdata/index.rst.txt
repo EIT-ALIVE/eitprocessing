@@ -132,7 +132,7 @@ Module Contents
 
 
    .. py:attribute:: path
-      :type:  str | pathlib.Path | list[pathlib.Path | str] | list[pathlib.Path] | list[str]
+      :type:  str | pathlib.Path | list[pathlib.Path | str]
 
 
    .. py:attribute:: nframes
@@ -166,7 +166,8 @@ Module Contents
    .. py:method:: __post_init__()
 
 
-   .. py:method:: parse_path(path: str | pathlib.Path | list[str | pathlib.Path] | list[str] | list[pathlib.Path], ensure_list: bool = True) -> list[pathlib.Path] | pathlib.Path
+   .. py:method:: parse_path(path: str | pathlib.Path | list[str | pathlib.Path], ensure_list: Literal[True]) -> list[pathlib.Path]
+                  parse_path(path: str | pathlib.Path | list[str | pathlib.Path], ensure_list: Literal[False]) -> pathlib.Path
       :staticmethod:
 
 
