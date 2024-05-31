@@ -99,6 +99,11 @@ class IntervalData(Equivalence, HasTimeIndexer):
             partial_inclusion = self.default_partial_inclusion
         newlabel = newlabel or self.label
 
+        if start_time is None and end_time is None:
+            copy_ = copy.deepcopy(self)
+            if newlabel:
+                copy_.label = newlabel
+            return copy_
         if start_time is None:
             start_time = self.time_ranges[0].start_time
         if end_time is None:
