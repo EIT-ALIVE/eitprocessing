@@ -12,8 +12,8 @@ from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer
 T = TypeVar("T", bound="IntervalData")
 
 
-class TimeRange(NamedTuple):
-    """A tuple containing the start time and end time of a time range."""
+class Interval(NamedTuple):
+    """A tuple containing the start time and end time of an interval."""
 
     start_time: float
     end_time: float
@@ -61,7 +61,7 @@ class IntervalData(Equivalence, HasTimeIndexer):
     name: str = field(compare=False)
     unit: str | None = field(metadata={"check_equivalence": True})
     category: str = field(metadata={"check_equivalence": True})
-    time_ranges: list[TimeRange | tuple[float, float]]
+    time_ranges: list[Interval | tuple[float, float]]
     values: list[Any] | None = None
     parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True})
     derived_from: list[Any] = field(default_factory=list, compare=False)
@@ -69,7 +69,7 @@ class IntervalData(Equivalence, HasTimeIndexer):
     default_partial_inclusion: bool = False
 
     def __post_init__(self) -> None:
-        self.time_ranges = [TimeRange._make(time_range) for time_range in self.time_ranges]
+        self.time_ranges = [Interval._make(time_range) for time_range in self.time_ranges]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.label}')"
@@ -109,15 +109,15 @@ class IntervalData(Equivalence, HasTimeIndexer):
         if end_time is None:
             end_time = self.time_ranges[-1].end_time
 
-        def keep_starting_on_or_before_end(item: tuple[TimeRange, Any]) -> bool:
+        def keep_starting_on_or_before_end(item: tuple[Interval, Any]) -> bool:
             time_range, _ = item
             return time_range.start_time <= end_time
 
-        def keep_ending_on_or_after_start(item: tuple[TimeRange, Any]) -> bool:
+        def keep_ending_on_or_after_start(item: tuple[Interval, Any]) -> bool:
             time_range, _ = item
             return time_range.end_time >= start_time
 
-        def keep_fully_overlapping(item: tuple[TimeRange, Any]) -> bool:
+        def keep_fully_overlapping(item: tuple[Interval, Any]) -> bool:
             time_range, _ = item
             if time_range.start_time < start_time:
                 return False
@@ -125,10 +125,10 @@ class IntervalData(Equivalence, HasTimeIndexer):
                 return False
             return True
 
-        def replace_start_end_time(time_range: TimeRange) -> TimeRange:
+        def replace_start_end_time(time_range: Interval) -> Interval:
             start_time_ = max(time_range.start_time, start_time)
             end_time_ = min(time_range.end_time, end_time)
-            return TimeRange(start_time_, end_time_)
+            return Interval(start_time_, end_time_)
 
         iter_values = self.values or itertools.repeat(None)
 
