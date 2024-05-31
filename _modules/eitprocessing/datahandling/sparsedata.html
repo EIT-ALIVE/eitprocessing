@@ -55,25 +55,27 @@
 <div class="viewcode-block" id="SparseData">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData">[docs]</a>
 <span class="k">class</span> <span class="nc">SparseData</span><span class="p">(</span><span class="n">Equivalence</span><span class="p">,</span> <span class="n">SelectByTime</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for data occuring at unpredictable time points.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for data related to individual time points.</span>
 
-<span class="sd">    In sparse data the time points are not necessarily evenly spaced. Data can consist time-value pairs or only time</span>
-<span class="sd">    points. Values generally are numeric values in arrays, but can also be lists of different types of object.</span>
+<span class="sd">    Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs</span>
+<span class="sd">    or only time points. Values generally are numeric values in arrays, but can also be lists of different types of</span>
+<span class="sd">    object.</span>
 
-<span class="sd">    Sparse data differs from IntervalData in that each data points is associated with a single time point rather than a</span>
+<span class="sd">    Sparse data is assumed to be sequential (i.e. only a single data points at a single time point, and sorted by time).</span>
+<span class="sd">    Sparse data can contain zero or more time points/time-values pairs.</span>
+
+<span class="sd">    Sparse data differs from interval data in that each data points is associated with a single time point rather than a</span>
 <span class="sd">    time range.</span>
 
 <span class="sd">    Examples are data points at end of inspiration/end of expiration (e.g. tidal volume, end-expiratoy lung impedance)</span>
 <span class="sd">    or detected time points (e.g. QRS complexes).</span>
 
-
-
 <span class="sd">    Args:</span>
 <span class="sd">        label: Computer readable name.</span>
 <span class="sd">        name: Human readable name.</span>
 <span class="sd">        unit: Unit of the data, if applicable.</span>
-<span class="sd">        category: Category the data falls into, e.g. &#39;airway pressure&#39;.</span>
-<span class="sd">        description: Human readible extended description of the data.</span>
+<span class="sd">        category: Category the data falls into, e.g. &#39;detected r peak&#39;.</span>
+<span class="sd">        description: Human readable extended description of the data.</span>
 <span class="sd">        parameters: Parameters used to derive the data.</span>
 <span class="sd">        derived_from: Traceback of intermediates from which the current data was derived.</span>
 <span class="sd">        values: List or array of values. These van be numeric data, text or Python objects.</span>
@@ -85,31 +87,31 @@
 
 <div class="viewcode-block" id="SparseData.name">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData.name">[docs]</a>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SparseData.unit">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData.unit">[docs]</a>
-    <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
+    <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SparseData.category">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData.category">[docs]</a>
-    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SparseData.time">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData.time">[docs]</a>
-    <span class="n">time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span></div>
+    <span class="n">time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SparseData.description">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData.description">[docs]</a>
-    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SparseData.parameters">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData.parameters">[docs]</a>
-    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SparseData.derived_from">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData.derived_from">[docs]</a>
-    <span class="n">derived_from</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">derived_from</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">compare</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SparseData.values">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.datacollection.SparseData.values">[docs]</a>

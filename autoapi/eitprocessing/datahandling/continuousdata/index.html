@@ -68,7 +68,7 @@
 <td><p>Adds methods for slicing by time rather than index.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData" title="eitprocessing.datahandling.continuousdata.ContinuousData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContinuousData</span></code></a></p></td>
-<td><p>Data class for (non-EIT) data with a continuous time axis.</p></td>
+<td><p>Container for data with a continuous time axis.</p></td>
 </tr>
 </tbody>
 </table>
@@ -181,13 +181,17 @@ on the original object label and the frames by which it is sliced.</p></li>
 <dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.ContinuousData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.continuousdata.</span></span><span class="sig-name descname"><span class="pre">ContinuousData</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/continuousdata.html#ContinuousData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.ContinuousData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a></p>
-<p>Data class for (non-EIT) data with a continuous time axis.</p>
+<p>Container for data with a continuous time axis.</p>
+<p>Continuous data is data that was continuously measured/created at a predictable rate. Therefore, continuous data is
+assumed to have a predictable delta between time points. A fixed delta is not enforced for two reasons: a) some
+devices have slightly varying sampling rate (but fixed around a set rate) and b) floating point arithmetic.</p>
+<p>Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> – Computer readable naming of the instance.</p></li>
 <li><p><strong>name</strong> – Human readable naming of the instance.</p></li>
-<li><p><strong>unit</strong> – Unit for the data.</p></li>
+<li><p><strong>unit</strong> – Unit of the data, if applicable.</p></li>
 <li><p><strong>category</strong> – Category the data falls into, e.g. ‘airway pressure’.</p></li>
 <li><p><strong>description</strong> – Human readable extended description of the data.</p></li>
 <li><p><strong>parameters</strong> – Parameters used to derive this data.</p></li>

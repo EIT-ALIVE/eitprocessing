@@ -75,8 +75,7 @@
 <span class="sd">    The convenience method `add()` adds an item by setting the key to `value.label`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or</span>
-<span class="sd">        SparseData.</span>
+<span class="sd">        data_type: the type of data stored in this collection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="DataCollection.data_type">
@@ -101,7 +100,10 @@
 <div class="viewcode-block" id="DataCollection.add">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.DataCollection.add">[docs]</a>
     <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">item</span><span class="p">:</span> <span class="n">V</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add one or multiple item(s) to the collection.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add one or multiple item(s) to the collection.</span>
+
+<span class="sd">        The item is added to the collection using the item label as the key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">item_</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_item</span><span class="p">(</span><span class="n">item_</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">item_</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">item_</span><span class="p">)</span></div>

@@ -115,24 +115,26 @@ Module Contents
    Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
 
 
-   Container for data occuring at unpredictable time points.
+   Container for data related to individual time points.
 
-   In sparse data the time points are not necessarily evenly spaced. Data can consist time-value pairs or only time
-   points. Values generally are numeric values in arrays, but can also be lists of different types of object.
+   Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs
+   or only time points. Values generally are numeric values in arrays, but can also be lists of different types of
+   object.
 
-   Sparse data differs from IntervalData in that each data points is associated with a single time point rather than a
+   Sparse data is assumed to be sequential (i.e. only a single data points at a single time point, and sorted by time).
+   Sparse data can contain zero or more time points/time-values pairs.
+
+   Sparse data differs from interval data in that each data points is associated with a single time point rather than a
    time range.
 
    Examples are data points at end of inspiration/end of expiration (e.g. tidal volume, end-expiratoy lung impedance)
    or detected time points (e.g. QRS complexes).
 
-
-
    :param label: Computer readable name.
    :param name: Human readable name.
    :param unit: Unit of the data, if applicable.
-   :param category: Category the data falls into, e.g. 'airway pressure'.
-   :param description: Human readible extended description of the data.
+   :param category: Category the data falls into, e.g. 'detected r peak'.
+   :param description: Human readable extended description of the data.
    :param parameters: Parameters used to derive the data.
    :param derived_from: Traceback of intermediates from which the current data was derived.
    :param values: List or array of values. These van be numeric data, text or Python objects.

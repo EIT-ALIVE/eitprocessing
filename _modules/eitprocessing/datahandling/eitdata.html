@@ -68,11 +68,14 @@
 <span class="sd">    disk.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        path: the path of list of paths of the source from which data was derived.</span>
-<span class="sd">        nframes: number of frames</span>
-<span class="sd">        time:</span>
-
-<span class="sd">    Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.</span>
+<span class="sd">        path: The path of list of paths of the source from which data was derived.</span>
+<span class="sd">        nframes: Number of frames.</span>
+<span class="sd">        time: The time of each frame (since start measurement).</span>
+<span class="sd">        framerate: The (average) rate at which the frames are collection, in Hz.</span>
+<span class="sd">        vendor: The vendor of the device the data was collected with.</span>
+<span class="sd">        label: Computer readable label identifying this dataset.</span>
+<span class="sd">        name: Human readable name for the data.</span>
+<span class="sd">        pixel_impedance: Impedance values for each pixel at each frame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># TODO: fix docstring</span>
 
 <div class="viewcode-block" id="EITData.path">

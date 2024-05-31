@@ -66,7 +66,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.sentec.ContinuousData" title="eitprocessing.datahandling.loading.sentec.ContinuousData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContinuousData</span></code></a></p></td>
-<td><p>Data class for (non-EIT) data with a continuous time axis.</p></td>
+<td><p>Container for data with a continuous time axis.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.sentec.DataCollection" title="eitprocessing.datahandling.loading.sentec.DataCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataCollection</span></code></a></p></td>
 <td><p>A collection of a single type of data with unique labels.</p></td>
@@ -84,7 +84,7 @@
 <td><p>Helper class for reading binary files from disk.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.sentec.SparseData" title="eitprocessing.datahandling.loading.sentec.SparseData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SparseData</span></code></a></p></td>
-<td><p>Container for data occuring at unpredictable time points.</p></td>
+<td><p>Container for data related to individual time points.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.loading.sentec.Domain" title="eitprocessing.datahandling.loading.sentec.Domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Domain</span></code></a></p></td>
 <td><p>Domain loaded data falls in.</p></td>
@@ -120,13 +120,17 @@
 <dt class="sig sig-object py" id="eitprocessing.datahandling.loading.sentec.ContinuousData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.sentec.</span></span><span class="sig-name descname"><span class="pre">ContinuousData</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/continuousdata.html#ContinuousData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.sentec.ContinuousData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a></p>
-<p>Data class for (non-EIT) data with a continuous time axis.</p>
+<p>Container for data with a continuous time axis.</p>
+<p>Continuous data is data that was continuously measured/created at a predictable rate. Therefore, continuous data is
+assumed to have a predictable delta between time points. A fixed delta is not enforced for two reasons: a) some
+devices have slightly varying sampling rate (but fixed around a set rate) and b) floating point arithmetic.</p>
+<p>Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> – Computer readable naming of the instance.</p></li>
 <li><p><strong>name</strong> – Human readable naming of the instance.</p></li>
-<li><p><strong>unit</strong> – Unit for the data.</p></li>
+<li><p><strong>unit</strong> – Unit of the data, if applicable.</p></li>
 <li><p><strong>category</strong> – Category the data falls into, e.g. ‘airway pressure’.</p></li>
 <li><p><strong>description</strong> – Human readable extended description of the data.</p></li>
 <li><p><strong>parameters</strong> – Parameters used to derive this data.</p></li>
@@ -333,10 +337,7 @@ Furthermore, the key has to match the attribute ‘label’ attached to the valu
 <p>The convenience method <cite>add()</cite> adds an item by setting the key to <cite>value.label</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data_type</strong> – the type of data stored in this collection. Expected to be one of EITData, ContinuousData or</p></li>
-<li><p><strong>SparseData.</strong></p></li>
-</ul>
+<dd class="field-odd"><p><strong>data_type</strong> – the type of data stored in this collection.</p>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -353,6 +354,7 @@ Furthermore, the key has to match the attribute ‘label’ attached to the valu
 <dt class="sig sig-object py" id="eitprocessing.datahandling.loading.sentec.DataCollection.add">
 <span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/datacollection.html#DataCollection.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.sentec.DataCollection.add" title="Link to this definition">¶</a></dt>
 <dd><p>Add one or multiple item(s) to the collection.</p>
+<p>The item is added to the collection using the item label as the key.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -426,13 +428,17 @@ disk.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – the path of list of paths of the source from which data was derived.</p></li>
-<li><p><strong>nframes</strong> – number of frames</p></li>
-<li><p><strong>time</strong></p></li>
+<li><p><strong>path</strong> – The path of list of paths of the source from which data was derived.</p></li>
+<li><p><strong>nframes</strong> – Number of frames.</p></li>
+<li><p><strong>time</strong> – The time of each frame (since start measurement).</p></li>
+<li><p><strong>framerate</strong> – The (average) rate at which the frames are collection, in Hz.</p></li>
+<li><p><strong>vendor</strong> – The vendor of the device the data was collected with.</p></li>
+<li><p><strong>label</strong> – Computer readable label identifying this dataset.</p></li>
+<li><p><strong>name</strong> – Human readable name for the data.</p></li>
+<li><p><strong>pixel_impedance</strong> – Impedance values for each pixel at each frame.</p></li>
 </ul>
 </dd>
 </dl>
-<p>Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.loading.sentec.EITData.path">
 <span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#eitprocessing.datahandling.loading.sentec.EITData.path" title="Link to this definition">¶</a></dt>
@@ -556,35 +562,28 @@ indices.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.sentec.</span></span><span class="sig-name descname"><span class="pre">IntervalData</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.sentec.IntervalData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByIndex" title="eitprocessing.datahandling.mixins.slicing.SelectByIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByIndex</span></code></a>, <a class="reference internal" href="../../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.HasTimeIndexer</span></code></a></p>
 <p>Container for interval data existing over a period of time.</p>
-<p>Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
+<p>Interval data is data that consists for a given time interval. Examples are a ventilator setting (e.g.
 end-expiratory pressure), the position of a patient, a maneuver (end-expiratory hold) being performed, detected
 periods in the data, etc.</p>
-<p>Interval data consists of a number of time range-value pairs or time ranges without associated values. E.g. interval
-data with the label “expiratory_breath_hold” only requires time ranges for when expiratory breath holds were
-performed. Other interval data, e.g. “set_driving_pressure” do have associated values.</p>
+<p>Interval data consists of a number of intervals that may or may not have values associated with them.</p>
+<p>Examples of IntervalData with associated values are certain ventilator settings (e.g. end-expiratory pressure) and
+the position of a patient. Examples of IntervalData without associated values are indicators of maneouvres (e.g. a
+breath hold) or detected occurences (e.g. a breath).</p>
 <p>Interval data can be selected by time through the <cite>select_by_time(start_time, end_time)</cite> method. Alternatively,
-<cite>t[start_time:end_time]</cite> can be used. When the start or end time overlaps with a time range, the time range and its
-associated value are included in the selection if <cite>partial_inclusion</cite> is <cite>True</cite>, but ignored if <cite>partial_inclusion</cite>
-is <cite>False</cite>. If the time range is partially included, the start and end times are trimmed to the start and end time
-of the selection.</p>
-<p>A potential use case where <cite>partial_inclusion</cite> should be set to <cite>True</cite> is “set_driving_pressure”: you might want to
-keep the driving pressure that was set before the start of the selectioon. A use case where <cite>partial_inclusion</cite>
-should be set to <cite>False</cite> is “detected_breaths”: you might want to ignore partial breaths that started before or
-ended after the selected period.</p>
-<p>Note that when selecting by time, the end time is included in the selection.</p>
+<cite>t[start_time:end_time]</cite> can be used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>label</strong> – a computer-readable name</p></li>
-<li><p><strong>name</strong> – a human-readable name</p></li>
-<li><p><strong>unit</strong> – the unit associated with the data</p></li>
-<li><p><strong>category</strong> – the category of data</p></li>
-<li><p><strong>time_ranges</strong> – a list of time ranges (tuples containing a start time and end time)</p></li>
-<li><p><strong>values</strong> – an optional list of values with the same length as time_ranges</p></li>
-<li><p><strong>parameters</strong> – parameters used to derive the data</p></li>
-<li><p><strong>derived_from</strong> – list of data sets this data was derived from</p></li>
-<li><p><strong>description</strong> – extended human readible description of the data</p></li>
-<li><p><strong>partial_inclusion</strong> – whether to include a trimmed version of a time range when selecting data</p></li>
+<li><p><strong>label</strong> – Computer readable label identifying this dataset.</p></li>
+<li><p><strong>name</strong> – Human readable name for the data.</p></li>
+<li><p><strong>unit</strong> – The unit of the data, if applicable.</p></li>
+<li><p><strong>category</strong> – Category the data falls into, e.g. ‘breath’.</p></li>
+<li><p><strong>intervals</strong> – A list of intervals (tuples containing a start time and end time).</p></li>
+<li><p><strong>values</strong> – An optional list of values associated with each interval.</p></li>
+<li><p><strong>parameters</strong> – Parameters used to derive the data.</p></li>
+<li><p><strong>derived_from</strong> – Traceback of intermediates from which the current data was derived.</p></li>
+<li><p><strong>description</strong> – Extended human readible description of the data.</p></li>
+<li><p><strong>default_partial_inclusion</strong> – Whether to include a trimmed version of an interval when selecting data</p></li>
 </ul>
 </dd>
 </dl>
@@ -671,10 +670,26 @@ indices.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.loading.sentec.IntervalData.select_by_time">
 <span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_inclusion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.sentec.IntervalData.select_by_time" title="Link to this definition">¶</a></dt>
-<dd><p>Return only period data that overlaps (partly) with start and end time.</p>
-<p>Other types of data (e.g. ContinuousData and SparseData) support the start_inclusive and end_inclusive
-arguments. PeriodData does not. That means that selection by time of PeriodData probably works slightly
-different than other types of selecting/slicing data.</p>
+<dd><p>Get a shortened copy of the object, starting from start_time and ending at end_time.</p>
+<p>When the start or end time overlaps with an interval, the interval and its associated value are included in
+the selection if <cite>partial_inclusion</cite> is <cite>True</cite>, but ignored if <cite>partial_inclusion</cite> is <cite>False</cite>. If the interval
+is partially included, the start and end times are trimmed to the start and end time of the selection. A
+potential use case where <cite>partial_inclusion</cite> should be set to <cite>True</cite> is “set_driving_pressure”: you might want
+to keep the driving pressure that was set before the start of the selectioon. A use case where
+<cite>partial_inclusion</cite> should be set to <cite>False</cite> is “detected_breaths”: you might want to ignore partial breaths
+that started before or ended after the selected period.</p>
+<p>Note that when selecting by time, the end time is always included in the selection if it exists in the original
+object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_time</strong> – earliest time point to include in the copy</p></li>
+<li><p><strong>end_time</strong> – latest time point to include in the copy</p></li>
+<li><p><strong>partial_inclusion</strong> – whether to include an interval that contains the start_time or end_time</p></li>
+<li><p><strong>newlabel</strong> – new label of the copied object</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -904,10 +919,13 @@ character is returned.</p>
 <dt class="sig sig-object py" id="eitprocessing.datahandling.loading.sentec.SparseData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.sentec.</span></span><span class="sig-name descname"><span class="pre">SparseData</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/sparsedata.html#SparseData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.sentec.SparseData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a></p>
-<p>Container for data occuring at unpredictable time points.</p>
-<p>In sparse data the time points are not necessarily evenly spaced. Data can consist time-value pairs or only time
-points. Values generally are numeric values in arrays, but can also be lists of different types of object.</p>
-<p>Sparse data differs from IntervalData in that each data points is associated with a single time point rather than a
+<p>Container for data related to individual time points.</p>
+<p>Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs
+or only time points. Values generally are numeric values in arrays, but can also be lists of different types of
+object.</p>
+<p>Sparse data is assumed to be sequential (i.e. only a single data points at a single time point, and sorted by time).
+Sparse data can contain zero or more time points/time-values pairs.</p>
+<p>Sparse data differs from interval data in that each data points is associated with a single time point rather than a
 time range.</p>
 <p>Examples are data points at end of inspiration/end of expiration (e.g. tidal volume, end-expiratoy lung impedance)
 or detected time points (e.g. QRS complexes).</p>
@@ -917,8 +935,8 @@ or detected time points (e.g. QRS complexes).</p>
 <li><p><strong>label</strong> – Computer readable name.</p></li>
 <li><p><strong>name</strong> – Human readable name.</p></li>
 <li><p><strong>unit</strong> – Unit of the data, if applicable.</p></li>
-<li><p><strong>category</strong> – Category the data falls into, e.g. ‘airway pressure’.</p></li>
-<li><p><strong>description</strong> – Human readible extended description of the data.</p></li>
+<li><p><strong>category</strong> – Category the data falls into, e.g. ‘detected r peak’.</p></li>
+<li><p><strong>description</strong> – Human readable extended description of the data.</p></li>
 <li><p><strong>parameters</strong> – Parameters used to derive the data.</p></li>
 <li><p><strong>derived_from</strong> – Traceback of intermediates from which the current data was derived.</p></li>
 <li><p><strong>values</strong> – List or array of values. These van be numeric data, text or Python objects.</p></li>

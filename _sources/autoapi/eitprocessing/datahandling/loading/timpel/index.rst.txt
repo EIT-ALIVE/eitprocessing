@@ -67,11 +67,17 @@ Module Contents
    Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
 
 
-   Data class for (non-EIT) data with a continuous time axis.
+   Container for data with a continuous time axis.
+
+   Continuous data is data that was continuously measured/created at a predictable rate. Therefore, continuous data is
+   assumed to have a predictable delta between time points. A fixed delta is not enforced for two reasons: a) some
+   devices have slightly varying sampling rate (but fixed around a set rate) and b) floating point arithmetic.
+
+   Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time).
 
    :param label: Computer readable naming of the instance.
    :param name: Human readable naming of the instance.
-   :param unit: Unit for the data.
+   :param unit: Unit of the data, if applicable.
    :param category: Category the data falls into, e.g. 'airway pressure'.
    :param description: Human readable extended description of the data.
    :param parameters: Parameters used to derive this data.
@@ -252,8 +258,7 @@ Module Contents
 
    The convenience method `add()` adds an item by setting the key to `value.label`.
 
-   :param data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or
-   :param SparseData.:
+   :param data_type: the type of data stored in this collection.
 
 
    .. py:attribute:: data_type
@@ -266,6 +271,8 @@ Module Contents
    .. py:method:: add(*item: V, overwrite: bool = False) -> None
 
       Add one or multiple item(s) to the collection.
+
+      The item is added to the collection using the item label as the key.
 
 
 
@@ -333,11 +340,14 @@ Module Contents
    This class can't be initialized directly. Instead, use `load_eit_data(<path>, vendor=<vendor>)` to load data from
    disk.
 
-   :param path: the path of list of paths of the source from which data was derived.
-   :param nframes: number of frames
-   :param time:
-
-   Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
+   :param path: The path of list of paths of the source from which data was derived.
+   :param nframes: Number of frames.
+   :param time: The time of each frame (since start measurement).
+   :param framerate: The (average) rate at which the frames are collection, in Hz.
+   :param vendor: The vendor of the device the data was collected with.
+   :param label: Computer readable label identifying this dataset.
+   :param name: Human readable name for the data.
+   :param pixel_impedance: Impedance values for each pixel at each frame.
 
 
    .. py:attribute:: path
@@ -441,37 +451,30 @@ Module Contents
 
    Container for interval data existing over a period of time.
 
-   Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
+   Interval data is data that consists for a given time interval. Examples are a ventilator setting (e.g.
    end-expiratory pressure), the position of a patient, a maneuver (end-expiratory hold) being performed, detected
    periods in the data, etc.
 
-   Interval data consists of a number of time range-value pairs or time ranges without associated values. E.g. interval
-   data with the label "expiratory_breath_hold" only requires time ranges for when expiratory breath holds were
-   performed. Other interval data, e.g. "set_driving_pressure" do have associated values.
+   Interval data consists of a number of intervals that may or may not have values associated with them.
+
+   Examples of IntervalData with associated values are certain ventilator settings (e.g. end-expiratory pressure) and
+   the position of a patient. Examples of IntervalData without associated values are indicators of maneouvres (e.g. a
+   breath hold) or detected occurences (e.g. a breath).
+
 
    Interval data can be selected by time through the `select_by_time(start_time, end_time)` method. Alternatively,
-   `t[start_time:end_time]` can be used. When the start or end time overlaps with a time range, the time range and its
-   associated value are included in the selection if `partial_inclusion` is `True`, but ignored if `partial_inclusion`
-   is `False`. If the time range is partially included, the start and end times are trimmed to the start and end time
-   of the selection.
+   `t[start_time:end_time]` can be used.
 
-   A potential use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you might want to
-   keep the driving pressure that was set before the start of the selectioon. A use case where `partial_inclusion`
-   should be set to `False` is "detected_breaths": you might want to ignore partial breaths that started before or
-   ended after the selected period.
-
-   Note that when selecting by time, the end time is included in the selection.
-
-   :param label: a computer-readable name
-   :param name: a human-readable name
-   :param unit: the unit associated with the data
-   :param category: the category of data
-   :param time_ranges: a list of time ranges (tuples containing a start time and end time)
-   :param values: an optional list of values with the same length as time_ranges
-   :param parameters: parameters used to derive the data
-   :param derived_from: list of data sets this data was derived from
-   :param description: extended human readible description of the data
-   :param partial_inclusion: whether to include a trimmed version of a time range when selecting data
+   :param label: Computer readable label identifying this dataset.
+   :param name: Human readable name for the data.
+   :param unit: The unit of the data, if applicable.
+   :param category: Category the data falls into, e.g. 'breath'.
+   :param intervals: A list of intervals (tuples containing a start time and end time).
+   :param values: An optional list of values associated with each interval.
+   :param parameters: Parameters used to derive the data.
+   :param derived_from: Traceback of intermediates from which the current data was derived.
+   :param description: Extended human readible description of the data.
+   :param default_partial_inclusion: Whether to include a trimmed version of an interval when selecting data
 
 
    .. py:attribute:: label
@@ -543,11 +546,23 @@ Module Contents
 
    .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, partial_inclusion: bool | None = None, newlabel: str | None = None) -> typing_extensions.Self
 
-      Return only period data that overlaps (partly) with start and end time.
+      Get a shortened copy of the object, starting from start_time and ending at end_time.
 
-      Other types of data (e.g. ContinuousData and SparseData) support the start_inclusive and end_inclusive
-      arguments. PeriodData does not. That means that selection by time of PeriodData probably works slightly
-      different than other types of selecting/slicing data.
+      When the start or end time overlaps with an interval, the interval and its associated value are included in
+      the selection if `partial_inclusion` is `True`, but ignored if `partial_inclusion` is `False`. If the interval
+      is partially included, the start and end times are trimmed to the start and end time of the selection. A
+      potential use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you might want
+      to keep the driving pressure that was set before the start of the selectioon. A use case where
+      `partial_inclusion` should be set to `False` is "detected_breaths": you might want to ignore partial breaths
+      that started before or ended after the selected period.
+
+      Note that when selecting by time, the end time is always included in the selection if it exists in the original
+      object.
+
+      :param start_time: earliest time point to include in the copy
+      :param end_time: latest time point to include in the copy
+      :param partial_inclusion: whether to include an interval that contains the start_time or end_time
+      :param newlabel: new label of the copied object
 
 
 
@@ -619,24 +634,26 @@ Module Contents
    Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
 
 
-   Container for data occuring at unpredictable time points.
+   Container for data related to individual time points.
 
-   In sparse data the time points are not necessarily evenly spaced. Data can consist time-value pairs or only time
-   points. Values generally are numeric values in arrays, but can also be lists of different types of object.
+   Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs
+   or only time points. Values generally are numeric values in arrays, but can also be lists of different types of
+   object.
 
-   Sparse data differs from IntervalData in that each data points is associated with a single time point rather than a
+   Sparse data is assumed to be sequential (i.e. only a single data points at a single time point, and sorted by time).
+   Sparse data can contain zero or more time points/time-values pairs.
+
+   Sparse data differs from interval data in that each data points is associated with a single time point rather than a
    time range.
 
    Examples are data points at end of inspiration/end of expiration (e.g. tidal volume, end-expiratoy lung impedance)
    or detected time points (e.g. QRS complexes).
 
-
-
    :param label: Computer readable name.
    :param name: Human readable name.
    :param unit: Unit of the data, if applicable.
-   :param category: Category the data falls into, e.g. 'airway pressure'.
-   :param description: Human readible extended description of the data.
+   :param category: Category the data falls into, e.g. 'detected r peak'.
+   :param description: Human readable extended description of the data.
    :param parameters: Parameters used to derive the data.
    :param derived_from: Traceback of intermediates from which the current data was derived.
    :param values: List or array of values. These van be numeric data, text or Python objects.

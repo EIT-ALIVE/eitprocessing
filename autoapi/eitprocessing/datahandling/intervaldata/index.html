@@ -234,35 +234,28 @@ indices.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.intervaldata.</span></span><span class="sig-name descname"><span class="pre">IntervalData</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByIndex" title="eitprocessing.datahandling.mixins.slicing.SelectByIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByIndex</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.HasTimeIndexer</span></code></a></p>
 <p>Container for interval data existing over a period of time.</p>
-<p>Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
+<p>Interval data is data that consists for a given time interval. Examples are a ventilator setting (e.g.
 end-expiratory pressure), the position of a patient, a maneuver (end-expiratory hold) being performed, detected
 periods in the data, etc.</p>
-<p>Interval data consists of a number of time range-value pairs or time ranges without associated values. E.g. interval
-data with the label “expiratory_breath_hold” only requires time ranges for when expiratory breath holds were
-performed. Other interval data, e.g. “set_driving_pressure” do have associated values.</p>
+<p>Interval data consists of a number of intervals that may or may not have values associated with them.</p>
+<p>Examples of IntervalData with associated values are certain ventilator settings (e.g. end-expiratory pressure) and
+the position of a patient. Examples of IntervalData without associated values are indicators of maneouvres (e.g. a
+breath hold) or detected occurences (e.g. a breath).</p>
 <p>Interval data can be selected by time through the <cite>select_by_time(start_time, end_time)</cite> method. Alternatively,
-<cite>t[start_time:end_time]</cite> can be used. When the start or end time overlaps with a time range, the time range and its
-associated value are included in the selection if <cite>partial_inclusion</cite> is <cite>True</cite>, but ignored if <cite>partial_inclusion</cite>
-is <cite>False</cite>. If the time range is partially included, the start and end times are trimmed to the start and end time
-of the selection.</p>
-<p>A potential use case where <cite>partial_inclusion</cite> should be set to <cite>True</cite> is “set_driving_pressure”: you might want to
-keep the driving pressure that was set before the start of the selectioon. A use case where <cite>partial_inclusion</cite>
-should be set to <cite>False</cite> is “detected_breaths”: you might want to ignore partial breaths that started before or
-ended after the selected period.</p>
-<p>Note that when selecting by time, the end time is included in the selection.</p>
+<cite>t[start_time:end_time]</cite> can be used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>label</strong> – a computer-readable name</p></li>
-<li><p><strong>name</strong> – a human-readable name</p></li>
-<li><p><strong>unit</strong> – the unit associated with the data</p></li>
-<li><p><strong>category</strong> – the category of data</p></li>
-<li><p><strong>time_ranges</strong> – a list of time ranges (tuples containing a start time and end time)</p></li>
-<li><p><strong>values</strong> – an optional list of values with the same length as time_ranges</p></li>
-<li><p><strong>parameters</strong> – parameters used to derive the data</p></li>
-<li><p><strong>derived_from</strong> – list of data sets this data was derived from</p></li>
-<li><p><strong>description</strong> – extended human readible description of the data</p></li>
-<li><p><strong>partial_inclusion</strong> – whether to include a trimmed version of a time range when selecting data</p></li>
+<li><p><strong>label</strong> – Computer readable label identifying this dataset.</p></li>
+<li><p><strong>name</strong> – Human readable name for the data.</p></li>
+<li><p><strong>unit</strong> – The unit of the data, if applicable.</p></li>
+<li><p><strong>category</strong> – Category the data falls into, e.g. ‘breath’.</p></li>
+<li><p><strong>intervals</strong> – A list of intervals (tuples containing a start time and end time).</p></li>
+<li><p><strong>values</strong> – An optional list of values associated with each interval.</p></li>
+<li><p><strong>parameters</strong> – Parameters used to derive the data.</p></li>
+<li><p><strong>derived_from</strong> – Traceback of intermediates from which the current data was derived.</p></li>
+<li><p><strong>description</strong> – Extended human readible description of the data.</p></li>
+<li><p><strong>default_partial_inclusion</strong> – Whether to include a trimmed version of an interval when selecting data</p></li>
 </ul>
 </dd>
 </dl>
@@ -349,10 +342,26 @@ indices.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.IntervalData.select_by_time">
 <span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_inclusion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#IntervalData.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.IntervalData.select_by_time" title="Link to this definition">¶</a></dt>
-<dd><p>Return only period data that overlaps (partly) with start and end time.</p>
-<p>Other types of data (e.g. ContinuousData and SparseData) support the start_inclusive and end_inclusive
-arguments. PeriodData does not. That means that selection by time of PeriodData probably works slightly
-different than other types of selecting/slicing data.</p>
+<dd><p>Get a shortened copy of the object, starting from start_time and ending at end_time.</p>
+<p>When the start or end time overlaps with an interval, the interval and its associated value are included in
+the selection if <cite>partial_inclusion</cite> is <cite>True</cite>, but ignored if <cite>partial_inclusion</cite> is <cite>False</cite>. If the interval
+is partially included, the start and end times are trimmed to the start and end time of the selection. A
+potential use case where <cite>partial_inclusion</cite> should be set to <cite>True</cite> is “set_driving_pressure”: you might want
+to keep the driving pressure that was set before the start of the selectioon. A use case where
+<cite>partial_inclusion</cite> should be set to <cite>False</cite> is “detected_breaths”: you might want to ignore partial breaths
+that started before or ended after the selected period.</p>
+<p>Note that when selecting by time, the end time is always included in the selection if it exists in the original
+object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_time</strong> – earliest time point to include in the copy</p></li>
+<li><p><strong>end_time</strong> – latest time point to include in the copy</p></li>
+<li><p><strong>partial_inclusion</strong> – whether to include an interval that contains the start_time or end_time</p></li>
+<li><p><strong>newlabel</strong> – new label of the copied object</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

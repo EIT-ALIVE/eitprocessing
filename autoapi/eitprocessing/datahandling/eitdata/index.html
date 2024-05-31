@@ -192,13 +192,17 @@ disk.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – the path of list of paths of the source from which data was derived.</p></li>
-<li><p><strong>nframes</strong> – number of frames</p></li>
-<li><p><strong>time</strong></p></li>
+<li><p><strong>path</strong> – The path of list of paths of the source from which data was derived.</p></li>
+<li><p><strong>nframes</strong> – Number of frames.</p></li>
+<li><p><strong>time</strong> – The time of each frame (since start measurement).</p></li>
+<li><p><strong>framerate</strong> – The (average) rate at which the frames are collection, in Hz.</p></li>
+<li><p><strong>vendor</strong> – The vendor of the device the data was collected with.</p></li>
+<li><p><strong>label</strong> – Computer readable label identifying this dataset.</p></li>
+<li><p><strong>name</strong> – Human readable name for the data.</p></li>
+<li><p><strong>pixel_impedance</strong> – Impedance values for each pixel at each frame.</p></li>
 </ul>
 </dd>
 </dl>
-<p>Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.EITData.path">
 <span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#EITData.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.EITData.path" title="Link to this definition">¶</a></dt>
