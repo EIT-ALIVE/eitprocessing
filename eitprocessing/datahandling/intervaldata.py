@@ -8,7 +8,7 @@ import numpy as np
 from typing_extensions import Self
 
 from eitprocessing.datahandling.mixins.equality import Equivalence
-from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer
+from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer, SelectByIndex
 
 T = TypeVar("T", bound="IntervalData")
 
@@ -21,7 +21,7 @@ class Interval(NamedTuple):
 
 
 @dataclass(eq=False)
-class IntervalData(Equivalence, HasTimeIndexer):
+class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
     """Container for interval data existing over a period of time.
 
     Interval data is data that constists for a given time interval. Examples are a ventilator setting (e.g.
@@ -82,6 +82,28 @@ class IntervalData(Equivalence, HasTimeIndexer):
     def has_values(self) -> bool:
         """True if the IntervalData has values, False otherwise."""
         return self.values is not None
+
+    def _sliced_copy(
+        self,
+        start_index: int,
+        end_index: int,
+        newlabel: str,
+    ) -> Self:
+        cls = type(self)
+        time_ranges = self.time_ranges[start_index:end_index]
+        values = self.values[start_index:end_index] if self.has_values else None
+        description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
+
+        return cls(
+            label=newlabel,
+            name=self.name,
+            unit=self.unit,
+            category=self.category,
+            description=description,
+            derived_from=[*self.derived_from, self],
+            time_ranges=time_ranges,
+            values=values,
+        )
 
     def select_by_time(  # noqa: C901
         self,
