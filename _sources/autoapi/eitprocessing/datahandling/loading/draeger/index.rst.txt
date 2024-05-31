@@ -492,8 +492,6 @@ Module Contents
 
    .. py:attribute:: values
       :type:  list[Any] | None
-      :value: None
-
 
 
    .. py:attribute:: parameters
@@ -510,8 +508,6 @@ Module Contents
 
    .. py:attribute:: default_partial_inclusion
       :type:  bool
-      :value: False
-
 
 
    .. py:method:: __post_init__() -> None
