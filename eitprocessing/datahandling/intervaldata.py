@@ -1,6 +1,7 @@
 import copy
 import itertools
 from dataclasses import dataclass, field
+from functools import partial
 from typing import Any, NamedTuple, TypeVar
 
 import numpy as np
@@ -99,49 +100,30 @@ class IntervalData(Equivalence, HasTimeIndexer):
             partial_inclusion = self.default_partial_inclusion
         newlabel = newlabel or self.label
 
-        if start_time is None and end_time is None:
+        selection_start = start_time
+        selection_end = end_time
+
+        if selection_start is None and selection_end is None:
             copy_ = copy.deepcopy(self)
             if newlabel:
                 copy_.label = newlabel
             return copy_
-        if start_time is None:
-            start_time = self.time_ranges[0].start_time
-        if end_time is None:
-            end_time = self.time_ranges[-1].end_time
-
-        def keep_starting_on_or_before_end(item: tuple[Interval, Any]) -> bool:
-            time_range, _ = item
-            return time_range.start_time <= end_time
-
-        def keep_ending_on_or_after_start(item: tuple[Interval, Any]) -> bool:
-            time_range, _ = item
-            return time_range.end_time >= start_time
-
-        def keep_fully_overlapping(item: tuple[Interval, Any]) -> bool:
-            time_range, _ = item
-            if time_range.start_time < start_time:
-                return False
-            if time_range.end_time > end_time:
-                return False
-            return True
-
-        def replace_start_end_time(time_range: Interval) -> Interval:
-            start_time_ = max(time_range.start_time, start_time)
-            end_time_ = min(time_range.end_time, end_time)
-            return Interval(start_time_, end_time_)
+        if selection_start is None:
+            selection_start = self.time_ranges[0].start_time
+        if selection_end is None:
+            selection_end = self.time_ranges[-1].end_time
 
         iter_values = self.values or itertools.repeat(None)
+        time_range_value_pairs = zip(self.time_ranges, iter_values, strict=True)
 
-        time_range_value_pairs: Any = zip(self.time_ranges, iter_values, strict=True)
-        time_range_value_pairs = filter(keep_starting_on_or_before_end, time_range_value_pairs)
-        time_range_value_pairs = list(filter(keep_ending_on_or_after_start, time_range_value_pairs))
+        func = self._keep_overlapping if partial_inclusion else self._keep_fully_overlapping
+        filterfunc = partial(func, selection_start=selection_start, selection_end=selection_end)
+        filtered_pairs = list(filter(filterfunc, time_range_value_pairs))
 
-        if not partial_inclusion:
-            time_range_value_pairs = list(filter(keep_fully_overlapping, time_range_value_pairs))
-
-        if len(time_range_value_pairs):
-            time_ranges, values = zip(*time_range_value_pairs, strict=True)
-            time_ranges = list(map(replace_start_end_time, time_ranges))
+        if len(filtered_pairs):
+            time_ranges, values = zip(*filtered_pairs, strict=True)
+            mapfun = partial(self._replace_start_end_time, selection_start=selection_start, selection_end=selection_end)
+            time_ranges = list(map(mapfun, time_ranges))
         else:
             time_ranges, values = [], []
 
@@ -154,6 +136,41 @@ class IntervalData(Equivalence, HasTimeIndexer):
             time_ranges=list(time_ranges),
             values=list(values) if self.has_values else None,
         )
+
+    @staticmethod
+    def _keep_overlapping(
+        item: tuple[Interval, Any],
+        selection_start: float,
+        selection_end: float,
+    ) -> bool:
+        """Helper function for filtering overlapping interval-value pairs."""
+        time_range, _ = item
+        return time_range.start_time <= selection_end and time_range.end_time >= selection_start
+
+    @staticmethod
+    def _keep_fully_overlapping(
+        item: tuple[Interval, Any],
+        selection_start: float,
+        selection_end: float,
+    ) -> bool:
+        """Helper function for filtering fully overlapping interval-value pairs."""
+        time_range, _ = item
+        if time_range.start_time < selection_start:
+            return False
+        if time_range.end_time > selection_end:
+            return False
+        return True
+
+    @staticmethod
+    def _replace_start_end_time(
+        time_range: Interval,
+        selection_start: float,
+        selection_end: float,
+    ) -> Interval:
+        """Helper function to replace start and end time after filtering interval-value pairs."""
+        start_time_ = max(time_range.start_time, selection_start)
+        end_time_ = min(time_range.end_time, selection_end)
+        return Interval(start_time_, end_time_)
 
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be moved to mixin in future
         self.isequivalent(other, raise_=True)
