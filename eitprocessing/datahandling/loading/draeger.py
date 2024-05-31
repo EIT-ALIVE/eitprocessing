@@ -115,9 +115,9 @@ def load_from_single_path(
             name="Global impedance (raw)",
             unit="a.u.",
             category="impedance",
-            derived_from=[eit_data_collection["raw"]],
-            time=eit_data_collection["raw"].time,
-            values=eit_data_collection["raw"]._calculate_global_impedance(),  # noqa: SLF001
+            derived_from=[eit_data],
+            time=eit_data.time,
+            values=eit_data._calculate_global_impedance(),  # noqa: SLF001
         ),
     )
     sparse_data_collection.add(
