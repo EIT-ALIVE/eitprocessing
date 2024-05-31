@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import auto
 from pathlib import Path
-from typing import TypeVar
+from typing import Literal, TypeVar, overload
 
 import numpy as np
 from strenum import LowercaseStrEnum
@@ -33,7 +33,7 @@ class EITData(SelectByTime, Equivalence):
     Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
     """  # TODO: fix docstring
 
-    path: str | Path | list[Path | str] | list[Path] | list[str] = field(compare=False)
+    path: str | Path | list[Path | str] = field(compare=False)
     nframes: int
     time: np.ndarray = field(repr=False)
     framerate: float = field(metadata={"check_equivalence": True})
@@ -50,9 +50,23 @@ class EITData(SelectByTime, Equivalence):
 
         self.name = self.name or self.label
 
+    @overload
     @staticmethod
     def parse_path(
-        path: str | Path | list[str | Path] | list[str] | list[Path],
+        path: str | Path | list[str | Path],
+        ensure_list: Literal[True],
+    ) -> list[Path]: ...
+
+    @overload
+    @staticmethod
+    def parse_path(
+        path: str | Path | list[str | Path],
+        ensure_list: Literal[False],
+    ) -> Path: ...
+
+    @staticmethod
+    def parse_path(
+        path: str | Path | list[str | Path],
         ensure_list: bool = True,
     ) -> list[Path] | Path:
         """Return the path or paths as a list.
@@ -82,7 +96,7 @@ class EITData(SelectByTime, Equivalence):
 
         return self.__class__(
             vendor=self.vendor,
-            path=self_path + other_path,
+            path=[*self_path, *other_path],
             label=self.label,  # TODO: using newlabel leads to errors
             framerate=self.framerate,
             nframes=self.nframes + other.nframes,
