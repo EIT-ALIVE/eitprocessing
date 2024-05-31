@@ -182,7 +182,10 @@ class IntervalData(Equivalence, HasTimeIndexer):
             return copy.deepcopy(self)
 
         if other.time_ranges[0].start_time < self.time_ranges[-1].end_time:
-            msg = f"{other} (b) starts before {self} (a) ends."
+            msg = (
+                "Concatenation failed. "
+                f"Second dataset ({other.name}) may not start before the first ({self.name}) ends."
+            )
             raise ValueError(msg)
 
         cls = type(self)
