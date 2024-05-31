@@ -99,8 +99,7 @@ def load_from_single_path(
         framerate=framerate,
         pixel_impedance=pixel_impedance,
     )
-    eitdata_collection = DataCollection(EITData)
-    eitdata_collection.add(eit_data)
+    eitdata_collection = DataCollection(EITData, raw=eit_data)
 
     # extract waveform data
     # TODO: properly export waveform data
