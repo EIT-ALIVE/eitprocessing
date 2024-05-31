@@ -90,7 +90,6 @@ def load_from_single_path(
     if not framerate:
         framerate = DRAEGER_FRAMERATE
 
-    eit_data_collection = DataCollection(EITData)
     eit_data = EITData(
         vendor=Vendor.DRAEGER,
         path=path,
@@ -100,7 +99,7 @@ def load_from_single_path(
         label="raw",
         pixel_impedance=pixel_impedance,
     )
-    eit_data_collection.add(eit_data)
+    eit_data_collection = DataCollection(EITData, raw=eit_data)
 
     (
         continuous_data_collection,
