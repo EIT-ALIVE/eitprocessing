@@ -66,7 +66,7 @@ class IntervalData(Equivalence, HasTimeIndexer):
     parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True})
     derived_from: list[Any] = field(default_factory=list, compare=False)
     description: str = field(compare=False, default="")
-    partial_inclusion: bool = False
+    default_partial_inclusion: bool = False
 
     def __post_init__(self) -> None:
         self.time_ranges = [TimeRange._make(time_range) for time_range in self.time_ranges]
@@ -96,7 +96,7 @@ class IntervalData(Equivalence, HasTimeIndexer):
         different than other types of selecting/slicing data.
         """
         if partial_inclusion is None:
-            partial_inclusion = self.partial_inclusion
+            partial_inclusion = self.default_partial_inclusion
         newlabel = newlabel or self.label
 
         if start_time is None:
