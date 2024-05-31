@@ -105,7 +105,7 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
             values=values,
         )
 
-    def select_by_time(  # noqa: C901
+    def select_by_time(
         self,
         start_time: float | None = None,
         end_time: float | None = None,
