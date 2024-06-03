@@ -31,6 +31,8 @@ def test_lock_continuousdata_values(draeger1: Sequence):
 
 
 def test_lock_continuousdata_default(draeger1: Sequence):
+    # TODO: for continuousdata, default and all do the same thing. We should probably create a dummy class for these
+    # tests to assure proper working
     try:
         cd = next(iter(draeger1.continuous_data.values()))
     except:
