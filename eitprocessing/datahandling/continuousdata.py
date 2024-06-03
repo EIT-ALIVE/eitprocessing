@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 
 from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling.mixins.locking import Lockable
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 if TYPE_CHECKING:
@@ -17,7 +18,7 @@ T = TypeVar("T", bound="ContinuousData")
 
 
 @dataclass(eq=False)
-class ContinuousData(Equivalence, SelectByTime):
+class ContinuousData(Equivalence, SelectByTime, Lockable):
     """Container for data with a continuous time axis.
 
     Continuous data is data that was continuously measured/created at a predictable rate. Therefore, continuous data is
@@ -44,21 +45,19 @@ class ContinuousData(Equivalence, SelectByTime):
     description: str = field(default="", compare=False, repr=False)
     parameters: dict[str, Any] = field(default_factory=dict, repr=False, metadata={"check_equivalence": True})
     derived_from: Any | list[Any] = field(default_factory=list, repr=False, compare=False)
-    time: np.ndarray = field(kw_only=True, repr=False)
-    values: np.ndarray = field(kw_only=True, repr=False)
+    time: np.ndarray = field(kw_only=True, repr=False, metadata={"lock_action_default": True})
+    values: np.ndarray = field(kw_only=True, repr=False, metadata={"lock_action_default": True})
 
     def __post_init__(self) -> None:
-        if self.loaded:
-            self.lock()
-        self.lock("time")
+        self.lock()
 
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
         try:
-            old_value = getattr(self, attr)
+            getattr(self, attr)
         except AttributeError:
             pass
         else:
-            if isinstance(old_value, np.ndarray) and old_value.flags["WRITEABLE"] is False:
+            if self.is_lockable(attr) and self.is_locked(attr):
                 msg = f"Attribute '{attr}' is locked and can't be overwritten."
                 raise AttributeError(msg)
         super().__setattr__(attr, value)
@@ -91,7 +90,7 @@ class ContinuousData(Equivalence, SelectByTime):
             time=np.copy(self.time),
             values=np.copy(self.values),
         )
-        obj.unlock()
+        obj.unlock_all()
         return obj
 
     def __add__(self: T, other: T) -> T:
