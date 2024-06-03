@@ -151,61 +151,6 @@ class ContinuousData(Equivalence, SelectByTime):
         copy.values = function(copy.values, **func_args)
         return copy
 
-    def lock(self, *attr: str) -> None:
-        """Lock attributes, essentially rendering them read-only.
-
-        Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.
-
-        Args:
-            *attr: any number of attributes can be passed here, all of which will be locked. Defaults to "values".
-
-        Examples:
-            >>> # lock the `values` attribute of `data`
-            >>> data.lock()
-            >>> data.values = [1, 2, 3] # will result in an AttributeError
-            >>> data.values[0] = 1      # will result in a RuntimeError
-        """
-        if not len(attr):
-            # default values are not allowed when using *attr, so set a default here if none is supplied
-            attr = ("values",)
-        for attr_ in attr:
-            getattr(self, attr_).flags["WRITEABLE"] = False
-
-    def unlock(self, *attr: str) -> None:
-        """Unlock attributes, rendering them editable.
-
-        Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.
-
-        Args:
-            *attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to "values".
-
-        Examples:
-            >>> # lock the `values` attribute of `data`
-            >>> data.lock()
-            >>> data.values = [1, 2, 3] # will result in an AttributeError
-            >>> data.values[0] = 1      # will result in a RuntimeError
-            >>> data.unlock()
-            >>> data.values = [1, 2, 3]
-            >>> print(data.values)
-            [1,2,3]
-            >>> data.values[0] = 1      # will result in a RuntimeError
-            >>> print(data.values)
-            1
-        """
-        if not len(attr):
-            # default values are not allowed when using *attr, so set a default here if none is supplied
-            attr = ("values",)
-        for attr_ in attr:
-            getattr(self, attr_).flags["WRITEABLE"] = True
-
-    @property
-    def locked(self) -> bool:
-        """Return whether the values attribute is locked.
-
-        See lock().
-        """
-        return not self.values.flags["WRITEABLE"]
-
     @property
     def loaded(self) -> bool:
         """Return whether the data was loaded from disk, or derived from elsewhere."""
