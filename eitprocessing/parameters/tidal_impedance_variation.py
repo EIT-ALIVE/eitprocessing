@@ -105,12 +105,13 @@ class TIV(ParameterExtraction):
         breaths = self._detect_breaths(data, sequence.eit_data[data_label].framerate, self.breath_detection_kwargs)
 
         rows, cols = breaths.shape
-        tiv_values_array = np.empty((11, rows, cols), dtype=object)
 
         non_empty_mask = np.array([[bool(lst) for lst in row] for row in breaths])
         non_empty_index = np.argwhere(non_empty_mask)[0]
-        number_of_breaths = len(breaths[non_empty_index[0], non_empty_index[1]])
 
+        number_of_breaths = len(breaths[non_empty_index[0], non_empty_index[1]])
+        tiv_values_array = np.empty((number_of_breaths, rows, cols), dtype=object)
+        
         for i in range(number_of_breaths):
             for row in range(rows):
                 for col in range(cols):
