@@ -15,15 +15,19 @@ def test_lock_continuousdata_values(draeger1: Sequence):
     assert isinstance(cd, ContinuousData)
     assert cd.islockable("values")
     assert cd.islocked("values")
+    assert cd.islocked("time")
     try:
         cd.unlock("values")
     except:
         pytest.fail("Can't unlock attribute")
     assert not cd.islocked("values")
+    assert cd.islocked("time")
     try:
         cd.lock("values")
     except:
         pytest.fail("Can't lock attribute")
+    assert cd.islocked("values")
+    assert cd.islocked("time")
 
 
 def test_lock_continuousdata_default(draeger1: Sequence):
