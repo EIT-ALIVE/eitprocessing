@@ -57,7 +57,7 @@ class ContinuousData(Equivalence, SelectByTime, Lockable):
         except AttributeError:
             pass
         else:
-            if self.is_lockable(attr) and self.is_locked(attr):
+            if self.islockable(attr) and self.islocked(attr):
                 msg = f"Attribute '{attr}' is locked and can't be overwritten."
                 raise AttributeError(msg)
         super().__setattr__(attr, value)

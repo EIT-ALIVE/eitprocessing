@@ -7,7 +7,7 @@ import numpy as np
 class Lockable:
     """Adds locking functionality to subclass.
 
-    This class provides the methods lock(), unlock(), lock_all(), unlock_all(), is_locked() and is_lockable(), and the
+    This class provides the methods lock(), unlock(), lock_all(), unlock_all(), islocked() and islockable(), and the
     property _lock_action_defaults.
     """
 
@@ -29,7 +29,7 @@ class Lockable:
             # default values are not allowed when using *attr, so set a default here if none is supplied
             attr = tuple(self._lock_action_defaults)
         for attr_ in attr:
-            if not self.is_lockable(attr_):
+            if not self.islockable(attr_):
                 msg = f"Attribute {attr_} is not lockable."
                 raise ValueError(msg)
             getattr(self, attr_).flags["WRITEABLE"] = False
@@ -59,7 +59,7 @@ class Lockable:
             # default values are not allowed when using *attr, so set a default here if none is supplied
             attr = tuple(self._lock_action_defaults)
         for attr_ in attr:
-            if not self.is_lockable(attr_):
+            if not self.islockable(attr_):
                 msg = f"Attribute {attr_} is not (un)lockable."
                 raise ValueError(msg)
             getattr(self, attr_).flags["WRITEABLE"] = True
@@ -70,7 +70,7 @@ class Lockable:
         See lock().
         """
         for attr in vars(self):
-            if self.is_lockable(attr):
+            if self.islockable(attr):
                 self.lock(attr)
 
     def unlock_all(self) -> None:
@@ -79,17 +79,17 @@ class Lockable:
         See unlock().
         """
         for attr in vars(self):
-            if self.is_lockable(attr):
+            if self.islockable(attr):
                 self.unlock(attr)
 
-    def is_locked(self, attr: str = "values") -> bool:
+    def islocked(self, attr: str = "values") -> bool:
         """Return whether an attribute is locked.
 
         See lock().
         """
         return not getattr(self, attr).flags["WRITEABLE"]
 
-    def is_lockable(self, attr: str = "values") -> bool:
+    def islockable(self, attr: str = "values") -> bool:
         """Return whether an attribute is lockable.
 
         See lock().

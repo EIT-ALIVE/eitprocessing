@@ -13,13 +13,13 @@ def test_lock_continuousdata_values(draeger1: Sequence):
         pytest.fail("No continuous data available in sequence")
 
     assert isinstance(cd, ContinuousData)
-    assert cd.is_lockable("values")
-    assert cd.is_locked("values")
+    assert cd.islockable("values")
+    assert cd.islocked("values")
     try:
         cd.unlock("values")
     except:
         pytest.fail("Can't unlock attribute")
-    assert not cd.is_locked("values")
+    assert not cd.islocked("values")
     try:
         cd.lock("values")
     except:
@@ -32,16 +32,16 @@ def test_lock_continuousdata_default(draeger1: Sequence):
     except:
         pytest.fail("No continuous data available in sequence")
 
-    assert cd.is_locked("values")
-    assert cd.is_locked("time")
+    assert cd.islocked("values")
+    assert cd.islocked("time")
 
     cd.unlock()
-    assert not cd.is_locked("values")
-    assert not cd.is_locked("time")
+    assert not cd.islocked("values")
+    assert not cd.islocked("time")
 
     cd.lock()
-    assert cd.is_locked("values")
-    assert cd.is_locked("time")
+    assert cd.islocked("values")
+    assert cd.islocked("time")
 
 
 def test_lock_continuousdata_all(draeger1: Sequence):
@@ -50,16 +50,16 @@ def test_lock_continuousdata_all(draeger1: Sequence):
     except:
         pytest.fail("No continuous data available in sequence")
 
-    lockables = {attr for attr in vars(cd) if cd.is_lockable(attr)}
+    lockables = {attr for attr in vars(cd) if cd.islockable(attr)}
     assert lockables == {"values", "time"}
 
     cd.unlock_all()
     for attr in lockables:
-        assert not cd.is_locked(attr)
+        assert not cd.islocked(attr)
 
     cd.lock_all()
     for attr in lockables:
-        assert cd.is_locked(attr)
+        assert cd.islocked(attr)
 
 
 def test_lock_overwrite(draeger1: Sequence) -> None:
