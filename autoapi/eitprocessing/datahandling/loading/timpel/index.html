@@ -140,10 +140,10 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.loading.timpel.</span></span><span class="sig-name descname"><span class="pre">ContinuousData</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/continuousdata.html#ContinuousData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.loading.timpel.ContinuousData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a></p>
 <p>Container for data with a continuous time axis.</p>
-<p>Continuous data is data that was continuously measured/created at a predictable rate. Therefore, continuous data is
-assumed to have a predictable delta between time points. A fixed delta is not enforced for two reasons: a) some
-devices have slightly varying sampling rate (but fixed around a set rate) and b) floating point arithmetic.</p>
-<p>Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time).</p>
+<p>Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and
+continuously measured/created at a fixed sampling rate. However, a fixed interval between consecutive time points is
+not enforced to account for floating point arithmetic, devices with imperfect sampling rates, and other sources of
+variation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
