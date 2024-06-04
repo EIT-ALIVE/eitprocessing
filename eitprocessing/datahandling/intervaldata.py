@@ -144,8 +144,12 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         iter_values = self.values or itertools.repeat(None)
         interval_value_pairs = zip(self.intervals, iter_values, strict=True)
 
-        func = self._keep_overlapping if partial_inclusion else self._keep_fully_overlapping
-        filterfunc = partial(func, selection_start=selection_start, selection_end=selection_end)
+        filterfunc = partial(
+            self._keep_overlapping,
+            selection_start=selection_start,
+            selection_end=selection_end,
+            keep_partial_overlapping=partial_inclusion,
+        )
         filtered_pairs = list(filter(filterfunc, interval_value_pairs))
 
         if len(filtered_pairs):
@@ -170,24 +174,15 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         item: tuple[Interval, Any],
         selection_start: float,
         selection_end: float,
+        keep_partial_overlapping: bool,
     ) -> bool:
         """Helper function for filtering overlapping interval-value pairs."""
         interval, _ = item
-        return interval.start_time <= selection_end and interval.end_time >= selection_start
 
-    @staticmethod
-    def _keep_fully_overlapping(
-        item: tuple[Interval, Any],
-        selection_start: float,
-        selection_end: float,
-    ) -> bool:
-        """Helper function for filtering fully overlapping interval-value pairs."""
-        interval, _ = item
-        if interval.start_time < selection_start:
-            return False
-        if interval.end_time > selection_end:
-            return False
-        return True
+        if keep_partial_overlapping:
+            return interval.start_time < selection_end and interval.end_time > selection_start
+
+        return interval.start_time >= selection_start and interval.end_time <= selection_end
 
     @staticmethod
     def _replace_start_end_time(
