@@ -44,9 +44,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
         return super().__setitem__(__key, __value)
 
     def add(self, *item: V, overwrite: bool = False) -> None:
-        """Add one or multiple item(s) to the collection.
-
-        The item is added to the collection using the item label as the key.
+        """Add one or multiple item(s) to the collection using the item label as the key.
         """
         for item_ in item:
             self._check_item(item_, overwrite=overwrite)
