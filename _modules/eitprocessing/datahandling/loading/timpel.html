@@ -151,13 +151,13 @@
         <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
         <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">pixel_impedance</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">eit_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="n">eit_data</span><span class="p">)</span>
+    <span class="n">eitdata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="n">eit_data</span><span class="p">)</span>
 
     <span class="c1"># extract waveform data</span>
     <span class="c1"># TODO: properly export waveform data</span>
 
-    <span class="n">continuous_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">ContinuousData</span><span class="p">)</span>
-    <span class="n">continuous_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">continuousdata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">ContinuousData</span><span class="p">)</span>
+    <span class="n">continuousdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">ContinuousData</span><span class="p">(</span>
             <span class="s2">&quot;global_impedance_(raw)&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Global impedance&quot;</span><span class="p">,</span>
@@ -168,7 +168,7 @@
             <span class="n">values</span><span class="o">=</span><span class="n">eit_data</span><span class="o">.</span><span class="n">calculate_global_impedance</span><span class="p">(),</span>
         <span class="p">),</span>
     <span class="p">)</span>
-    <span class="n">continuous_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">continuousdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">ContinuousData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;airway_pressure_(timpel)&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Airway pressure&quot;</span><span class="p">,</span>
@@ -180,7 +180,7 @@
         <span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="n">continuous_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">continuousdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">ContinuousData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;flow_(timpel)&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Flow&quot;</span><span class="p">,</span>
@@ -192,7 +192,7 @@
         <span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="n">continuous_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">continuousdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">ContinuousData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;volume_(timpel)&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Volume&quot;</span><span class="p">,</span>
@@ -205,10 +205,10 @@
     <span class="p">)</span>
 
     <span class="c1"># extract sparse data</span>
-    <span class="n">sparse_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">SparseData</span><span class="p">)</span>
+    <span class="n">sparsedata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">SparseData</span><span class="p">)</span>
 
     <span class="n">min_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1027</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">sparse_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">sparsedata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">SparseData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;minvalues_(timpel)&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Minimum values detected by Timpel device.&quot;</span><span class="p">,</span>
@@ -220,7 +220,7 @@
     <span class="p">)</span>
 
     <span class="n">max_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1028</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">sparse_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">sparsedata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">SparseData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;maxvalues_(timpel)&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Maximum values detected by Timpel device.&quot;</span><span class="p">,</span>
@@ -231,11 +231,11 @@
         <span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="n">gi</span> <span class="o">=</span> <span class="n">continuous_collection</span><span class="p">[</span><span class="s2">&quot;global_impedance_(raw)&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">gi</span> <span class="o">=</span> <span class="n">continuousdata_collection</span><span class="p">[</span><span class="s2">&quot;global_impedance_(raw)&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
     <span class="n">time_ranges</span><span class="p">,</span> <span class="n">breaths</span> <span class="o">=</span> <span class="n">_make_breaths</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">min_indices</span><span class="p">,</span> <span class="n">max_indices</span><span class="p">,</span> <span class="n">gi</span><span class="p">)</span>
-    <span class="n">interval_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">IntervalData</span><span class="p">)</span>
-    <span class="n">interval_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">intervaldata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">IntervalData</span><span class="p">)</span>
+    <span class="n">intervaldata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">IntervalData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;breaths_(timpel)&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Breaths (Timpel)&quot;</span><span class="p">,</span>
@@ -248,7 +248,7 @@
     <span class="p">)</span>
 
     <span class="n">qrs_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1029</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">sparse_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">sparsedata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">SparseData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;qrscomplexes_(timpel)&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;QRS complexes detected by Timpel device&quot;</span><span class="p">,</span>
@@ -260,10 +260,10 @@
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;eit_collection&quot;</span><span class="p">:</span> <span class="n">eit_collection</span><span class="p">,</span>
-        <span class="s2">&quot;continuous_collection&quot;</span><span class="p">:</span> <span class="n">continuous_collection</span><span class="p">,</span>
-        <span class="s2">&quot;sparse_collection&quot;</span><span class="p">:</span> <span class="n">sparse_collection</span><span class="p">,</span>
-        <span class="s2">&quot;interval_collection&quot;</span><span class="p">:</span> <span class="n">interval_collection</span><span class="p">,</span>
+        <span class="s2">&quot;eitdata_collection&quot;</span><span class="p">:</span> <span class="n">eitdata_collection</span><span class="p">,</span>
+        <span class="s2">&quot;continuousdata_collection&quot;</span><span class="p">:</span> <span class="n">continuousdata_collection</span><span class="p">,</span>
+        <span class="s2">&quot;sparsedata_collection&quot;</span><span class="p">:</span> <span class="n">sparsedata_collection</span><span class="p">,</span>
+        <span class="s2">&quot;intervaldata_collection&quot;</span><span class="p">:</span> <span class="n">intervaldata_collection</span><span class="p">,</span>
     <span class="p">}</span></div>
 
 
