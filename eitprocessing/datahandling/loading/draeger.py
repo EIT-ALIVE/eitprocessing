@@ -99,17 +99,17 @@ def load_from_single_path(
         label="raw",
         pixel_impedance=pixel_impedance,
     )
-    eit_collection = DataCollection(EITData, raw=eit_data)
+    eitdata_collection = DataCollection(EITData, raw=eit_data)
 
     (
-        continuous_collection,
-        sparse_collection,
+        continuousdata_collection,
+        sparsedata_collection,
     ) = _convert_medibus_data(medibus_data, time)
-    interval_collection = DataCollection(IntervalData)
+    intervaldata_collection = DataCollection(IntervalData)
     # TODO: move some medibus data to sparse / interval
     # TODO: move phases and events to sparse / interval
 
-    continuous_collection.add(
+    continuousdata_collection.add(
         ContinuousData(
             label="global_impedance_(raw)",
             name="Global impedance (raw)",
@@ -120,7 +120,7 @@ def load_from_single_path(
             values=eit_data.calculate_global_impedance(),
         ),
     )
-    sparse_collection.add(
+    sparsedata_collection.add(
         SparseData(
             label="minvalues_(draeger)",
             name="Minimum values detected by Draeger device.",
@@ -130,7 +130,7 @@ def load_from_single_path(
             time=np.array([t for t, d in phases if d == -1]),
         ),
     )
-    sparse_collection.add(
+    sparsedata_collection.add(
         SparseData(
             label="maxvalues_(draeger)",
             name="Maximum values detected by Draeger device.",
@@ -146,7 +146,7 @@ def load_from_single_path(
         events = list(events_)
     else:
         time, events = np.array([]), []
-    sparse_collection.add(
+    sparsedata_collection.add(
         SparseData(
             label="events_(draeger)",
             name="Events loaded from Draeger data",
@@ -159,10 +159,10 @@ def load_from_single_path(
     )
 
     return {
-        "eit_collection": eit_collection,
-        "continuous_collection": continuous_collection,
-        "sparse_collection": sparse_collection,
-        "interval_collection": interval_collection,
+        "eitdata_collection": eitdata_collection,
+        "continuousdata_collection": continuousdata_collection,
+        "sparsedata_collection": sparsedata_collection,
+        "intervaldata_collection": intervaldata_collection,
     }
 
 
@@ -170,8 +170,8 @@ def _convert_medibus_data(
     medibus_data: NDArray,
     time: NDArray,
 ) -> tuple[DataCollection, DataCollection]:
-    continuous_collection = DataCollection(ContinuousData)
-    sparse_collection = DataCollection(SparseData)
+    continuousdata_collection = DataCollection(ContinuousData)
+    sparsedata_collection = DataCollection(SparseData)
 
     for field_info, data in zip(_medibus_fields, medibus_data, strict=True):
         if field_info.continuous:
@@ -185,13 +185,13 @@ def _convert_medibus_data(
                 category=field_info.signal_name,
             )
             continuous_data.lock()
-            continuous_collection.add(continuous_data)
+            continuousdata_collection.add(continuous_data)
 
         else:
             # TODO parse sparse data
             ...
 
-    return continuous_collection, sparse_collection
+    return continuousdata_collection, sparsedata_collection
 
 
 def _read_frame(

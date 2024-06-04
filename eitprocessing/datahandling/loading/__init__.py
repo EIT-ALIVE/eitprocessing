@@ -80,10 +80,10 @@ def load_eit_data(
             max_frames=max_frames,
         )
 
-        eit_datasets.append(loaded_data["eit_collection"])
-        continuous_datasets.append(loaded_data["continuous_collection"])
-        sparse_datasets.append(loaded_data["sparse_collection"])
-        interval_datasets.append(loaded_data["interval_collection"])
+        eit_datasets.append(loaded_data["eitdata_collection"])
+        continuous_datasets.append(loaded_data["continuousdata_collection"])
+        sparse_datasets.append(loaded_data["sparsedata_collection"])
+        interval_datasets.append(loaded_data["intervaldata_collection"])
 
     return Sequence(
         label=label,
