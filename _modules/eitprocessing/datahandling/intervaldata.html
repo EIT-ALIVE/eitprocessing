@@ -242,8 +242,12 @@
         <span class="n">iter_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="ow">or</span> <span class="n">itertools</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="n">interval_value_pairs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">,</span> <span class="n">iter_values</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_overlapping</span> <span class="k">if</span> <span class="n">partial_inclusion</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_fully_overlapping</span>
-        <span class="n">filterfunc</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">selection_start</span><span class="o">=</span><span class="n">selection_start</span><span class="p">,</span> <span class="n">selection_end</span><span class="o">=</span><span class="n">selection_end</span><span class="p">)</span>
+        <span class="n">filterfunc</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_keep_overlapping</span><span class="p">,</span>
+            <span class="n">selection_start</span><span class="o">=</span><span class="n">selection_start</span><span class="p">,</span>
+            <span class="n">selection_end</span><span class="o">=</span><span class="n">selection_end</span><span class="p">,</span>
+            <span class="n">keep_partial_overlapping</span><span class="o">=</span><span class="n">partial_inclusion</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">filtered_pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">filterfunc</span><span class="p">,</span> <span class="n">interval_value_pairs</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_pairs</span><span class="p">):</span>
@@ -271,27 +275,15 @@
         <span class="n">item</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Interval</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">selection_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">selection_end</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">keep_partial_overlapping</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function for filtering overlapping interval-value pairs.&quot;&quot;&quot;</span>
         <span class="n">interval</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">item</span>
-        <span class="k">return</span> <span class="n">interval</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&lt;=</span> <span class="n">selection_end</span> <span class="ow">and</span> <span class="n">interval</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&gt;=</span> <span class="n">selection_start</span></div>
 
+        <span class="k">if</span> <span class="n">keep_partial_overlapping</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">interval</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&lt;</span> <span class="n">selection_end</span> <span class="ow">and</span> <span class="n">interval</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&gt;</span> <span class="n">selection_start</span>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="IntervalData._keep_fully_overlapping">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData._keep_fully_overlapping">[docs]</a>
-    <span class="k">def</span> <span class="nf">_keep_fully_overlapping</span><span class="p">(</span>
-        <span class="n">item</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Interval</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-        <span class="n">selection_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">selection_end</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function for filtering fully overlapping interval-value pairs.&quot;&quot;&quot;</span>
-        <span class="n">interval</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">item</span>
-        <span class="k">if</span> <span class="n">interval</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&lt;</span> <span class="n">selection_start</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="n">interval</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&gt;</span> <span class="n">selection_end</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+        <span class="k">return</span> <span class="n">interval</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&gt;=</span> <span class="n">selection_start</span> <span class="ow">and</span> <span class="n">interval</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;=</span> <span class="n">selection_end</span></div>
 
 
     <span class="nd">@staticmethod</span>

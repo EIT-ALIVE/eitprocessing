@@ -566,19 +566,11 @@ Module Contents
 
 
 
-   .. py:method:: _keep_overlapping(item: tuple[Interval, Any], selection_start: float, selection_end: float) -> bool
+   .. py:method:: _keep_overlapping(item: tuple[Interval, Any], selection_start: float, selection_end: float, keep_partial_overlapping: bool) -> bool
       :staticmethod:
 
 
       Helper function for filtering overlapping interval-value pairs.
-
-
-
-   .. py:method:: _keep_fully_overlapping(item: tuple[Interval, Any], selection_start: float, selection_end: float) -> bool
-      :staticmethod:
-
-
-      Helper function for filtering fully overlapping interval-value pairs.
 
 
 
