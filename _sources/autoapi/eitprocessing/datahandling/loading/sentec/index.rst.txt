@@ -739,8 +739,6 @@ Module Contents
    Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs
    or only time points.
 
-   Sparse data is assumed to be sequential (i.e. only a single data points at a single time point, and sorted by time).
-   Sparse data can contain zero or more time points/time-values pairs.
 
    Sparse data differs from interval data in that each data points is associated with a single time point rather than a
    time range.
