@@ -102,24 +102,27 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         partial_inclusion: bool | None = None,
         newlabel: str | None = None,
     ) -> Self:
-        """Get a shortened copy of the object, starting from start_time and ending at end_time.
+        """Create a new copy of the object, selecting data between start_time and end_time.
 
-        When the start or end time overlaps with an interval, the interval and its associated value are included in
-        the selection if `partial_inclusion` is `True`, but ignored if `partial_inclusion` is `False`. If the interval
-        is partially included, the start and end times are trimmed to the start and end time of the selection. A
-        potential use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you might want
-        to keep the driving pressure that was set before the start of the selectioon. A use case where
-        `partial_inclusion` should be set to `False` is "detected_breaths": you might want to ignore partial breaths
-        that started before or ended after the selected period.
+        This function returns a shortened copy of the object, containing data from the specified start_time to end_time.
 
-        Note that when selecting by time, the end time is always included in the selection if it exists in the original
-        object.
+        If `partial_inclusion` is set to `True`, any intervals that overlap with the start_time or end_time are included
+        in the selection, and their times are adjusted to fit within the specified range. If `partial_inclusion` is
+        `False`, intervals that overlap the start or end times are excluded from the selection.
+
+        For example:
+        - Set `partial_inclusion` to `True` for cases like "set_driving_pressure" where you want to include settings
+        that were active before the start_time.
+        - Set `partial_inclusion` to `False` for cases like "detected_breaths" where you want to exclude partial data
+        that doesn't fully fit within the time range.
+
+        Note that the end_time is always included in the selection if it is present in the original object.
 
         Args:
-            start_time: earliest time point to include in the copy
-            end_time: latest time point to include in the copy
-            partial_inclusion: whether to include an interval that contains the start_time or end_time
-            newlabel: new label of the copied object
+            start_time: The earliest time point to include in the copy.
+            end_time: The latest time point to include in the copy.
+            partial_inclusion: Whether to include intervals that overlap with the start_time or end_time.
+            newlabel: A new label for the copied object.
         """
         if partial_inclusion is None:
             partial_inclusion = self.default_partial_inclusion
