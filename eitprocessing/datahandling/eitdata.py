@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import auto
 from pathlib import Path
-from typing import Literal, TypeVar, overload
+from typing import TypeVar
 
 import numpy as np
 from strenum import LowercaseStrEnum
@@ -49,29 +49,16 @@ class EITData(SelectByTime, Equivalence):
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
 
-        self.path = self.parse_path(self.path, ensure_list=False)
+        self.path = self.ensure_path_list(self.path)
+        if len(self.path) == 1:
+            self.path = self.path[0]
 
         self.name = self.name or self.label
 
-    @overload
     @staticmethod
-    def parse_path(
+    def ensure_path_list(
         path: str | Path | list[str | Path],
-        ensure_list: Literal[True],
-    ) -> list[Path]: ...
-
-    @overload
-    @staticmethod
-    def parse_path(
-        path: str | Path | list[str | Path],
-        ensure_list: Literal[False],
-    ) -> Path: ...
-
-    @staticmethod
-    def parse_path(
-        path: str | Path | list[str | Path],
-        ensure_list: bool = True,
-    ) -> list[Path] | Path:
+    ) -> list[Path]:
         """Return the path or paths as a list.
 
         The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
@@ -79,9 +66,7 @@ class EITData(SelectByTime, Equivalence):
         """
         if isinstance(path, list):
             return [Path(p) for p in path]
-        if ensure_list:
-            return [Path(path)]
-        return Path(path)
+        return [Path(path)]
 
     def __add__(self: T, other: T) -> T:
         return self.concatenate(other)
@@ -93,8 +78,8 @@ class EITData(SelectByTime, Equivalence):
             msg = f"Concatenation failed. Second dataset ({other.name}) may not start before first ({self.name}) ends."
             raise ValueError(msg)
 
-        self_path = self.parse_path(self.path, ensure_list=True)
-        other_path = self.parse_path(other.path, ensure_list=True)
+        self_path = self.ensure_path_list(self.path)
+        other_path = self.ensure_path_list(other.path)
         newlabel = newlabel or f"Merge of <{self.label}> and <{other.label}>"
 
         return self.__class__(
