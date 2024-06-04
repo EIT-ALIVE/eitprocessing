@@ -1,5 +1,7 @@
 import copy
+import itertools
 from dataclasses import dataclass, field
+from functools import partial
 from typing import Any, NamedTuple, TypeVar
 
 import numpy as np
@@ -122,25 +124,40 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
             partial_inclusion: whether to include an interval that contains the start_time or end_time
             newlabel: new label of the copied object
         """
-        selection_start = start_time or self.intervals[0].start_time
-        selection_end = end_time or self.intervals[-1].end_time
-        partial_inclusion = partial_inclusion or self.default_partial_inclusion
+        if partial_inclusion is None:
+            partial_inclusion = self.default_partial_inclusion
         newlabel = newlabel or self.label
 
-        # return copy of self if neither start nor end is selected
-        if start_time is None and end_time is None:
-            copy_ = copy.deepcopy(self)
-            copy_.derived_from.append(self)
-            copy_.label = newlabel
-            return copy_
+        selection_start = start_time
+        selection_end = end_time
 
-        selection_conditions = (selection_start, selection_end, partial_inclusion)
-        keep_intervals, keep_indices = [], []
-        for i, interval in enumerate(self.intervals):
-            if self._keep_overlapping(interval, *selection_conditions):
-                keep_intervals.append(self._replace_start_end_time(interval, *selection_conditions))
-                keep_indices.append(i)
-        keep_values = [self.values[x] for x in keep_indices] if self.has_values else None
+        if selection_start is None and selection_end is None:
+            copy_ = copy.deepcopy(self)
+            if newlabel:
+                copy_.label = newlabel
+            return copy_
+        if selection_start is None:
+            selection_start = self.intervals[0].start_time
+        if selection_end is None:
+            selection_end = self.intervals[-1].end_time
+
+        iter_values = self.values or itertools.repeat(None)
+        interval_value_pairs = zip(self.intervals, iter_values, strict=True)
+
+        filterfunc = partial(
+            self._keep_overlapping,
+            selection_start=selection_start,
+            selection_end=selection_end,
+            keep_partial_overlapping=partial_inclusion,
+        )
+        filtered_pairs = list(filter(filterfunc, interval_value_pairs))
+
+        if len(filtered_pairs):
+            intervals, values = zip(*filtered_pairs, strict=True)
+            mapfun = partial(self._replace_start_end_time, selection_start=selection_start, selection_end=selection_end)
+            intervals = list(map(mapfun, intervals))
+        else:
+            intervals, values = [], []
 
         return type(self)(
             label=newlabel,
@@ -148,20 +165,23 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
             unit=self.unit,
             category=self.category,
             derived_from=[*self.derived_from, self],
-            intervals=keep_intervals,
-            values=keep_values,
+            intervals=list(intervals),
+            values=list(values) if self.has_values else None,
         )
 
     @staticmethod
     def _keep_overlapping(
-        interval: Interval,
+        item: tuple[Interval, Any],
         selection_start: float,
         selection_end: float,
-        partial_inclusion: bool,
+        keep_partial_overlapping: bool,
     ) -> bool:
         """Helper function for filtering overlapping interval-value pairs."""
-        if partial_inclusion:
-            return interval.start_time <= selection_end and interval.end_time >= selection_start
+        interval, _ = item
+
+        if keep_partial_overlapping:
+            return interval.start_time < selection_end and interval.end_time > selection_start
+
         return interval.start_time >= selection_start and interval.end_time <= selection_end
 
     @staticmethod
