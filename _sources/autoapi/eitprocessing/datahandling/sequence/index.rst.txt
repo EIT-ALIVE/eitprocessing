@@ -210,16 +210,13 @@ Module Contents
 
    A collection of a single type of data with unique labels.
 
-   This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
-   ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects
-   added to the collection need to have a `label` attribute and a `concatenate()` method.
-
-   When adding an item to the collection, the type of the value has to match the data type of the collection.
-   Furthermore, the key has to match the attribute 'label' attached to the value.
+   A DataCollection functions largely as a dictionary, but requires a data_type argument, which must be one of the data
+   containers existing in this package. When adding an item to the collection, the type of the value must match the
+   data_type of the collection. Furthermore, the key has to match the attribute 'label' attached to the value.
 
    The convenience method `add()` adds an item by setting the key to `value.label`.
 
-   :param data_type: the type of data stored in this collection.
+   :param data_type: the data container stored in this collection.
 
 
    .. py:attribute:: data_type
@@ -504,7 +501,7 @@ Module Contents
 
 
 
-   .. py:method:: _keep_overlapping(item: tuple[Interval, Any], selection_start: float, selection_end: float, keep_partial_overlapping: bool) -> bool
+   .. py:method:: _keep_overlapping(interval: Interval, selection_start: float, selection_end: float, partial_inclusion: bool) -> bool
       :staticmethod:
 
 

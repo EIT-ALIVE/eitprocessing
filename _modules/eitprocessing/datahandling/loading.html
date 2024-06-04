@@ -93,7 +93,7 @@
     <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.loading</span> <span class="kn">import</span> <span class="n">draeger</span><span class="p">,</span> <span class="n">sentec</span><span class="p">,</span> <span class="n">timpel</span>  <span class="c1"># not in top level to avoid circular import</span>
 
     <span class="n">vendor</span> <span class="o">=</span> <span class="n">_ensure_vendor</span><span class="p">(</span><span class="n">vendor</span><span class="p">)</span>
-    <span class="n">load_func</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">load_from_single_path</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">Vendor</span><span class="o">.</span><span class="n">DRAEGER</span><span class="p">:</span> <span class="n">draeger</span><span class="o">.</span><span class="n">load_from_single_path</span><span class="p">,</span>
         <span class="n">Vendor</span><span class="o">.</span><span class="n">TIMPEL</span><span class="p">:</span> <span class="n">timpel</span><span class="o">.</span><span class="n">load_from_single_path</span><span class="p">,</span>
         <span class="n">Vendor</span><span class="o">.</span><span class="n">SENTEC</span><span class="p">:</span> <span class="n">sentec</span><span class="o">.</span><span class="n">load_from_single_path</span><span class="p">,</span>
@@ -112,17 +112,17 @@
         <span class="n">single_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># raise error if any file does not exist</span>
 
     <span class="k">for</span> <span class="n">single_path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
-        <span class="n">loaded_data</span> <span class="o">=</span> <span class="n">load_func</span><span class="p">(</span>
+        <span class="n">loaded_data</span> <span class="o">=</span> <span class="n">load_from_single_path</span><span class="p">(</span>
             <span class="n">path</span><span class="o">=</span><span class="n">single_path</span><span class="p">,</span>
             <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
             <span class="n">first_frame</span><span class="o">=</span><span class="n">first_frame</span><span class="p">,</span>
             <span class="n">max_frames</span><span class="o">=</span><span class="n">max_frames</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="n">eit_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">[</span><span class="s2">&quot;eitdata_collection&quot;</span><span class="p">])</span>
-        <span class="n">continuous_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">[</span><span class="s2">&quot;continuousdata_collection&quot;</span><span class="p">])</span>
-        <span class="n">sparse_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">[</span><span class="s2">&quot;sparsedata_collection&quot;</span><span class="p">])</span>
-        <span class="n">interval_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">[</span><span class="s2">&quot;intervaldata_collection&quot;</span><span class="p">])</span>
+        <span class="n">eit_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">[</span><span class="s2">&quot;eit_collection&quot;</span><span class="p">])</span>
+        <span class="n">continuous_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">[</span><span class="s2">&quot;continuous_collection&quot;</span><span class="p">])</span>
+        <span class="n">sparse_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">[</span><span class="s2">&quot;sparse_collection&quot;</span><span class="p">])</span>
+        <span class="n">interval_datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">[</span><span class="s2">&quot;interval_collection&quot;</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span>
         <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
