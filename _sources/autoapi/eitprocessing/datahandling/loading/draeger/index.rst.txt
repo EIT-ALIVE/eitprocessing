@@ -365,8 +365,7 @@ Module Contents
    .. py:method:: __post_init__()
 
 
-   .. py:method:: parse_path(path: str | pathlib.Path | list[str | pathlib.Path], ensure_list: Literal[True]) -> list[pathlib.Path]
-                  parse_path(path: str | pathlib.Path | list[str | pathlib.Path], ensure_list: Literal[False]) -> pathlib.Path
+   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
       :staticmethod:
 
 
