@@ -620,8 +620,7 @@ Module Contents
    Container for data related to individual time points.
 
    Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs
-   or only time points. Values generally are numeric values in arrays, but can also be lists of different types of
-   object.
+   or only time points.
 
    Sparse data is assumed to be sequential (i.e. only a single data points at a single time point, and sorted by time).
    Sparse data can contain zero or more time points/time-values pairs.
