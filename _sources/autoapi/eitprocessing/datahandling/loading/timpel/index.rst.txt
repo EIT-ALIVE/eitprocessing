@@ -267,9 +267,8 @@ Module Contents
 
    .. py:method:: add(*item: V, overwrite: bool = False) -> None
 
-      Add one or multiple item(s) to the collection.
+      Add one or multiple item(s) to the collection using the item label as the key.
 
-      The item is added to the collection using the item label as the key.
 
 
 
