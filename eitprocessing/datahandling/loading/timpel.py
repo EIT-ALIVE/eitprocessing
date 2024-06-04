@@ -99,13 +99,13 @@ def load_from_single_path(
         framerate=framerate,
         pixel_impedance=pixel_impedance,
     )
-    eitdata_collection = DataCollection(EITData, raw=eit_data)
+    eit_collection = DataCollection(EITData, raw=eit_data)
 
     # extract waveform data
     # TODO: properly export waveform data
 
-    continuousdata_collection = DataCollection(ContinuousData)
-    continuousdata_collection.add(
+    continuous_collection = DataCollection(ContinuousData)
+    continuous_collection.add(
         ContinuousData(
             "global_impedance_(raw)",
             "Global impedance",
@@ -116,7 +116,7 @@ def load_from_single_path(
             values=eit_data.calculate_global_impedance(),
         ),
     )
-    continuousdata_collection.add(
+    continuous_collection.add(
         ContinuousData(
             label="airway_pressure_(timpel)",
             name="Airway pressure",
@@ -128,7 +128,7 @@ def load_from_single_path(
         ),
     )
 
-    continuousdata_collection.add(
+    continuous_collection.add(
         ContinuousData(
             label="flow_(timpel)",
             name="Flow",
@@ -140,7 +140,7 @@ def load_from_single_path(
         ),
     )
 
-    continuousdata_collection.add(
+    continuous_collection.add(
         ContinuousData(
             label="volume_(timpel)",
             name="Volume",
@@ -153,10 +153,10 @@ def load_from_single_path(
     )
 
     # extract sparse data
-    sparsedata_collection = DataCollection(SparseData)
+    sparse_collection = DataCollection(SparseData)
 
     min_indices = np.nonzero(data[:, 1027] == 1)[0]
-    sparsedata_collection.add(
+    sparse_collection.add(
         SparseData(
             label="minvalues_(timpel)",
             name="Minimum values detected by Timpel device.",
@@ -168,7 +168,7 @@ def load_from_single_path(
     )
 
     max_indices = np.nonzero(data[:, 1028] == 1)[0]
-    sparsedata_collection.add(
+    sparse_collection.add(
         SparseData(
             label="maxvalues_(timpel)",
             name="Maximum values detected by Timpel device.",
@@ -179,11 +179,11 @@ def load_from_single_path(
         ),
     )
 
-    gi = continuousdata_collection["global_impedance_(raw)"].values
+    gi = continuous_collection["global_impedance_(raw)"].values
 
     time_ranges, breaths = _make_breaths(time, min_indices, max_indices, gi)
-    intervaldata_collection = DataCollection(IntervalData)
-    intervaldata_collection.add(
+    interval_collection = DataCollection(IntervalData)
+    interval_collection.add(
         IntervalData(
             label="breaths_(timpel)",
             name="Breaths (Timpel)",
@@ -196,7 +196,7 @@ def load_from_single_path(
     )
 
     qrs_indices = np.nonzero(data[:, 1029] == 1)[0]
-    sparsedata_collection.add(
+    sparse_collection.add(
         SparseData(
             label="qrscomplexes_(timpel)",
             name="QRS complexes detected by Timpel device",
@@ -208,10 +208,10 @@ def load_from_single_path(
     )
 
     return {
-        "eitdata_collection": eitdata_collection,
-        "continuousdata_collection": continuousdata_collection,
-        "sparsedata_collection": sparsedata_collection,
-        "intervaldata_collection": intervaldata_collection,
+        "eit_collection": eit_collection,
+        "continuous_collection": continuous_collection,
+        "sparse_collection": sparse_collection,
+        "interval_collection": interval_collection,
     }
 
 

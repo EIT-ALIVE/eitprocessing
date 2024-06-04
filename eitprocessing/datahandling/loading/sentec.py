@@ -27,7 +27,7 @@ SENTEC_FRAMERATE = 50.2
 load_sentec_data = partial(load_eit_data, vendor=Vendor.SENTEC)
 
 
-def load_from_single_path(  # noqa: C901
+def load_from_single_path(  # noqa: C901, PLR0912
     path: Path,
     framerate: float | None = 50.2,
     first_frame: int = 0,
@@ -110,8 +110,8 @@ def load_from_single_path(  # noqa: C901
     if not framerate:
         framerate = SENTEC_FRAMERATE
 
-    eit_data_collection = DataCollection(EITData)
-    eit_data_collection.add(
+    eit_collection = DataCollection(EITData)
+    eit_collection.add(
         EITData(
             vendor=Vendor.SENTEC,
             path=path,
@@ -124,10 +124,10 @@ def load_from_single_path(  # noqa: C901
     )
 
     return {
-        "eitdata_collection": eit_data_collection,
-        "continuousdata_collection": DataCollection(ContinuousData),
-        "sparsedata_collection": DataCollection(SparseData),
-        "intervaldata_collection": DataCollection(IntervalData),
+        "eit_collection": eit_collection,
+        "continuous_collection": DataCollection(ContinuousData),
+        "sparse_collection": DataCollection(SparseData),
+        "interval_collection": DataCollection(IntervalData),
     }
 
 

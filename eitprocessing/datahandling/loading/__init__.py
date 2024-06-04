@@ -54,7 +54,7 @@ def load_eit_data(
     from eitprocessing.datahandling.loading import draeger, sentec, timpel  # not in top level to avoid circular import
 
     vendor = _ensure_vendor(vendor)
-    load_func = {
+    load_from_single_path = {
         Vendor.DRAEGER: draeger.load_from_single_path,
         Vendor.TIMPEL: timpel.load_from_single_path,
         Vendor.SENTEC: sentec.load_from_single_path,
@@ -73,17 +73,17 @@ def load_eit_data(
         single_path.resolve(strict=True)  # raise error if any file does not exist
 
     for single_path in paths:
-        loaded_data = load_func(
+        loaded_data = load_from_single_path(
             path=single_path,
             framerate=framerate,
             first_frame=first_frame,
             max_frames=max_frames,
         )
 
-        eit_datasets.append(loaded_data["eitdata_collection"])
-        continuous_datasets.append(loaded_data["continuousdata_collection"])
-        sparse_datasets.append(loaded_data["sparsedata_collection"])
-        interval_datasets.append(loaded_data["intervaldata_collection"])
+        eit_datasets.append(loaded_data["eit_collection"])
+        continuous_datasets.append(loaded_data["continuous_collection"])
+        sparse_datasets.append(loaded_data["sparse_collection"])
+        interval_datasets.append(loaded_data["interval_collection"])
 
     return Sequence(
         label=label,
