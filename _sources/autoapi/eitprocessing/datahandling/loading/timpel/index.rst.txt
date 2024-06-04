@@ -562,7 +562,7 @@ Module Contents
 
 
 
-   .. py:method:: _keep_overlapping(interval: Interval, selection_start: float, selection_end: float, partial_inclusion: bool) -> bool
+   .. py:method:: _keep_overlapping(item: tuple[Interval, Any], selection_start: float, selection_end: float, keep_partial_overlapping: bool) -> bool
       :staticmethod:
 
 
