@@ -34,7 +34,7 @@ class ContinuousData(Equivalence, SelectByTime):
         parameters: Parameters used to derive this data.
         derived_from: Traceback of intermediates from which the current data was derived.
         values: Data points.
-    """  # TODO: update docstring
+    """
 
     label: str = field(compare=False)
     name: str = field(compare=False, repr=False)
