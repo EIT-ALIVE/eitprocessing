@@ -65,9 +65,6 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
     def __post_init__(self) -> None:
         self.intervals = [Interval._make(interval) for interval in self.intervals]
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}('{self.label}')"
-
     def __len__(self) -> int:
         return len(self.intervals)
 
