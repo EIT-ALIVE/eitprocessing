@@ -437,6 +437,9 @@ Module Contents
 
 
 
+   .. py:method:: __add__(other: typing_extensions.Self) -> typing_extensions.Self
+
+
    .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
 
 
@@ -605,6 +608,9 @@ Module Contents
 
 
 
+   .. py:method:: __add__(other: typing_extensions.Self) -> typing_extensions.Self
+
+
    .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
 
 
@@ -638,7 +644,6 @@ Module Contents
    .. py:method:: add(*item: V, overwrite: bool = False) -> None
 
       Add one or multiple item(s) to the collection using the item label as the key.
-
 
 
 

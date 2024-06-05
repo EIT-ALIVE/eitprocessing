@@ -69,7 +69,6 @@ Package Contents
 
 
 
-
    .. py:method:: _check_item(item: V, key: str | None = None, overwrite: bool = False) -> None
 
       Check whether the item can be added to the collection.

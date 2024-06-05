@@ -270,7 +270,6 @@ Module Contents
 
 
 
-
    .. py:method:: _check_item(item: V, key: str | None = None, overwrite: bool = False) -> None
 
       Check whether the item can be added to the collection.
@@ -573,6 +572,9 @@ Module Contents
 
 
 
+   .. py:method:: __add__(other: typing_extensions.Self) -> typing_extensions.Self
+
+
    .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
 
 
@@ -699,6 +701,9 @@ Module Contents
       Must return a copy of self object with all attached data within selected
       indices.
 
+
+
+   .. py:method:: __add__(other: typing_extensions.Self) -> typing_extensions.Self
 
 
    .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T

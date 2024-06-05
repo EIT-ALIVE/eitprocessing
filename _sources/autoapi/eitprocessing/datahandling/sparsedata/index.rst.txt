@@ -199,6 +199,9 @@ Module Contents
 
 
 
+   .. py:method:: __add__(other: typing_extensions.Self) -> typing_extensions.Self
+
+
    .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
 
 
