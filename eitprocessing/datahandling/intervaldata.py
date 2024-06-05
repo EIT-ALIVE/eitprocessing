@@ -136,23 +136,17 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         selection_end = end_time or self.intervals[-1].end_time
 
         numbered_filtered_intervals = [
-            (i, interval)
+            (i, self._replace_start_end_time(interval, selection_start, selection_end))
             for i, interval in enumerate(self.intervals)
             if self._keep_overlapping(interval, selection_start, selection_end, partial_inclusion)
         ]
 
-        if len(numbered_filtered_intervals):
+        try:
             indices, filtered_intervals = zip(*numbered_filtered_intervals, strict=True)
-            trimmed_intervals = [
-                self._replace_start_end_time(interval, selection_start, selection_end)
-                for interval in filtered_intervals
-            ]
-            values = [self.values[i] for i in indices] if self.values else None
-        else:
-            trimmed_intervals = []
-
-            # values should still be an empty list if self.values is an empty list
-            values = [] if self.values is not None else None
+            values = [self.values[i] for i in indices] if self.has_values else None
+        except ValueError:
+            filtered_intervals = []
+            values = [] if self.has_values else None
 
         return type(self)(
             label=newlabel,
@@ -160,7 +154,7 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
             unit=self.unit,
             category=self.category,
             derived_from=[*self.derived_from, self],
-            intervals=trimmed_intervals,
+            intervals=list(filtered_intervals),
             values=values,
         )
 
