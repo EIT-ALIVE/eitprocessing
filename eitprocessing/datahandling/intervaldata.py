@@ -1,4 +1,5 @@
 import copy
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import Any, NamedTuple, TypeVar
 
@@ -135,18 +136,13 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         selection_start = start_time or self.intervals[0].start_time
         selection_end = end_time or self.intervals[-1].end_time
 
-        numbered_filtered_intervals = [
-            (i, self._replace_start_end_time(interval, selection_start, selection_end))
-            for i, interval in enumerate(self.intervals)
-            if self._keep_overlapping(interval, selection_start, selection_end, partial_inclusion)
-        ]
-
         try:
-            indices, filtered_intervals = zip(*numbered_filtered_intervals, strict=True)
-            values = [self.values[i] for i in indices] if self.has_values else None
+            filtered_intervals, values = zip(
+                *self._filter_items_by_time(selection_start, selection_end, partial_inclusion),
+                strict=True,
+            )
         except ValueError:
-            filtered_intervals = []
-            values = [] if self.has_values else None
+            filtered_intervals, values = [], []
 
         return type(self)(
             label=newlabel,
@@ -154,22 +150,30 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
             unit=self.unit,
             category=self.category,
             derived_from=[*self.derived_from, self],
-            intervals=list(filtered_intervals),
-            values=values,
+            intervals=filtered_intervals,
+            values=list(values) if self.has_values else None,
         )
 
-    @staticmethod
-    def _keep_overlapping(
-        interval: Interval,
+    def items(self) -> Iterator[tuple[Interval, Any]]:
+        """Return an iterator yielding interval-value pairs."""
+        values = self.values if self.has_values else [None] * len(self.intervals)
+        yield from zip(self.intervals, values, strict=True)
+
+    def _filter_items_by_time(
+        self,
         selection_start: float,
         selection_end: float,
         keep_partial_overlapping: bool,
-    ) -> bool:
-        """Helper function for filtering overlapping interval-value pairs."""
-        if keep_partial_overlapping:
-            return interval.start_time < selection_end and interval.end_time > selection_start
+    ) -> Iterator[tuple[Interval, Any]]:
+        """Yields the (trimmed) interval-value pairs for which the interval overlaps with the selection."""
+        for interval, value in self.items():
+            if keep_partial_overlapping:
+                if interval.start_time < selection_end and interval.end_time > selection_start:
+                    trimmed_interval = self._replace_start_end_time(interval, selection_start, selection_end)
+                    yield trimmed_interval, value
 
-        return interval.start_time >= selection_start and interval.end_time <= selection_end
+            elif interval.start_time >= selection_start and interval.end_time <= selection_end:
+                yield interval, value
 
     @staticmethod
     def _replace_start_end_time(
