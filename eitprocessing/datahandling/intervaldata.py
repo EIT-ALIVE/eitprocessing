@@ -188,6 +188,9 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         end_time_ = min(interval.end_time, selection_end)
         return Interval(start_time_, end_time_)
 
+    def __add__(self: Self, other: Self) -> Self:
+        return self.concatenate(other)
+
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be moved to mixin in future
         self.isequivalent(other, raise_=True)
 
