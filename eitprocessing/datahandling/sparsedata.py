@@ -98,16 +98,19 @@ class SparseData(Equivalence, SelectByTime):
         cls = type(self)
         newlabel = newlabel or self.label
 
-        new_values: Any
-        if isinstance(self.values, list) and isinstance(other.values, list):
-            new_values = self.values + other.values
-        elif isinstance(self.values, np.ndarray) and isinstance(other.values, np.ndarray):
-            new_values = np.concatenate((self.values, other.values))
-        elif self.values is None and other.values is None:
-            new_values = None
-        else:
-            msg = "Value types of self and other do not match."
+        if type(self.values) is not type(other.values):  #noqa: E721
+            msg = "Concatenation failed because value types are non-identical."
             raise TypeError(msg)
+        if not self.has_values:
+            new_values = None
+        elif isinstance(self.values, np.ndarray):
+            new_values = np.concatenate((self.values, other.values))
+        else:
+            try:
+                new_values = self.values + other.values
+            except TypeError as e:
+                msg = "Concatenation failed because values could not be concatenated."
+                raise TypeError(msg) from e
 
         return cls(
             label=newlabel,
