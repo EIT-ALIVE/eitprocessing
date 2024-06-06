@@ -151,7 +151,8 @@ def test_select_by_time(
     assert len(sliced_copy) == 3
 
     sliced_copy = intervaldata_novalues_partialtrue.t[:]
-    assert len(sliced_copy) == len(intervaldata_novalues_partialtrue)
+    assert sliced_copy == intervaldata_novalues_partialtrue
+    assert sliced_copy is not intervaldata_novalues_partialtrue
 
     assert intervaldata_novalues_partialtrue.t[:10] == intervaldata_novalues_partialtrue.t[0:10]
     assert (
