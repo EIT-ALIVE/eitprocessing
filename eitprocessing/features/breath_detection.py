@@ -9,6 +9,7 @@ from numpy.typing import ArrayLike
 from scipy import signal
 
 from eitprocessing.datahandling.breath import Breath
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.moving_average import MovingAverage
 
@@ -292,7 +293,7 @@ class BreathDetection:
 
         return breaths
 
-    def find_breaths(self, sequence: Sequence, continuousdata_label: str) -> list[Breath]:
+    def find_breaths(self, sequence: Sequence, continuousdata_label: str) -> IntervalData:
         """Find breaths in the data.
 
         This method attempts to find peaks and valleys in the data in a
@@ -356,4 +357,19 @@ class BreathDetection:
             )
         ]
 
-        return self._remove_breaths_around_invalid_data(breaths, data, time)
+        breaths = self._remove_breaths_around_invalid_data(breaths, data, time)
+
+        sequence.interval_data.add(
+            IntervalData(
+                label="breaths",
+                name="Breaths as determined by BreathDetection",
+                unit=None,
+                category="breath",
+                intervals=[(breath.start_time, breath.end_time) for breath in breaths],
+                values=breaths,
+                parameters={self.__class__: dict(vars(self))},
+                derived_from=[continuous_data],
+            ),
+        )
+
+        return sequence.interval_data["breaths"]
