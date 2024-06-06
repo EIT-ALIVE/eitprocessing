@@ -55,8 +55,8 @@ class SelectByIndex(ABC):
             warnings.warn("No starting or end timepoint was selected.")
             return self
 
-        start = start if isinstance(start, int) else 0
-        end = end if isinstance(end, int) else len(self)
+        start = start if start is not None else 0
+        end = end if end is not None else len(self)
         newlabel = newlabel or self.label
 
         return self._sliced_copy(start_index=start, end_index=end, newlabel=newlabel)
