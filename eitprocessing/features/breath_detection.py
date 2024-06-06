@@ -8,6 +8,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 from scipy import signal
 
+from eitprocessing.datahandling.breath import Breath
 from eitprocessing.features.moving_average import MovingAverage
 
 
@@ -16,14 +17,6 @@ class _PeakValleyData(NamedTuple):
     peak_values: np.ndarray
     valley_indices: np.ndarray
     valley_values: np.ndarray
-
-
-class Breath(NamedTuple):
-    """Indicates the start, middle and end of a single breath."""
-
-    start_index: int
-    middle_index: int
-    end_index: int
 
 
 @dataclass
