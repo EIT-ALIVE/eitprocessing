@@ -63,7 +63,6 @@ class SparseData(Equivalence, SelectByTime):
         end_index: int,
         newlabel: str,
     ) -> Self:
-        # TODO: check correct implementation
         cls = self.__class__
         time = self.time[start_index:end_index]
         values = self.values[start_index:end_index] if self.has_values else None
