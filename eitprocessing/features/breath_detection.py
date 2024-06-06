@@ -260,6 +260,7 @@ class BreathDetection:
         self,
         breaths: list[Breath],
         data: np.ndarray,
+        time: np.ndarray,
     ) -> list[Breath]:
         mean = np.mean(data)
         lower_percentile = np.percentile(
@@ -283,7 +284,9 @@ class BreathDetection:
         extended_data_is_zero = extended_data_is_zero.astype(bool).astype(int)
 
         for breath in breaths[:]:
-            if np.max(extended_data_is_zero[breath.start_index : breath.end_index]):
+            if np.max(
+                extended_data_is_zero[np.argmax(time == breath.start_time) : np.argmax(time == breath.end_time)],
+            ):
                 breaths.remove(breath)
 
         return breaths
@@ -339,7 +342,7 @@ class BreathDetection:
         peak_valley_data = self._remove_low_amplitudes(*peak_valley_data)
 
         breaths = [
-            Breath(int(start), int(middle), int(end))
+            Breath(time[start], time[middle], time[end])
             for middle, (start, end) in zip(
                 peak_valley_data.peak_indices,
                 itertools.pairwise(peak_valley_data.valley_indices),
@@ -347,4 +350,4 @@ class BreathDetection:
             )
         ]
 
-        return self._remove_breaths_around_invalid_data(breaths, data)
+        return self._remove_breaths_around_invalid_data(breaths, data, time)
