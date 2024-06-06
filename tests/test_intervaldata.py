@@ -118,9 +118,9 @@ def test_select_by_time(
     assert intervaldata_novalues_partialtrue.t[:1] == intervaldata_novalues_partialtrue[:1]
 
     assert len(intervaldata_novalues_partialtrue.t[:1]) == 1
-    assert len(intervaldata_novalues_partialtrue.t[:0.5]) == 1
-
     assert len(intervaldata_novalues_partialfalse.t[:1]) == 1
+
+    assert len(intervaldata_novalues_partialtrue.t[:0.5]) == 1
     assert len(intervaldata_novalues_partialfalse.t[:0.5]) == 0
 
     assert len(intervaldata_novalues_partialtrue.t[1:2]) == 1
