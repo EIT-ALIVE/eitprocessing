@@ -9,6 +9,7 @@ from numpy.typing import ArrayLike
 from scipy import signal
 
 from eitprocessing.datahandling.breath import Breath
+from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.moving_average import MovingAverage
 
 
@@ -291,7 +292,7 @@ class BreathDetection:
 
         return breaths
 
-    def find_breaths(self, data: np.ndarray) -> list[Breath]:
+    def find_breaths(self, sequence: Sequence, continuousdata_label: str) -> list[Breath]:
         """Find breaths in the data.
 
         This method attempts to find peaks and valleys in the data in a
@@ -319,11 +320,16 @@ class BreathDetection:
         expiration, and end of expiration.
 
         Args:
-            data (np.ndarray): a 1D array containing the data to find breaths in.
+            sequence: the sequence that contains the data
+            continuousdata_label: label of the continuous data to apply the algorithm to
 
         Returns:
             A list of Breath objects.
         """
+        continuous_data = sequence.continuous_data[continuousdata_label]
+        data = continuous_data.values
+        time = continuous_data.time
+
         window_size = int(self.sample_frequency * self.averaging_window_length)
         averager = MovingAverage(window_size=window_size, window_fun=np.bartlett)
         moving_average = averager.apply(data)
