@@ -124,11 +124,11 @@ def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence):
         bd = BreathDetection(
             sample_frequency=sequence.eit_data["raw"].framerate,
         )
-        gi = sequence.continuous_data["global_impedance_(raw)"].values
+
         cd = sequence.continuous_data["global_impedance_(raw)"]
         breaths = bd.find_breaths(sequence, "global_impedance_(raw)")
 
-        for breath in breaths:
+        for breath in breaths.values:
             # Test whether the indices are in the proper order within a breath
             assert breath.start_time < breath.middle_time < breath.end_time
 
@@ -136,7 +136,7 @@ def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence):
             assert cd.t[breath.middle_time].values[0] > cd.t[breath.start_time].values[0]
             assert cd.t[breath.middle_time].values[0] > cd.t[breath.end_time].values[0]
 
-        start_indices, middle_indices, end_indices = (list(x) for x in zip(*breaths, strict=True))
+        start_indices, middle_indices, end_indices = (list(x) for x in zip(*breaths.values, strict=True))
 
         # Test whether breaths are sorted properly
         assert start_indices == sorted(start_indices)
