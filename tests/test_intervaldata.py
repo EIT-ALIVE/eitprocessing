@@ -7,12 +7,15 @@ from eitprocessing.datahandling.intervaldata import Interval, IntervalData
 
 
 @pytest.fixture()
-def intervaldata1():
-    """Creates an IntervalData object with n sequential intervals lasting 1 second each."""
+def intervaldata_novalues_partialtrue():
+    """IntervalData object without values, and partial inclusion set to True by default.
+
+    Creates an IntervalData object with n sequential intervals lasting 1 second each.
+    """
     n = random.randint(50, 150)
     return IntervalData(
-        label="intervaldata1",
-        name="IntervalData 1",
+        label="intervaldata_novalues_partialtrue",
+        name="IntervalData without values, with partial inclusion",
         unit=None,
         category="dummy",
         intervals=list(zip(range(n), range(1, n + 1), strict=True)),
@@ -21,12 +24,15 @@ def intervaldata1():
 
 
 @pytest.fixture()
-def intervaldata2():
-    """Creates an IntervalData object with n sequential intervals lasting 1 second each."""
+def intervaldata_novalues_partialfalse():
+    """IntervalData object without values, without partial inclusion.
+
+    Creates an IntervalData object with n sequential intervals lasting 1 second each.
+    """
     n = random.randint(50, 150)
     return IntervalData(
-        label="intervaldata1",
-        name="IntervalData 2",
+        label="intervaldata_novalues_partialfalse",
+        name="IntervalData without values, without partial inclusion",
         unit=None,
         category="dummy",
         intervals=list(zip(range(n), range(1, n + 1), strict=True)),
@@ -35,12 +41,15 @@ def intervaldata2():
 
 
 @pytest.fixture()
-def intervaldata3():
-    """Creates an IntervalData object with n sequential intervals lasting 1 second each, with values."""
+def intervaldata_listvalues_partialfalse():
+    """IntervalData object with values as list, no partial inclusion.
+
+    Creates an IntervalData object with n sequential intervals lasting 1 second each, with values.
+    """
     n = random.randint(50, 150)
     return IntervalData(
-        label="intervaldata1",
-        name="IntervalData 2",
+        label="intervaldata_listvalues_partialfalse",
+        name="IntervalData with values as list, no partial inclusion",
         unit=None,
         category="dummy",
         intervals=list(zip(range(n), range(1, n + 1), strict=True)),
@@ -50,12 +59,15 @@ def intervaldata3():
 
 
 @pytest.fixture()
-def intervaldata4():
-    """Creates an IntervalData object with n sequential intervals lasting 1 second each, with values."""
+def intervaldata_arrayvalues_partialfalse():
+    """IntervalData object with values as numpy array, no partial inclusion.
+
+    Creates an IntervalData object with n sequential intervals lasting 1 second each, with values.
+    """
     n = random.randint(50, 150)
     return IntervalData(
-        label="intervaldata1",
-        name="IntervalData 2",
+        label="intervaldata_arrayvalues_partialfalse",
+        name="IntervalData with values as array, no partial inclusion",
         unit=None,
         category="dummy",
         intervals=list(zip(range(n), range(1, n + 1), strict=True)),
@@ -64,94 +76,100 @@ def intervaldata4():
     )
 
 
-def test_post_init(intervaldata1: IntervalData) -> None:
-    assert isinstance(intervaldata1.intervals, list)
-    assert all(isinstance(interval, Interval) for interval in intervaldata1.intervals)
+def test_post_init(intervaldata_novalues_partialtrue: IntervalData) -> None:
+    assert isinstance(intervaldata_novalues_partialtrue.intervals, list)
+    assert all(isinstance(interval, Interval) for interval in intervaldata_novalues_partialtrue.intervals)
 
 
-def test_len(intervaldata1: IntervalData) -> None:
-    assert len(intervaldata1) == len(intervaldata1.intervals)
+def test_len(intervaldata_novalues_partialtrue: IntervalData) -> None:
+    assert len(intervaldata_novalues_partialtrue) == len(intervaldata_novalues_partialtrue.intervals)
 
 
 def test_has_values(
-    intervaldata1: IntervalData,
-    intervaldata2: IntervalData,
-    intervaldata3: IntervalData,
-    intervaldata4: IntervalData,
+    intervaldata_novalues_partialtrue: IntervalData,
+    intervaldata_novalues_partialfalse: IntervalData,
+    intervaldata_listvalues_partialfalse: IntervalData,
+    intervaldata_arrayvalues_partialfalse: IntervalData,
 ) -> None:
-    assert not intervaldata1.has_values
-    intervaldata1.values = []
-    assert intervaldata1.has_values
-    intervaldata1.values = None
+    assert not intervaldata_novalues_partialtrue.has_values
+    intervaldata_novalues_partialtrue.values = []
+    assert intervaldata_novalues_partialtrue.has_values
+    intervaldata_novalues_partialtrue.values = None
 
-    assert not intervaldata2.has_values
-    assert intervaldata3.has_values
-    assert intervaldata4.has_values
+    assert not intervaldata_novalues_partialfalse.has_values
+    assert intervaldata_listvalues_partialfalse.has_values
+    assert intervaldata_arrayvalues_partialfalse.has_values
 
 
-def test_index_slicing(intervaldata1: IntervalData) -> None:
-    _sliced_copy = intervaldata1._sliced_copy(0, 10, newlabel="sliced_copy")  # noqa: SLF001
+def test_index_slicing(intervaldata_novalues_partialtrue: IntervalData) -> None:
+    _sliced_copy = intervaldata_novalues_partialtrue._sliced_copy(0, 10, newlabel="sliced_copy")  # noqa: SLF001
     assert len(_sliced_copy) == 10
-    sliced_copy = intervaldata1[:10]
+    sliced_copy = intervaldata_novalues_partialtrue[:10]
     assert _sliced_copy == sliced_copy
 
-    assert len(intervaldata1[0]) == 1
+    assert len(intervaldata_novalues_partialtrue[0]) == 1
 
 
-def test_select_by_time(intervaldata1: IntervalData, intervaldata2: IntervalData) -> None:
-    assert intervaldata1.t[:1] == intervaldata1[:1]
+def test_select_by_time(
+    intervaldata_novalues_partialtrue: IntervalData,
+    intervaldata_novalues_partialfalse: IntervalData,
+) -> None:
+    assert intervaldata_novalues_partialtrue.t[:1] == intervaldata_novalues_partialtrue[:1]
 
-    assert len(intervaldata1.t[:1]) == 1
-    assert len(intervaldata1.t[:0.5]) == 1
+    assert len(intervaldata_novalues_partialtrue.t[:1]) == 1
+    assert len(intervaldata_novalues_partialtrue.t[:0.5]) == 1
 
-    assert len(intervaldata2.t[:1]) == 1
-    assert len(intervaldata2.t[:0.5]) == 0
+    assert len(intervaldata_novalues_partialfalse.t[:1]) == 1
+    assert len(intervaldata_novalues_partialfalse.t[:0.5]) == 0
 
-    assert len(intervaldata1.t[1:2]) == 1
-    assert len(intervaldata2.t[1:2]) == 1
+    assert len(intervaldata_novalues_partialtrue.t[1:2]) == 1
+    assert len(intervaldata_novalues_partialfalse.t[1:2]) == 1
 
-    assert len(intervaldata1.t[1.5:2.5]) == 2
-    assert len(intervaldata2.t[1.5:2.5]) == 0
+    assert len(intervaldata_novalues_partialtrue.t[1.5:2.5]) == 2
+    assert len(intervaldata_novalues_partialfalse.t[1.5:2.5]) == 0
 
-    assert len(intervaldata1.t[1.5:3]) == 2
-    assert len(intervaldata2.t[1.5:3]) == 1
+    assert len(intervaldata_novalues_partialtrue.t[1.5:3]) == 2
+    assert len(intervaldata_novalues_partialfalse.t[1.5:3]) == 1
 
-    assert len(intervaldata1.t[1.5:3.5]) == 3
-    assert len(intervaldata2.t[1.5:3.5]) == 1
+    assert len(intervaldata_novalues_partialtrue.t[1.5:3.5]) == 3
+    assert len(intervaldata_novalues_partialfalse.t[1.5:3.5]) == 1
 
-    assert len(intervaldata1.t[2:3.5]) == 2
-    assert len(intervaldata2.t[2:3.5]) == 1
+    assert len(intervaldata_novalues_partialtrue.t[2:3.5]) == 2
+    assert len(intervaldata_novalues_partialfalse.t[2:3.5]) == 1
 
-    sliced_copy = intervaldata1.t[2.5:3.5]
+    sliced_copy = intervaldata_novalues_partialtrue.t[2.5:3.5]
     assert sliced_copy.intervals[0].start_time == 2.5
     assert sliced_copy.intervals[0].end_time == 3
     assert sliced_copy.intervals[1].start_time == 3
     assert sliced_copy.intervals[1].end_time == 3.5
 
-    sliced_copy = intervaldata1.t[-10:-1]
+    sliced_copy = intervaldata_novalues_partialtrue.t[-10:-1]
     assert len(sliced_copy) == 0
 
-    sliced_copy = intervaldata1.t[-10:3]
+    sliced_copy = intervaldata_novalues_partialtrue.t[-10:3]
     assert len(sliced_copy) == 3
 
-    sliced_copy = intervaldata1.t[:]
-    assert len(sliced_copy) == len(intervaldata1)
+    sliced_copy = intervaldata_novalues_partialtrue.t[:]
+    assert len(sliced_copy) == len(intervaldata_novalues_partialtrue)
 
-    assert intervaldata1.t[:10] == intervaldata1.t[0:10]
-    assert intervaldata1.t[20:] == intervaldata1.t[20 : len(intervaldata1) + 1]
+    assert intervaldata_novalues_partialtrue.t[:10] == intervaldata_novalues_partialtrue.t[0:10]
+    assert (
+        intervaldata_novalues_partialtrue.t[20:]
+        == intervaldata_novalues_partialtrue.t[20 : len(intervaldata_novalues_partialtrue) + 1]
+    )
 
 
-def test_select_by_time_values(intervaldata3: IntervalData):
-    assert isinstance(intervaldata3.values, list)
+def test_select_by_time_values(intervaldata_listvalues_partialfalse: IntervalData):
+    assert isinstance(intervaldata_listvalues_partialfalse.values, list)
 
-    sliced_copy = intervaldata3[:10]
+    sliced_copy = intervaldata_listvalues_partialfalse[:10]
     assert len(sliced_copy.intervals) == len(sliced_copy.values)
-    assert sliced_copy.values == intervaldata3.values[:10]
+    assert sliced_copy.values == intervaldata_listvalues_partialfalse.values[:10]
 
 
-def test_concatenate(intervaldata1: IntervalData) -> None:
-    sliced_copy_1 = intervaldata1[:10]
-    sliced_copy_2 = intervaldata1[10:20]
+def test_concatenate(intervaldata_novalues_partialtrue: IntervalData) -> None:
+    sliced_copy_1 = intervaldata_novalues_partialtrue[:10]
+    sliced_copy_2 = intervaldata_novalues_partialtrue[10:20]
 
     assert len(sliced_copy_1) == 10
     assert len(sliced_copy_2) == 10
@@ -163,7 +181,7 @@ def test_concatenate(intervaldata1: IntervalData) -> None:
     assert sliced_copy_1.intervals == concatenated.intervals[:10]
     assert sliced_copy_2.intervals == concatenated.intervals[10:]
 
-    sliced_copy_3 = intervaldata1[1000:]
+    sliced_copy_3 = intervaldata_novalues_partialtrue[1000:]
     assert sliced_copy_1 + sliced_copy_3 == sliced_copy_1
     assert sliced_copy_3 + sliced_copy_1 == sliced_copy_1
 
@@ -171,26 +189,29 @@ def test_concatenate(intervaldata1: IntervalData) -> None:
         sliced_copy_2 + sliced_copy_1
 
 
-def test_concatenate_values_list(intervaldata3: IntervalData):
-    sliced_copy_1 = intervaldata3[:10]
-    sliced_copy_2 = intervaldata3[10:20]
+def test_concatenate_values_list(intervaldata_listvalues_partialfalse: IntervalData):
+    sliced_copy_1 = intervaldata_listvalues_partialfalse[:10]
+    sliced_copy_2 = intervaldata_listvalues_partialfalse[10:20]
 
     concatenated = sliced_copy_1 + sliced_copy_2
     assert len(concatenated.intervals) == len(concatenated.values)
-    assert isinstance(intervaldata3.values, list)
-    assert concatenated.values == intervaldata3.values[:20]
+    assert isinstance(intervaldata_listvalues_partialfalse.values, list)
+    assert concatenated.values == intervaldata_listvalues_partialfalse.values[:20]
 
 
-def test_concatenate_values_numpy(intervaldata4: IntervalData) -> None:
-    sliced_copy_1 = intervaldata4[:10]
-    sliced_copy_2 = intervaldata4[10:20]
+def test_concatenate_values_numpy(intervaldata_arrayvalues_partialfalse: IntervalData) -> None:
+    sliced_copy_1 = intervaldata_arrayvalues_partialfalse[:10]
+    sliced_copy_2 = intervaldata_arrayvalues_partialfalse[10:20]
 
     concatenated = sliced_copy_1 + sliced_copy_2
     assert len(concatenated.intervals) == len(concatenated.values)
-    assert isinstance(intervaldata4.values, np.ndarray)
-    assert np.array_equal(concatenated.values, intervaldata4.values[:20])
+    assert isinstance(intervaldata_arrayvalues_partialfalse.values, np.ndarray)
+    assert np.array_equal(concatenated.values, intervaldata_arrayvalues_partialfalse.values[:20])
 
 
-def test_concatenate_values_type_mismatch(intervaldata3: IntervalData, intervaldata4: IntervalData) -> None:
+def test_concatenate_values_type_mismatch(
+    intervaldata_listvalues_partialfalse: IntervalData,
+    intervaldata_arrayvalues_partialfalse: IntervalData,
+) -> None:
     with pytest.raises(TypeError):
-        intervaldata3[:10] + intervaldata4[10:]
+        intervaldata_listvalues_partialfalse[:10] + intervaldata_arrayvalues_partialfalse[10:]
