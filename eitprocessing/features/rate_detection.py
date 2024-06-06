@@ -7,6 +7,7 @@ import numpy as np
 from scipy import signal
 from strenum import LowercaseStrEnum
 
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 
 if TYPE_CHECKING:
@@ -109,6 +110,34 @@ class RateDetection:
             diff_total_summed_spectra[indices_heart_rate] == np.max(diff_total_summed_spectra[indices_heart_rate]),
         )
         estimated_heart_rate: float = frequencies[indices_heart_rate][max_diff_index]
+
+        sequence.sparse_data.add(
+            IntervalData(
+                "respiratory_rate",
+                "Estimated respiratory rate as determined by RateDetection",
+                unit="Hz",
+                category="respiratory rate",
+                intervals=[(eitdata.time[0], eitdata.time[-1])],
+                values=[estimated_respiratory_rate],
+                parameters=dict(vars(self)),
+                derived_from=[eitdata],
+                default_partial_inclusion=True,
+            ),
+        )
+
+        sequence.sparse_data.add(
+            IntervalData(
+                "heart_rate",
+                "Estimated heart rate as determined by RateDetection",
+                unit="Hz",
+                category="heart rate",
+                intervals=[(eitdata.time[0], eitdata.time[-1])],
+                values=[estimated_heart_rate],
+                parameters=dict(vars(self)),
+                derived_from=[eitdata],
+                default_partial_inclusion=True,
+            ),
+        )
 
         return estimated_respiratory_rate, estimated_heart_rate
 
