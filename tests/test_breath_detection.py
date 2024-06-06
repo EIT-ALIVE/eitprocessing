@@ -1,49 +1,39 @@
 import os
+from pathlib import Path
+
 import numpy as np
 import pytest
-from numpy.typing import NDArray
-from eitprocessing.sequence import Sequence
 
+from eitprocessing.datahandling.sequence import Sequence
+from eitprocessing.features.breath_detection import BreathDetection
 
-# from eitprocessing.features.breath_detection import Breath
-# from eitprocessing.features.breath_detection import BreathDetection
-
-
-environment = os.environ.get(
-    "EIT_PROCESSING_TEST_DATA",
-    os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+environment = Path(
+    os.environ.get(
+        "EIT_PROCESSING_TEST_DATA",
+        Path(__file__).parent.parent.resolve(),
+    ),
 )
-data_directory = os.path.join(environment, "tests", "test_data")
-draeger_file1 = os.path.join(data_directory, "Draeger_Test3.bin")
-draeger_file2 = os.path.join(data_directory, "Draeger_Test.bin")
-timpel_file = os.path.join(data_directory, "Timpel_Test.txt")
+data_directory = environment / "tests" / "test_data"
+draeger_file1 = data_directory / "Draeger_Test3.bin"
+draeger_file2 = data_directory / "Draeger_Test.bin"
+timpel_file = data_directory / "Timpel_Test.txt"
 
 
-@pytest.fixture(scope="module")
-def draeger_data1():
-    return Sequence.from_path(draeger_file1, vendor="draeger")
+def test_find_features(): ...
 
 
-@pytest.fixture(scope="module")
-def draeger_data2():
-    return Sequence.from_path(draeger_file2, vendor="draeger")
-
-
-@pytest.fixture(scope="module")
-def timpel_data():
-    return Sequence.from_path(timpel_file, vendor="timpel")
-
-
-def test_find_features():
-    ...
-
-
-def test_remove_edge_cases():
-    ...
+def test_remove_edge_cases(): ...
 
 
 @pytest.mark.parametrize(
-    "peak_indices,peak_values,valley_indices,valley_values,expected_peak_indices,expected_valley_indices",
+    (
+        "peak_indices",
+        "peak_values",
+        "valley_indices",
+        "valley_values",
+        "expected_peak_indices",
+        "expected_valley_indices",
+    ),
     [
         (  # test removal of the first valley
             np.array([0, 3]),
@@ -104,36 +94,37 @@ def test_remove_edge_cases():
     ],
 )
 def test_remove_doubles(
-    peak_indices: NDArray,
-    peak_values: NDArray,
-    valley_indices: NDArray,
-    valley_values: NDArray,
-    expected_peak_indices: NDArray,
-    expected_valley_indices,
+    peak_indices: np.ndarray,
+    peak_values: np.ndarray,
+    valley_indices: np.ndarray,
+    valley_values: np.ndarray,
+    expected_peak_indices: np.ndarray,
+    expected_valley_indices: np.ndarray,
 ):
     bd = BreathDetection(sample_frequency=1)
-    result_peak_indices, _, result_valley_indices, _ = bd._remove_doubles(
-        peak_indices, peak_values, valley_indices, valley_values
+    result_peak_indices, _, result_valley_indices, _ = bd._remove_doubles(  # noqa: SLF001
+        peak_indices,
+        peak_values,
+        valley_indices,
+        valley_values,
     )
 
     assert np.all(result_peak_indices == expected_peak_indices)
     assert np.all(result_valley_indices == expected_valley_indices)
 
 
-def test_remove_low_amplitudes():
-    ...
+def test_remove_low_amplitudes(): ...
 
 
-def test_remove_breaths_around_invalid_data():
-    ...
+def test_remove_breaths_around_invalid_data(): ...
 
 
-def test_with_data(draeger_data1, draeger_data2, timpel_data):
-    for sequence in draeger_data1, draeger_data2, timpel_data:
+def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence):
+    for sequence in draeger1, draeger2, timpel1:
         bd = BreathDetection(
-            sample_frequency=sequence.framerate,
+            sample_frequency=sequence.eit_data["raw"].framerate,
         )
-        gi = sequence.framesets["raw"].global_impedance
+        gi = sequence.continuous_data["global_impedance_(raw)"].values
         breaths = bd.find_breaths(gi)
 
         for breath in breaths:
@@ -144,7 +135,7 @@ def test_with_data(draeger_data1, draeger_data2, timpel_data):
             assert gi[breath.middle_index] > gi[breath.start_index]
             assert gi[breath.middle_index] > gi[breath.end_index]
 
-        start_indices, middle_indices, end_indices = (list(x) for x in zip(*breaths))
+        start_indices, middle_indices, end_indices = (list(x) for x in zip(*breaths, strict=True))
 
         # Test whether breaths are sorted properly
         assert start_indices == sorted(start_indices)
@@ -153,14 +144,11 @@ def test_with_data(draeger_data1, draeger_data2, timpel_data):
 
         # Test whether indices are unique. `set` removes non-unique values,
         # `sorted(list(...))` converts the set to a sorted list again.
-        assert list(start_indices) == sorted(list(set(start_indices)))
-        assert list(middle_indices) == sorted(list(set(middle_indices)))
-        assert list(end_indices) == sorted(list(set(end_indices)))
+        assert list(start_indices) == sorted(set(start_indices))
+        assert list(middle_indices) == sorted(set(middle_indices))
+        assert list(end_indices) == sorted(set(end_indices))
 
         # Test whether the start of the next breath is on/after the previous breath
         assert all(
-            [
-                start_index >= end_index
-                for start_index, end_index in zip(start_indices[1:], end_indices[:-1])
-            ]
+            start_index >= end_index for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
         )
