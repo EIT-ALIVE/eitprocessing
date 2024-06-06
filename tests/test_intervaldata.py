@@ -95,6 +95,7 @@ def test_has_values(
     intervaldata_novalues_partialtrue.values = []
     assert intervaldata_novalues_partialtrue.has_values
     intervaldata_novalues_partialtrue.values = None
+    assert not intervaldata_novalues_partialtrue.has_values
 
     assert not intervaldata_novalues_partialfalse.has_values
     assert intervaldata_listvalues_partialfalse.has_values
