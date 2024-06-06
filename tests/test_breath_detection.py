@@ -1,3 +1,4 @@
+import copy
 import os
 from pathlib import Path
 
@@ -120,6 +121,9 @@ def test_remove_breaths_around_invalid_data(): ...
 
 
 def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence):
+    draeger1 = copy.deepcopy(draeger1)
+    draeger2 = copy.deepcopy(draeger2)
+    timpel1 = copy.deepcopy(timpel1)
     for sequence in draeger1, draeger2, timpel1:
         bd = BreathDetection(
             sample_frequency=sequence.eit_data["raw"].framerate,
