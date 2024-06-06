@@ -76,12 +76,12 @@ def intervaldata_arrayvalues_partialfalse():
     )
 
 
-def test_post_init(intervaldata_novalues_partialtrue: IntervalData) -> None:
+def test_post_init(intervaldata_novalues_partialtrue: IntervalData):
     assert isinstance(intervaldata_novalues_partialtrue.intervals, list)
     assert all(isinstance(interval, Interval) for interval in intervaldata_novalues_partialtrue.intervals)
 
 
-def test_len(intervaldata_novalues_partialtrue: IntervalData) -> None:
+def test_len(intervaldata_novalues_partialtrue: IntervalData):
     assert len(intervaldata_novalues_partialtrue) == len(intervaldata_novalues_partialtrue.intervals)
 
 
@@ -101,7 +101,7 @@ def test_has_values(
     assert intervaldata_arrayvalues_partialfalse.has_values
 
 
-def test_index_slicing(intervaldata_novalues_partialtrue: IntervalData) -> None:
+def test_index_slicing(intervaldata_novalues_partialtrue: IntervalData):
     _sliced_copy = intervaldata_novalues_partialtrue._sliced_copy(0, 10, newlabel="sliced_copy")  # noqa: SLF001
     assert len(_sliced_copy) == 10
     sliced_copy = intervaldata_novalues_partialtrue[:10]
@@ -113,7 +113,7 @@ def test_index_slicing(intervaldata_novalues_partialtrue: IntervalData) -> None:
 def test_select_by_time(
     intervaldata_novalues_partialtrue: IntervalData,
     intervaldata_novalues_partialfalse: IntervalData,
-) -> None:
+):
     assert intervaldata_novalues_partialtrue.t[:1] == intervaldata_novalues_partialtrue[:1]
 
     assert len(intervaldata_novalues_partialtrue.t[:1]) == 1
@@ -167,7 +167,7 @@ def test_select_by_time_values(intervaldata_listvalues_partialfalse: IntervalDat
     assert sliced_copy.values == intervaldata_listvalues_partialfalse.values[:10]
 
 
-def test_concatenate(intervaldata_novalues_partialtrue: IntervalData) -> None:
+def test_concatenate(intervaldata_novalues_partialtrue: IntervalData):
     sliced_copy_1 = intervaldata_novalues_partialtrue[:10]
     sliced_copy_2 = intervaldata_novalues_partialtrue[10:20]
 
@@ -199,7 +199,7 @@ def test_concatenate_values_list(intervaldata_listvalues_partialfalse: IntervalD
     assert concatenated.values == intervaldata_listvalues_partialfalse.values[:20]
 
 
-def test_concatenate_values_numpy(intervaldata_arrayvalues_partialfalse: IntervalData) -> None:
+def test_concatenate_values_numpy(intervaldata_arrayvalues_partialfalse: IntervalData):
     sliced_copy_1 = intervaldata_arrayvalues_partialfalse[:10]
     sliced_copy_2 = intervaldata_arrayvalues_partialfalse[10:20]
 
@@ -212,6 +212,6 @@ def test_concatenate_values_numpy(intervaldata_arrayvalues_partialfalse: Interva
 def test_concatenate_values_type_mismatch(
     intervaldata_listvalues_partialfalse: IntervalData,
     intervaldata_arrayvalues_partialfalse: IntervalData,
-) -> None:
+):
     with pytest.raises(TypeError):
         intervaldata_listvalues_partialfalse[:10] + intervaldata_arrayvalues_partialfalse[10:]
