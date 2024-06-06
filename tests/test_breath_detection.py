@@ -125,15 +125,16 @@ def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence):
             sample_frequency=sequence.eit_data["raw"].framerate,
         )
         gi = sequence.continuous_data["global_impedance_(raw)"].values
-        breaths = bd.find_breaths(gi)
+        cd = sequence.continuous_data["global_impedance_(raw)"]
+        breaths = bd.find_breaths(sequence, "global_impedance_(raw)")
 
         for breath in breaths:
             # Test whether the indices are in the proper order within a breath
-            assert breath.start_index < breath.middle_index < breath.end_index
+            assert breath.start_time < breath.middle_time < breath.end_time
 
             # Test whether the peak values are larger than valley values
-            assert gi[breath.middle_index] > gi[breath.start_index]
-            assert gi[breath.middle_index] > gi[breath.end_index]
+            assert cd.t[breath.middle_time].values[0] > cd.t[breath.start_time].values[0]
+            assert cd.t[breath.middle_time].values[0] > cd.t[breath.end_time].values[0]
 
         start_indices, middle_indices, end_indices = (list(x) for x in zip(*breaths, strict=True))
 
