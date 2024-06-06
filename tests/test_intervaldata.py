@@ -12,7 +12,7 @@ def intervaldata_novalues_partialtrue():
 
     Creates an IntervalData object with n sequential intervals lasting 1 second each.
     """
-    n = random.randint(50, 150)
+    n = 50
     return IntervalData(
         label="intervaldata_novalues_partialtrue",
         name="IntervalData without values, with partial inclusion",
@@ -29,7 +29,7 @@ def intervaldata_novalues_partialfalse():
 
     Creates an IntervalData object with n sequential intervals lasting 1 second each.
     """
-    n = random.randint(50, 150)
+    n = 56
     return IntervalData(
         label="intervaldata_novalues_partialfalse",
         name="IntervalData without values, without partial inclusion",
@@ -46,7 +46,7 @@ def intervaldata_listvalues_partialfalse():
 
     Creates an IntervalData object with n sequential intervals lasting 1 second each, with values.
     """
-    n = random.randint(50, 150)
+    n = 62
     return IntervalData(
         label="intervaldata_listvalues_partialfalse",
         name="IntervalData with values as list, no partial inclusion",
@@ -64,7 +64,7 @@ def intervaldata_arrayvalues_partialfalse():
 
     Creates an IntervalData object with n sequential intervals lasting 1 second each, with values.
     """
-    n = random.randint(50, 150)
+    n = 68
     return IntervalData(
         label="intervaldata_arrayvalues_partialfalse",
         name="IntervalData with values as array, no partial inclusion",
