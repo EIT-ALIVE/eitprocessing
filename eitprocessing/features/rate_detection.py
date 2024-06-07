@@ -111,7 +111,7 @@ class RateDetection:
         )
         estimated_heart_rate: float = frequencies[indices_heart_rate][max_diff_index]
 
-        sequence.sparse_data.add(
+        sequence.interval_data.add(
             IntervalData(
                 "respiratory_rate",
                 "Estimated respiratory rate as determined by RateDetection",
@@ -125,7 +125,7 @@ class RateDetection:
             ),
         )
 
-        sequence.sparse_data.add(
+        sequence.interval_data.add(
             IntervalData(
                 "heart_rate",
                 "Estimated heart rate as determined by RateDetection",
