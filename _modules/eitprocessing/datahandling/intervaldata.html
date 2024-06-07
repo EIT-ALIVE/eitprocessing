@@ -36,7 +36,9 @@
             
   <h1>Source code for eitprocessing.datahandling.intervaldata</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -147,6 +149,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span><span class="n">Interval</span><span class="o">.</span><span class="n">_make</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span> <span class="k">for</span> <span class="n">interval</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">]</span></div>
 
 
+<div class="viewcode-block" id="IntervalData.__repr__">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData.__repr__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&#39;)&quot;</span></div>
+
+
 <div class="viewcode-block" id="IntervalData.__len__">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData.__len__">[docs]</a>
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -195,53 +203,55 @@
         <span class="n">partial_inclusion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">newlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new copy of the object, selecting data between start_time and end_time.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a shortened copy of the object, starting from start_time and ending at end_time.</span>
 
-<span class="sd">        This function returns a shortened copy of the object, containing data from the specified start_time to end_time.</span>
+<span class="sd">        When the start or end time overlaps with an interval, the interval and its associated value are included in</span>
+<span class="sd">        the selection if `partial_inclusion` is `True`, but ignored if `partial_inclusion` is `False`. If the interval</span>
+<span class="sd">        is partially included, the start and end times are trimmed to the start and end time of the selection. A</span>
+<span class="sd">        potential use case where `partial_inclusion` should be set to `True` is &quot;set_driving_pressure&quot;: you might want</span>
+<span class="sd">        to keep the driving pressure that was set before the start of the selectioon. A use case where</span>
+<span class="sd">        `partial_inclusion` should be set to `False` is &quot;detected_breaths&quot;: you might want to ignore partial breaths</span>
+<span class="sd">        that started before or ended after the selected period.</span>
 
-<span class="sd">        If `partial_inclusion` is set to `True`, any intervals that overlap with the start_time or end_time are included</span>
-<span class="sd">        in the selection, and their times are adjusted to fit within the specified range. If `partial_inclusion` is</span>
-<span class="sd">        `False`, intervals that overlap the start or end times are excluded from the selection.</span>
-
-<span class="sd">        For example:</span>
-<span class="sd">        - Set `partial_inclusion` to `True` for cases like &quot;set_driving_pressure&quot; where you want to include settings</span>
-<span class="sd">        that were active before the start_time.</span>
-<span class="sd">        - Set `partial_inclusion` to `False` for cases like &quot;detected_breaths&quot; where you want to exclude partial data</span>
-<span class="sd">        that doesn&#39;t fully fit within the time range.</span>
-
-<span class="sd">        Note that the end_time is always included in the selection if it is present in the original object.</span>
+<span class="sd">        Note that when selecting by time, the end time is always included in the selection if it exists in the original</span>
+<span class="sd">        object.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            start_time: The earliest time point to include in the copy.</span>
-<span class="sd">            end_time: The latest time point to include in the copy.</span>
-<span class="sd">            partial_inclusion: Whether to include intervals that overlap with the start_time or end_time.</span>
-<span class="sd">            newlabel: A new label for the copied object.</span>
+<span class="sd">            start_time: earliest time point to include in the copy</span>
+<span class="sd">            end_time: latest time point to include in the copy</span>
+<span class="sd">            partial_inclusion: whether to include an interval that contains the start_time or end_time</span>
+<span class="sd">            newlabel: new label of the copied object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">partial_inclusion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">partial_inclusion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_partial_inclusion</span>
         <span class="n">newlabel</span> <span class="o">=</span> <span class="n">newlabel</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
 
-        <span class="k">if</span> <span class="n">start_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">selection_start</span> <span class="o">=</span> <span class="n">start_time</span>
+        <span class="n">selection_end</span> <span class="o">=</span> <span class="n">end_time</span>
+
+        <span class="k">if</span> <span class="n">selection_start</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">selection_end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">copy_</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-            <span class="n">copy_</span><span class="o">.</span><span class="n">derived_from</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-            <span class="n">copy_</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">newlabel</span>
+            <span class="k">if</span> <span class="n">newlabel</span><span class="p">:</span>
+                <span class="n">copy_</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">newlabel</span>
             <span class="k">return</span> <span class="n">copy_</span>
+        <span class="k">if</span> <span class="n">selection_start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">selection_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start_time</span>
+        <span class="k">if</span> <span class="n">selection_end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">selection_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span>
 
-        <span class="n">partial_inclusion</span> <span class="o">=</span> <span class="n">partial_inclusion</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_partial_inclusion</span>
+        <span class="n">iter_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="ow">or</span> <span class="n">itertools</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">interval_value_pairs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">,</span> <span class="n">iter_values</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">selection_start</span> <span class="o">=</span> <span class="n">start_time</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">start_time</span>
-        <span class="n">selection_end</span> <span class="o">=</span> <span class="n">end_time</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end_time</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_overlapping</span> <span class="k">if</span> <span class="n">partial_inclusion</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_fully_overlapping</span>
+        <span class="n">filterfunc</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">selection_start</span><span class="o">=</span><span class="n">selection_start</span><span class="p">,</span> <span class="n">selection_end</span><span class="o">=</span><span class="n">selection_end</span><span class="p">)</span>
+        <span class="n">filtered_pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">filterfunc</span><span class="p">,</span> <span class="n">interval_value_pairs</span><span class="p">))</span>
 
-        <span class="n">numbered_filtered_intervals</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replace_start_end_time</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span> <span class="n">selection_start</span><span class="p">,</span> <span class="n">selection_end</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">interval</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_overlapping</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span> <span class="n">selection_start</span><span class="p">,</span> <span class="n">selection_end</span><span class="p">,</span> <span class="n">partial_inclusion</span><span class="p">)</span>
-        <span class="p">]</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">indices</span><span class="p">,</span> <span class="n">filtered_intervals</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">numbered_filtered_intervals</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_values</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="n">filtered_intervals</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_values</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_pairs</span><span class="p">):</span>
+            <span class="n">intervals</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">filtered_pairs</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">mapfun</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_replace_start_end_time</span><span class="p">,</span> <span class="n">selection_start</span><span class="o">=</span><span class="n">selection_start</span><span class="p">,</span> <span class="n">selection_end</span><span class="o">=</span><span class="n">selection_end</span><span class="p">)</span>
+            <span class="n">intervals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">mapfun</span><span class="p">,</span> <span class="n">intervals</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">intervals</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
 
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span>
             <span class="n">label</span><span class="o">=</span><span class="n">newlabel</span><span class="p">,</span>
@@ -249,8 +259,8 @@
             <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
             <span class="n">category</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span>
             <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">derived_from</span><span class="p">,</span> <span class="bp">self</span><span class="p">],</span>
-            <span class="n">intervals</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_intervals</span><span class="p">),</span>
-            <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">intervals</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">intervals</span><span class="p">),</span>
+            <span class="n">values</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_values</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -258,16 +268,30 @@
 <div class="viewcode-block" id="IntervalData._keep_overlapping">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData._keep_overlapping">[docs]</a>
     <span class="k">def</span> <span class="nf">_keep_overlapping</span><span class="p">(</span>
-        <span class="n">interval</span><span class="p">:</span> <span class="n">Interval</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Interval</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">selection_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">selection_end</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">keep_partial_overlapping</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function for filtering overlapping interval-value pairs.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">keep_partial_overlapping</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">interval</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&lt;</span> <span class="n">selection_end</span> <span class="ow">and</span> <span class="n">interval</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&gt;</span> <span class="n">selection_start</span>
+        <span class="n">interval</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="k">return</span> <span class="n">interval</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&lt;=</span> <span class="n">selection_end</span> <span class="ow">and</span> <span class="n">interval</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&gt;=</span> <span class="n">selection_start</span></div>
 
-        <span class="k">return</span> <span class="n">interval</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&gt;=</span> <span class="n">selection_start</span> <span class="ow">and</span> <span class="n">interval</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&lt;=</span> <span class="n">selection_end</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="IntervalData._keep_fully_overlapping">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData._keep_fully_overlapping">[docs]</a>
+    <span class="k">def</span> <span class="nf">_keep_fully_overlapping</span><span class="p">(</span>
+        <span class="n">item</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Interval</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">selection_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">selection_end</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function for filtering fully overlapping interval-value pairs.&quot;&quot;&quot;</span>
+        <span class="n">interval</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="k">if</span> <span class="n">interval</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&lt;</span> <span class="n">selection_start</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">interval</span><span class="o">.</span><span class="n">end_time</span> <span class="o">&gt;</span> <span class="n">selection_end</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
 
     <span class="nd">@staticmethod</span>
@@ -282,12 +306,6 @@
         <span class="n">start_time_</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">interval</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span> <span class="n">selection_start</span><span class="p">)</span>
         <span class="n">end_time_</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">interval</span><span class="o">.</span><span class="n">end_time</span><span class="p">,</span> <span class="n">selection_end</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Interval</span><span class="p">(</span><span class="n">start_time_</span><span class="p">,</span> <span class="n">end_time_</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="IntervalData.__add__">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData.__add__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="IntervalData.concatenate">
@@ -311,19 +329,15 @@
         <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">newlabel</span> <span class="o">=</span> <span class="n">newlabel</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
 
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>  <span class="c1">#noqa: E721</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Concatenation failed because value types are non-identical.&quot;</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_values</span><span class="p">:</span>
-            <span class="n">new_values</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">new_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">new_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_values</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">new_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span>
-            <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Concatenation failed because values could not be concatenated.&quot;</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;self and other have different value types&quot;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="n">newlabel</span><span class="p">,</span>

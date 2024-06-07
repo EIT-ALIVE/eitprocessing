@@ -37,12 +37,13 @@
   <h1>Source code for eitprocessing.datahandling.continuousdata</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.mixins.equality</span> <span class="kn">import</span> <span class="n">Equivalence</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.mixins.locking</span> <span class="kn">import</span> <span class="n">Lockable</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.mixins.slicing</span> <span class="kn">import</span> <span class="n">SelectByTime</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -59,13 +60,14 @@
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <div class="viewcode-block" id="ContinuousData">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.ContinuousData">[docs]</a>
-<span class="k">class</span> <span class="nc">ContinuousData</span><span class="p">(</span><span class="n">Equivalence</span><span class="p">,</span> <span class="n">SelectByTime</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ContinuousData</span><span class="p">(</span><span class="n">Equivalence</span><span class="p">,</span> <span class="n">SelectByTime</span><span class="p">,</span> <span class="n">Lockable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for data with a continuous time axis.</span>
 
-<span class="sd">    Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and</span>
-<span class="sd">    continuously measured/created at a fixed sampling rate. However, a fixed interval between consecutive time points is</span>
-<span class="sd">    not enforced to account for floating point arithmetic, devices with imperfect sampling rates, and other sources of</span>
-<span class="sd">    variation.</span>
+<span class="sd">    Continuous data is data that was continuously measured/created at a predictable rate. Therefore, continuous data is</span>
+<span class="sd">    assumed to have a predictable delta between time points. A fixed delta is not enforced for two reasons: a) some</span>
+<span class="sd">    devices have slightly varying sampling rate (but fixed around a set rate) and b) floating point arithmetic.</span>
+
+<span class="sd">    Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        label: Computer readable naming of the instance.</span>
@@ -76,7 +78,7 @@
 <span class="sd">        parameters: Parameters used to derive this data.</span>
 <span class="sd">        derived_from: Traceback of intermediates from which the current data was derived.</span>
 <span class="sd">        values: Data points.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># TODO: update docstring</span>
 
 <div class="viewcode-block" id="ContinuousData.label">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.label">[docs]</a>
@@ -108,30 +110,28 @@
 
 <div class="viewcode-block" id="ContinuousData.time">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.time">[docs]</a>
-    <span class="n">time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;lock_action_default&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="ContinuousData.values">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.values">[docs]</a>
-    <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;lock_action_default&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span></div>
 
 
 <div class="viewcode-block" id="ContinuousData.__post_init__">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.__post_init__">[docs]</a>
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ContinuousData.__setattr__">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.__setattr__">[docs]</a>
     <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>  <span class="c1"># noqa: ANN401</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">old_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">old_value</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">islockable</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">islocked</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Attribute &#39;</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2">&#39; is locked and can&#39;t be overwritten.&quot;</span>
                 <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
@@ -167,7 +167,7 @@
             <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
             <span class="n">values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
         <span class="p">)</span>
-        <span class="n">obj</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">unlock_all</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
 
@@ -235,70 +235,6 @@
         <span class="n">copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">copy</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">func_args</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">copy</span></div>
-
-
-<div class="viewcode-block" id="ContinuousData.lock">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.lock">[docs]</a>
-    <span class="k">def</span> <span class="nf">lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lock attributes, essentially rendering them read-only.</span>
-
-<span class="sd">        Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            *attr: any number of attributes can be passed here, all of which will be locked. Defaults to &quot;values&quot;.</span>
-
-<span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; # lock the `values` attribute of `data`</span>
-<span class="sd">            &gt;&gt;&gt; data.lock()</span>
-<span class="sd">            &gt;&gt;&gt; data.values = [1, 2, 3] # will result in an AttributeError</span>
-<span class="sd">            &gt;&gt;&gt; data.values[0] = 1      # will result in a RuntimeError</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
-            <span class="c1"># default values are not allowed when using *attr, so set a default here if none is supplied</span>
-            <span class="n">attr</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;values&quot;</span><span class="p">,)</span>
-        <span class="k">for</span> <span class="n">attr_</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_</span><span class="p">)</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span></div>
-
-
-<div class="viewcode-block" id="ContinuousData.unlock">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.unlock">[docs]</a>
-    <span class="k">def</span> <span class="nf">unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unlock attributes, rendering them editable.</span>
-
-<span class="sd">        Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            *attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to &quot;values&quot;.</span>
-
-<span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; # lock the `values` attribute of `data`</span>
-<span class="sd">            &gt;&gt;&gt; data.lock()</span>
-<span class="sd">            &gt;&gt;&gt; data.values = [1, 2, 3] # will result in an AttributeError</span>
-<span class="sd">            &gt;&gt;&gt; data.values[0] = 1      # will result in a RuntimeError</span>
-<span class="sd">            &gt;&gt;&gt; data.unlock()</span>
-<span class="sd">            &gt;&gt;&gt; data.values = [1, 2, 3]</span>
-<span class="sd">            &gt;&gt;&gt; print(data.values)</span>
-<span class="sd">            [1,2,3]</span>
-<span class="sd">            &gt;&gt;&gt; data.values[0] = 1      # will result in a RuntimeError</span>
-<span class="sd">            &gt;&gt;&gt; print(data.values)</span>
-<span class="sd">            1</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
-            <span class="c1"># default values are not allowed when using *attr, so set a default here if none is supplied</span>
-            <span class="n">attr</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;values&quot;</span><span class="p">,)</span>
-        <span class="k">for</span> <span class="n">attr_</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_</span><span class="p">)</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
-
-
-    <span class="nd">@property</span>
-<div class="viewcode-block" id="ContinuousData.locked">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.locked">[docs]</a>
-    <span class="k">def</span> <span class="nf">locked</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether the values attribute is locked.</span>
-
-<span class="sd">        See lock().</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span></div>
 
 
     <span class="nd">@property</span>

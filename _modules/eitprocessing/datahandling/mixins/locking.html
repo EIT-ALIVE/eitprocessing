@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eitprocessing.datahandling.mixins.locking &#8212; eitprocessing 0.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
+    <script src="../../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.mixins.locking</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for eitprocessing.datahandling.mixins.locking</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">fields</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="nd">@dataclass</span>
+<div class="viewcode-block" id="Lockable">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/locking/index.html#eitprocessing.datahandling.continuousdata.Lockable">[docs]</a>
+<span class="k">class</span> <span class="nc">Lockable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds locking functionality to subclass.</span>
+
+<span class="sd">    This class provides the methods lock(), unlock(), lock_all(), unlock_all(), islocked() and islockable(), and the</span>
+<span class="sd">    property _lock_action_defaults.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Lockable.lock">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/locking/index.html#eitprocessing.datahandling.continuousdata.Lockable.lock">[docs]</a>
+    <span class="k">def</span> <span class="nf">lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lock attributes, essentially rendering them read-only.</span>
+
+<span class="sd">        Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *attr: any number of attributes can be passed here, all of which will be locked. Defaults to &quot;values&quot;.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # lock the `values` attribute of `data`</span>
+<span class="sd">            &gt;&gt;&gt; data.lock()</span>
+<span class="sd">            &gt;&gt;&gt; data.values = [1, 2, 3] # will result in an AttributeError</span>
+<span class="sd">            &gt;&gt;&gt; data.values[0] = 1      # will result in a RuntimeError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+            <span class="c1"># default values are not allowed when using *attr, so set a default here if none is supplied</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lock_action_defaults</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attr_</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">islockable</span><span class="p">(</span><span class="n">attr_</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Attribute </span><span class="si">{</span><span class="n">attr_</span><span class="si">}</span><span class="s2"> is not lockable.&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_</span><span class="p">)</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Lockable.unlock">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/locking/index.html#eitprocessing.datahandling.continuousdata.Lockable.unlock">[docs]</a>
+    <span class="k">def</span> <span class="nf">unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unlock attributes, rendering them editable.</span>
+
+<span class="sd">        Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to &quot;values&quot;.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; # lock the `values` attribute of `data`</span>
+<span class="sd">            &gt;&gt;&gt; data.lock()</span>
+<span class="sd">            &gt;&gt;&gt; data.values = [1, 2, 3] # will result in an AttributeError</span>
+<span class="sd">            &gt;&gt;&gt; data.values[0] = 1      # will result in a RuntimeError</span>
+<span class="sd">            &gt;&gt;&gt; data.unlock()</span>
+<span class="sd">            &gt;&gt;&gt; data.values = [1, 2, 3]</span>
+<span class="sd">            &gt;&gt;&gt; print(data.values)</span>
+<span class="sd">            [1,2,3]</span>
+<span class="sd">            &gt;&gt;&gt; data.values[0] = 1      # will result in a RuntimeError</span>
+<span class="sd">            &gt;&gt;&gt; print(data.values)</span>
+<span class="sd">            1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+            <span class="c1"># default values are not allowed when using *attr, so set a default here if none is supplied</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lock_action_defaults</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attr_</span> <span class="ow">in</span> <span class="n">attr</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">islockable</span><span class="p">(</span><span class="n">attr_</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Attribute </span><span class="si">{</span><span class="n">attr_</span><span class="si">}</span><span class="s2"> is not (un)lockable.&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_</span><span class="p">)</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Lockable.lock_all">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/locking/index.html#eitprocessing.datahandling.continuousdata.Lockable.lock_all">[docs]</a>
+    <span class="k">def</span> <span class="nf">lock_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lock all lockable attributes.</span>
+
+<span class="sd">        See lock().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">islockable</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Lockable.unlock_all">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/locking/index.html#eitprocessing.datahandling.continuousdata.Lockable.unlock_all">[docs]</a>
+    <span class="k">def</span> <span class="nf">unlock_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unlock all (un)lockable attributes.</span>
+
+<span class="sd">        See unlock().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">islockable</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">unlock</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Lockable.islocked">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/locking/index.html#eitprocessing.datahandling.continuousdata.Lockable.islocked">[docs]</a>
+    <span class="k">def</span> <span class="nf">islocked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;values&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether an attribute is locked.</span>
+
+<span class="sd">        See lock().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s2">&quot;WRITEABLE&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Lockable.islockable">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/locking/index.html#eitprocessing.datahandling.continuousdata.Lockable.islockable">[docs]</a>
+    <span class="k">def</span> <span class="nf">islockable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;values&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether an attribute is lockable.</span>
+
+<span class="sd">        See lock().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Lockable._lock_action_defaults">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/locking/index.html#eitprocessing.datahandling.continuousdata.Lockable._lock_action_defaults">[docs]</a>
+    <span class="k">def</span> <span class="nf">_lock_action_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of attributes that (un)locked if no arguments are provided to lock() or unlock().&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">field</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lock_action_default&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">]</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.mixins.locking</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

@@ -47,13 +47,16 @@ Package Contents
 
    A collection of a single type of data with unique labels.
 
-   A DataCollection functions largely as a dictionary, but requires a data_type argument, which must be one of the data
-   containers existing in this package. When adding an item to the collection, the type of the value must match the
-   data_type of the collection. Furthermore, the key has to match the attribute 'label' attached to the value.
+   This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
+   ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects
+   added to the collection need to have a `label` attribute and a `concatenate()` method.
+
+   When adding an item to the collection, the type of the value has to match the data type of the collection.
+   Furthermore, the key has to match the attribute 'label' attached to the value.
 
    The convenience method `add()` adds an item by setting the key to `value.label`.
 
-   :param data_type: the data container stored in this collection.
+   :param data_type: the type of data stored in this collection.
 
 
    .. py:attribute:: data_type
@@ -65,7 +68,9 @@ Package Contents
 
    .. py:method:: add(*item: V, overwrite: bool = False) -> None
 
-      Add one or multiple item(s) to the collection using the item label as the key.
+      Add one or multiple item(s) to the collection.
+
+      The item is added to the collection using the item label as the key.
 
 
 
@@ -178,7 +183,8 @@ Package Contents
    .. py:method:: __post_init__()
 
 
-   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
+   .. py:method:: parse_path(path: str | pathlib.Path | list[str | pathlib.Path], ensure_list: Literal[True]) -> list[pathlib.Path]
+                  parse_path(path: str | pathlib.Path | list[str | pathlib.Path], ensure_list: Literal[False]) -> pathlib.Path
       :staticmethod:
 
 

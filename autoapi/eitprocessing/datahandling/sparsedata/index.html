@@ -183,7 +183,10 @@ on the original object label and the frames by which it is sliced.</p></li>
 <dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a></p>
 <p>Container for data related to individual time points.</p>
 <p>Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs
-or only time points.</p>
+or only time points. Values generally are numeric values in arrays, but can also be lists of different types of
+object.</p>
+<p>Sparse data is assumed to be sequential (i.e. only a single data points at a single time point, and sorted by time).
+Sparse data can contain zero or more time points/time-values pairs.</p>
 <p>Sparse data differs from interval data in that each data points is associated with a single time point rather than a
 time range.</p>
 <p>Examples are data points at end of inspiration/end of expiration (e.g. tidal volume, end-expiratoy lung impedance)
@@ -273,11 +276,6 @@ indices.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.sparsedata.SparseData.__add__">
-<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sparsedata.html#SparseData.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.sparsedata.SparseData.__add__" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.sparsedata.SparseData.concatenate">
 <span class="sig-name descname"><span class="pre">concatenate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/sparsedata.html#SparseData.concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.sparsedata.SparseData.concatenate" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -328,7 +326,6 @@ indices.</p>
 <li><a class="reference internal" href="#eitprocessing.datahandling.sparsedata.SparseData.__len__"><code class="docutils literal notranslate"><span class="pre">SparseData.__len__()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.sparsedata.SparseData.has_values"><code class="docutils literal notranslate"><span class="pre">SparseData.has_values</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.sparsedata.SparseData._sliced_copy"><code class="docutils literal notranslate"><span class="pre">SparseData._sliced_copy()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.sparsedata.SparseData.__add__"><code class="docutils literal notranslate"><span class="pre">SparseData.__add__()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.sparsedata.SparseData.concatenate"><code class="docutils literal notranslate"><span class="pre">SparseData.concatenate()</span></code></a></li>
 </ul>
 </li>

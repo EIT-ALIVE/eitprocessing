@@ -11,6 +11,7 @@ Submodules
    :maxdepth: 1
 
    /autoapi/eitprocessing/datahandling/mixins/equality/index
+   /autoapi/eitprocessing/datahandling/mixins/locking/index
    /autoapi/eitprocessing/datahandling/mixins/slicing/index
 
 

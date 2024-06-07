@@ -1,0 +1,104 @@
+eitprocessing.datahandling.mixins.locking
+=========================================
+
+.. py:module:: eitprocessing.datahandling.mixins.locking
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.mixins.locking.Lockable
+
+
+Module Contents
+---------------
+
+.. py:class:: Lockable
+
+   Adds locking functionality to subclass.
+
+   This class provides the methods lock(), unlock(), lock_all(), unlock_all(), islocked() and islockable(), and the
+   property _lock_action_defaults.
+
+
+   .. py:method:: lock(*attr: str) -> None
+
+      Lock attributes, essentially rendering them read-only.
+
+      Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.
+
+      :param \*attr: any number of attributes can be passed here, all of which will be locked. Defaults to "values".
+
+      .. rubric:: Examples
+
+      >>> # lock the `values` attribute of `data`
+      >>> data.lock()
+      >>> data.values = [1, 2, 3] # will result in an AttributeError
+      >>> data.values[0] = 1      # will result in a RuntimeError
+
+
+
+   .. py:method:: unlock(*attr: str) -> None
+
+      Unlock attributes, rendering them editable.
+
+      Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.
+
+      :param \*attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to "values".
+
+      .. rubric:: Examples
+
+      >>> # lock the `values` attribute of `data`
+      >>> data.lock()
+      >>> data.values = [1, 2, 3] # will result in an AttributeError
+      >>> data.values[0] = 1      # will result in a RuntimeError
+      >>> data.unlock()
+      >>> data.values = [1, 2, 3]
+      >>> print(data.values)
+      [1,2,3]
+      >>> data.values[0] = 1      # will result in a RuntimeError
+      >>> print(data.values)
+      1
+
+
+
+   .. py:method:: lock_all() -> None
+
+      Lock all lockable attributes.
+
+      See lock().
+
+
+
+   .. py:method:: unlock_all() -> None
+
+      Unlock all (un)lockable attributes.
+
+      See unlock().
+
+
+
+   .. py:method:: islocked(attr: str = 'values') -> bool
+
+      Return whether an attribute is locked.
+
+      See lock().
+
+
+
+   .. py:method:: islockable(attr: str = 'values') -> bool
+
+      Return whether an attribute is lockable.
+
+      See lock().
+
+
+
+   .. py:property:: _lock_action_defaults
+      :type: list[str]
+
+      Returns a list of attributes that (un)locked if no arguments are provided to lock() or unlock().
+
+

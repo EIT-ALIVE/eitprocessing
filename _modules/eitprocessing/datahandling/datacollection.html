@@ -65,14 +65,17 @@
 <span class="k">class</span> <span class="nc">DataCollection</span><span class="p">(</span><span class="n">Equivalence</span><span class="p">,</span> <span class="n">UserDict</span><span class="p">,</span> <span class="n">HasTimeIndexer</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">V</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A collection of a single type of data with unique labels.</span>
 
-<span class="sd">    A DataCollection functions largely as a dictionary, but requires a data_type argument, which must be one of the data</span>
-<span class="sd">    containers existing in this package. When adding an item to the collection, the type of the value must match the</span>
-<span class="sd">    data_type of the collection. Furthermore, the key has to match the attribute &#39;label&#39; attached to the value.</span>
+<span class="sd">    This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,</span>
+<span class="sd">    ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects</span>
+<span class="sd">    added to the collection need to have a `label` attribute and a `concatenate()` method.</span>
+
+<span class="sd">    When adding an item to the collection, the type of the value has to match the data type of the collection.</span>
+<span class="sd">    Furthermore, the key has to match the attribute &#39;label&#39; attached to the value.</span>
 
 <span class="sd">    The convenience method `add()` adds an item by setting the key to `value.label`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        data_type: the data container stored in this collection.</span>
+<span class="sd">        data_type: the type of data stored in this collection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="DataCollection.data_type">
@@ -97,7 +100,10 @@
 <div class="viewcode-block" id="DataCollection.add">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.DataCollection.add">[docs]</a>
     <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">item</span><span class="p">:</span> <span class="n">V</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add one or multiple item(s) to the collection using the item label as the key.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add one or multiple item(s) to the collection.</span>
+
+<span class="sd">        The item is added to the collection using the item label as the key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">item_</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_item</span><span class="p">(</span><span class="n">item_</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">item_</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">item_</span><span class="p">)</span></div>

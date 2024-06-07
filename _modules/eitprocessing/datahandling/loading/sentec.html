@@ -73,7 +73,7 @@
 
 <div class="viewcode-block" id="load_from_single_path">
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/sentec/index.html#eitprocessing.datahandling.loading.sentec.load_from_single_path">[docs]</a>
-<span class="k">def</span> <span class="nf">load_from_single_path</span><span class="p">(</span>  <span class="c1"># noqa: C901, PLR0912</span>
+<span class="k">def</span> <span class="nf">load_from_single_path</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
     <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">50.2</span><span class="p">,</span>
     <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -156,8 +156,8 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">framerate</span><span class="p">:</span>
         <span class="n">framerate</span> <span class="o">=</span> <span class="n">SENTEC_FRAMERATE</span>
 
-    <span class="n">eitdata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">)</span>
-    <span class="n">eitdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">eit_data_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">)</span>
+    <span class="n">eit_data_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">EITData</span><span class="p">(</span>
             <span class="n">vendor</span><span class="o">=</span><span class="n">Vendor</span><span class="o">.</span><span class="n">SENTEC</span><span class="p">,</span>
             <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
@@ -170,7 +170,7 @@
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;eitdata_collection&quot;</span><span class="p">:</span> <span class="n">eitdata_collection</span><span class="p">,</span>
+        <span class="s2">&quot;eitdata_collection&quot;</span><span class="p">:</span> <span class="n">eit_data_collection</span><span class="p">,</span>
         <span class="s2">&quot;continuousdata_collection&quot;</span><span class="p">:</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">ContinuousData</span><span class="p">),</span>
         <span class="s2">&quot;sparsedata_collection&quot;</span><span class="p">:</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">SparseData</span><span class="p">),</span>
         <span class="s2">&quot;intervaldata_collection&quot;</span><span class="p">:</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">IntervalData</span><span class="p">),</span>
