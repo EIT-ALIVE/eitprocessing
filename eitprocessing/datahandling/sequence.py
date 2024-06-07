@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer, SelectByTime
 from eitprocessing.datahandling.sparsedata import SparseData
@@ -39,11 +40,12 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
     """  # TODO: check that docstring is up to date
 
     label: str | None = field(default=None, compare=False)
-    name: str | None = field(default=None, compare=False)
-    description: str = field(default="", compare=False)
+    name: str | None = field(default=None, compare=False, repr=False)
+    description: str = field(default="", compare=False, repr=False)
     eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData), repr=False)
     continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData), repr=False)
     sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData), repr=False)
+    interval_data: DataCollection = field(default_factory=lambda: DataCollection(IntervalData), repr=False)
 
     def __post_init__(self):
         if not self.label:
@@ -56,7 +58,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         if len(self.eit_data):
             return self.eit_data["raw"].time
         if len(self.continuous_data):
-            return next(self.continuous_data.values())
+            return next(iter(self.continuous_data.values()))
 
         msg = "Sequence has no timed data"
         raise AttributeError(msg)
@@ -80,14 +82,16 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         concat_eit = a.eit_data.concatenate(b.eit_data)
         concat_continuous = a.continuous_data.concatenate(b.continuous_data)
         concat_sparse = a.sparse_data.concatenate(b.sparse_data)
+        concat_interval = a.interval_data.concatenate(b.interval_data)
 
-        newlabel = newlabel or f"Merge of <{a.label}> and <{b.label}>"
+        newlabel = newlabel or a.label
         # TODO: add concatenation of other attached objects
 
         return a.__class__(
             eit_data=concat_eit,
             continuous_data=concat_continuous,
             sparse_data=concat_sparse,
+            interval_data=concat_interval,
             label=newlabel,
         )
 
@@ -107,7 +111,11 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
 
         sliced_sparse = DataCollection(SparseData)
         for value in self.sparse_data.values():
-            sliced_sparse.add(value.t[time[0], time[-1]])
+            sliced_sparse.add(value.t[time[0] : time[-1]])
+
+        sliced_interval = DataCollection(IntervalData)
+        for value in self.interval_data.values():
+            sliced_interval.add(value.t[time[0] : time[-1]])
 
         return self.__class__(
             label=self.label,  # newlabel gives errors
@@ -116,6 +124,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
             eit_data=sliced_eit,
             continuous_data=sliced_continuous,
             sparse_data=sliced_sparse,
+            interval_data=sliced_interval,
         )
 
     def select_by_time(
@@ -126,7 +135,7 @@ class Sequence(Equivalence, SelectByTime, HasTimeIndexer):
         end_inclusive: bool = False,
         label: str | None = None,
         name: str | None = None,
-        description: str | None = "",
+        description: str = "",
     ) -> Self:
         """Return a sliced version of the Sequence.
 

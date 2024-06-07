@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import auto
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar
+from typing import TypeVar
 
 import numpy as np
 from strenum import LowercaseStrEnum
@@ -12,15 +12,12 @@ from typing_extensions import Self
 from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
-if TYPE_CHECKING:
-    from eitprocessing.datahandling.eitdata import Vendor
-
 T = TypeVar("T", bound="EITData")
 
 
 @dataclass(eq=False)
 class EITData(SelectByTime, Equivalence):
-    """Container for EIT data.
+    """Container for EIT impedance data.
 
     This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The
     class is meant to hold data from (part of) a singular continuous measurement.
@@ -29,31 +26,39 @@ class EITData(SelectByTime, Equivalence):
     disk.
 
     Args:
-        path: the path of list of paths of the source from which data was derived.
-        nframes: number of frames
-        time:
-
-    Several convenience methods are supplied for calculating global impedance, calculating or removing baselines, etc.
+        path: The path of list of paths of the source from which data was derived.
+        nframes: Number of frames.
+        time: The time of each frame (since start measurement).
+        framerate: The (average) rate at which the frames are collection, in Hz.
+        vendor: The vendor of the device the data was collected with.
+        label: Computer readable label identifying this dataset.
+        name: Human readable name for the data.
+        pixel_impedance: Impedance values for each pixel at each frame.
     """  # TODO: fix docstring
 
-    path: Path | list[Path] = field(compare=False)
-    nframes: int
+    path: str | Path | list[Path | str] = field(compare=False, repr=False)
+    nframes: int = field(repr=False)
     time: np.ndarray = field(repr=False)
-    framerate: float = field(metadata={"check_equivalence": True})
-    vendor: Vendor = field(metadata={"check_equivalence": True})
-    phases: list = field(default_factory=list, repr=False)
-    events: list = field(default_factory=list, repr=False)
+    framerate: float = field(metadata={"check_equivalence": True}, repr=False)
+    vendor: Vendor = field(metadata={"check_equivalence": True}, repr=False)
     label: str | None = field(default=None, compare=False, metadata={"check_equivalence": True})
-    name: str | None = field(default=None, compare=False)
+    name: str | None = field(default=None, compare=False, repr=False)
     pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
 
     def __post_init__(self):
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
+
+        self.path = self.ensure_path_list(self.path)
+        if len(self.path) == 1:
+            self.path = self.path[0]
+
         self.name = self.name or self.label
 
     @staticmethod
-    def ensure_path_list(path: str | Path | list[str | Path]) -> list[Path]:
+    def ensure_path_list(
+        path: str | Path | list[str | Path],
+    ) -> list[Path]:
         """Return the path or paths as a list.
 
         The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
@@ -64,7 +69,7 @@ class EITData(SelectByTime, Equivalence):
         return [Path(path)]
 
     def __add__(self: T, other: T) -> T:
-        return self.concatenate(self, other)
+        return self.concatenate(other)
 
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be moved to mixin in future
         # Check that data can be concatenated
@@ -79,14 +84,12 @@ class EITData(SelectByTime, Equivalence):
 
         return self.__class__(
             vendor=self.vendor,
-            path=self_path + other_path,
+            path=[*self_path, *other_path],
             label=self.label,  # TODO: using newlabel leads to errors
             framerate=self.framerate,
             nframes=self.nframes + other.nframes,
             time=np.concatenate((self.time, other.time)),
             pixel_impedance=np.concatenate((self.pixel_impedance, other.pixel_impedance), axis=0),
-            phases=self.phases + other.phases,
-            events=self.events + other.events,
         )
 
     def _sliced_copy(
@@ -99,9 +102,6 @@ class EITData(SelectByTime, Equivalence):
         time = self.time[start_index:end_index]
         nframes = len(time)
 
-        phases = list(filter(lambda p: start_index <= p.index < end_index, self.phases))
-        events = list(filter(lambda e: start_index <= e.index < end_index, self.events))
-
         pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
 
         return cls(
@@ -110,8 +110,6 @@ class EITData(SelectByTime, Equivalence):
             vendor=self.vendor,
             time=time,
             framerate=self.framerate,
-            phases=phases,
-            events=events,
             label=self.label,  # newlabel gives errors
             pixel_impedance=pixel_impedance,
         )
@@ -119,35 +117,8 @@ class EITData(SelectByTime, Equivalence):
     def __len__(self):
         return self.pixel_impedance.shape[0]
 
-    @property
-    def global_baseline(self) -> np.ndarray:
-        """Return the global baseline, i.e. the minimum pixel impedance across all pixels."""
-        return np.nanmin(self.pixel_impedance)
-
-    @property
-    def pixel_impedance_global_offset(self) -> np.ndarray:
-        """Return the pixel impedance with the global baseline removed.
-
-        In the resulting array the minimum impedance across all pixels is set to 0.
-        """
-        return self.pixel_impedance - self.global_baseline
-
-    @property
-    def pixel_baseline(self) -> np.ndarray:
-        """Return the lowest value in each individual pixel over time."""
-        return np.nanmin(self.pixel_impedance, axis=0)
-
-    @property
-    def pixel_impedance_individual_offset(self) -> np.ndarray:
-        """Return the pixel impedance with the baseline of each individual pixel removed.
-
-        Each pixel in the resulting array has a minimum value of 0.
-        """
-        return self.pixel_impedance - self.pixel_baseline
-
-    @property
-    def global_impedance(self) -> np.ndarray:
-        """Return the global impedance, i.e. the sum of all pixels at each frame."""
+    def calculate_global_impedance(self) -> np.ndarray:
+        """Return the global impedance, i.e. the sum of all included pixels at each frame."""
         return np.nansum(self.pixel_impedance, axis=(1, 2))
 
 

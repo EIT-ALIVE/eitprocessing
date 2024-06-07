@@ -67,7 +67,7 @@ jobs:
           python3 -m pip install --upgrade pip setuptools
           python3 -m pip install .[dev,publishing]
       - name: Check linting with ruff
-        run: ruff .
+        run: ruff check .
 
   coveralls:
     if: github.event.pull_request.draft == false

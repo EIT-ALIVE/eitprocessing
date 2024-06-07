@@ -12,9 +12,9 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.event import Event
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.loading.binreader import BinReader
-from eitprocessing.datahandling.phases import MaxValue, MinValue
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
@@ -32,7 +32,7 @@ def load_from_single_path(
     framerate: float | None = 20,
     first_frame: int = 0,
     max_frames: int | None = None,
-) -> tuple[DataCollection, DataCollection, DataCollection]:
+) -> dict[str, DataCollection]:
     """Load Dräger EIT data from path."""
     file_size = path.stat().st_size
     if file_size % _FRAME_SIZE_BYTES:
@@ -65,8 +65,8 @@ def load_from_single_path(
 
     pixel_impedance = np.zeros((n_frames, 32, 32))
     time = np.zeros((n_frames,))
-    events = []
-    phases = []
+    events: list[tuple[float, Event]] = []
+    phases: list[tuple[float, int]] = []
     medibus_data = np.zeros((52, n_frames))
 
     with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
@@ -85,44 +85,93 @@ def load_from_single_path(
                 events,
                 phases,
                 previous_marker,
-                first_frame,
             )
 
     if not framerate:
         framerate = DRAEGER_FRAMERATE
 
-    eit_data_collection = DataCollection(EITData)
-    eit_data_collection.add(
-        EITData(
-            vendor=Vendor.DRAEGER,
-            path=path,
-            framerate=framerate,
-            nframes=n_frames,
-            time=time,
-            phases=phases,
-            events=events,
-            label="raw",
-            pixel_impedance=pixel_impedance,
+    eit_data = EITData(
+        vendor=Vendor.DRAEGER,
+        path=path,
+        framerate=framerate,
+        nframes=n_frames,
+        time=time,
+        label="raw",
+        pixel_impedance=pixel_impedance,
+    )
+    eitdata_collection = DataCollection(EITData, raw=eit_data)
+
+    (
+        continuousdata_collection,
+        sparsedata_collection,
+    ) = _convert_medibus_data(medibus_data, time)
+    intervaldata_collection = DataCollection(IntervalData)
+    # TODO: move some medibus data to sparse / interval
+    # TODO: move phases and events to sparse / interval
+
+    continuousdata_collection.add(
+        ContinuousData(
+            label="global_impedance_(raw)",
+            name="Global impedance (raw)",
+            unit="a.u.",
+            category="impedance",
+            derived_from=[eit_data],
+            time=eit_data.time,
+            values=eit_data.calculate_global_impedance(),
         ),
     )
-    (
-        continuous_data_collection,
-        sparse_data_collections,
-    ) = _convert_medibus_data(medibus_data, time)
-
-    return (
-        eit_data_collection,
-        continuous_data_collection,
-        sparse_data_collections,
+    sparsedata_collection.add(
+        SparseData(
+            label="minvalues_(draeger)",
+            name="Minimum values detected by Draeger device.",
+            unit=None,
+            category="minvalue",
+            derived_from=[eit_data],
+            time=np.array([t for t, d in phases if d == -1]),
+        ),
     )
+    sparsedata_collection.add(
+        SparseData(
+            label="maxvalues_(draeger)",
+            name="Maximum values detected by Draeger device.",
+            unit=None,
+            category="maxvalue",
+            derived_from=[eit_data],
+            time=np.array([t for t, d in phases if d == 1]),
+        ),
+    )
+    if len(events):
+        time_, events_ = zip(*events, strict=True)
+        time = np.array(time_)
+        events = list(events_)
+    else:
+        time, events = np.array([]), []
+    sparsedata_collection.add(
+        SparseData(
+            label="events_(draeger)",
+            name="Events loaded from Draeger data",
+            unit=None,
+            category="event",
+            derived_from=[eit_data],
+            time=time,
+            values=events,
+        ),
+    )
+
+    return {
+        "eitdata_collection": eitdata_collection,
+        "continuousdata_collection": continuousdata_collection,
+        "sparsedata_collection": sparsedata_collection,
+        "intervaldata_collection": intervaldata_collection,
+    }
 
 
 def _convert_medibus_data(
     medibus_data: NDArray,
     time: NDArray,
 ) -> tuple[DataCollection, DataCollection]:
-    continuous_data_collection = DataCollection(ContinuousData)
-    sparse_data_collection = DataCollection(SparseData)
+    continuousdata_collection = DataCollection(ContinuousData)
+    sparsedata_collection = DataCollection(SparseData)
 
     for field_info, data in zip(_medibus_fields, medibus_data, strict=True):
         if field_info.continuous:
@@ -136,13 +185,13 @@ def _convert_medibus_data(
                 category=field_info.signal_name,
             )
             continuous_data.lock()
-            continuous_data_collection.add(continuous_data)
+            continuousdata_collection.add(continuous_data)
 
         else:
             # TODO parse sparse data
             ...
 
-    return continuous_data_collection, sparse_data_collection
+    return continuousdata_collection, sparsedata_collection
 
 
 def _read_frame(
@@ -154,7 +203,6 @@ def _read_frame(
     events: list,
     phases: list,
     previous_marker: int | None,
-    first_frame: int = 0,
 ) -> int:
     """Read frame by frame data from DRAEGER files.
 
@@ -186,14 +234,12 @@ def _read_frame(
     # Therefore, check whether the event marker has changed with
     # respect to the most recent event. If so, create a new event.
     if (previous_marker is not None) and (event_marker > previous_marker):
-        events.append(Event(index + first_frame, frame_time, event_marker, event_text))
+        events.append((frame_time, Event(event_marker, event_text)))
     if timing_error:
         warnings.warn("A timing error was encountered during loading.")
         # TODO: expand on what timing errors are in some documentation.
-    if min_max_flag == 1:
-        phases.append(MaxValue(index + first_frame, frame_time))
-    elif min_max_flag == -1:
-        phases.append(MinValue(index + first_frame, frame_time))
+    if min_max_flag in (1, -1):
+        phases.append((frame_time, min_max_flag))
 
     return event_marker
 

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer
 from eitprocessing.datahandling.sparsedata import SparseData
@@ -12,30 +13,27 @@ from eitprocessing.datahandling.sparsedata import SparseData
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-V = TypeVar("V", EITData, ContinuousData, SparseData)
+V_classes = (EITData, ContinuousData, SparseData, IntervalData)
+V = TypeVar("V", *V_classes)
 
 
 class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
     """A collection of a single type of data with unique labels.
 
-    This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
-    ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects
-    added to the collection need to have a `label` attribute and a `concatenate()` method.
-
-    When adding an item to the collection, the type of the value has to match the data type of the collection.
-    Furthermore, the key has to match the attribute 'label' attached to the value.
+    A DataCollection functions largely as a dictionary, but requires a data_type argument, which must be one of the data
+    containers existing in this package. When adding an item to the collection, the type of the value must match the
+    data_type of the collection. Furthermore, the key has to match the attribute 'label' attached to the value.
 
     The convenience method `add()` adds an item by setting the key to `value.label`.
 
     Args:
-        data_type: the type of data stored in this collection. Expected to be one of EITData, ContinuousData or
-        SparseData.
+        data_type: the data container stored in this collection.
     """
 
     data_type: type
 
     def __init__(self, data_type: type[V], *args, **kwargs):
-        if not any(issubclass(data_type, cls) for cls in V.__constraints__):
+        if not any(issubclass(data_type, cls) for cls in V_classes):
             msg = f"Type {data_type} not expected to be stored in a DataCollection."
             raise ValueError(msg)
         self.data_type = data_type
@@ -46,7 +44,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
         return super().__setitem__(__key, __value)
 
     def add(self, *item: V, overwrite: bool = False) -> None:
-        """Add one or multiple item(s) to the collection."""
+        """Add one or multiple item(s) to the collection using the item label as the key."""
         for item_ in item:
             self._check_item(item_, overwrite=overwrite)
             super().__setitem__(item_.label, item_)
@@ -101,7 +99,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
         """Return all data that was derived from any source."""
         return {k: v for k, v in self.items() if v.derived_from}
 
-    def concatenate(self: Self[V], other: Self[V]) -> Self[V]:
+    def concatenate(self: Self, other: Self) -> Self:
         """Concatenate this collection with an equivalent collection.
 
         Each item of self of concatenated with the item of other with the same key.
@@ -110,7 +108,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
 
         concatenated = self.__class__(self.data_type)
         for key in self:
-            concatenated[key] = self[key].concatenate(other[key])
+            concatenated.add(self[key].concatenate(other[key]))
 
         return concatenated
 
@@ -120,9 +118,29 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
         end_time: float | None,
         start_inclusive: bool = True,
         end_inclusive: bool = False,
-    ) -> Self:
+    ) -> DataCollection:
         """Return a DataCollection containing sliced copies of the items."""
+        if self.data_type is IntervalData:
+            return DataCollection(
+                self.data_type,
+                **{
+                    k: v.select_by_time(
+                        start_time=start_time,
+                        end_time=end_time,
+                    )
+                    for k, v in self.items()
+                },
+            )
+
         return DataCollection(
             self.data_type,
-            **{k: v.select_by_time(start_time, end_time, start_inclusive, end_inclusive) for k, v in self.items()},
+            **{
+                k: v.select_by_time(
+                    start_time=start_time,
+                    end_time=end_time,
+                    start_inclusive=start_inclusive,
+                    end_inclusive=end_inclusive,
+                )
+                for k, v in self.items()
+            },
         )

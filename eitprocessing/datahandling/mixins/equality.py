@@ -21,19 +21,40 @@ class Equivalence:
         if type(self) is not type(other):
             return False
 
-        if is_dataclass(self):
-            field_names = {field.name for field in fields(self)}
-            if set(vars(self).keys()) != field_names or set(vars(other).keys()) != field_names:
-                return False
+        if is_dataclass(self) and isinstance(self, Equivalence):
+            return self._eq_dataclass(other)
 
-            compare_fields = filter(lambda x: x.compare, fields(self))
-
-            return all(
-                Equivalence._array_safe_eq(getattr(self, field.name), getattr(other, field.name))
-                for field in compare_fields
-            )
+        if isinstance(self, UserDict):
+            return self._eq_userdict(other)
 
         return Equivalence._array_safe_eq(self, other)
+
+    def _eq_dataclass(self, other: object) -> bool:
+        """Compare two dataclasses for equality."""
+        if not is_dataclass(self) or not is_dataclass(other):
+            msg = "self or other is not a Dataclass"
+            raise TypeError(msg)
+
+        field_names = {field.name for field in fields(self)}
+        if set(vars(self).keys()) != field_names or set(vars(other).keys()) != field_names:
+            return False
+
+        compare_fields = filter(lambda x: x.compare, fields(self))
+
+        return all(
+            Equivalence._array_safe_eq(getattr(self, field.name), getattr(other, field.name))
+            for field in compare_fields
+        )
+
+    def _eq_userdict(self, other: object) -> bool:
+        """Compare two userdicts for equality."""
+        if not isinstance(self, UserDict) or not isinstance(other, UserDict):
+            msg = "self or other is not a Userdict"
+            raise TypeError(msg)
+
+        if set(self.keys()) != set(other.keys()):
+            return False
+        return all(Equivalence.__eq__(self[key], other[key]) for key in set(self.keys()))
 
     @staticmethod
     def _array_safe_eq(a: Any, b: Any) -> bool:  # noqa: ANN401, PLR0911

@@ -54,7 +54,7 @@ def load_eit_data(
     from eitprocessing.datahandling.loading import draeger, sentec, timpel  # not in top level to avoid circular import
 
     vendor = _ensure_vendor(vendor)
-    load_func = {
+    load_from_single_path = {
         Vendor.DRAEGER: draeger.load_from_single_path,
         Vendor.TIMPEL: timpel.load_from_single_path,
         Vendor.SENTEC: sentec.load_from_single_path,
@@ -67,21 +67,23 @@ def load_eit_data(
     eit_datasets: list[DataCollection] = []
     continuous_datasets: list[DataCollection] = []
     sparse_datasets: list[DataCollection] = []
+    interval_datasets: list[DataCollection] = []
 
     for single_path in paths:
         single_path.resolve(strict=True)  # raise error if any file does not exist
 
     for single_path in paths:
-        eit, continuous, sparse = load_func(
+        loaded_data = load_from_single_path(
             path=single_path,
             framerate=framerate,
             first_frame=first_frame,
             max_frames=max_frames,
         )
 
-        eit_datasets.append(eit)
-        continuous_datasets.append(continuous)
-        sparse_datasets.append(sparse)
+        eit_datasets.append(loaded_data["eitdata_collection"])
+        continuous_datasets.append(loaded_data["continuousdata_collection"])
+        sparse_datasets.append(loaded_data["sparsedata_collection"])
+        interval_datasets.append(loaded_data["intervaldata_collection"])
 
     return Sequence(
         label=label,
@@ -90,6 +92,7 @@ def load_eit_data(
         eit_data=reduce(DataCollection.concatenate, eit_datasets),
         continuous_data=reduce(DataCollection.concatenate, continuous_datasets),
         sparse_data=reduce(DataCollection.concatenate, sparse_datasets),
+        interval_data=reduce(DataCollection.concatenate, interval_datasets),
     )
 
 

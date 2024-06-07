@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import bisect
+import copy
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -44,7 +45,7 @@ class SelectByIndex(ABC):
         end: int | None = None,
         newlabel: str | None = None,
     ) -> Self:
-        """De facto implementation of the `__getitem__ function.
+        """De facto implementation of the `__getitem__` function.
 
         This function can also be called directly to add a label to the sliced
         object. Otherwise a default label describing the slice and original
@@ -54,11 +55,14 @@ class SelectByIndex(ABC):
             warnings.warn("No starting or end timepoint was selected.")
             return self
 
-        start = start or 0
-        end = end or len(self)
-        newlabel = newlabel or f"Slice ({start}-{end}] of <{self.label}>"
+        start = start if start is not None else 0
+        end = end if end is not None else len(self)
+        newlabel = newlabel or self.label
 
         return self._sliced_copy(start_index=start, end_index=end, newlabel=newlabel)
+
+    @abstractmethod
+    def __len__(self): ...
 
     @abstractmethod
     def _sliced_copy(
@@ -93,6 +97,9 @@ class HasTimeIndexer:
         """
         return TimeIndexer(self)
 
+    @abstractmethod
+    def select_by_time(self, *args, **kwargs) -> Self: ...  # noqa: D102
+
 
 class SelectByTime(SelectByIndex, HasTimeIndexer):
     """Adds methods for slicing by time rather than index."""
@@ -105,7 +112,7 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
         end_inclusive: bool = False,
         label: str | None = None,
     ) -> Self:
-        """Get a slice from start to end time stamps.
+        """Get a shortened copy of the object, starting from start_time and ending at end_time.
 
         Given a start and end time stamp (i.e. its value, not its index),
         return a slice of the original object, which must contain a time axis.
@@ -126,11 +133,15 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
             ValueError: if time stamps are not sorted.
 
         Returns:
-            Slice of self.
+            A shortened copy of the object.
         """
-        if "time" not in vars(self):
+        if not hasattr(self, "time"):
             msg = f"Object {self} has no time axis."
             raise TypeError(msg)
+
+        if len(self.time) == 0:
+            # TODO: make proper new instances when not slicing
+            return copy.deepcopy(self)
 
         if start_time is None and end_time is None:
             warnings.warn("No starting or end timepoint was selected.")
@@ -157,7 +168,7 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
         return self.select_by_index(
             start=start_index,
             end=end_index,
-            label=label,
+            newlabel=label,
         )
 
 
@@ -175,7 +186,7 @@ class TimeIndexer:
     ```
     """
 
-    obj: SelectByTime
+    obj: HasTimeIndexer
 
     def __getitem__(self, key: slice | float):
         if isinstance(key, slice):

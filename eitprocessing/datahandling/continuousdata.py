@@ -18,24 +18,29 @@ T = TypeVar("T", bound="ContinuousData")
 
 @dataclass(eq=False)
 class ContinuousData(Equivalence, SelectByTime):
-    """Data class for (non-EIT) data with a continuous time axis.
+    """Container for data with a continuous time axis.
+
+    Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and
+    continuously measured/created at a fixed sampling rate. However, a fixed interval between consecutive time points is
+    not enforced to account for floating point arithmetic, devices with imperfect sampling rates, and other sources of
+    variation.
 
     Args:
         label: Computer readable naming of the instance.
         name: Human readable naming of the instance.
-        unit: Unit for the data.
+        unit: Unit of the data, if applicable.
         category: Category the data falls into, e.g. 'airway pressure'.
         description: Human readable extended description of the data.
         parameters: Parameters used to derive this data.
         derived_from: Traceback of intermediates from which the current data was derived.
         values: Data points.
-    """  # TODO: update docstring
+    """
 
     label: str = field(compare=False)
-    name: str = field(compare=False)
-    unit: str = field(metadata={"check_equivalence": True})
-    category: str = field(metadata={"check_equivalence": True})
-    description: str = field(default="", compare=False)
+    name: str = field(compare=False, repr=False)
+    unit: str = field(metadata={"check_equivalence": True}, repr=False)
+    category: str = field(metadata={"check_equivalence": True}, repr=False)
+    description: str = field(default="", compare=False, repr=False)
     parameters: dict[str, Any] = field(default_factory=dict, repr=False, metadata={"check_equivalence": True})
     derived_from: Any | list[Any] = field(default_factory=list, repr=False, compare=False)
     time: np.ndarray = field(kw_only=True, repr=False)
@@ -89,7 +94,7 @@ class ContinuousData(Equivalence, SelectByTime):
         return obj
 
     def __add__(self: T, other: T) -> T:
-        return self.concatenate(self, other)
+        return self.concatenate(other)
 
     def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be removed soon
         # TODO: compare both concatenate methods and check what is needed from both and merge into one
@@ -100,7 +105,7 @@ class ContinuousData(Equivalence, SelectByTime):
             raise ValueError(msg)
 
         cls = self.__class__
-        newlabel = newlabel or f"Merge of <{self.label}> and <{other.label}>"
+        newlabel = newlabel or self.label
 
         return cls(
             name=self.name,
@@ -161,7 +166,7 @@ class ContinuousData(Equivalence, SelectByTime):
         """
         if not len(attr):
             # default values are not allowed when using *attr, so set a default here if none is supplied
-            attr = ["values"]
+            attr = ("values",)
         for attr_ in attr:
             getattr(self, attr_).flags["WRITEABLE"] = False
 
@@ -188,7 +193,7 @@ class ContinuousData(Equivalence, SelectByTime):
         """
         if not len(attr):
             # default values are not allowed when using *attr, so set a default here if none is supplied
-            attr = ["values"]
+            attr = ("values",)
         for attr_ in attr:
             getattr(self, attr_).flags["WRITEABLE"] = True
 
