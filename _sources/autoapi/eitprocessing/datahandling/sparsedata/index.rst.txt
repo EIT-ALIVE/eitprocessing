@@ -118,11 +118,8 @@ Module Contents
    Container for data related to individual time points.
 
    Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs
-   or only time points. Values generally are numeric values in arrays, but can also be lists of different types of
-   object.
+   or only time points.
 
-   Sparse data is assumed to be sequential (i.e. only a single data points at a single time point, and sorted by time).
-   Sparse data can contain zero or more time points/time-values pairs.
 
    Sparse data differs from interval data in that each data points is associated with a single time point rather than a
    time range.
@@ -200,6 +197,9 @@ Module Contents
       Must return a copy of self object with all attached data within selected
       indices.
 
+
+
+   .. py:method:: __add__(other: typing_extensions.Self) -> typing_extensions.Self
 
 
    .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T

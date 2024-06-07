@@ -64,16 +64,15 @@ Module Contents
 
 .. py:class:: ContinuousData
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.locking.Lockable`
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
 
 
    Container for data with a continuous time axis.
 
-   Continuous data is data that was continuously measured/created at a predictable rate. Therefore, continuous data is
-   assumed to have a predictable delta between time points. A fixed delta is not enforced for two reasons: a) some
-   devices have slightly varying sampling rate (but fixed around a set rate) and b) floating point arithmetic.
-
-   Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time).
+   Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and
+   continuously measured/created at a fixed sampling rate. However, a fixed interval between consecutive time points is
+   not enforced to account for floating point arithmetic, devices with imperfect sampling rates, and other sources of
+   variation.
 
    :param label: Computer readable naming of the instance.
    :param name: Human readable naming of the instance.
@@ -175,6 +174,55 @@ Module Contents
 
 
 
+   .. py:method:: lock(*attr: str) -> None
+
+      Lock attributes, essentially rendering them read-only.
+
+      Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.
+
+      :param \*attr: any number of attributes can be passed here, all of which will be locked. Defaults to "values".
+
+      .. rubric:: Examples
+
+      >>> # lock the `values` attribute of `data`
+      >>> data.lock()
+      >>> data.values = [1, 2, 3] # will result in an AttributeError
+      >>> data.values[0] = 1      # will result in a RuntimeError
+
+
+
+   .. py:method:: unlock(*attr: str) -> None
+
+      Unlock attributes, rendering them editable.
+
+      Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.
+
+      :param \*attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to "values".
+
+      .. rubric:: Examples
+
+      >>> # lock the `values` attribute of `data`
+      >>> data.lock()
+      >>> data.values = [1, 2, 3] # will result in an AttributeError
+      >>> data.values[0] = 1      # will result in a RuntimeError
+      >>> data.unlock()
+      >>> data.values = [1, 2, 3]
+      >>> print(data.values)
+      [1,2,3]
+      >>> data.values[0] = 1      # will result in a RuntimeError
+      >>> print(data.values)
+      1
+
+
+
+   .. py:property:: locked
+      :type: bool
+
+      Return whether the values attribute is locked.
+
+      See lock().
+
+
    .. py:property:: loaded
       :type: bool
 
@@ -200,16 +248,13 @@ Module Contents
 
    A collection of a single type of data with unique labels.
 
-   This collection functions as a dictionary in most part. When initializing, a data type has to be passed. EITData,
-   ContinuousData or SparseData is expected as the data type. Other types are allowed, but not supported. The objects
-   added to the collection need to have a `label` attribute and a `concatenate()` method.
-
-   When adding an item to the collection, the type of the value has to match the data type of the collection.
-   Furthermore, the key has to match the attribute 'label' attached to the value.
+   A DataCollection functions largely as a dictionary, but requires a data_type argument, which must be one of the data
+   containers existing in this package. When adding an item to the collection, the type of the value must match the
+   data_type of the collection. Furthermore, the key has to match the attribute 'label' attached to the value.
 
    The convenience method `add()` adds an item by setting the key to `value.label`.
 
-   :param data_type: the type of data stored in this collection.
+   :param data_type: the data container stored in this collection.
 
 
    .. py:attribute:: data_type
@@ -221,9 +266,7 @@ Module Contents
 
    .. py:method:: add(*item: V, overwrite: bool = False) -> None
 
-      Add one or multiple item(s) to the collection.
-
-      The item is added to the collection using the item label as the key.
+      Add one or multiple item(s) to the collection using the item label as the key.
 
 
 
@@ -336,8 +379,7 @@ Module Contents
    .. py:method:: __post_init__()
 
 
-   .. py:method:: parse_path(path: str | pathlib.Path | list[str | pathlib.Path], ensure_list: Literal[True]) -> list[pathlib.Path]
-                  parse_path(path: str | pathlib.Path | list[str | pathlib.Path], ensure_list: Literal[False]) -> pathlib.Path
+   .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]
       :staticmethod:
 
 
@@ -471,12 +513,6 @@ Module Contents
    .. py:method:: __post_init__() -> None
 
 
-   .. py:method:: __repr__() -> str
-
-      Return repr(self).
-
-
-
    .. py:method:: __len__() -> int
 
 
@@ -497,39 +533,34 @@ Module Contents
 
    .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, partial_inclusion: bool | None = None, newlabel: str | None = None) -> typing_extensions.Self
 
-      Get a shortened copy of the object, starting from start_time and ending at end_time.
+      Create a new copy of the object, selecting data between start_time and end_time.
 
-      When the start or end time overlaps with an interval, the interval and its associated value are included in
-      the selection if `partial_inclusion` is `True`, but ignored if `partial_inclusion` is `False`. If the interval
-      is partially included, the start and end times are trimmed to the start and end time of the selection. A
-      potential use case where `partial_inclusion` should be set to `True` is "set_driving_pressure": you might want
-      to keep the driving pressure that was set before the start of the selectioon. A use case where
-      `partial_inclusion` should be set to `False` is "detected_breaths": you might want to ignore partial breaths
-      that started before or ended after the selected period.
+      This function returns a shortened copy of the object, containing data from the specified start_time to end_time.
 
-      Note that when selecting by time, the end time is always included in the selection if it exists in the original
-      object.
+      If `partial_inclusion` is set to `True`, any intervals that overlap with the start_time or end_time are included
+      in the selection, and their times are adjusted to fit within the specified range. If `partial_inclusion` is
+      `False`, intervals that overlap the start or end times are excluded from the selection.
 
-      :param start_time: earliest time point to include in the copy
-      :param end_time: latest time point to include in the copy
-      :param partial_inclusion: whether to include an interval that contains the start_time or end_time
-      :param newlabel: new label of the copied object
+      For example:
+      - Set `partial_inclusion` to `True` for cases like "set_driving_pressure" where you want to include settings
+      that were active before the start_time.
+      - Set `partial_inclusion` to `False` for cases like "detected_breaths" where you want to exclude partial data
+      that doesn't fully fit within the time range.
+
+      Note that the end_time is always included in the selection if it is present in the original object.
+
+      :param start_time: The earliest time point to include in the copy.
+      :param end_time: The latest time point to include in the copy.
+      :param partial_inclusion: Whether to include intervals that overlap with the start_time or end_time.
+      :param newlabel: A new label for the copied object.
 
 
 
-   .. py:method:: _keep_overlapping(item: tuple[Interval, Any], selection_start: float, selection_end: float) -> bool
+   .. py:method:: _keep_overlapping(interval: Interval, selection_start: float, selection_end: float, keep_partial_overlapping: bool) -> bool
       :staticmethod:
 
 
       Helper function for filtering overlapping interval-value pairs.
-
-
-
-   .. py:method:: _keep_fully_overlapping(item: tuple[Interval, Any], selection_start: float, selection_end: float) -> bool
-      :staticmethod:
-
-
-      Helper function for filtering fully overlapping interval-value pairs.
 
 
 
@@ -539,6 +570,9 @@ Module Contents
 
       Helper function to replace start and end time after filtering interval-value pairs.
 
+
+
+   .. py:method:: __add__(other: typing_extensions.Self) -> typing_extensions.Self
 
 
    .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
@@ -588,11 +622,8 @@ Module Contents
    Container for data related to individual time points.
 
    Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs
-   or only time points. Values generally are numeric values in arrays, but can also be lists of different types of
-   object.
+   or only time points.
 
-   Sparse data is assumed to be sequential (i.e. only a single data points at a single time point, and sorted by time).
-   Sparse data can contain zero or more time points/time-values pairs.
 
    Sparse data differs from interval data in that each data points is associated with a single time point rather than a
    time range.
@@ -670,6 +701,9 @@ Module Contents
       Must return a copy of self object with all attached data within selected
       indices.
 
+
+
+   .. py:method:: __add__(other: typing_extensions.Self) -> typing_extensions.Self
 
 
    .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T

@@ -64,13 +64,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Equivalence" title="eitprocessing.datahandling.continuousdata.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Equivalence</span></code></a></p></td>
 <td><p>Mixin class that adds an equality and equivalence check.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Lockable" title="eitprocessing.datahandling.continuousdata.Lockable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Lockable</span></code></a></p></td>
-<td><p>Adds locking functionality to subclass.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.SelectByTime" title="eitprocessing.datahandling.continuousdata.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByTime</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.SelectByTime" title="eitprocessing.datahandling.continuousdata.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByTime</span></code></a></p></td>
 <td><p>Adds methods for slicing by time rather than index.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData" title="eitprocessing.datahandling.continuousdata.ContinuousData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContinuousData</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData" title="eitprocessing.datahandling.continuousdata.ContinuousData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContinuousData</span></code></a></p></td>
 <td><p>Container for data with a continuous time axis.</p></td>
 </tr>
 </tbody>
@@ -137,93 +134,6 @@ returned.</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Lockable">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.continuousdata.</span></span><span class="sig-name descname"><span class="pre">Lockable</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/locking.html#Lockable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Lockable" title="Link to this definition">¶</a></dt>
-<dd><p>Adds locking functionality to subclass.</p>
-<p>This class provides the methods lock(), unlock(), lock_all(), unlock_all(), islocked() and islockable(), and the
-property _lock_action_defaults.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Lockable.lock">
-<span class="sig-name descname"><span class="pre">lock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/locking.html#Lockable.lock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Lockable.lock" title="Link to this definition">¶</a></dt>
-<dd><p>Lock attributes, essentially rendering them read-only.</p>
-<p>Locked attributes cannot be overwritten. Attributes can be unlocked using <cite>unlock()</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>*attr</strong> – any number of attributes can be passed here, all of which will be locked. Defaults to “values”.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># lock the `values` attribute of `data`</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="c1"># will result in an AttributeError</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c1"># will result in a RuntimeError</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Lockable.unlock">
-<span class="sig-name descname"><span class="pre">unlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/locking.html#Lockable.unlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Lockable.unlock" title="Link to this definition">¶</a></dt>
-<dd><p>Unlock attributes, rendering them editable.</p>
-<p>Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>*attr</strong> – any number of attributes can be passed here, all of which will be unlocked. Defaults to “values”.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># lock the `values` attribute of `data`</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="c1"># will result in an AttributeError</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c1"># will result in a RuntimeError</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-<span class="go">[1,2,3]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c1"># will result in a RuntimeError</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-<span class="go">1</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Lockable.lock_all">
-<span class="sig-name descname"><span class="pre">lock_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/locking.html#Lockable.lock_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Lockable.lock_all" title="Link to this definition">¶</a></dt>
-<dd><p>Lock all lockable attributes.</p>
-<p>See lock().</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Lockable.unlock_all">
-<span class="sig-name descname"><span class="pre">unlock_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/locking.html#Lockable.unlock_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Lockable.unlock_all" title="Link to this definition">¶</a></dt>
-<dd><p>Unlock all (un)lockable attributes.</p>
-<p>See unlock().</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Lockable.islocked">
-<span class="sig-name descname"><span class="pre">islocked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'values'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/locking.html#Lockable.islocked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Lockable.islocked" title="Link to this definition">¶</a></dt>
-<dd><p>Return whether an attribute is locked.</p>
-<p>See lock().</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Lockable.islockable">
-<span class="sig-name descname"><span class="pre">islockable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'values'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/locking.html#Lockable.islockable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Lockable.islockable" title="Link to this definition">¶</a></dt>
-<dd><p>Return whether an attribute is lockable.</p>
-<p>See lock().</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.Lockable._lock_action_defaults">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_lock_action_defaults</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.Lockable._lock_action_defaults" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a list of attributes that (un)locked if no arguments are provided to lock() or unlock().</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.SelectByTime">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.continuousdata.</span></span><span class="sig-name descname"><span class="pre">SelectByTime</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.SelectByTime" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByIndex</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></p>
@@ -270,12 +180,12 @@ on the original object label and the frames by which it is sliced.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.ContinuousData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.continuousdata.</span></span><span class="sig-name descname"><span class="pre">ContinuousData</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/continuousdata.html#ContinuousData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.ContinuousData" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a>, <a class="reference internal" href="../mixins/locking/index.html#eitprocessing.datahandling.mixins.locking.Lockable" title="eitprocessing.datahandling.mixins.locking.Lockable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.locking.Lockable</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence" title="eitprocessing.datahandling.mixins.equality.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.equality.Equivalence</span></code></a>, <a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing.SelectByTime</span></code></a></p>
 <p>Container for data with a continuous time axis.</p>
-<p>Continuous data is data that was continuously measured/created at a predictable rate. Therefore, continuous data is
-assumed to have a predictable delta between time points. A fixed delta is not enforced for two reasons: a) some
-devices have slightly varying sampling rate (but fixed around a set rate) and b) floating point arithmetic.</p>
-<p>Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time).</p>
+<p>Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and
+continuously measured/created at a fixed sampling rate. However, a fixed interval between consecutive time points is
+not enforced to account for floating point arithmetic, devices with imperfect sampling rates, and other sources of
+variation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -402,6 +312,58 @@ derived = data.derive(“volume_L”, convert_data, {“divide”: 1000}, name=�
 <a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.ContinuousData.lock">
+<span class="sig-name descname"><span class="pre">lock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/continuousdata.html#ContinuousData.lock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.ContinuousData.lock" title="Link to this definition">¶</a></dt>
+<dd><p>Lock attributes, essentially rendering them read-only.</p>
+<p>Locked attributes cannot be overwritten. Attributes can be unlocked using <cite>unlock()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*attr</strong> – any number of attributes can be passed here, all of which will be locked. Defaults to “values”.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># lock the `values` attribute of `data`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="c1"># will result in an AttributeError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c1"># will result in a RuntimeError</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.ContinuousData.unlock">
+<span class="sig-name descname"><span class="pre">unlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/continuousdata.html#ContinuousData.unlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.ContinuousData.unlock" title="Link to this definition">¶</a></dt>
+<dd><p>Unlock attributes, rendering them editable.</p>
+<p>Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*attr</strong> – any number of attributes can be passed here, all of which will be unlocked. Defaults to “values”.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># lock the `values` attribute of `data`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="c1"># will result in an AttributeError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c1"># will result in a RuntimeError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="go">[1,2,3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c1"># will result in a RuntimeError</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.ContinuousData.locked">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">locked</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/continuousdata.html#ContinuousData.locked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.ContinuousData.locked" title="Link to this definition">¶</a></dt>
+<dd><p>Return whether the values attribute is locked.</p>
+<p>See lock().</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.continuousdata.ContinuousData.loaded">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/continuousdata.html#ContinuousData.loaded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.continuousdata.ContinuousData.loaded" title="Link to this definition">¶</a></dt>
@@ -448,16 +410,6 @@ indices.</p>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Equivalence.isequivalent"><code class="docutils literal notranslate"><span class="pre">Equivalence.isequivalent()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Lockable"><code class="docutils literal notranslate"><span class="pre">Lockable</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Lockable.lock"><code class="docutils literal notranslate"><span class="pre">Lockable.lock()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Lockable.unlock"><code class="docutils literal notranslate"><span class="pre">Lockable.unlock()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Lockable.lock_all"><code class="docutils literal notranslate"><span class="pre">Lockable.lock_all()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Lockable.unlock_all"><code class="docutils literal notranslate"><span class="pre">Lockable.unlock_all()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Lockable.islocked"><code class="docutils literal notranslate"><span class="pre">Lockable.islocked()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Lockable.islockable"><code class="docutils literal notranslate"><span class="pre">Lockable.islockable()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.Lockable._lock_action_defaults"><code class="docutils literal notranslate"><span class="pre">Lockable._lock_action_defaults</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.SelectByTime"><code class="docutils literal notranslate"><span class="pre">SelectByTime</span></code></a><ul>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.SelectByTime.select_by_time"><code class="docutils literal notranslate"><span class="pre">SelectByTime.select_by_time()</span></code></a></li>
 </ul>
@@ -479,6 +431,9 @@ indices.</p>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData.__add__"><code class="docutils literal notranslate"><span class="pre">ContinuousData.__add__()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData.concatenate"><code class="docutils literal notranslate"><span class="pre">ContinuousData.concatenate()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData.derive"><code class="docutils literal notranslate"><span class="pre">ContinuousData.derive()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData.lock"><code class="docutils literal notranslate"><span class="pre">ContinuousData.lock()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData.unlock"><code class="docutils literal notranslate"><span class="pre">ContinuousData.unlock()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData.locked"><code class="docutils literal notranslate"><span class="pre">ContinuousData.locked</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData.loaded"><code class="docutils literal notranslate"><span class="pre">ContinuousData.loaded</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData.__len__"><code class="docutils literal notranslate"><span class="pre">ContinuousData.__len__()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.continuousdata.ContinuousData._sliced_copy"><code class="docutils literal notranslate"><span class="pre">ContinuousData._sliced_copy()</span></code></a></li>

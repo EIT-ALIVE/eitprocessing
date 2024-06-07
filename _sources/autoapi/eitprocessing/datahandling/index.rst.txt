@@ -26,7 +26,6 @@ Submodules
    /autoapi/eitprocessing/datahandling/eitdata/index
    /autoapi/eitprocessing/datahandling/event/index
    /autoapi/eitprocessing/datahandling/intervaldata/index
-   /autoapi/eitprocessing/datahandling/phases/index
    /autoapi/eitprocessing/datahandling/sequence/index
    /autoapi/eitprocessing/datahandling/sparsedata/index
 
