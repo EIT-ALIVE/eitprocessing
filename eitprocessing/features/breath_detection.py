@@ -373,3 +373,8 @@ class BreathDetection:
         )
 
         return sequence.interval_data["breaths"]
+    def _twosidedfill(self, data: np.ndarray) -> np.ndarray:
+        while any(np.isnan(data)):
+            data = np.where(np.isnan(data), np.concatenate([data[:1], data[:-1]]), data)
+            data = np.where(np.isnan(data), np.concatenate([data[1:], data[-1:]]), data)
+        return data
