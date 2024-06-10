@@ -337,6 +337,32 @@ class BreathDetection:
         data = continuous_data.values
         time = continuous_data.time
 
+        data, outliers = self._remove_outlier_data(data)
+
+        peak_valley_data = self._detect_peaks_and_valleys(data)
+
+        breaths = self._create_breaths_from_peak_valley_data(
+            time,
+            peak_valley_data.peak_indices,
+            peak_valley_data.valley_indices,
+        )
+        breaths = self._remove_breaths_around_invalid_data(breaths, data, time, outliers)
+
+        sequence.interval_data.add(
+            IntervalData(
+                label="breaths",
+                name="Breaths as determined by BreathDetection",
+                unit=None,
+                category="breath",
+                intervals=[(breath.start_time, breath.end_time) for breath in breaths],
+                values=breaths,
+                parameters={self.__class__: dict(vars(self))},
+                derived_from=[continuous_data],
+            ),
+        )
+
+        return sequence.interval_data["breaths"]
+
     def _create_breaths_from_peak_valley_data(self, time: np.ndarray, peak_indices, valley_indices):
         return [
             Breath(time[start], time[middle], time[end])
@@ -346,12 +372,15 @@ class BreathDetection:
                 strict=True,
             )
         ]
+
     def _remove_outlier_data(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         outliers = self._detect_invalid_data(data)
 
         data[outliers] = np.nan
         data = self._twosidedfill(data)
         return data, outliers
+
+    def _detect_peaks_and_valleys(self, data: np.ndarray) -> _PeakValleyData:
         window_size = int(self.sample_frequency * self.averaging_window_length)
         averager = MovingAverage(window_size=window_size, window_fun=np.bartlett)
         moving_average = averager.apply(data)
@@ -368,32 +397,22 @@ class BreathDetection:
         peak_valley_data = self._remove_edge_cases(*peak_valley_data, data, moving_average)
         peak_valley_data = self._remove_doubles(*peak_valley_data)
         peak_valley_data = self._remove_low_amplitudes(*peak_valley_data)
-
-        breaths = [
-            Breath(time[start], time[middle], time[end])
-            for middle, (start, end) in zip(
-                peak_valley_data.peak_indices,
-                itertools.pairwise(peak_valley_data.valley_indices),
-                strict=True,
-            )
-        ]
+        return peak_valley_data
 
         breaths = self._remove_breaths_around_invalid_data(breaths, data, time)
 
-        sequence.interval_data.add(
-            IntervalData(
-                label="breaths",
-                name="Breaths as determined by BreathDetection",
-                unit=None,
-                category="breath",
-                intervals=[(breath.start_time, breath.end_time) for breath in breaths],
-                values=breaths,
-                parameters={self.__class__: dict(vars(self))},
-                derived_from=[continuous_data],
-            ),
-        )
+    def _detect_invalid_data(self, data: np.ndarray) -> np.ndarray:
+        data_mean = np.mean(data)
 
-        return sequence.interval_data["breaths"]
+        lower_percentile = np.percentile(data, self.invalid_data_removal_percentile)
+        cutoff_low = data_mean - (data_mean - lower_percentile) * self.invalid_data_removal_multiplier
+
+        upper_percentile = np.percentile(data, 100 - self.invalid_data_removal_percentile)
+        cutoff_high = data_mean + (upper_percentile - data_mean) * self.invalid_data_removal_multiplier
+
+        # detect indices of outliers
+        return np.flatnonzero((data < cutoff_low) | (data > cutoff_high))
+
     def _twosidedfill(self, data: np.ndarray) -> np.ndarray:
         while any(np.isnan(data)):
             data = np.where(np.isnan(data), np.concatenate([data[:1], data[:-1]]), data)
