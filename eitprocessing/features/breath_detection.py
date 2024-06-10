@@ -97,12 +97,10 @@ class BreathDetection:
         """
         Remove overdetected peaks/valleys at the start and end of the data.
 
-        This method removed a valley at the start of the data, if the data
-        before said valley stays below the moving average of the data at said
-        valley. Likewise, it removes the last valley if the data after the last
-        valley stays below the moving average of the data at said valley. This
-        ensures a valley is a true valley, and not just a local minimum while
-        the true valley is cut off.
+        This method removes a valley at the start of the data if the data before said valley stays below the moving
+        average of the data at said valley. Likewise, it removes the last valley if the data after the last valley stays
+        below the moving average of the data at said valley. This ensures a valley is a true valley, and not just a
+        local minimum while the true valley is cut off.
 
         Then, all peaks that occur before the first and after the last valley
         are removed. This ensures peaks only fall between valleys.
@@ -227,10 +225,10 @@ class BreathDetection:
         unchanged.
 
         Args:
-          peak_indices (np.ndarray): the indices of the peaks
-          peak_values (np.ndarray): the values of the peaks
-          valley_indices (np.ndarray): the indices of the valleys
-          valley_values (np.ndarray): the values of the valleys
+            peak_indices (np.ndarray): the indices of the peaks
+            peak_values (np.ndarray): the values of the peaks
+            valley_indices (np.ndarray): the indices of the valleys
+            valley_values (np.ndarray): the values of the valleys
 
         Returns:
             A tuple (peak_indices, peak_values, valley_indices, valley_values)
