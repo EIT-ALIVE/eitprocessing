@@ -337,6 +337,15 @@ class BreathDetection:
         data = continuous_data.values
         time = continuous_data.time
 
+    def _create_breaths_from_peak_valley_data(self, time: np.ndarray, peak_indices, valley_indices):
+        return [
+            Breath(time[start], time[middle], time[end])
+            for middle, (start, end) in zip(
+                peak_indices,
+                itertools.pairwise(valley_indices),
+                strict=True,
+            )
+        ]
     def _remove_outlier_data(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         outliers = self._detect_invalid_data(data)
 
