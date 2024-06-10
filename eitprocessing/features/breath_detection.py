@@ -337,6 +337,12 @@ class BreathDetection:
         data = continuous_data.values
         time = continuous_data.time
 
+    def _remove_outlier_data(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        outliers = self._detect_invalid_data(data)
+
+        data[outliers] = np.nan
+        data = self._twosidedfill(data)
+        return data, outliers
         window_size = int(self.sample_frequency * self.averaging_window_length)
         averager = MovingAverage(window_size=window_size, window_fun=np.bartlett)
         moving_average = averager.apply(data)
