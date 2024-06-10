@@ -263,32 +263,38 @@ class BreathDetection:
         breaths: list[Breath],
         data: np.ndarray,
         time: np.ndarray,
+        outliers: np.ndarray,
     ) -> list[Breath]:
-        mean = np.mean(data)
-        lower_percentile = np.percentile(
-            data,
-            self.invalid_data_removal_percentile,
-        )
-        cutoff_low = mean - (mean - lower_percentile) * self.invalid_data_removal_multiplier
-        upper_percentile = np.percentile(
-            data,
-            100 - self.invalid_data_removal_percentile,
-        )
-        cutoff_high = mean + (upper_percentile - mean) * self.invalid_data_removal_multiplier
-        outliers = (data < cutoff_low) | (data > cutoff_high)
+        """Remove breaths overlapping with invalid data.
 
-        window_length = math.ceil(
-            self.invalid_data_removal_window_length * self.sample_frequency,
-        )
-        window = np.ones(window_length)
+        This function defines a lower and upper cutoff. Data beyond those cutoffs is considered invalid for the
+        purposes of breath detection. Breaths that start within a window length of invalid data are removed.
 
-        extended_data_is_zero = np.convolve(outliers, window, mode="same")
-        extended_data_is_zero = extended_data_is_zero.astype(bool).astype(int)
+        The lower cutoff is a distance away from the mean. The distance is m times the distance between the
+        mean and the nth percentile of the data. m is given by `invalid_data_removal_multiplier` and n is given by
+        `invalid_data_removal_percentile`.
+
+        For example, with m = 4 and n = 5, the mean = 100, and 5% of the data is below/equal to 90, all data below 100 -
+        (4 * 10) = 60 and above 100 + (4 * 10) = 140 is considerd invalid.
+
+        Args:
+            breaths: list of detected breath objects
+            data: data the breaths were detected in
+            time: time axis belonging to the data
+        """
+        # TODO: write more general(ized) method of determining invalid data
+
+        outlier_values = np.zeros(data.shape)
+        outlier_values[outliers] = 1
+        window_length = math.ceil(self.invalid_data_removal_window_length * self.sample_frequency)
 
         for breath in breaths[:]:
-            if np.max(
-                extended_data_is_zero[np.argmax(time == breath.start_time) : np.argmax(time == breath.end_time)],
-            ):
+            breath_start_minus_window = np.argmax(time == breath.start_time) - window_length
+            breath_end_plus_window = np.argmax(time == breath.end_time) + window_length
+
+            # is no outliers are within the window, np.max() will return 0
+            # if any outliers are within the window, np.max() will return 1
+            if np.max(outlier_values[breath_start_minus_window:breath_end_plus_window]):
                 breaths.remove(breath)
 
         return breaths
