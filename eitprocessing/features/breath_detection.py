@@ -41,7 +41,7 @@ class BreathDetection:
     averaging_window_length: float = 15
     averaging_window_fun: Callable[[int], ArrayLike] | None = np.blackman
     amplitude_cutoff_fraction: float | None = 0.25
-    invalid_data_removal_window_length: float = 1
+    invalid_data_removal_window_length: float = 0.5
     invalid_data_removal_percentile: int = 5
     invalid_data_removal_multiplier: int = 4
 
