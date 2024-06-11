@@ -331,8 +331,10 @@ def test_remove_breaths_around_invalid_data():
     )
 
 
-def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence):
-    # pytest.skip("Skip so formalized tests can cover 100%.")
+def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
+    if pytestconfig.getoption("--cov"):
+        pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
+
     draeger1 = copy.deepcopy(draeger1)
     draeger2 = copy.deepcopy(draeger2)
     timpel1 = copy.deepcopy(timpel1)
