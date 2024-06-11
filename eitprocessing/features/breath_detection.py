@@ -361,7 +361,7 @@ class BreathDetection:
 
         return sequence.interval_data["breaths"]
 
-    def _create_breaths_from_peak_valley_data(self, time: np.ndarray, peak_indices, valley_indices):
+    def _create_breaths_from_peak_valley_data(self, time: np.ndarray, peak_indices, valley_indices) -> list[Breath]:
         return [
             Breath(time[start], time[middle], time[end])
             for middle, (start, end) in zip(
