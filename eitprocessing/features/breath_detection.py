@@ -388,6 +388,19 @@ class BreathDetection:
         return np.flatnonzero((data < cutoff_low) | (data > cutoff_high))
 
     def _twosidedfill(self, data: np.ndarray) -> np.ndarray:
+        """Forward-fill and backward-fill sequences of np.nan values.
+
+        Any np.nan value following a non-nan-value is set to the preceding value. Then np.nan value preceding a
+        non-nan-value is set to the following value. These two rules are repeated until all np.nan values are filled
+        out.
+
+        Example:
+            foo = np.ndarray([np.nan, 1, np.nan, np.nan, np.nan, 3, np.nan, np.nan])
+            bar = _twosidedfill(foo)
+            # after first loop: np.ndarray([1, 1, 1, np.nan, 3, 3, 3, np.nan])
+            # after second loop: np.ndarray([1, 1, 1, 1, 3, 3, 3, 3])
+            assert bar == np.ndarray([1, 1, 1, 1, 3, 3, 3, 3])
+        """
         while any(np.isnan(data)):
             data = np.where(np.isnan(data), np.concatenate([data[:1], data[:-1]]), data)
             data = np.where(np.isnan(data), np.concatenate([data[1:], data[-1:]]), data)
