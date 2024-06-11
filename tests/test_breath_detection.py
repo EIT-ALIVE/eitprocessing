@@ -68,80 +68,70 @@ def test_remove_edge_cases(
     data = np.array([2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
 
     bd = BreathDetection(1)
-    results = bd._remove_edge_cases(  # noqa: SLF001
-        peak_indices,
-        data[peak_indices],
-        valley_indices,
-        data[valley_indices],
+    result_peak_indices, result_valley_indices = bd._remove_edge_cases(  # noqa: SLF001
         data,
+        peak_indices,
+        valley_indices,
         moving_average,
     )
-    assert np.array_equal(results.peak_indices, expected_peak_indices)
-    assert np.array_equal(results.valley_indices, expected_valley_indices)
+    assert np.array_equal(result_peak_indices, expected_peak_indices)
+    assert np.array_equal(result_valley_indices, expected_valley_indices)
 
 
 test_data_remove_doubles = [
     (  # test removal of the first valley
+        np.array([5, 1, 2, 5]),
         np.array([0, 3]),
-        np.array([0, 0]),
-        np.array([1, 2]),
         np.array([1, 2]),
         np.array([0, 3]),
         np.array([1]),
     ),
     (  # test removal of the second valley
+        np.array([5, 2, 1, 5]),
         np.array([0, 3]),
-        np.array([0, 0]),
         np.array([1, 2]),
-        np.array([2, 1]),
         np.array([0, 3]),
         np.array([2]),
     ),
     (  # test removal of valleys with same value
+        np.array([0, 1, 1, 0]),
         np.array([0, 3]),
-        np.array([0, 0]),
         np.array([1, 2]),
-        np.array([1, 1]),
         np.array([0, 3]),
         np.array([1]),
     ),
     (  # test removal of first peak
-        np.array([1, 2]),
+        np.array([0, 1, 2, 0]),
         np.array([1, 2]),
         np.array([0, 3]),
-        np.array([0, 0]),
         np.array([2]),
         np.array([0, 3]),
     ),
     (  # test removal of second peak
+        np.array([0, 2, 1, 0]),
         np.array([1, 2]),
-        np.array([2, 1]),
         np.array([0, 3]),
-        np.array([0, 0]),
         np.array([1]),
         np.array([0, 3]),
     ),
     (  # test removal of peaks with same value
+        np.array([0, 1, 1, 0]),
         np.array([1, 2]),
-        np.array([1, 1]),
         np.array([0, 3]),
-        np.array([0, 0]),
         np.array([1]),
         np.array([0, 3]),
     ),
     (  # test removal of both valleys and peaks
+        np.array([0, 1, 1, 0, 1, 1, 2, 0]),
         np.array([1, 2, 5, 6]),
-        np.array([1, 1, 1, 2]),
         np.array([0, 3, 4, 7]),
-        np.array([0, 0, 1, 0]),
         np.array([1, 6]),
         np.array([0, 3, 7]),
     ),
     (
         np.array([]),
-        np.array([]),
-        np.array([]),
-        np.array([]),
+        np.array([], dtype=int),
+        np.array([], dtype=int),
         np.array([]),
         np.array([]),
     ),
@@ -150,29 +140,26 @@ test_data_remove_doubles = [
 
 @pytest.mark.parametrize(
     (
+        "data",
         "peak_indices",
-        "peak_values",
         "valley_indices",
-        "valley_values",
         "expected_peak_indices",
         "expected_valley_indices",
     ),
     test_data_remove_doubles,
 )
 def test_remove_doubles(
+    data: np.ndarray,
     peak_indices: np.ndarray,
-    peak_values: np.ndarray,
     valley_indices: np.ndarray,
-    valley_values: np.ndarray,
     expected_peak_indices: np.ndarray,
     expected_valley_indices: np.ndarray,
 ):
     bd = BreathDetection(sample_frequency=1)
-    result_peak_indices, _, result_valley_indices, _ = bd._remove_doubles(  # noqa: SLF001
+    result_peak_indices, result_valley_indices = bd._remove_doubles(
+        data,
         peak_indices,
-        peak_values,
         valley_indices,
-        valley_values,
     )
 
     assert np.all(result_peak_indices == expected_peak_indices)
@@ -181,58 +168,51 @@ def test_remove_doubles(
 
 test_data_remove_low_amplitude = [
     (  # test remove none
+        np.array([0, 1, 3, 1, 3, 1, 3, 1, 3, 1]),
         np.array([2, 4, 6, 8]),
-        np.array([3, 3, 3, 3]),
         np.array([1, 3, 5, 7, 9]),
-        np.array([1, 1, 1, 1, 1]),
         np.array([2, 4, 6, 8]),
         np.array([1, 3, 5, 7, 9]),
     ),
     (  # test remove first peak, keeping the first valley
+        np.array([0, 1, 1.2, 1.1, 3, 1, 3, 1, 3, 1]),
         np.array([2, 4, 6, 8]),
-        np.array([1.2, 3, 3, 3]),
         np.array([1, 3, 5, 7, 9]),
-        np.array([1, 1.1, 1, 1, 1]),
         np.array([4, 6, 8]),
         np.array([1, 5, 7, 9]),
     ),
     (  # test remove first peak, keeping the second valley
+        np.array([0, 1.1, 1.2, 1, 3, 1, 3, 1, 3, 1]),
         np.array([2, 4, 6, 8]),
-        np.array([1.2, 3, 3, 3]),
         np.array([1, 3, 5, 7, 9]),
-        np.array([1.1, 1, 1, 1, 1]),
         np.array([4, 6, 8]),
         np.array([3, 5, 7, 9]),
     ),
     (  # test remove second peak, keeping the second valley
+        np.array([0, 1, 3, 1, 1.2, 1.1, 3, 1, 3, 1]),
         np.array([2, 4, 6, 8]),
-        np.array([3, 1.2, 3, 3]),
         np.array([1, 3, 5, 7, 9]),
-        np.array([1, 1, 1.1, 1, 1]),
         np.array([2, 6, 8]),
         np.array([1, 3, 7, 9]),
     ),
     (  # test remove second peak, keeping the third valley
+        np.array([0, 1, 3, 1.1, 1.2, 1, 3, 1, 3, 1]),
         np.array([2, 4, 6, 8]),
-        np.array([3, 1.2, 3, 3]),
         np.array([1, 3, 5, 7, 9]),
-        np.array([1, 1.1, 1, 1, 1]),
         np.array([2, 6, 8]),
         np.array([1, 5, 7, 9]),
     ),
     (  # test remove last peak, keeping the second to last valley
+        np.array([0, 1, 3, 1, 3, 1, 3, 1, 1.2, 1.1]),
         np.array([2, 4, 6, 8]),
-        np.array([3, 3, 3, 1.2]),
         np.array([1, 3, 5, 7, 9]),
-        np.array([1, 1, 1, 1, 1.1]),
         np.array([2, 4, 6]),
         np.array([1, 3, 5, 7]),
     ),
     (  # test remove last peak, keeping the last valley
+        np.array([0, 1, 3, 1, 3, 1, 3, 1.1, 1.2, 1]),
         np.array([2, 4, 6, 8]),
-        np.array([3, 3, 3, 1.2]),
         np.array([1, 3, 5, 7, 9]),
-        np.array([1, 1, 1, 1.1, 1]),
         np.array([2, 4, 6]),
         np.array([1, 3, 5, 9]),
     ),
@@ -241,58 +221,54 @@ test_data_remove_low_amplitude = [
 
 @pytest.mark.parametrize(
     (
+        "data",
         "peak_indices",
-        "peak_values",
         "valley_indices",
-        "valley_values",
         "expected_peak_indices",
         "expected_valley_indices",
     ),
     test_data_remove_low_amplitude,
 )
 def test_remove_low_amplitudes(
+    data: np.ndarray,
     peak_indices: np.ndarray,
-    peak_values: np.ndarray,
     valley_indices: np.ndarray,
-    valley_values: np.ndarray,
     expected_peak_indices: np.ndarray,
     expected_valley_indices: np.ndarray,
 ):
     bd = BreathDetection(1)
-    results = bd._remove_low_amplitudes(peak_indices, peak_values, valley_indices, valley_values)  # noqa: SLF001
-    assert np.array_equal(results.peak_indices, expected_peak_indices)
-    assert np.array_equal(results.valley_indices, expected_valley_indices)
+    result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)  # noqa: SLF001
+    assert np.array_equal(result_peak_indices, expected_peak_indices)
+    assert np.array_equal(result_valley_indices, expected_valley_indices)
 
 
 @pytest.mark.parametrize(
     (
+        "data",
         "peak_indices",
-        "peak_values",
         "valley_indices",
-        "valley_values",
         "expected_peak_indices",
         "expected_valley_indices",
     ),
     test_data_remove_low_amplitude,
 )
 def test_no_remove_low_amplitudes(
+    data: np.ndarray,
     peak_indices: np.ndarray,
-    peak_values: np.ndarray,
     valley_indices: np.ndarray,
-    valley_values: np.ndarray,
     expected_peak_indices: np.ndarray,
     expected_valley_indices: np.ndarray,
 ):
     """This test uses the same data as test_remove_low_amplitudes, but expects the output to be the same as the input."""
     bd = BreathDetection(1, amplitude_cutoff_fraction=None)
-    results = bd._remove_low_amplitudes(peak_indices, peak_values, valley_indices, valley_values)  # noqa: SLF001
-    assert np.array_equal(results.peak_indices, peak_indices)
-    assert np.array_equal(results.valley_indices, valley_indices)
+    result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)  # noqa: SLF001
+    assert np.array_equal(result_peak_indices, peak_indices)
+    assert np.array_equal(result_valley_indices, valley_indices)
 
     bd = BreathDetection(1, amplitude_cutoff_fraction=0)
-    results = bd._remove_low_amplitudes(peak_indices, peak_values, valley_indices, valley_values)  # noqa: SLF001
-    assert np.array_equal(results.peak_indices, peak_indices)
-    assert np.array_equal(results.valley_indices, valley_indices)
+    result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)  # noqa: SLF001
+    assert np.array_equal(result_peak_indices, peak_indices)
+    assert np.array_equal(result_valley_indices, valley_indices)
 
 
 def test_remove_no_breaths_around_valid_data():
@@ -300,10 +276,10 @@ def test_remove_no_breaths_around_valid_data():
     time, y = make_cosine_wave(sample_frequency, 1000, 1)
     bd = BreathDetection(sample_frequency)
 
-    peak_valley_data = bd._detect_peaks_and_valleys(y)
-    assert np.array_equal(time[peak_valley_data.peak_indices], np.arange(1, 50))
+    peak_indices, valley_indices = bd._detect_peaks_and_valleys(y)
+    assert np.array_equal(time[peak_indices], np.arange(1, 50))
     assert np.array_equal(
-        time[peak_valley_data.valley_indices],
+        time[valley_indices],
         np.arange(0, 50) + 0.5,
     )
 
@@ -313,21 +289,21 @@ def test_remove_breaths_around_invalid_data():
     time, y = make_cosine_wave(sample_frequency, 1000, 1)
     bd = BreathDetection(sample_frequency)
 
-    peak_valley_data = bd._detect_peaks_and_valleys(y)
+    valid_peak_indices, valid_valley_indices = bd._detect_peaks_and_valleys(y)
 
     start_invalid = np.argmax(time >= 2.75)
     end_invalid = np.argmax(time >= 3.25)
-    y_with_invalid = np.copy(y)
-    y_with_invalid[start_invalid:end_invalid] = np.nan
-    y_with_invalid = bd._twosidedfill(y_with_invalid)
+    y_with_invalid_data = np.copy(y)
+    y_with_invalid_data[start_invalid:end_invalid] = np.nan
+    y_with_invalid_data = bd._twosidedfill(y_with_invalid_data)
 
-    peak_valley_data2 = bd._detect_peaks_and_valleys(y_with_invalid)
-    assert not np.array_equal(peak_valley_data.peak_indices, peak_valley_data2.peak_indices)
-    assert not np.array_equal(peak_valley_data.valley_indices, peak_valley_data2.valley_indices)
+    invalid_peak_indices, invalid_valley_indices = bd._detect_peaks_and_valleys(y_with_invalid_data)
+    assert not np.array_equal(valid_peak_indices, invalid_peak_indices)
+    assert not np.array_equal(valid_valley_indices, invalid_valley_indices)
 
-    assert np.array_equal(time[peak_valley_data2.peak_indices], np.concatenate([[1.0, 2.0], np.arange(4.0, 50.0, 1.0)]))
+    assert np.array_equal(time[invalid_peak_indices], np.concatenate([[1.0, 2.0], np.arange(4.0, 50.0, 1.0)]))
     assert np.array_equal(
-        time[peak_valley_data2.valley_indices],
+        time[invalid_valley_indices],
         np.concatenate([[0.5, 1.5, 2.5], np.arange(4.5, 50.0, 1.0)]),
     )
 
