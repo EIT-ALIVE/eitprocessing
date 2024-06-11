@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from dataclasses import dataclass
 
 
@@ -16,3 +17,6 @@ class Breath:
                 "{self.start_time:.2f}, {self.middle_time:.2f} and {self.end_time:.2f}"
             )
             raise ValueError(msg)
+
+    def __iter__(self) -> Iterator[float]:
+        return iter((self.start_time, self.middle_time, self.end_time))
