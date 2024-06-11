@@ -45,6 +45,70 @@ class BreathDetection:
     invalid_data_removal_percentile: int = 5
     invalid_data_removal_multiplier: int = 4
 
+    def find_breaths(self, sequence: Sequence, continuousdata_label: str) -> IntervalData:
+        """Find breaths in the data.
+
+        This method attempts to find peaks and valleys in the data in a
+        multi-step process. First, it naively finds any peaks that are a
+        certain distance apart and higher than the moving average, and
+        similarly valleys that are a certain distance apart and below the
+        moving average.
+
+        Next, valleys at the start and end of the signal are removed
+        to ensure the first and last valleys are actual valleys, and not just
+        the start or end of the signal. Peaks before the first or after the
+        last valley are removed, to ensure peaks always fall between two
+        valleys.
+
+        At this point, it is possible multiple peaks exist between two valleys.
+        Lower peaks are removed leaving only the highest peak between two
+        valleys. Similarly, multiple valleys between two peaks are reduced to
+        only the lowest valley.
+
+        As a last step, breaths with a low amplitude (the average between the
+        inspiratory and expiratory amplitudes) are removed.
+
+        Breaths are constructed as a valley-peak-valley combination,
+        representing the start of inspiration, the end of inspiration/start of
+        expiration, and end of expiration.
+
+        Args:
+            sequence: the sequence that contains the data
+            continuousdata_label: label of the continuous data to apply the algorithm to
+
+        Returns:
+            A list of Breath objects.
+        """
+        continuous_data = sequence.continuous_data[continuousdata_label]
+        data = continuous_data.values
+        time = continuous_data.time
+
+        data, outliers = self._remove_outlier_data(data)
+
+        peak_valley_data = self._detect_peaks_and_valleys(data)
+
+        breaths = self._create_breaths_from_peak_valley_data(
+            time,
+            peak_valley_data.peak_indices,
+            peak_valley_data.valley_indices,
+        )
+        breaths = self._remove_breaths_around_invalid_data(breaths, time, outliers)
+
+        sequence.interval_data.add(
+            IntervalData(
+                label="breaths",
+                name="Breaths as determined by BreathDetection",
+                unit=None,
+                category="breath",
+                intervals=[(breath.start_time, breath.end_time) for breath in breaths],
+                values=breaths,
+                parameters={self.__class__: dict(vars(self))},
+                derived_from=[continuous_data],
+            ),
+        )
+
+        return sequence.interval_data["breaths"]
+
     def _find_features(
         self,
         data: np.ndarray,
@@ -296,70 +360,6 @@ class BreathDetection:
                 breaths.remove(breath)
 
         return breaths
-
-    def find_breaths(self, sequence: Sequence, continuousdata_label: str) -> IntervalData:
-        """Find breaths in the data.
-
-        This method attempts to find peaks and valleys in the data in a
-        multi-step process. First, it naively finds any peaks that are a
-        certain distance apart and higher than the moving average, and
-        similarly valleys that are a certain distance apart and below the
-        moving average.
-
-        Next, valleys at the start and end of the signal are removed
-        to ensure the first and last valleys are actual valleys, and not just
-        the start or end of the signal. Peaks before the first or after the
-        last valley are removed, to ensure peaks always fall between two
-        valleys.
-
-        At this point, it is possible multiple peaks exist between two valleys.
-        Lower peaks are removed leaving only the highest peak between two
-        valleys. Similarly, multiple valleys between two peaks are reduced to
-        only the lowest valley.
-
-        As a last step, breaths with a low amplitude (the average between the
-        inspiratory and expiratory amplitudes) are removed.
-
-        Breaths are constructed as a valley-peak-valley combination,
-        representing the start of inspiration, the end of inspiration/start of
-        expiration, and end of expiration.
-
-        Args:
-            sequence: the sequence that contains the data
-            continuousdata_label: label of the continuous data to apply the algorithm to
-
-        Returns:
-            A list of Breath objects.
-        """
-        continuous_data = sequence.continuous_data[continuousdata_label]
-        data = continuous_data.values
-        time = continuous_data.time
-
-        data, outliers = self._remove_outlier_data(data)
-
-        peak_valley_data = self._detect_peaks_and_valleys(data)
-
-        breaths = self._create_breaths_from_peak_valley_data(
-            time,
-            peak_valley_data.peak_indices,
-            peak_valley_data.valley_indices,
-        )
-        breaths = self._remove_breaths_around_invalid_data(breaths, time, outliers)
-
-        sequence.interval_data.add(
-            IntervalData(
-                label="breaths",
-                name="Breaths as determined by BreathDetection",
-                unit=None,
-                category="breath",
-                intervals=[(breath.start_time, breath.end_time) for breath in breaths],
-                values=breaths,
-                parameters={self.__class__: dict(vars(self))},
-                derived_from=[continuous_data],
-            ),
-        )
-
-        return sequence.interval_data["breaths"]
 
     def _create_breaths_from_peak_valley_data(self, time: np.ndarray, peak_indices, valley_indices) -> list[Breath]:
         return [
