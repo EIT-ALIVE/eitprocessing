@@ -315,19 +315,20 @@ def test_remove_breaths_around_invalid_data():
 
     peak_valley_data = bd._detect_peaks_and_valleys(y)
 
-    start_invalid = np.argmax(time >= 3.25)
-    end_invalid = np.argmax(time >= 3.75)
+    start_invalid = np.argmax(time >= 2.75)
+    end_invalid = np.argmax(time >= 3.25)
     y_with_invalid = np.copy(y)
-    y_with_invalid[start_invalid:end_invalid] = -1000
+    y_with_invalid[start_invalid:end_invalid] = np.nan
+    y_with_invalid = bd._twosidedfill(y_with_invalid)
 
     peak_valley_data2 = bd._detect_peaks_and_valleys(y_with_invalid)
     assert not np.array_equal(peak_valley_data.peak_indices, peak_valley_data2.peak_indices)
     assert not np.array_equal(peak_valley_data.valley_indices, peak_valley_data2.valley_indices)
 
-    assert np.array_equal(time[peak_valley_data2.peak_indices], np.concatenate([[1], np.arange(5, 50)]))
+    assert np.array_equal(time[peak_valley_data2.peak_indices], np.concatenate([[1.0, 2.0], np.arange(4.0, 50.0, 1.0)]))
     assert np.array_equal(
         time[peak_valley_data2.valley_indices],
-        np.array([0.5, 1.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]),
+        np.concatenate([[0.5, 1.5, 2.5], np.arange(4.5, 50.0, 1.0)]),
     )
 
 
