@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
 
@@ -348,6 +349,41 @@ def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, py
         assert all(
             start_index >= end_index for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
         )
+
+
+def test_create_breaths_from_peak_valley_data():
+    time = np.arange(100) / 3.1415
+    peak_indices = np.array([10, 20, 30, 40, 50])
+    valley_indices = np.array([5, 15, 25, 35, 45, 55])
+
+    bd = BreathDetection(1)
+    breaths = bd._create_breaths_from_peak_valley_data(time, peak_indices, valley_indices)
+    assert len(breaths) == 5
+    assert all(isinstance(breath, Breath) for breath in breaths)
+    assert np.array_equal(np.array([breath.start_time for breath in breaths]), time[valley_indices[:-1]])
+    assert np.array_equal(np.array([breath.middle_time for breath in breaths]), time[peak_indices])
+    assert np.array_equal(np.array([breath.end_time for breath in breaths]), time[valley_indices[1:]])
+
+    fewer_valley_indices = valley_indices[:-1]
+    with pytest.raises(ValueError):
+        bd._create_breaths_from_peak_valley_data(time, peak_indices, fewer_valley_indices)
+
+    fewer_peak_indices = peak_indices[:-1]
+    with pytest.raises(ValueError):
+        bd._create_breaths_from_peak_valley_data(time, fewer_peak_indices, valley_indices)
+
+    peaks_out_of_order = np.concatenate([peak_indices[3:], peak_indices[:3]])
+    with pytest.raises(ValueError):
+        bd._create_breaths_from_peak_valley_data(time, peaks_out_of_order, valley_indices)
+
+    valleys_out_of_order = np.concatenate([valley_indices[3:], valley_indices[:3]])
+    with pytest.raises(ValueError):
+        bd._create_breaths_from_peak_valley_data(time, peak_indices, valleys_out_of_order)
+
+    peaks_at_same_index_as_valleys = valley_indices[:-1]
+    with pytest.raises(ValueError):
+        bd._create_breaths_from_peak_valley_data(time, peaks_at_same_index_as_valleys, valley_indices)
+
 
 def test_remove_breaths_around_invalid_data():
     sample_frequency = 10
