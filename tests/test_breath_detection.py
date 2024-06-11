@@ -412,12 +412,18 @@ def test_remove_breaths_around_invalid_data():
 
     # a single outlier at a peak at t=6 should remove only breaths within 5.6 < t < 6.4
     outliers = np.array([60])
-    removed_breaths = bd._remove_breaths_around_invalid_data(breaths, time, outliers)
-    assert len(removed_breaths) == len(breaths) - 1
-    assert set(breaths) - set(removed_breaths) == {Breath(5.5, 6, 6.5)}
+    breaths_with_some_removed = bd._remove_breaths_around_invalid_data(breaths, time, outliers)
+    removed_breath = Breath(5.5, 6, 6.5)
+    assert len(breaths_with_some_removed) == len(breaths) - 1
+    assert removed_breath in breaths
+    assert removed_breath not in breaths_with_some_removed  # the expected breaths were removed
+    assert all(breath in breaths for breath in breaths_with_some_removed)  # all other stayed the same
 
     # a single outlier at a valley at t=6.5 should remove breaths overlapping with 6.1 < t < 6.9
     outliers = np.array([65])
-    removed_breaths = bd._remove_breaths_around_invalid_data(breaths, time, outliers)
-    assert len(removed_breaths) == len(breaths) - 2
-    assert set(breaths) - set(removed_breaths) == {Breath(5.5, 6, 6.5), Breath(6.5, 7, 7.5)}
+    breaths_with_some_removed = bd._remove_breaths_around_invalid_data(breaths, time, outliers)
+    removed_breaths = [Breath(5.5, 6, 6.5), Breath(6.5, 7, 7.5)]
+    assert len(breaths_with_some_removed) == len(breaths) - 2
+    assert all(removed_breath in breaths for removed_breath in removed_breaths)
+    assert all(removed_breath not in breaths_with_some_removed for removed_breath in removed_breaths)
+    assert all(kept_breath in breaths for kept_breath in breaths_with_some_removed)  # all other stayed the same
