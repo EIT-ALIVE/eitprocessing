@@ -259,7 +259,6 @@ class BreathDetection:
     def _remove_breaths_around_invalid_data(
         self,
         breaths: list[Breath],
-        data: np.ndarray,
         time: np.ndarray,
         outliers: np.ndarray,
     ) -> list[Breath]:
@@ -279,10 +278,11 @@ class BreathDetection:
             breaths: list of detected breath objects
             data: data the breaths were detected in
             time: time axis belonging to the data
+            outliers: indices of outlier data points
         """
         # TODO: write more general(ized) method of determining invalid data
 
-        outlier_values = np.zeros(data.shape)
+        outlier_values = np.zeros(time.shape)
         outlier_values[outliers] = 1
         window_length = math.ceil(self.invalid_data_removal_window_length * self.sample_frequency)
 
@@ -344,7 +344,7 @@ class BreathDetection:
             peak_valley_data.peak_indices,
             peak_valley_data.valley_indices,
         )
-        breaths = self._remove_breaths_around_invalid_data(breaths, data, time, outliers)
+        breaths = self._remove_breaths_around_invalid_data(breaths, time, outliers)
 
         sequence.interval_data.add(
             IntervalData(
@@ -397,7 +397,7 @@ class BreathDetection:
         peak_valley_data = self._remove_low_amplitudes(*peak_valley_data)
         return peak_valley_data
 
-        breaths = self._remove_breaths_around_invalid_data(breaths, data, time)
+        breaths = self._remove_breaths_around_invalid_data(breaths, time, outliers)
 
     def _detect_invalid_data(self, data: np.ndarray) -> np.ndarray:
         data_mean = np.mean(data)
