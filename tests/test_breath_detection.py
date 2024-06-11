@@ -348,3 +348,35 @@ def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, py
         assert all(
             start_index >= end_index for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
         )
+
+def test_remove_breaths_around_invalid_data():
+    sample_frequency = 10
+    length = 100
+    frequency = 1
+    time, y = make_cosine_wave(sample_frequency, length, frequency)
+
+    peak_indices = np.arange(10, 100, 10)
+    valley_indices = np.arange(5, 100, 10)
+
+    assert np.array_equal(y[peak_indices], np.array([1.0] * 9))
+    assert np.array_equal(y[valley_indices], np.array([-1.0] * 10))
+
+    bd = BreathDetection(sample_frequency, invalid_data_removal_window_length=0.4)
+    breaths = bd._create_breaths_from_peak_valley_data(time, peak_indices, valley_indices)
+
+    outliers = np.array([], dtype=int)
+    no_breaths_removed = bd._remove_breaths_around_invalid_data(breaths, time, outliers)
+    assert no_breaths_removed == breaths
+    assert no_breaths_removed is not breaths
+
+    # a single outlier at a peak at t=6 should remove only breaths within 5.6 < t < 6.4
+    outliers = np.array([60])
+    removed_breaths = bd._remove_breaths_around_invalid_data(breaths, time, outliers)
+    assert len(removed_breaths) == len(breaths) - 1
+    assert set(breaths) - set(removed_breaths) == {Breath(5.5, 6, 6.5)}
+
+    # a single outlier at a valley at t=6.5 should remove breaths overlapping with 6.1 < t < 6.9
+    outliers = np.array([65])
+    removed_breaths = bd._remove_breaths_around_invalid_data(breaths, time, outliers)
+    assert len(removed_breaths) == len(breaths) - 2
+    assert set(breaths) - set(removed_breaths) == {Breath(5.5, 6, 6.5), Breath(6.5, 7, 7.5)}
