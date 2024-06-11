@@ -94,7 +94,7 @@ class BreathDetection:
                 category="breath",
                 intervals=[(breath.start_time, breath.end_time) for breath in breaths],
                 values=breaths,
-                parameters={self.__class__: dict(vars(self))},
+                parameters={type(self): dict(vars(self))},
                 derived_from=[continuous_data],
             ),
         )
