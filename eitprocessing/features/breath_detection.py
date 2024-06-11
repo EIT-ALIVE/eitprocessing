@@ -325,20 +325,25 @@ class BreathDetection:
         """
         # TODO: write more general(ized) method of determining invalid data
 
+        new_breaths = breaths[:]
+
+        if not len(outliers):
+            return new_breaths
+
         outlier_values = np.zeros(time.shape)
         outlier_values[outliers] = 1
         window_length = math.ceil(self.invalid_data_removal_window_length * self.sample_frequency)
 
-        for breath in breaths[:]:
+        for breath in new_breaths[:]:
             breath_start_minus_window = np.argmax(time == breath.start_time) - window_length
             breath_end_plus_window = np.argmax(time == breath.end_time) + window_length
 
             # is no outliers are within the window, np.max() will return 0
             # if any outliers are within the window, np.max() will return 1
             if np.max(outlier_values[breath_start_minus_window:breath_end_plus_window]):
-                breaths.remove(breath)
+                new_breaths.remove(breath)
 
-        return breaths
+        return new_breaths
 
     def _create_breaths_from_peak_valley_data(
         self,
