@@ -24,8 +24,18 @@ class BreathDetection:
     should be short enough to include the shortest expected breath in the data.
 
     Examples:
-    >>> bd = BreathDetection(sample_frequency=50, minimum_duration=0.5)
-    >>> breaths = bd.find_breaths(global_impedance)
+    >>> bd = BreathDetection(sample_frequency=50, minimum_distance=0.5)
+    >>> breaths = bd.find_breaths(sequency=seq, continuousdata_label="global_impedance_(raw)")
+
+    Args:
+        sample_frequency: sample frequency of the data
+        minimum_distance: minimum expected distance between breaths, defaults to 0.67 seconds
+        averaging_window_length: length of window used for averaging the data, defaults to 15 seconds
+        averaging_window_fun: function used to average the data, defaults to np.blackman
+        amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed
+        invalid_data_removal_window_length: window around invalid data in which breaths are removed
+        invalid_data_removal_percentile: the nth percentile of values used to remove outliers
+        invalid_data_removal_multiplier: the multiplier used to remove outliers
     """
 
     # TODO: remove after continuousdata gets its own sample frequency #209
