@@ -69,7 +69,7 @@
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <div class="viewcode-block" id="IntervalData">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.datahandling.datacollection.IntervalData">[docs]</a>
 <span class="k">class</span> <span class="nc">IntervalData</span><span class="p">(</span><span class="n">Equivalence</span><span class="p">,</span> <span class="n">SelectByIndex</span><span class="p">,</span> <span class="n">HasTimeIndexer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for interval data existing over a period of time.</span>
 
@@ -142,13 +142,13 @@
 
 
 <div class="viewcode-block" id="IntervalData.__post_init__">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData.__post_init__">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.datahandling.datacollection.IntervalData.__post_init__">[docs]</a>
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span><span class="n">Interval</span><span class="o">.</span><span class="n">_make</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span> <span class="k">for</span> <span class="n">interval</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="IntervalData.__len__">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData.__len__">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.datahandling.datacollection.IntervalData.__len__">[docs]</a>
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">)</span></div>
 
@@ -162,7 +162,7 @@
 
 
 <div class="viewcode-block" id="IntervalData._sliced_copy">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData._sliced_copy">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.datahandling.datacollection.IntervalData._sliced_copy">[docs]</a>
     <span class="k">def</span> <span class="nf">_sliced_copy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -187,7 +187,7 @@
 
 
 <div class="viewcode-block" id="IntervalData.select_by_time">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData.select_by_time">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.datahandling.datacollection.IntervalData.select_by_time">[docs]</a>
     <span class="k">def</span> <span class="nf">select_by_time</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -256,7 +256,7 @@
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="IntervalData._keep_overlapping">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData._keep_overlapping">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.datahandling.datacollection.IntervalData._keep_overlapping">[docs]</a>
     <span class="k">def</span> <span class="nf">_keep_overlapping</span><span class="p">(</span>
         <span class="n">interval</span><span class="p">:</span> <span class="n">Interval</span><span class="p">,</span>
         <span class="n">selection_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -272,7 +272,7 @@
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="IntervalData._replace_start_end_time">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData._replace_start_end_time">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.datahandling.datacollection.IntervalData._replace_start_end_time">[docs]</a>
     <span class="k">def</span> <span class="nf">_replace_start_end_time</span><span class="p">(</span>
         <span class="n">interval</span><span class="p">:</span> <span class="n">Interval</span><span class="p">,</span>
         <span class="n">selection_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -285,13 +285,13 @@
 
 
 <div class="viewcode-block" id="IntervalData.__add__">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData.__add__">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.datahandling.datacollection.IntervalData.__add__">[docs]</a>
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="IntervalData.concatenate">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sequence/index.html#eitprocessing.datahandling.datacollection.IntervalData.concatenate">[docs]</a>
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.datahandling.datacollection.IntervalData.concatenate">[docs]</a>
     <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">newlabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>  <span class="c1"># noqa: D102, will be moved to mixin in future</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">isequivalent</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">raise_</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 

@@ -11,6 +11,7 @@ Subpackages
    :maxdepth: 1
 
    /autoapi/eitprocessing/datahandling/index
+   /autoapi/eitprocessing/features/index
    /autoapi/eitprocessing/filters/index
    /autoapi/eitprocessing/plotting/index
 
