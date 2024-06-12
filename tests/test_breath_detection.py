@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 from eitprocessing.datahandling.breath import Breath
+from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
 
@@ -399,3 +400,96 @@ def test_remove_breaths_around_invalid_data():
     assert all(removed_breath in breaths for removed_breath in removed_breaths)
     assert all(removed_breath not in breaths_with_some_removed for removed_breath in removed_breaths)
     assert all(kept_breath in breaths for kept_breath in breaths_with_some_removed)  # all other stayed the same
+
+
+def test_detect_invalid_data():
+    sample_frequency = 10
+    bd = BreathDetection(sample_frequency)
+
+    _, y = make_cosine_wave(sample_frequency, 200, 1)
+    lower_percentile = np.percentile(y, bd.invalid_data_removal_percentile)
+    upper_percentile = np.percentile(y, 100 - bd.invalid_data_removal_percentile)
+
+    no_invalid_indices = np.array([], dtype=int)
+    assert np.array_equal(bd._detect_invalid_data(y), no_invalid_indices)
+
+    y_copy = np.copy(y)
+    y_copy[10:15] = -lower_percentile * bd.invalid_data_removal_multiplier * 0.9
+    assert np.array_equal(bd._detect_invalid_data(y_copy), no_invalid_indices)
+
+    y_copy = np.copy(y)
+    y_copy[10:15] = -lower_percentile * bd.invalid_data_removal_multiplier * 1.1
+    assert np.array_equal(bd._detect_invalid_data(y_copy), np.arange(10, 15))
+
+    y_copy = np.copy(y)
+    y_copy[10:15] = -lower_percentile * bd.invalid_data_removal_multiplier * 1.1
+    y_copy[30:35] = upper_percentile * bd.invalid_data_removal_multiplier * 0.9
+    assert np.array_equal(bd._detect_invalid_data(y_copy), np.arange(10, 15))
+
+    y_copy = np.copy(y)
+    y_copy[10:15] = -lower_percentile * bd.invalid_data_removal_multiplier * 1.1
+    y_copy[30:35] = upper_percentile * bd.invalid_data_removal_multiplier * 1.1
+    assert np.array_equal(bd._detect_invalid_data(y_copy), np.concatenate([np.arange(10, 15), np.arange(30, 35)]))
+
+
+def test_remove_outlier_data(monkeypatch: pytest.MonkeyPatch):
+    outliers = np.arange(20, 30)
+
+    def mock_detect_invalid_data(data: np.ndarray):
+        return np.copy(outliers)
+
+    bd = BreathDetection(1)
+    monkeypatch.setattr(bd, "_detect_invalid_data", mock_detect_invalid_data)
+
+    data = np.arange(100, dtype=float)
+    expected_data = np.copy(data)
+    expected_data[20:25] = expected_data[19]
+    expected_data[25:30] = expected_data[30]
+    result_data, result_outliers = bd._remove_outlier_data(data)
+    assert np.array_equal(result_outliers, outliers)
+    assert np.array_equal(result_data, expected_data)
+
+
+def test_find_breaths():
+    sample_frequency = 25
+    length = sample_frequency * 70
+    frequency = 1 / 3.5  # one breath every 3.5 seconds
+    time, y = make_cosine_wave(sample_frequency, length, frequency)
+
+    label = "waveform_data"
+    cd = ContinuousData(label, "Generated waveform data", None, "mock", "", time=time, values=y)
+    seq = Sequence("sequence_label")
+    seq.continuous_data.add(cd)
+
+    # every breath should be detected as normal
+    bd = BreathDetection(sample_frequency, minimum_distance=3)
+    breaths = bd.find_breaths(seq, label)
+    assert breaths is seq.interval_data["breaths"]
+    assert len(breaths) == len(breaths.values)
+    assert len(breaths) == len(breaths.intervals)
+    assert len(breaths) == 19
+
+    # too long minimum distance, number of breaths reduced
+    bd = BreathDetection(sample_frequency, minimum_distance=4)
+    breaths = bd.find_breaths(seq, label)
+    assert len(breaths) < 19
+
+    # very short breaths expected, but no influence due to lack of disturbances
+    bd = BreathDetection(sample_frequency, minimum_distance=1 / 25)
+    breaths = bd.find_breaths(seq, label)
+    assert len(breaths) == 19
+
+    y_copy = np.copy(y)
+    y_copy[438] = -100  # single timepoint around the peak of the 4th breath
+    cd = ContinuousData(label, "Generated waveform data", None, "mock", "", time=time, values=y_copy)
+    seq.continuous_data.add(cd, overwrite=True)
+
+    # single breath invalidated
+    bd = BreathDetection(sample_frequency)
+    breaths = bd.find_breaths(seq, label)
+    assert len(breaths) == 18
+
+    # three breaths invalidated
+    bd = BreathDetection(sample_frequency, invalid_data_removal_window_length=3.5)
+    breaths = bd.find_breaths(seq, label)
+    assert len(breaths) == 16
