@@ -163,5 +163,6 @@ isort.known-first-party = ["eitprocessing"]
     "ANN201",  # Missing return type
     "D103",    # Missing function docstring
     "PLR2004", # Comparison against unnamed value
+    "SLF001",  # Private member accessed
 ]
 "docs/*" = ["ALL"]

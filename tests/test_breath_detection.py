@@ -71,7 +71,7 @@ def test_remove_edge_cases(
     data = np.array([2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
 
     bd = BreathDetection(1)
-    result_peak_indices, result_valley_indices = bd._remove_edge_cases(  # noqa: SLF001
+    result_peak_indices, result_valley_indices = bd._remove_edge_cases(
         data,
         peak_indices,
         valley_indices,
@@ -240,7 +240,7 @@ def test_remove_low_amplitudes(
     expected_valley_indices: np.ndarray,
 ):
     bd = BreathDetection(1)
-    result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)  # noqa: SLF001
+    result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)
     assert np.array_equal(result_peak_indices, expected_peak_indices)
     assert np.array_equal(result_valley_indices, expected_valley_indices)
 
@@ -264,12 +264,12 @@ def test_no_remove_low_amplitudes(
 ):
     """This test uses the same data as test_remove_low_amplitudes, but expects the output to be the same as the input."""
     bd = BreathDetection(1, amplitude_cutoff_fraction=None)
-    result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)  # noqa: SLF001
+    result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)
     assert np.array_equal(result_peak_indices, peak_indices)
     assert np.array_equal(result_valley_indices, valley_indices)
 
     bd = BreathDetection(1, amplitude_cutoff_fraction=0)
-    result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)  # noqa: SLF001
+    result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)
     assert np.array_equal(result_peak_indices, peak_indices)
     assert np.array_equal(result_valley_indices, valley_indices)
 
