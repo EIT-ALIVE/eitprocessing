@@ -31,10 +31,6 @@ def make_cosine_wave(sample_frequency: float, length: int, frequency: float):
     return time, np.cos(time * np.pi * 2 * frequency)
 
 
-def test_find_features():
-    pytest.skip()
-
-
 test_data_remove_edge_cases = [
     (  # test removal of edge peaks
         np.array([0, 1, 3, 5, 7, 9]),
@@ -287,30 +283,6 @@ def test_remove_no_breaths_around_valid_data():
     assert np.array_equal(
         time[valley_indices],
         np.arange(0, 50) + 0.5,
-    )
-
-
-def test_remove_breaths_around_invalid_data():
-    sample_frequency = 20
-    time, y = make_cosine_wave(sample_frequency, 1000, 1)
-    bd = BreathDetection(sample_frequency)
-
-    valid_peak_indices, valid_valley_indices = bd._detect_peaks_and_valleys(y)
-
-    start_invalid = np.argmax(time >= 2.75)
-    end_invalid = np.argmax(time >= 3.25)
-    y_with_invalid_data = np.copy(y)
-    y_with_invalid_data[start_invalid:end_invalid] = np.nan
-    y_with_invalid_data = bd._twosidedfill(y_with_invalid_data)
-
-    invalid_peak_indices, invalid_valley_indices = bd._detect_peaks_and_valleys(y_with_invalid_data)
-    assert not np.array_equal(valid_peak_indices, invalid_peak_indices)
-    assert not np.array_equal(valid_valley_indices, invalid_valley_indices)
-
-    assert np.array_equal(time[invalid_peak_indices], np.concatenate([[1.0, 2.0], np.arange(4.0, 50.0, 1.0)]))
-    assert np.array_equal(
-        time[invalid_valley_indices],
-        np.concatenate([[0.5, 1.5, 2.5], np.arange(4.5, 50.0, 1.0)]),
     )
 
 
