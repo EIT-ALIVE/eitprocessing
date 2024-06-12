@@ -336,8 +336,8 @@ class BreathDetection:
         window_length = math.ceil(self.invalid_data_removal_window_length * self.sample_frequency)
 
         for breath in new_breaths[:]:
-            breath_start_minus_window = np.argmax(time == breath.start_time) - window_length
-            breath_end_plus_window = np.argmax(time == breath.end_time) + window_length
+            breath_start_minus_window = max(0, np.argmax(time == breath.start_time) - window_length)
+            breath_end_plus_window = min(len(outlier_values), np.argmax(time == breath.end_time) + window_length)
 
             # is no outliers are within the window, np.max() will return 0
             # if any outliers are within the window, np.max() will return 1
