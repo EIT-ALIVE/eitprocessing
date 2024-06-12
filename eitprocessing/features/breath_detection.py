@@ -28,6 +28,7 @@ class BreathDetection:
     >>> breaths = bd.find_breaths(global_impedance)
     """
 
+    # TODO: remove after continuousdata gets its own sample frequency #209
     sample_frequency: float
     minimum_distance: float = 2 / 3
     averaging_window_length: float = 15
