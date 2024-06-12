@@ -394,7 +394,8 @@ class BreathDetection:
         # detect indices of outliers
         return np.flatnonzero((data < cutoff_low) | (data > cutoff_high))
 
-    def _twosidedfill(self, data: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def _twosidedfill(data: np.ndarray) -> np.ndarray:
         """Forward-fill and backward-fill sequences of np.nan values.
 
         Any np.nan value following a non-nan-value is set to the preceding value. Then np.nan value preceding a
