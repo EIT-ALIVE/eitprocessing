@@ -364,6 +364,7 @@ class BreathDetection:
     def _remove_outlier_data(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         outliers = self._detect_invalid_data(data)
 
+        data = np.copy(data)
         data[outliers] = np.nan
         data = self._twosidedfill(data)
         return data, outliers
