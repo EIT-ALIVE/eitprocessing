@@ -259,10 +259,10 @@ def test_no_remove_low_amplitudes(
     data: np.ndarray,
     peak_indices: np.ndarray,
     valley_indices: np.ndarray,
-    expected_peak_indices: np.ndarray,
-    expected_valley_indices: np.ndarray,
+    expected_peak_indices: np.ndarray,  # noqa: ARG001
+    expected_valley_indices: np.ndarray,  # noqa: ARG001
 ):
-    """This test uses the same data as test_remove_low_amplitudes, but expects the output to be the same as the input."""
+    """This test uses the same data as test_remove_low_amplitudes, expects output to be the same as the input."""
     bd = BreathDetection(1, amplitude_cutoff_fraction=None)
     result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)
     assert np.array_equal(result_peak_indices, peak_indices)
@@ -435,7 +435,7 @@ def test_detect_invalid_data():
 def test_remove_outlier_data(monkeypatch: pytest.MonkeyPatch):
     outliers = np.arange(20, 30)
 
-    def mock_detect_invalid_data(data: np.ndarray):
+    def mock_detect_invalid_data(_: np.ndarray) -> np.ndarray:
         return np.copy(outliers)
 
     bd = BreathDetection(1)
