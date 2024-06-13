@@ -153,7 +153,7 @@ make doctest
    where level must be one of the following ([following semantic versioning conventions](https://semver.org/)):
    - `major`: when API-incompatible changes have been made
    - `minor`: when functionality was added in a backward compatible manner
-   - `path`: when backward compatible bug fixes were made
+   - `patch`: when backward compatible bug fixes were made
 4. Merge the release branch into `main`.
 5. On the [Releases page](https://github.com/EIT-ALIVE/eitprocessing/releases):
    1. Click "Draft a new release"
