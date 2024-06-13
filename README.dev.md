@@ -6,21 +6,27 @@ If you're looking for user documentation, go [here](README.md).
 
 We welcome all contributions to this open-source project, as long as they follow our
 [code of conduct](https://github.com/EIT-ALIVE/eitprocessing/blob/main/CODE_OF_CONDUCT.md).
-We appreciate it if you adhere to our naming and style [conventions](#conventions) below.
+We also ask you to adhere to our [naming and style conventions](#conventions).
 
-Please follow these steps:
+We appreciate if you follow the steps below. Don't be discouraged if you struggle with any of these: if you feel you
+have made or can make a valuable contribution. We are happy to help, so please reach out! Do keep in mind that you might
+be asked to append additional commits or make changes to your pull request.
 
-1. (**important**) announce your plan to the rest of the community _before you start working_. This announcement should be in the form of a (new) issue;
-1. (**important**) wait until some kind of consensus is reached about your idea being a good idea;
-1. if needed, fork the repository to your own Github profile and create your own feature branch off of the latest master commit. While working on your feature branch, make sure to stay up to date with the master branch by pulling in changes, possibly from the 'upstream' repository (follow the instructions [here](https://help.github.com/articles/configuring-a-remote-for-a-fork/) and [here](https://help.github.com/articles/syncing-a-fork/));
-1. make sure the existing tests still work by running `pytest` (see also [here](#testing-locally));
-1. add your own tests (if necessary);
-1. update or expand the documentation;
-1. update the `CHANGELOG.md` file with change;
-1. push your feature branch to (your fork of) the eitprocessing repository on GitHub;
-1. create the pull request, e.g. following the instructions [here](https://help.github.com/articles/creating-a-pull-request/).
+1. announce your plan to the rest of the community _before you start working_. This announcement should be done via GitHub in the form of a (new) [issue](https://github.com/EIT-ALIVE/eitprocessing/issues);
+2. wait until some kind of consensus is reached about your idea being a good idea;
+3. if needed, fork the repository to your own Github profile and create your own feature branch off of the latest master commit. While working on your feature branch, make sure to stay up to date with the main branch by pulling in changes, possibly from the 'upstream' repository (follow the instructions [here](https://help.github.com/articles/configuring-a-remote-for-a-fork/) and [here](https://help.github.com/articles/syncing-a-fork/));
+4. make sure the existing [tests still work](#testing-locally) by running `pytest`;
+5. add your own tests (recommended);
+6. update or expand the documentation;
+7. push your feature branch (or fork) to the eitprocessing repository on GitHub;
+8. [create a pull request](https://help.github.com/articles/creating-a-pull-request/), following our [PR conventions]()
+   and link it to the issue in step 1;
+9. ensure that all automatically generated checks pass and update make changes as required to solve any resulting issues;
+   - it can be tricky to discover what some of the problems mean, feel free to reach out if you have difficulties finding out.
+10. request a review of your PR once you are happy with its state or if you require feedback.
 
-In case you feel like you've made a valuable contribution, but you don't know how to write or run tests for it, or how to generate the documentation: don't let this discourage you from making the pull request; we can help you! Just go ahead and submit the pull request, but keep in mind that you might be asked to append additional commits to your pull request.
+Note that all contrubtions to this project will be published under our [Apache 2.0 licence]
+(<https://github.com/EIT-ALIVE/eitprocessing/blob/main/LICENSE>).
 
 ### Conventions
 
@@ -31,20 +37,17 @@ readibility or simplicity is more important than absolute correctness.
 It is hard to define the precise balance we are looking for, so instead we will refer
 to the [Zen of python](https://peps.python.org/pep-0020/).
 
-Note that all contrubtions to this project will be published under our [Apache 2.0 licence]
-(<https://github.com/EIT-ALIVE/eitprocessing/blob/main/LICENSE>).
+#### Linting and formatting
+
+We use the [Ruff formatter](https://pypi.org/project/black/) to format code. If you use Visual
+Studio Code, the [extension by
+Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter) is a good
+place to start. This extension is currently in preview, but seems to work more reliably than older implementations.
 
 #### Docstrings
 
 We use the [google convention](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
 for writing docstrings.
-
-#### Code formatting
-
-We use the [Black formatter](https://pypi.org/project/black/) to format code. If you use Visual
-Studio Code, the [extension by
-Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter) is a good
-place to start. This extension is currently in preview, but seems to work more reliably than older implementations.
 
 #### Branch naming convention
 
@@ -60,7 +63,7 @@ Also, it simplifies tab autocompletion when switching to your branch.
 
 Please use an [angular convention type](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#type),
 followed by a semicolon and then a description when creating a PR.
-E.g., `feat: added module to calculate the answer to life, the universe, and everything`.
+E.g., `feat: added module to calculate the answer to life, the universe, and everything`
 
 ### Creating a PR
 
