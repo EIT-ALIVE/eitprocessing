@@ -17,6 +17,9 @@ Module Contents
 
 .. py:class:: Breath
 
+   Bases: :py:obj:`NamedTuple`
+
+
    Represents a breath with a start, middle and end index.
 
 
@@ -30,11 +33,5 @@ Module Contents
 
    .. py:attribute:: end_time
       :type:  float
-
-
-   .. py:method:: __post_init__()
-
-
-   .. py:method:: __iter__() -> collections.abc.Iterator[float]
 
 

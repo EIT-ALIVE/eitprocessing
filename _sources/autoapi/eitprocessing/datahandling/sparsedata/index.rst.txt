@@ -84,7 +84,7 @@ Module Contents
    Adds methods for slicing by time rather than index.
 
 
-   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = False, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
 
       Get a shortened copy of the object, starting from start_time and ending at end_time.
 
