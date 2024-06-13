@@ -11,8 +11,22 @@ Subpackages
    :maxdepth: 1
 
    /autoapi/eitprocessing/datahandling/index
-   /autoapi/eitprocessing/features/index
    /autoapi/eitprocessing/filters/index
    /autoapi/eitprocessing/plotting/index
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   eitprocessing.__version__
+
+
+Package Contents
+----------------
+
+.. py:data:: __version__
+   :value: '1.0.0'
 
 
