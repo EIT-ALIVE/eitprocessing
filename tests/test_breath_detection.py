@@ -1,12 +1,14 @@
 import copy
 import os
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pytest
 
 from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
 
@@ -283,6 +285,30 @@ def test_remove_no_breaths_around_valid_data():
         time[valley_indices],
         np.arange(0, 50) + 0.5,
     )
+
+
+@pytest.mark.parametrize("obj", ["", 1, (1,), []])
+def test_pass_invalid(obj: Any):  # noqa: ANN401
+    bd = BreathDetection(1)
+    with pytest.raises(NotImplementedError):
+        bd.find_breaths(obj)
+
+
+def test_pass_continuousdata(draeger1: Sequence):
+    draeger1 = copy.deepcopy(draeger1)  # prevents writing results to original file
+    cd = draeger1.continuous_data["global_impedance_(raw)"]
+    bd = BreathDetection(draeger1.eit_data["raw"].framerate)
+
+    breaths_container = bd.find_breaths(cd)
+    assert isinstance(breaths_container, IntervalData)
+    # results are not stored
+    assert "breaths" not in draeger1.interval_data
+
+    bd.find_breaths(cd, draeger1)
+    # results are now stored
+    assert "breaths" in draeger1.interval_data
+    assert draeger1.interval_data["breaths"] == breaths_container
+    assert draeger1.interval_data["breaths"] is not breaths_container
 
 
 def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
