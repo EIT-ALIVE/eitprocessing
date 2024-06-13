@@ -1,10 +1,9 @@
-name: Python package
+name: Build package
 
 on:
   push:
     branches:
       - main
-      - drcandacemakedamoore/docker
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
