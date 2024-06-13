@@ -13,12 +13,14 @@
 | Citation data consistency        | [![cffconvert](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/cffconvert.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/cffconvert.yml)                                                                                        |
 | MarkDown link checker            | [![markdown-link-check](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/markdown-link-check.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/markdown-link-check.yml)                                                             |
 
-## How to use eitprocessing
+# eitprocessing
 
 Processing of lung image data from electrical impedance tomography
+<TODO package info>
 
 ## Installation
 
+<TODO instructions for pypi or local installation>
 Install eitprocessing as follows:
 
 - Create fresh environment
