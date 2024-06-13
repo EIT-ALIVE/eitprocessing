@@ -2,12 +2,14 @@ import itertools
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
+from functools import singledispatchmethod
 
 import numpy as np
 from numpy.typing import ArrayLike
 from scipy import signal
 
 from eitprocessing.datahandling.breath import Breath
+from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.moving_average import MovingAverage
@@ -48,7 +50,8 @@ class BreathDetection:
     invalid_data_removal_percentile: int = 5
     invalid_data_removal_multiplier: int = 4
 
-    def find_breaths(self, sequence: Sequence, continuousdata_label: str) -> IntervalData:
+    @singledispatchmethod
+    def find_breaths(self, container: Sequence | ContinuousData) -> IntervalData:
         """Find breaths in the data.
 
         This method attempts to find peaks and valleys in the data in a
@@ -82,7 +85,19 @@ class BreathDetection:
         Returns:
             A list of Breath objects.
         """
-        continuous_data = sequence.continuous_data[continuousdata_label]
+        msg = "find_breaths expects a Sequence or ContinuousData object as first argument."
+        raise NotImplementedError(msg)
+
+    @find_breaths.register(Sequence)
+    def _(self, sequence: Sequence, continuousdata_label: str) -> IntervalData:
+        cd = sequence.continuous_data[continuousdata_label]
+        return self._find_breaths(cd, sequence)
+
+    @find_breaths.register(ContinuousData)
+    def _(self, continuous_data: ContinuousData, sequence: Sequence | None = None) -> IntervalData:
+        return self._find_breaths(continuous_data, sequence=sequence)
+
+    def _find_breaths(self, continuous_data: ContinuousData, sequence: Sequence | None = None) -> IntervalData:
         data = continuous_data.values
         time = continuous_data.time
 
@@ -97,21 +112,20 @@ class BreathDetection:
             valley_indices,
         )
         breaths = self._remove_breaths_around_invalid_data(breaths, time, invalid_data_indices)
-
-        sequence.interval_data.add(
-            IntervalData(
-                label="breaths",
-                name="Breaths as determined by BreathDetection",
-                unit=None,
-                category="breath",
-                intervals=[(breath.start_time, breath.end_time) for breath in breaths],
-                values=breaths,
-                parameters={type(self): dict(vars(self))},
-                derived_from=[continuous_data],
-            ),
+        breaths_container = IntervalData(
+            label="breaths",
+            name="Breaths as determined by BreathDetection",
+            unit=None,
+            category="breath",
+            intervals=[(breath.start_time, breath.end_time) for breath in breaths],
+            values=breaths,
+            parameters={type(self): dict(vars(self))},
+            derived_from=[continuous_data],
         )
+        if sequence:
+            sequence.interval_data.add(breaths_container)
 
-        return sequence.interval_data["breaths"]
+        return breaths_container
 
     def _detect_invalid_data(self, data: np.ndarray) -> np.ndarray:
         """Detects invalid data as outliers outside an upper and lower cutoff.
