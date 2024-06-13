@@ -17,8 +17,6 @@
 
 Processing of lung image data from electrical impedance tomography
 
-The project setup is documented in [project_setup.md](project_setup.md). Feel free to remove this document (and/or the link to this document) if you don't need it.
-
 ## Installation
 
 Install eitprocessing as follows:
