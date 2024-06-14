@@ -63,7 +63,10 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.features.breath_detection.MovingAverage" title="eitprocessing.features.breath_detection.MovingAverage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MovingAverage</span></code></a></p></td>
 <td><p>Calculate the moving average of the data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection" title="eitprocessing.features.breath_detection.BreathDetection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BreathDetection</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.features.breath_detection._PeakValleyData" title="eitprocessing.features.breath_detection._PeakValleyData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_PeakValleyData</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection" title="eitprocessing.features.breath_detection.BreathDetection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BreathDetection</span></code></a></p></td>
 <td><p>Algorithm for detecting breaths in data representing respiration.</p></td>
 </tr>
 </tbody>
@@ -74,7 +77,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.features.breath_detection.Breath">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.features.breath_detection.</span></span><span class="sig-name descname"><span class="pre">Breath</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/breath.html#Breath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.Breath" title="Link to this definition">¶</a></dt>
-<dd><p>Represents a breath with a start, middle and end index.</p>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+<p>Represents a breath with a start, middle and end index.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.features.breath_detection.Breath.start_time">
 <span class="sig-name descname"><span class="pre">start_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="headerlink" href="#eitprocessing.features.breath_detection.Breath.start_time" title="Link to this definition">¶</a></dt>
@@ -88,16 +92,6 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.features.breath_detection.Breath.end_time">
 <span class="sig-name descname"><span class="pre">end_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="headerlink" href="#eitprocessing.features.breath_detection.Breath.end_time" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.Breath.__post_init__">
-<span class="sig-name descname"><span class="pre">__post_init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/breath.html#Breath.__post_init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.Breath.__post_init__" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.Breath.__iter__">
-<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" title="(in Python v3.12)"><span class="pre">collections.abc.Iterator</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/breath.html#Breath.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.Breath.__iter__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -419,6 +413,32 @@ average at the boundaries of the data.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.features.breath_detection._PeakValleyData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.features.breath_detection.</span></span><span class="sig-name descname"><span class="pre">_PeakValleyData</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#_PeakValleyData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection._PeakValleyData" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.features.breath_detection._PeakValleyData.peak_indices">
+<span class="sig-name descname"><span class="pre">peak_indices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#_PeakValleyData.peak_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection._PeakValleyData.peak_indices" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.features.breath_detection._PeakValleyData.peak_values">
+<span class="sig-name descname"><span class="pre">peak_values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#_PeakValleyData.peak_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection._PeakValleyData.peak_values" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.features.breath_detection._PeakValleyData.valley_indices">
+<span class="sig-name descname"><span class="pre">valley_indices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#_PeakValleyData.valley_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection._PeakValleyData.valley_indices" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.features.breath_detection._PeakValleyData.valley_values">
+<span class="sig-name descname"><span class="pre">valley_values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#_PeakValleyData.valley_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection._PeakValleyData.valley_values" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.features.breath_detection.</span></span><span class="sig-name descname"><span class="pre">BreathDetection</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection" title="Link to this definition">¶</a></dt>
 <dd><p>Algorithm for detecting breaths in data representing respiration.</p>
@@ -428,22 +448,8 @@ initializing BreathDetection, the sample frequency of the data and the
 minimum duration of a breath have to be provided. The minimum duration
 should be short enough to include the shortest expected breath in the data.</p>
 <p>Examples:
-&gt;&gt;&gt; bd = BreathDetection(sample_frequency=50, minimum_distance=0.5)
-&gt;&gt;&gt; breaths = bd.find_breaths(sequency=seq, continuousdata_label=”global_impedance_(raw)”)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sample_frequency</strong> – sample frequency of the data</p></li>
-<li><p><strong>minimum_distance</strong> – minimum expected distance between breaths, defaults to 0.67 seconds</p></li>
-<li><p><strong>averaging_window_length</strong> – length of window used for averaging the data, defaults to 15 seconds</p></li>
-<li><p><strong>averaging_window_fun</strong> – function used to average the data, defaults to np.blackman</p></li>
-<li><p><strong>amplitude_cutoff_fraction</strong> – fraction of the median amplitude below which breaths are removed</p></li>
-<li><p><strong>invalid_data_removal_window_length</strong> – window around invalid data in which breaths are removed</p></li>
-<li><p><strong>invalid_data_removal_percentile</strong> – the nth percentile of values used to remove outliers</p></li>
-<li><p><strong>invalid_data_removal_multiplier</strong> – the multiplier used to remove outliers</p></li>
-</ul>
-</dd>
-</dl>
+&gt;&gt;&gt; bd = BreathDetection(sample_frequency=50, minimum_duration=0.5)
+&gt;&gt;&gt; breaths = bd.find_breaths(global_impedance)</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection.sample_frequency">
 <span class="sig-name descname"><span class="pre">sample_frequency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection.sample_frequency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection.sample_frequency" title="Link to this definition">¶</a></dt>
@@ -471,7 +477,7 @@ should be short enough to include the shortest expected breath in the data.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection.invalid_data_removal_window_length">
-<span class="sig-name descname"><span class="pre">invalid_data_removal_window_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection.invalid_data_removal_window_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection.invalid_data_removal_window_length" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">invalid_data_removal_window_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection.invalid_data_removal_window_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection.invalid_data_removal_window_length" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -482,6 +488,124 @@ should be short enough to include the shortest expected breath in the data.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection.invalid_data_removal_multiplier">
 <span class="sig-name descname"><span class="pre">invalid_data_removal_multiplier</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection.invalid_data_removal_multiplier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection.invalid_data_removal_multiplier" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._find_features">
+<span class="sig-name descname"><span class="pre">_find_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._find_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._find_features" title="Link to this definition">¶</a></dt>
+<dd><p>Find features (peaks or valleys) in the data.</p>
+<p>This method finds features (either peaks or valleys) in the data using
+the <cite>scipy.signal.find_peaks()</cite> function. The minimum distance (in
+time) between peaks is determined by the <cite>minimum_distance</cite> attribute.</p>
+<p>To find peaks, <cite>invert</cite> should be False. To find valleys, <cite>invert</cite>
+should be True, which flips the data before finding peaks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – a 1D array containing the data.</p></li>
+<li><p><strong>moving_average</strong> (<em>NDArrag</em>) – a 1D array containing the moving average
+of the data.</p></li>
+<li><p><strong>invert</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – whether to invert the data before</p></li>
+<li><p><strong>False.</strong> (<em>detecting peaks. Defaults to</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing two 1D arrays of length N with the indices (int)
+and values (float) of the features, where N is the number of
+features found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._remove_edge_cases">
+<span class="sig-name descname"><span class="pre">_remove_edge_cases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peak_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valley_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valley_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.features.breath_detection._PeakValleyData" title="eitprocessing.features.breath_detection._PeakValleyData"><span class="pre">_PeakValleyData</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._remove_edge_cases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._remove_edge_cases" title="Link to this definition">¶</a></dt>
+<dd><p>Remove overdetected peaks/valleys at the start and end of the data.</p>
+<p>This method removed a valley at the start of the data, if the data
+before said valley stays below the moving average of the data at said
+valley. Likewise, it removes the last valley if the data after the last
+valley stays below the moving average of the data at said valley. This
+ensures a valley is a true valley, and not just a local minimum while
+the true valley is cut off.</p>
+<p>Then, all peaks that occur before the first and after the last valley
+are removed. This ensures peaks only fall between valleys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>peak_indices</strong> (<em>np.ndarray</em>) – indices of the peaks</p></li>
+<li><p><strong>peak_values</strong> (<em>np.ndarray</em>) – values of the peaks</p></li>
+<li><p><strong>valley_indices</strong> (<em>np.ndarray</em>) – indices of the valleys</p></li>
+<li><p><strong>valley_values</strong> (<em>np.ndarray</em>) – values of the valleys</p></li>
+<li><p><strong>data</strong> (<em>np.ndarray</em>) – the data in which the peaks/valleys were detected</p></li>
+<li><p><strong>moving_average</strong> (<em>np.ndarray</em>) – the moving average of data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple (peak_indices, peak_values, valley_indices, valley_values)
+with edge cases removed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._remove_doubles">
+<span class="sig-name descname"><span class="pre">_remove_doubles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peak_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valley_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valley_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.features.breath_detection._PeakValleyData" title="eitprocessing.features.breath_detection._PeakValleyData"><span class="pre">_PeakValleyData</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._remove_doubles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._remove_doubles" title="Link to this definition">¶</a></dt>
+<dd><p>Remove double peaks/valleys.</p>
+<p>This method ensures there is only one peak between valleys, and only
+one valley between peaks. If there are multiple peaks between two
+valleys, the peak with the highest value is kept and the others are
+removed. If there are no peaks between several valleys (i.e. multiple
+valleys between peaks) the valley with the lowest value is kept, while
+the others are removed.</p>
+<p>This method does not remove peaks before the first or after the last
+valley.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>peak_indices</strong> (<em>np.ndarray</em>) – indices of the peaks</p></li>
+<li><p><strong>peak_values</strong> (<em>np.ndarray</em>) – values of the peaks</p></li>
+<li><p><strong>valley_indices</strong> (<em>np.ndarray</em>) – indices of the valleys</p></li>
+<li><p><strong>valley_values</strong> (<em>np.ndarray</em>) – values of the valleys</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple (peak_indices, peak_values, valley_indices, valley_values)
+with double peaks/valleys removed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._remove_low_amplitudes">
+<span class="sig-name descname"><span class="pre">_remove_low_amplitudes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peak_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valley_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valley_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#eitprocessing.features.breath_detection._PeakValleyData" title="eitprocessing.features.breath_detection._PeakValleyData"><span class="pre">_PeakValleyData</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._remove_low_amplitudes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._remove_low_amplitudes" title="Link to this definition">¶</a></dt>
+<dd><p>Remove peaks if the amplitude is low compared to the median amplitude.</p>
+<p>The amplitude of a peak is determined as the average vertical distance
+between the peak value and the two valley values besides it. The cutoff
+value for the amplitude is calculated as the median amplitude times
+<cite>amplitude_cutoff_fraction</cite>. Peaks that have an amplitude below the
+cutoff are removed. Then, <cite>_remove_doubles()</cite> is called to remove
+either of the valleys next to the peak.</p>
+<p>If <cite>amplitude_cutoff_fraction</cite> is None, the input is returned
+unchanged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>peak_indices</strong> (<em>np.ndarray</em>) – the indices of the peaks</p></li>
+<li><p><strong>peak_values</strong> (<em>np.ndarray</em>) – the values of the peaks</p></li>
+<li><p><strong>valley_indices</strong> (<em>np.ndarray</em>) – the indices of the valleys</p></li>
+<li><p><strong>valley_values</strong> (<em>np.ndarray</em>) – the values of the valleys</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple (peak_indices, peak_values, valley_indices, valley_values)
+with low-amplitude breaths removed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._remove_breaths_around_invalid_data">
+<span class="sig-name descname"><span class="pre">_remove_breaths_around_invalid_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">breaths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../datahandling/breath/index.html#eitprocessing.datahandling.breath.Breath" title="eitprocessing.datahandling.breath.Breath"><span class="pre">eitprocessing.datahandling.breath.Breath</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../datahandling/breath/index.html#eitprocessing.datahandling.breath.Breath" title="eitprocessing.datahandling.breath.Breath"><span class="pre">eitprocessing.datahandling.breath.Breath</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._remove_breaths_around_invalid_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._remove_breaths_around_invalid_data" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -520,173 +644,6 @@ expiration, and end of expiration.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._find_features">
-<span class="sig-name descname"><span class="pre">_find_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._find_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._find_features" title="Link to this definition">¶</a></dt>
-<dd><p>Find features (peaks or valleys) in the data.</p>
-<p>This method finds features (either peaks or valleys) in the data using
-the <cite>scipy.signal.find_peaks()</cite> function. The minimum distance (in
-time) between peaks is determined by the <cite>minimum_distance</cite> attribute.</p>
-<p>To find peaks, <cite>invert</cite> should be False. To find valleys, <cite>invert</cite>
-should be True, which flips the data before finding peaks.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>np.ndarray</em>) – a 1D array containing the data.</p></li>
-<li><p><strong>moving_average</strong> (<em>NDArrag</em>) – a 1D array containing the moving average
-of the data.</p></li>
-<li><p><strong>invert</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – whether to invert the data before</p></li>
-<li><p><strong>False.</strong> (<em>detecting peaks. Defaults to</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A tuple containing two 1D arrays of length N with the indices (int)
-and values (float) of the features, where N is the number of
-features found.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._remove_edge_cases">
-<span class="sig-name descname"><span class="pre">_remove_edge_cases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valley_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._remove_edge_cases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._remove_edge_cases" title="Link to this definition">¶</a></dt>
-<dd><p>Remove overdetected peaks/valleys at the start and end of the data.</p>
-<p>This method removes a valley at the start of the data if the data before said valley stays below the moving
-average of the data at said valley. Likewise, it removes the last valley if the data after the last valley stays
-below the moving average of the data at said valley. This ensures a valley is a true valley, and not just a
-local minimum while the true valley is cut off.</p>
-<p>Then, all peaks that occur before the first and after the last valley
-are removed. This ensures peaks only fall between valleys.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>peak_indices</strong> (<em>np.ndarray</em>) – indices of the peaks</p></li>
-<li><p><strong>peak_values</strong> (<em>np.ndarray</em>) – values of the peaks</p></li>
-<li><p><strong>valley_indices</strong> (<em>np.ndarray</em>) – indices of the valleys</p></li>
-<li><p><strong>valley_values</strong> (<em>np.ndarray</em>) – values of the valleys</p></li>
-<li><p><strong>data</strong> (<em>np.ndarray</em>) – the data in which the peaks/valleys were detected</p></li>
-<li><p><strong>moving_average</strong> (<em>np.ndarray</em>) – the moving average of data</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A tuple (peak_indices, peak_values, valley_indices, valley_values)
-with edge cases removed.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._remove_doubles">
-<span class="sig-name descname"><span class="pre">_remove_doubles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valley_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._remove_doubles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._remove_doubles" title="Link to this definition">¶</a></dt>
-<dd><p>Remove double peaks/valleys.</p>
-<p>This method ensures there is only one peak between valleys, and only
-one valley between peaks. If there are multiple peaks between two
-valleys, the peak with the highest value is kept and the others are
-removed. If there are no peaks between several valleys (i.e. multiple
-valleys between peaks) the valley with the lowest value is kept, while
-the others are removed.</p>
-<p>This method does not remove peaks before the first or after the last
-valley.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> – data the peaks and valleys were found in</p></li>
-<li><p><strong>peak_indices</strong> – indices of the peaks</p></li>
-<li><p><strong>valley_indices</strong> – indices of the valleys</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A tuple (peak_indices, peak_values, valley_indices, valley_values)
-with double peaks/valleys removed.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._remove_low_amplitudes">
-<span class="sig-name descname"><span class="pre">_remove_low_amplitudes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valley_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._remove_low_amplitudes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._remove_low_amplitudes" title="Link to this definition">¶</a></dt>
-<dd><p>Remove peaks if the amplitude is low compared to the median amplitude.</p>
-<p>The amplitude of a peak is determined as the average vertical distance
-between the peak value and the two valley values besides it. The cutoff
-value for the amplitude is calculated as the median amplitude times
-<cite>amplitude_cutoff_fraction</cite>. Peaks that have an amplitude below the
-cutoff are removed. Then, <cite>_remove_doubles()</cite> is called to remove
-either of the valleys next to the peak.</p>
-<p>If <cite>amplitude_cutoff_fraction</cite> is None, the input is returned
-unchanged.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> – the data the peaks and valleys were found in</p></li>
-<li><p><strong>peak_indices</strong> (<em>np.ndarray</em>) – the indices of the peaks</p></li>
-<li><p><strong>valley_indices</strong> (<em>np.ndarray</em>) – the indices of the valleys</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A tuple (peak_indices, peak_values, valley_indices, valley_values)
-with low-amplitude breaths removed.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._remove_breaths_around_invalid_data">
-<span class="sig-name descname"><span class="pre">_remove_breaths_around_invalid_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">breaths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../datahandling/breath/index.html#eitprocessing.datahandling.breath.Breath" title="eitprocessing.datahandling.breath.Breath"><span class="pre">eitprocessing.datahandling.breath.Breath</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outliers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../datahandling/breath/index.html#eitprocessing.datahandling.breath.Breath" title="eitprocessing.datahandling.breath.Breath"><span class="pre">eitprocessing.datahandling.breath.Breath</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._remove_breaths_around_invalid_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._remove_breaths_around_invalid_data" title="Link to this definition">¶</a></dt>
-<dd><p>Remove breaths overlapping with invalid data.</p>
-<p>This function defines a lower and upper cutoff. Data beyond those cutoffs is considered invalid for the
-purposes of breath detection. Breaths that start within a window length of invalid data are removed.</p>
-<p>The lower cutoff is a distance away from the mean. The distance is m times the distance between the
-mean and the nth percentile of the data. m is given by <cite>invalid_data_removal_multiplier</cite> and n is given by
-<cite>invalid_data_removal_percentile</cite>.</p>
-<p>For example, with m = 4 and n = 5, the mean = 100, and 5% of the data is below/equal to 90, all data below 100 -
-(4 * 10) = 60 and above 100 + (4 * 10) = 140 is considerd invalid.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>breaths</strong> – list of detected breath objects</p></li>
-<li><p><strong>data</strong> – data the breaths were detected in</p></li>
-<li><p><strong>time</strong> – time axis belonging to the data</p></li>
-<li><p><strong>outliers</strong> – indices of outlier data points</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._create_breaths_from_peak_valley_data">
-<span class="sig-name descname"><span class="pre">_create_breaths_from_peak_valley_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valley_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../datahandling/breath/index.html#eitprocessing.datahandling.breath.Breath" title="eitprocessing.datahandling.breath.Breath"><span class="pre">eitprocessing.datahandling.breath.Breath</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._create_breaths_from_peak_valley_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._create_breaths_from_peak_valley_data" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._remove_outlier_data">
-<span class="sig-name descname"><span class="pre">_remove_outlier_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._remove_outlier_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._remove_outlier_data" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._detect_peaks_and_valleys">
-<span class="sig-name descname"><span class="pre">_detect_peaks_and_valleys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._detect_peaks_and_valleys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._detect_peaks_and_valleys" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._detect_invalid_data">
-<span class="sig-name descname"><span class="pre">_detect_invalid_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._detect_invalid_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._detect_invalid_data" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.features.breath_detection.BreathDetection._twosidedfill">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_twosidedfill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection._twosidedfill"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection._twosidedfill" title="Link to this definition">¶</a></dt>
-<dd><p>Forward-fill and backward-fill sequences of np.nan values.</p>
-<p>Any np.nan value following a non-nan-value is set to the preceding value. Then np.nan value preceding a
-non-nan-value is set to the following value. These two rules are repeated until all np.nan values are filled
-out.</p>
-<p class="rubric">Example</p>
-<p>foo = np.ndarray([np.nan, 1, np.nan, np.nan, np.nan, 3, np.nan, np.nan])
-bar = _twosidedfill(foo)
-# after first loop: np.ndarray([1, 1, 1, np.nan, 3, 3, 3, np.nan])
-# after second loop: np.ndarray([1, 1, 1, 1, 3, 3, 3, 3])
-assert bar == np.ndarray([1, 1, 1, 1, 3, 3, 3, 3])</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -709,8 +666,6 @@ assert bar == np.ndarray([1, 1, 1, 1, 3, 3, 3, 3])</p>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.Breath.start_time"><code class="docutils literal notranslate"><span class="pre">Breath.start_time</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.Breath.middle_time"><code class="docutils literal notranslate"><span class="pre">Breath.middle_time</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.Breath.end_time"><code class="docutils literal notranslate"><span class="pre">Breath.end_time</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.features.breath_detection.Breath.__post_init__"><code class="docutils literal notranslate"><span class="pre">Breath.__post_init__()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.features.breath_detection.Breath.__iter__"><code class="docutils literal notranslate"><span class="pre">Breath.__iter__()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.IntervalData"><code class="docutils literal notranslate"><span class="pre">IntervalData</span></code></a><ul>
@@ -760,6 +715,13 @@ assert bar == np.ndarray([1, 1, 1, 1, 3, 3, 3, 3])</p>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.MovingAverage.apply"><code class="docutils literal notranslate"><span class="pre">MovingAverage.apply()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#eitprocessing.features.breath_detection._PeakValleyData"><code class="docutils literal notranslate"><span class="pre">_PeakValleyData</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.features.breath_detection._PeakValleyData.peak_indices"><code class="docutils literal notranslate"><span class="pre">_PeakValleyData.peak_indices</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.features.breath_detection._PeakValleyData.peak_values"><code class="docutils literal notranslate"><span class="pre">_PeakValleyData.peak_values</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.features.breath_detection._PeakValleyData.valley_indices"><code class="docutils literal notranslate"><span class="pre">_PeakValleyData.valley_indices</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.features.breath_detection._PeakValleyData.valley_values"><code class="docutils literal notranslate"><span class="pre">_PeakValleyData.valley_values</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection"><code class="docutils literal notranslate"><span class="pre">BreathDetection</span></code></a><ul>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection.sample_frequency"><code class="docutils literal notranslate"><span class="pre">BreathDetection.sample_frequency</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection.minimum_distance"><code class="docutils literal notranslate"><span class="pre">BreathDetection.minimum_distance</span></code></a></li>
@@ -769,17 +731,12 @@ assert bar == np.ndarray([1, 1, 1, 1, 3, 3, 3, 3])</p>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection.invalid_data_removal_window_length"><code class="docutils literal notranslate"><span class="pre">BreathDetection.invalid_data_removal_window_length</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection.invalid_data_removal_percentile"><code class="docutils literal notranslate"><span class="pre">BreathDetection.invalid_data_removal_percentile</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection.invalid_data_removal_multiplier"><code class="docutils literal notranslate"><span class="pre">BreathDetection.invalid_data_removal_multiplier</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection.find_breaths"><code class="docutils literal notranslate"><span class="pre">BreathDetection.find_breaths()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection._find_features"><code class="docutils literal notranslate"><span class="pre">BreathDetection._find_features()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection._remove_edge_cases"><code class="docutils literal notranslate"><span class="pre">BreathDetection._remove_edge_cases()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection._remove_doubles"><code class="docutils literal notranslate"><span class="pre">BreathDetection._remove_doubles()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection._remove_low_amplitudes"><code class="docutils literal notranslate"><span class="pre">BreathDetection._remove_low_amplitudes()</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection._remove_breaths_around_invalid_data"><code class="docutils literal notranslate"><span class="pre">BreathDetection._remove_breaths_around_invalid_data()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection._create_breaths_from_peak_valley_data"><code class="docutils literal notranslate"><span class="pre">BreathDetection._create_breaths_from_peak_valley_data()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection._remove_outlier_data"><code class="docutils literal notranslate"><span class="pre">BreathDetection._remove_outlier_data()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection._detect_peaks_and_valleys"><code class="docutils literal notranslate"><span class="pre">BreathDetection._detect_peaks_and_valleys()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection._detect_invalid_data"><code class="docutils literal notranslate"><span class="pre">BreathDetection._detect_invalid_data()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection._twosidedfill"><code class="docutils literal notranslate"><span class="pre">BreathDetection._twosidedfill()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.features.breath_detection.BreathDetection.find_breaths"><code class="docutils literal notranslate"><span class="pre">BreathDetection.find_breaths()</span></code></a></li>
 </ul>
 </li>
 </ul>
