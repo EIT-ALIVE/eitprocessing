@@ -153,6 +153,12 @@ make doctest
    where level must be one of the following ([following semantic versioning conventions](https://semver.org/)):
    - `major`: when API-incompatible changes have been made
    - `minor`: when functionality was added in a backward compatible manner
-   - `path`: when backward compatible bug fixes were made
+   - `patch`: when backward compatible bug fixes were made
 4. Merge the release branch into `main`.
-5. Go to https://github.com/EIT-ALIVE/eitprocessing/releases and draft a new release; create a new tag for the release, generate release notes automatically and adjust them, and finally publish the release as latest. This will trigger [a GitHub action](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/release.yml) that will take care of publishing the package on PyPi.
+5. On the [Releases page](https://github.com/EIT-ALIVE/eitprocessing/releases):
+   1. Click "Draft a new release"
+   2. By convention, use `v<version number>` as both the release title and as a tag for the release.
+   3. Click "Generate release notes" to automatically load release notes from merged PRs since the last release.
+   4. Adjust the notes as required
+   5. Ensure that "Set as latest release" is checked and that both other boxes are unchecked.
+   6. Hit "Publish release". This will automatically trigger [the GitHub action](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/release.yml) that will take care of publishing the package on PyPi.
