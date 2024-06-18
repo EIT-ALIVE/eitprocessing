@@ -1,0 +1,22 @@
+name: Dashboard
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - "**.md"
+      - "**.rst"
+      - "**.ipynb"
+    branches:
+      - main
+
+jobs:
+  call-build-workflow:
+    if: github.event.pull_request.draft == false
+    name: Build dashboard
+    uses: EIT-ALIVE/eit_dash/.github/workflows/build.yml@main
+    with:
+      caller_branch: ${{ github.head_ref || github.ref_name }}

@@ -1,10 +1,9 @@
-name: Python package
+name: Build package
 
 on:
   push:
     branches:
       - main
-      - drcandacemakedamoore/docker
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
@@ -41,40 +40,19 @@ jobs:
           ghcr.io/eit-alive/eittestdata:latest
           sh -c 'set -xe ;
             cd /ci ;
-            python -m pip install ".[dev,publishing]" ;
+            python${{ matrix.python-version }} -m pip install ".[dev,publishing]" ;
             pytest -v ;
-            python -m build'
-
-  lint:
-    if: github.event.pull_request.draft == false
-    name: Linting build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.10"
-      - name: Python info
-        shell: bash -l {0}
-        run: |
-          which python3
-          python3 --version
-      - name: Upgrade pip and install dependencies
-        run: |
-          python3 -m pip install --upgrade pip setuptools
-          python3 -m pip install .[dev,publishing]
-      - name: Check linting with ruff
-        run: ruff check .
+            python${{ matrix.python-version }} -m build'
 
   coveralls:
     if: github.event.pull_request.draft == false
     name: Coveralls build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.10"]
     steps:
       - uses: actions/checkout@v3
       - name: Connect to Container Registry
@@ -91,12 +69,12 @@ jobs:
           -e EIT_PROCESSING_TEST_DATA=/eitprocessing
           -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
           -e COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }}
-          -e COVERALLS_FLAG_NAME=python-${{ matrix.version }}
+          -e COVERALLS_FLAG_NAME=python-${{ matrix.python-version }}
           ghcr.io/eit-alive/eittestdata:latest
           sh -c 'set -xe ;
             cd /ci ;
-            python -m pip install --upgrade pip setuptools ;
-            python -m pip install ".[dev,publishing]" ;
+            python${{ matrix.python-version }} -m pip install --upgrade pip setuptools ;
+            python${{ matrix.python-version }} -m pip install ".[dev,publishing]" ;
             pytest --cov --cov-append --cov-report xml --cov-report term --cov-report html ;
             coveralls --service=github ;
-            python -m build'
+            python${{ matrix.python-version }} -m build'
