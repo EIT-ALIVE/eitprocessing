@@ -1,0 +1,102 @@
+name: Draft GitHub Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_level:
+        description: "Semantic version level increase."
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      release_branch:
+        description: "Branch to use for releasing."
+        type: string
+        default: "test_protected_develop"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: "ubuntu-latest"
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Check inputs
+        run: |
+          echo "-- check for valid bumpversion level"
+          if [[ "${{ github.event.inputs.version_level }}" != "patch" && "${{ github.event.inputs.version_level }}" != "minor" && "${{ github.event.inputs.version_level }}" != "major" ]]; then
+            echo "::error::Invalid version_type provided: ${{ github.event.inputs.version_level }}."
+            echo "Please use 'patch', 'minor', or 'major' instead."
+            exit 1
+          fi
+          echo "-- check for valid branch name"
+          if [[ "${{ github.event.inputs.release_branch }}" == "test_protected_main" ]]; then
+            echo "::error::Invalid release_branch may not be `test_protected_main`."
+            exit 1
+          fi
+        # TODO: check that build and lint (and other?) actions have passed.
+        # option 1: check whether other actions have passed already
+        # option 2: trigger actions from here
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # token must be associated to an admin (currently @DaniBodor, expires 20 June 2025), as admins can bypass branch protection
+          # TODO: add documentation on updating the token
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Configure Git
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git pull
+
+      - name: Check for conflicts
+        # TODO: check what happens if merge conflicts arise and compare to desired behavior
+        run: |
+          echo "-- check whether merging main into release_branch is possible"
+          git switch ${{ github.event.inputs.release_branch }}
+          git merge origin/test_protected_main --no-ff --no-commit
+          git merge --abort
+          echo "-- merge main into release_branch"
+          git merge origin/test_protected_main
+          if [[ "${{ github.event.inputs.release_branch }}" != "test_protected_develop" ]]; then
+            echo "-- check whether main can be merged into develop"
+            git switch test_protected_develop
+            git merge origin/${{ github.event.inputs.release_branch }} --no-ff --no-commit
+          fi
+
+      - name: Bump version
+        id: bump
+        run: |
+          echo "-- install bumpversion"
+          python3 -m pip install bumpversion
+          echo "-- merge release branch into main"
+          git switch test_protected_main
+          git merge ${{ github.event.inputs.release_branch }}
+          echo "-- bump the version"
+          bumpversion ${{ github.event.inputs.version_level }} --commit --tag
+          echo "-- push bumpversion"
+          echo "RELEASE_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+          git push --tags -f
+          git push
+          echo "-- merge changesand bump into develop and push"
+          git switch test_protected_develop
+          git merge test_protected_main
+          git push
+
+      - name: Create GitHub Release
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ steps.bump.outputs.RELEASE_TAG }} \
+              --title="Release ${{ steps.bump.outputs.RELEASE_TAG }}" \
+              --generate-notes \
+              --draft
