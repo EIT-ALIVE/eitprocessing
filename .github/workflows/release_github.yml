@@ -1,0 +1,73 @@
+name: Draft GitHub Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_level:
+        description: "Semantic version level increase."
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      release_branch:
+        description: "Branch to use for releasing."
+        type: string
+        default: "test_protected_develop"
+
+permissions:
+  contents: write
+
+jobs:
+  github_release:
+    runs-on: "ubuntu-latest"
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Configure git
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git pull
+
+      - name: Check for conflicts
+        run: |
+          echo "-- check whether merging main into release_branch is possible"
+          git switch ${{ github.event.inputs.release_branch }}
+          git merge origin/test_protected_main --no-ff --no-commit
+          git merge --abort
+          echo "-- merge main into release_branch"
+          git merge origin/test_protected_main
+
+      - name: Bump version
+        id: bump
+        run: |
+          echo "-- install bumpversion"
+          python3 -m pip install bumpversion
+          echo "-- merge release branch into main"
+          git switch test_protected_main
+          git merge ${{ github.event.inputs.release_branch }}
+          echo "-- bump the version"
+          bumpversion ${{ github.event.inputs.version_level }} --commit --tag
+          echo "-- push bumpversion"
+          echo "RELEASE_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+          git push --tags -f
+          git push
+
+      - name: Create GitHub Release
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ steps.bump.outputs.RELEASE_TAG }} \
+              --title="Release ${{ steps.bump.outputs.RELEASE_TAG }}" \
+              --generate-notes \
+              --draft
