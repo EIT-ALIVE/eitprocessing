@@ -18,7 +18,7 @@ class MovingAverage:
 
     Args:
         window_size: the size of the window. Should be odd; is enlarged by 1 if even.
-        window_fun: window function, e.g. np.window.bartlett.
+        window_function: window function, e.g. np.window.bartlett.
         padding_type: see `np.pad()`.
 
     Returns:
@@ -26,7 +26,7 @@ class MovingAverage:
     """
 
     window_size: int
-    window_fun: Callable | None = None
+    window_function: Callable | None = None
     padding_type: str = "edge"
 
     def __post_init__(self):
@@ -43,8 +43,8 @@ class MovingAverage:
         if window_size > len(data):
             window_size = int((len(data) - 1) / 2) * 2 + 1
 
-        if self.window_fun:
-            window = np.array(self.window_fun(window_size))
+        if self.window_function:
+            window = np.array(self.window_function(window_size))
             window = window / np.sum(window)  # normalizes to an area of 1
         else:
             window = np.ones(window_size) / window_size
