@@ -1,0 +1,85 @@
+name: Check and Run Build Workflow
+
+on:
+  workflow_call:
+    inputs:
+      branch_name:
+        type: string
+        description: "Branch name to check and run the build on"
+        required: true
+      read_workflow:
+        type: string
+        description: "Workflow that will be checked"
+        required: true
+
+jobs:
+  check_and_run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up GitHub CLI
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Install necessary packages
+        run: npm install -g @actions/core @actions/github
+
+      - name: Fetch latest commit on the specified branch
+        id: fetch_commit
+        run: |
+          branch_name=${{ github.event.inputs.branch_name }}
+          latest_commit=$(gh api repos/${{ github.repository }}/commits/${branch_name} --jq '.sha')
+          echo "Latest commit on $branch_name: $latest_commit"
+          echo "::set-output name=commit_sha::$latest_commit"
+
+      - name: Check if build workflow has run on the latest commit
+        id: check_workflow
+        run: |
+          commit_sha=${{ steps.fetch_commit.outputs.commit_sha }}
+          workflow_runs=$(gh api repos/${{ github.repository }}/actions/workflows/build.yml/runs --jq '.workflow_runs[] | select(.head_sha=="'${commit_sha}'")')
+          echo "Workflow runs: $workflow_runs"
+          if [ -z "$workflow_runs" ]; then
+            echo "::set-output name=has_run::false"
+          else
+            workflow_id=$(echo $workflow_runs | jq -r '.id')
+            echo "::set-output name=has_run::true"
+            echo "::set-output name=workflow_id::$workflow_id"
+          fi
+
+      - name: Run build workflow if not already run
+        if: steps.check_workflow.outputs.has_run == 'false'
+        id: trigger_build
+        run: |
+          branch_name=${{ github.event.inputs.branch_name }}
+          response=$(gh api repos/${{ github.repository }}/actions/workflows/build.yml/dispatches -f ref=${branch_name} -H "Accept: application/vnd.github.v3+json")
+          echo "Triggered build workflow: $response"
+          echo "::set-output name=build_triggered::true"
+
+      - name: Wait for build workflow completion
+        if: steps.trigger_build.outputs.build_triggered == 'true'
+        id: wait_for_build
+        run: |
+          commit_sha=${{ steps.fetch_commit.outputs.commit_sha }}
+          while : ; do
+            workflow_runs=$(gh api repos/${{ github.repository }}/actions/workflows/build.yml/runs --jq '.workflow_runs[] | select(.head_sha=="'${commit_sha}'")')
+            if [ ! -z "$workflow_runs" ]; then
+              workflow_status=$(echo $workflow_runs | jq -r '.status')
+              echo "Current build workflow status: $workflow_status"
+              if [ "$workflow_status" == "completed" ]; then
+                workflow_conclusion=$(echo $workflow_runs | jq -r '.conclusion')
+                echo "::set-output name=workflow_conclusion::$workflow_conclusion"
+                break
+              fi
+            fi
+            sleep 10
+          done
+
+      - name: Output build workflow result
+        if: steps.check_workflow.outputs.has_run == 'true'
+        id: output_result
+        run: |
+          workflow_id=${{ steps.check_workflow.outputs.workflow_id }}
+          workflow_conclusion=$(gh api repos/${{ github.repository }}/actions/runs/${workflow_id} --jq '.conclusion')
+          echo "Build workflow conclusion: $workflow_conclusion"
+          echo "::set-output name=workflow_conclusion::$workflow_conclusion"
