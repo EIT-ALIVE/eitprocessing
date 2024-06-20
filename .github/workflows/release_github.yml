@@ -10,7 +10,7 @@ on:
       release_branch:
         description: "Branch to use for releasing"
         type: string
-        default: "test_protected_develop"
+        default: "_test_release"
 
 permissions:
   contents: write
