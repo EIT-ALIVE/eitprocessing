@@ -41,6 +41,8 @@ class MovingAverage:
         """
         window_size = self.window_size
         if window_size > len(data):
+            # shorten window to the largest odd number less than the length of data
+            # having a window longer than the data results in unexpected values
             window_size = int((len(data) - 1) / 2) * 2 + 1
 
         if self.window_function:
