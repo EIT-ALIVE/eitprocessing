@@ -17,7 +17,7 @@ class MovingAverage:
     boundaries of the data.
 
     Args:
-        window_size: the size of the window. Should be odd; is enlarged by 1 if even.
+        window_size: the number of data points in the averaging window. Should be odd; is increased by 1 if even.
         window_function: window function, e.g. np.bartlett.
         padding_type: see `np.pad()`.
 
