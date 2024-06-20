@@ -46,11 +46,11 @@ class MovingAverage:
             window_size = int((len(data) - 1) / 2) * 2 + 1
 
         if self.window_function:
-            window = np.array(self.window_function(window_size))
-            window = window / np.sum(window)  # normalizes to an area of 1
+            weights = np.array(self.window_function(window_size))
+            weights = weights / np.sum(weights)  # normalizes to an area of 1
         else:
-            window = np.ones(window_size) / window_size
+            weights = np.ones(window_size) / window_size
 
         padding_length = (window_size - 1) // 2
         padded_data = np.pad(data, padding_length, mode=self.padding_type)
-        return np.convolve(padded_data, window, mode="valid")
+        return np.convolve(padded_data, weights, mode="valid")
