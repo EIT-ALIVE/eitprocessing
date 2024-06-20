@@ -22,7 +22,7 @@ class MovingAverage:
         padding_type: see `np.pad()`.
 
     Returns:
-        np.ndarray: moving average as a 1D array with the same length as `data`.
+        np.ndarray: moving average of data with the same shape as `data`.
     """
 
     window_size: int
