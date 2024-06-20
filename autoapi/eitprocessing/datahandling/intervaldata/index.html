@@ -61,19 +61,10 @@
 <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence" title="eitprocessing.datahandling.intervaldata.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Equivalence</span></code></a></p></td>
-<td><p>Mixin class that adds an equality and equivalence check.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer" title="eitprocessing.datahandling.intervaldata.HasTimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></a></p></td>
-<td><p>Gives access to a TimeIndexer object that can be used to slice by time.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.SelectByIndex" title="eitprocessing.datahandling.intervaldata.SelectByIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByIndex</span></code></a></p></td>
-<td><p>Adds slicing functionality to subclass by implementing <cite>__getitem__</cite>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Interval" title="eitprocessing.datahandling.intervaldata.Interval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Interval</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Interval" title="eitprocessing.datahandling.intervaldata.Interval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Interval</span></code></a></p></td>
 <td><p>A tuple containing the start time and end time of an interval.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData" title="eitprocessing.datahandling.intervaldata.IntervalData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntervalData</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.IntervalData" title="eitprocessing.datahandling.intervaldata.IntervalData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntervalData</span></code></a></p></td>
 <td><p>Container for interval data existing over a period of time.</p></td>
 </tr>
 </tbody>
@@ -81,132 +72,6 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.intervaldata.</span></span><span class="sig-name descname"><span class="pre">Equivalence</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence" title="Link to this definition">¶</a></dt>
-<dd><p>Mixin class that adds an equality and equivalence check.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence.__eq__">
-<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence.__eq__" title="Link to this definition">¶</a></dt>
-<dd><p>Return self==value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence._eq_dataclass">
-<span class="sig-name descname"><span class="pre">_eq_dataclass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._eq_dataclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence._eq_dataclass" title="Link to this definition">¶</a></dt>
-<dd><p>Compare two dataclasses for equality.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence._eq_userdict">
-<span class="sig-name descname"><span class="pre">_eq_userdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._eq_userdict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence._eq_userdict" title="Link to this definition">¶</a></dt>
-<dd><p>Compare two userdicts for equality.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence._array_safe_eq">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_array_safe_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._array_safe_eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence._array_safe_eq" title="Link to this definition">¶</a></dt>
-<dd><p>Check if a and b are equal, even if they are numpy arrays containing nans.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.Equivalence.isequivalent">
-<span class="sig-name descname"><span class="pre">isequivalent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence.isequivalent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.Equivalence.isequivalent" title="Link to this definition">¶</a></dt>
-<dd><p>Test whether the data structure between two objects are equivalent.</p>
-<p>Equivalence, in this case means that objects are compatible e.g. to be
-merged. Data content can vary, but e.g. the category of data (e.g.
-airway pressure, flow, tidal volume) and unit, etc., must match.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>other</strong> – object that will be compared to self.</p></li>
-<li><p><strong>raise</strong> – sets this method’s behavior in case of non-equivalence. If
-True, an <cite>EquivalenceError</cite> is raised, otherwise <cite>False</cite> is
-returned.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.EquivalenceError" title="eitprocessing.datahandling.mixins.equality.EquivalenceError"><strong>EquivalenceError</strong></a> – if <cite>raise_ == True</cite> and the objects are not</p></li>
-<li><p><strong>equivalent.</strong> – </p></li>
-</ul>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool describing result of equivalence comparison.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.HasTimeIndexer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.intervaldata.</span></span><span class="sig-name descname"><span class="pre">HasTimeIndexer</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#HasTimeIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer" title="Link to this definition">¶</a></dt>
-<dd><p>Gives access to a TimeIndexer object that can be used to slice by time.</p>
-<dl class="py property">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.HasTimeIndexer.t">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../mixins/slicing/index.html#eitprocessing.datahandling.mixins.slicing.TimeIndexer" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer"><span class="pre">TimeIndexer</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer.t" title="Link to this definition">¶</a></dt>
-<dd><p>Slicing an object using the time axis instead of indices.</p>
-<p>Example:
-<code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">sequence</span> <span class="pre">=</span> <span class="pre">load_eit_data(&lt;path&gt;,</span> <span class="pre">...)</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">=</span> <span class="pre">sequence.t[tp_start:tp_end]</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice2</span> <span class="pre">=</span> <span class="pre">sequence.select_by_time(tp_start,</span> <span class="pre">tp_end)</span>
-<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">==</span> <span class="pre">time_slice2</span>
-<span class="pre">True</span>
-<span class="pre">`</span></code></p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.HasTimeIndexer.select_by_time">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#HasTimeIndexer.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer.select_by_time" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.SelectByIndex">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.intervaldata.</span></span><span class="sig-name descname"><span class="pre">SelectByIndex</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.SelectByIndex" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
-<p>Adds slicing functionality to subclass by implementing <cite>__getitem__</cite>.</p>
-<p>Subclasses must implement a <cite>_sliced_copy</cite> function that defines what should
-happen when the object is sliced. This class ensures that when calling a
-slice between square brackets (as e.g. done for lists) then return the
-expected sliced object.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.SelectByIndex.label">
-<span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.SelectByIndex.label" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.SelectByIndex.__getitem__">
-<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.12)"><span class="pre">slice</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.SelectByIndex.__getitem__" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.SelectByIndex.select_by_index">
-<span class="sig-name descname"><span class="pre">select_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex.select_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.SelectByIndex.select_by_index" title="Link to this definition">¶</a></dt>
-<dd><p>De facto implementation of the <cite>__getitem__</cite> function.</p>
-<p>This function can also be called directly to add a label to the sliced
-object. Otherwise a default label describing the slice and original
-object is attached.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.SelectByIndex.__len__">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.SelectByIndex.__len__" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.SelectByIndex._sliced_copy">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_sliced_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">newlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex._sliced_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.SelectByIndex._sliced_copy" title="Link to this definition">¶</a></dt>
-<dd><p>Slicing method that must be implemented by all subclasses.</p>
-<p>Must return a copy of self object with all attached data within selected
-indices.</p>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="py data">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.intervaldata.T">
 <span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.intervaldata.</span></span><span class="sig-name descname"><span class="pre">T</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/intervaldata.html#T"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.intervaldata.T" title="Link to this definition">¶</a></dt>
@@ -400,27 +265,6 @@ that doesn’t fully fit within the time range.</p>
 <li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence"><code class="docutils literal notranslate"><span class="pre">Equivalence</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence.__eq__"><code class="docutils literal notranslate"><span class="pre">Equivalence.__eq__()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence._eq_dataclass"><code class="docutils literal notranslate"><span class="pre">Equivalence._eq_dataclass()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence._eq_userdict"><code class="docutils literal notranslate"><span class="pre">Equivalence._eq_userdict()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence._array_safe_eq"><code class="docutils literal notranslate"><span class="pre">Equivalence._array_safe_eq()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Equivalence.isequivalent"><code class="docutils literal notranslate"><span class="pre">Equivalence.isequivalent()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer.t"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer.t</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.HasTimeIndexer.select_by_time"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer.select_by_time()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.SelectByIndex"><code class="docutils literal notranslate"><span class="pre">SelectByIndex</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.SelectByIndex.label"><code class="docutils literal notranslate"><span class="pre">SelectByIndex.label</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.SelectByIndex.__getitem__"><code class="docutils literal notranslate"><span class="pre">SelectByIndex.__getitem__()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.SelectByIndex.select_by_index"><code class="docutils literal notranslate"><span class="pre">SelectByIndex.select_by_index()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.SelectByIndex.__len__"><code class="docutils literal notranslate"><span class="pre">SelectByIndex.__len__()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.SelectByIndex._sliced_copy"><code class="docutils literal notranslate"><span class="pre">SelectByIndex._sliced_copy()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.T"><code class="docutils literal notranslate"><span class="pre">T</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Interval"><code class="docutils literal notranslate"><span class="pre">Interval</span></code></a><ul>
 <li><a class="reference internal" href="#eitprocessing.datahandling.intervaldata.Interval.start_time"><code class="docutils literal notranslate"><span class="pre">Interval.start_time</span></code></a></li>

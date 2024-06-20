@@ -18,7 +18,6 @@ Classes
 
 .. autoapisummary::
 
-   eitprocessing.filters.butterworth_filters.TimeDomainFilter
    eitprocessing.filters.butterworth_filters.ButterworthFilter
    eitprocessing.filters.butterworth_filters.LowPassFilter
    eitprocessing.filters.butterworth_filters.HighPassFilter
@@ -28,27 +27,6 @@ Classes
 
 Module Contents
 ---------------
-
-.. py:class:: TimeDomainFilter
-
-   Bases: :py:obj:`abc.ABC`
-
-
-   Parent class for time domain filters.
-
-
-   .. py:attribute:: available_in_gui
-      :value: True
-
-
-
-   .. py:method:: apply_filter(input_data: numpy.typing.ArrayLike) -> NoReturn
-      :abstractmethod:
-
-
-      Apply the filter to the input data.
-
-
 
 .. py:class:: ButterworthFilter
 

@@ -61,12 +61,6 @@
 <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence" title="eitprocessing.datahandling.eitdata.Equivalence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Equivalence</span></code></a></p></td>
-<td><p>Mixin class that adds an equality and equivalence check.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.eitdata.SelectByTime" title="eitprocessing.datahandling.eitdata.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByTime</span></code></a></p></td>
-<td><p>Adds methods for slicing by time rather than index.</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData" title="eitprocessing.datahandling.eitdata.EITData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EITData</span></code></a></p></td>
 <td><p>Container for EIT impedance data.</p></td>
 </tr>
@@ -78,103 +72,6 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.eitdata.</span></span><span class="sig-name descname"><span class="pre">Equivalence</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence" title="Link to this definition">¶</a></dt>
-<dd><p>Mixin class that adds an equality and equivalence check.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence.__eq__">
-<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence.__eq__" title="Link to this definition">¶</a></dt>
-<dd><p>Return self==value.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence._eq_dataclass">
-<span class="sig-name descname"><span class="pre">_eq_dataclass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._eq_dataclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence._eq_dataclass" title="Link to this definition">¶</a></dt>
-<dd><p>Compare two dataclasses for equality.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence._eq_userdict">
-<span class="sig-name descname"><span class="pre">_eq_userdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._eq_userdict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence._eq_userdict" title="Link to this definition">¶</a></dt>
-<dd><p>Compare two userdicts for equality.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence._array_safe_eq">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_array_safe_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence._array_safe_eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence._array_safe_eq" title="Link to this definition">¶</a></dt>
-<dd><p>Check if a and b are equal, even if they are numpy arrays containing nans.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.Equivalence.isequivalent">
-<span class="sig-name descname"><span class="pre">isequivalent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/equality.html#Equivalence.isequivalent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.Equivalence.isequivalent" title="Link to this definition">¶</a></dt>
-<dd><p>Test whether the data structure between two objects are equivalent.</p>
-<p>Equivalence, in this case means that objects are compatible e.g. to be
-merged. Data content can vary, but e.g. the category of data (e.g.
-airway pressure, flow, tidal volume) and unit, etc., must match.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>other</strong> – object that will be compared to self.</p></li>
-<li><p><strong>raise</strong> – sets this method’s behavior in case of non-equivalence. If
-True, an <cite>EquivalenceError</cite> is raised, otherwise <cite>False</cite> is
-returned.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><a class="reference internal" href="../mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.EquivalenceError" title="eitprocessing.datahandling.mixins.equality.EquivalenceError"><strong>EquivalenceError</strong></a> – if <cite>raise_ == True</cite> and the objects are not</p></li>
-<li><p><strong>equivalent.</strong> – </p></li>
-</ul>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool describing result of equivalence comparison.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.SelectByTime">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.eitdata.</span></span><span class="sig-name descname"><span class="pre">SelectByTime</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.SelectByTime" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByIndex</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></p>
-<p>Adds methods for slicing by time rather than index.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.SelectByTime.select_by_time">
-<span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_inclusive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_inclusive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.SelectByTime.select_by_time" title="Link to this definition">¶</a></dt>
-<dd><p>Get a shortened copy of the object, starting from start_time and ending at end_time.</p>
-<p>Given a start and end time stamp (i.e. its value, not its index),
-return a slice of the original object, which must contain a time axis.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>start_time</strong> – first time point to include. Defaults to first frame of sequence.</p></li>
-<li><p><strong>end_time</strong> – last time point. Defaults to last frame of sequence.</p></li>
-<li><p><strong>(</strong><strong>default</strong> (<em>start_inclusive</em>) – <cite>True</cite>), end_inclusive (default <cite>False</cite>):
-these arguments control the behavior if the given time stamp
-does not match exactly with an existing time stamp of the input.
-if <cite>True</cite>: the given time stamp will be inside the sliced object.
-if <cite>False</cite>: the given time stamp will be outside the sliced object.</p></li>
-<li><p><strong>label</strong> – Description. Defaults to None, which will create a label based
-on the original object label and the frames by which it is sliced.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.12)"><strong>TypeError</strong></a> – if <cite>self</cite> does not contain a <cite>time</cite> attribute.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if time stamps are not sorted.</p></li>
-</ul>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A shortened copy of the object.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="py data">
 <dt class="sig sig-object py" id="eitprocessing.datahandling.eitdata.T">
 <span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.eitdata.</span></span><span class="sig-name descname"><span class="pre">T</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/datahandling/eitdata.html#T"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.eitdata.T" title="Link to this definition">¶</a></dt>
@@ -336,18 +233,6 @@ indices.</p>
 <li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence"><code class="docutils literal notranslate"><span class="pre">Equivalence</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence.__eq__"><code class="docutils literal notranslate"><span class="pre">Equivalence.__eq__()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence._eq_dataclass"><code class="docutils literal notranslate"><span class="pre">Equivalence._eq_dataclass()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence._eq_userdict"><code class="docutils literal notranslate"><span class="pre">Equivalence._eq_userdict()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence._array_safe_eq"><code class="docutils literal notranslate"><span class="pre">Equivalence._array_safe_eq()</span></code></a></li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.Equivalence.isequivalent"><code class="docutils literal notranslate"><span class="pre">Equivalence.isequivalent()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.SelectByTime"><code class="docutils literal notranslate"><span class="pre">SelectByTime</span></code></a><ul>
-<li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.SelectByTime.select_by_time"><code class="docutils literal notranslate"><span class="pre">SelectByTime.select_by_time()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.T"><code class="docutils literal notranslate"><span class="pre">T</span></code></a></li>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData"><code class="docutils literal notranslate"><span class="pre">EITData</span></code></a><ul>
 <li><a class="reference internal" href="#eitprocessing.datahandling.eitdata.EITData.path"><code class="docutils literal notranslate"><span class="pre">EITData.path</span></code></a></li>
