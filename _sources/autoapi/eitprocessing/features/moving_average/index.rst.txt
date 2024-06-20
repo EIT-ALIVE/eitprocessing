@@ -31,7 +31,7 @@ Module Contents
    :param window_function: window function, e.g. np.bartlett.
    :param padding_type: see `np.pad()`.
 
-   :returns: moving average as a 1D array with the same length as `data`.
+   :returns: moving average of data with the same shape as `data`.
    :rtype: np.ndarray
 
 
