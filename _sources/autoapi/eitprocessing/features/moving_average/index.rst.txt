@@ -27,7 +27,7 @@ Module Contents
    Padding adds values at the start and end with the first/last value, to more accurately determine the average at the
    boundaries of the data.
 
-   :param window_size: the size of the window. Should be odd; is enlarged by 1 if even.
+   :param window_size: the number of data points in the averaging window. Should be odd; is increased by 1 if even.
    :param window_function: window function, e.g. np.bartlett.
    :param padding_type: see `np.pad()`.
 
