@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 
 from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling.mixins.locking import Lockable
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 if TYPE_CHECKING:
@@ -17,7 +18,7 @@ T = TypeVar("T", bound="ContinuousData")
 
 
 @dataclass(eq=False)
-class ContinuousData(Equivalence, SelectByTime):
+class ContinuousData(Equivalence, SelectByTime, Lockable):
     """Container for data with a continuous time axis.
 
     Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and
@@ -43,21 +44,19 @@ class ContinuousData(Equivalence, SelectByTime):
     description: str = field(default="", compare=False, repr=False)
     parameters: dict[str, Any] = field(default_factory=dict, repr=False, metadata={"check_equivalence": True})
     derived_from: Any | list[Any] = field(default_factory=list, repr=False, compare=False)
-    time: np.ndarray = field(kw_only=True, repr=False)
-    values: np.ndarray = field(kw_only=True, repr=False)
+    time: np.ndarray = field(kw_only=True, repr=False, metadata={"lock_action_default": True})
+    values: np.ndarray = field(kw_only=True, repr=False, metadata={"lock_action_default": True})
 
     def __post_init__(self) -> None:
-        if self.loaded:
-            self.lock()
-        self.lock("time")
+        self.lock()
 
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
         try:
-            old_value = getattr(self, attr)
+            getattr(self, attr)
         except AttributeError:
             pass
         else:
-            if isinstance(old_value, np.ndarray) and old_value.flags["WRITEABLE"] is False:
+            if self.islockable(attr) and self.islocked(attr):
                 msg = f"Attribute '{attr}' is locked and can't be overwritten."
                 raise AttributeError(msg)
         super().__setattr__(attr, value)
@@ -90,7 +89,7 @@ class ContinuousData(Equivalence, SelectByTime):
             time=np.copy(self.time),
             values=np.copy(self.values),
         )
-        obj.unlock()
+        obj.unlock_all()
         return obj
 
     def __add__(self: T, other: T) -> T:
@@ -149,61 +148,6 @@ class ContinuousData(Equivalence, SelectByTime):
         copy = self.copy(label, **kwargs)
         copy.values = function(copy.values, **func_args)
         return copy
-
-    def lock(self, *attr: str) -> None:
-        """Lock attributes, essentially rendering them read-only.
-
-        Locked attributes cannot be overwritten. Attributes can be unlocked using `unlock()`.
-
-        Args:
-            *attr: any number of attributes can be passed here, all of which will be locked. Defaults to "values".
-
-        Examples:
-            >>> # lock the `values` attribute of `data`
-            >>> data.lock()
-            >>> data.values = [1, 2, 3] # will result in an AttributeError
-            >>> data.values[0] = 1      # will result in a RuntimeError
-        """
-        if not len(attr):
-            # default values are not allowed when using *attr, so set a default here if none is supplied
-            attr = ("values",)
-        for attr_ in attr:
-            getattr(self, attr_).flags["WRITEABLE"] = False
-
-    def unlock(self, *attr: str) -> None:
-        """Unlock attributes, rendering them editable.
-
-        Locked attributes cannot be overwritten, but can be unlocked with this function to make them editable.
-
-        Args:
-            *attr: any number of attributes can be passed here, all of which will be unlocked. Defaults to "values".
-
-        Examples:
-            >>> # lock the `values` attribute of `data`
-            >>> data.lock()
-            >>> data.values = [1, 2, 3] # will result in an AttributeError
-            >>> data.values[0] = 1      # will result in a RuntimeError
-            >>> data.unlock()
-            >>> data.values = [1, 2, 3]
-            >>> print(data.values)
-            [1,2,3]
-            >>> data.values[0] = 1      # will result in a RuntimeError
-            >>> print(data.values)
-            1
-        """
-        if not len(attr):
-            # default values are not allowed when using *attr, so set a default here if none is supplied
-            attr = ("values",)
-        for attr_ in attr:
-            getattr(self, attr_).flags["WRITEABLE"] = True
-
-    @property
-    def locked(self) -> bool:
-        """Return whether the values attribute is locked.
-
-        See lock().
-        """
-        return not self.values.flags["WRITEABLE"]
 
     @property
     def loaded(self) -> bool:
