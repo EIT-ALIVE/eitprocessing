@@ -58,7 +58,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        window_size: the size of the window. Should be odd; is enlarged by 1 if even.</span>
-<span class="sd">        window_fun: window function, e.g. np.window.bartlett.</span>
+<span class="sd">        window_function: window function, e.g. np.bartlett.</span>
 <span class="sd">        padding_type: see `np.pad()`.</span>
 
 <span class="sd">    Returns:</span>
@@ -69,9 +69,9 @@
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/features/moving_average/index.html#eitprocessing.features.moving_average.MovingAverage.window_size">[docs]</a>
     <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span></div>
 
-<div class="viewcode-block" id="MovingAverage.window_fun">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/moving_average/index.html#eitprocessing.features.moving_average.MovingAverage.window_fun">[docs]</a>
-    <span class="n">window_fun</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+<div class="viewcode-block" id="MovingAverage.window_function">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/moving_average/index.html#eitprocessing.features.moving_average.MovingAverage.window_function">[docs]</a>
+    <span class="n">window_function</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="MovingAverage.padding_type">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/features/moving_average/index.html#eitprocessing.features.moving_average.MovingAverage.padding_type">[docs]</a>
@@ -97,8 +97,8 @@
         <span class="k">if</span> <span class="n">window_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
             <span class="n">window_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_fun</span><span class="p">:</span>
-            <span class="n">window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_fun</span><span class="p">(</span><span class="n">window_size</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_function</span><span class="p">:</span>
+            <span class="n">window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_function</span><span class="p">(</span><span class="n">window_size</span><span class="p">))</span>
             <span class="n">window</span> <span class="o">=</span> <span class="n">window</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>  <span class="c1"># normalizes to an area of 1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span> <span class="o">/</span> <span class="n">window_size</span>

@@ -28,7 +28,7 @@ Module Contents
    boundaries of the data.
 
    :param window_size: the size of the window. Should be odd; is enlarged by 1 if even.
-   :param window_fun: window function, e.g. np.window.bartlett.
+   :param window_function: window function, e.g. np.bartlett.
    :param padding_type: see `np.pad()`.
 
    :returns: moving average as a 1D array with the same length as `data`.
@@ -39,7 +39,7 @@ Module Contents
       :type:  int
 
 
-   .. py:attribute:: window_fun
+   .. py:attribute:: window_function
       :type:  collections.abc.Callable | None
       :value: None
 
