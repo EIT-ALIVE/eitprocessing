@@ -22,11 +22,11 @@ draeger_file2 = data_directory / "Draeger_Test.bin"
 timpel_file = data_directory / "Timpel_Test.txt"
 
 
-def make_cosine_wave(sample_frequency: float, length: int, frequency: float):
+def _make_cosine_wave(sample_frequency: float, length: int, frequency: float):
     """Generate a cosine wave with the given parameters and amplitude 1.
 
     A cosine wave starts and ends at a value of 1, passing through -1 halfway between the maximum values. This makes it
-    a very predictable signal for breath detection.
+    a very predictable signal for breath detection and will be used as simplified test data by some of the tests below.
     """
     time = np.arange(length) / sample_frequency
     return time, np.cos(time * np.pi * 2 * frequency)
