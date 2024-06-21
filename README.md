@@ -11,17 +11,15 @@
 
 # Contents <!-- omit in toc -->
 
-- [What is eitprocessing?](#what-is-eitprocessing)
-- [Installation](#installation)
+- [Installation](#installation-1)
   - [Virtual environment](#virtual-environment)
   - [Install using `pip`](#install-using-pip)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 - [Credits](#credits)
 
-# What is eitprocessing?
-
-Processing of data from electrical impedance tomography and other respiratory monitoring tools.
+The project setup is documented in [project_setup](/project_setup.md). Feel free to remove this document (and/or the link to this document) if you don't need it.
+## Installation
 
 [Electrical Impedance Tomography](https://en.wikipedia.org/wiki/Electrical_impedance_tomography) (EIT) is a noninvasive
 and radiation-free continuous imaging tool for monitoring respiratory mechanics. eitprocessing aims to provide a
