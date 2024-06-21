@@ -10,4 +10,6 @@
         index.md  # The documentation homepage.
         ...       # Other markdown pages, images and other files.
 ## Reference 
-::: eitprocessing.datahandling.continuousdata.ContinuousData
+::: eitprocessing.datahandling
+    options: 
+        show_submodels: true
