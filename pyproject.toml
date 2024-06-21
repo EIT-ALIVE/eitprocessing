@@ -51,6 +51,10 @@ dev = [
     "tox",
     "myst_parser",
     "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings",
+    "mkdocs-exlude",
+    "mike",
 ]
 notebooks = [
     "ipykernel >= 6.15.2",
