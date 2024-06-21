@@ -50,12 +50,9 @@ nav:
 - Getting started:
   - Installation: installation.md
   - Basic example: basic_example.md
-- API Documentation:
-  - Generating Data:
-    - Task: api/task.md
-    - TaskSettingsMixin: api/tasksettingsmixin.md
+- API Documentation: APIindex.md
 - About:
-  - Contributing: contributing.md
+  - Contributing: contributing_doc.md
   - Code of Conduct: code_of_conduct.md
   - License: license.md
 
@@ -84,6 +81,8 @@ markdown_extensions:
 - pymdownx.tabbed:
     alternate_style: true
 - pymdownx.magiclink
+- pymdownx.snippets:
+      base_path: ["docs","."]
 
 watch:
 - docs
@@ -107,6 +106,7 @@ plugins:
           - https://pandas.pydata.org/docs/objects.inv
         options:
           members_order: source
+          inherited_members: true
           filters: ["!^_"]
           merge_init_into_class: true
           show_root_heading: true
