@@ -55,6 +55,7 @@ dev = [
     "mkdocstrings",
     "mkdocs-exlude",
     "mike",
+    "pymdown-extensions",
 ]
 notebooks = [
     "ipykernel >= 6.15.2",
