@@ -49,12 +49,17 @@ dev = [
     "pytest-cov",
     "pytest-runner",
     "coveralls",
-    "sphinx",
-    "sphinx_rtd_theme",
-    "sphinx-autoapi",
     "tox",
     "ruff < 0.6",
-    "myst_parser",
+]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings",
+    "mkdocstrings-python",
+    "mkdocs-exclude",
+    "mike",
+    "pymdown-extensions",
 ]
 notebooks = [
     "ipykernel >= 6.15.2",
