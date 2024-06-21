@@ -1,14 +1,18 @@
-name: Release Workflow
+name: Draft GitHub Release
 
 on:
   workflow_dispatch:
     inputs:
       version_level:
-        description: "Version type: patch, minor, or major"
+        description: "Semantic version level increase."
         required: true
-        type: string
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
       release_branch:
-        description: "Branch to use for releasing"
+        description: "Branch to use for releasing."
         type: string
         default: "_test_release"
 
