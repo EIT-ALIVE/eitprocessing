@@ -15,9 +15,21 @@
 
 ## How to use eitprocessing
 
-Processing of lung image data from electrical impedance tomography
+Processing of data from electrical impedance tomography and other respiratory monitoring tools.
 
-The project setup is documented in [project_setup.md](project_setup.md). Feel free to remove this document (and/or the link to this document) if you don't need it.
+[Electrical Impedance Tomography](https://en.wikipedia.org/wiki/Electrical_impedance_tomography) (EIT) is a noninvasive and radiation-free continuous imaging tool for monitoring respiratory
+mechanics.
+eitprocessing aims to provide a versatile, user-friendly, reproducible and reliable workflow for the processing and
+analysis of EIT data and related waveform data, like pressures and flow.
+
+eitprocessing includes tools to load data exported from EIT-devices from several manufacturers, including Dräger, SenTec and
+Timpel, as well as data from other sources. 
+Several pre-processing tools and analysis tools are provided. 
+<!-- TODO when available, add summarisation and reporting -->
+<!-- TODO extend with short list of available tools when applicable -->
+
+[eit_dash](https://github.com/EIT-ALIVE/eit_dash) provides an accompanying GUI. 
+
 
 ## Installation
 
