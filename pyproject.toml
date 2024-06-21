@@ -53,6 +53,7 @@ dev = [
     "sphinx-autoapi",
     "tox",
     "myst_parser",
+    "mkdocs",
 ]
 notebooks = [
     "ipykernel >= 6.15.2",
