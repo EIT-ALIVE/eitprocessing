@@ -21,17 +21,14 @@ The project setup is documented in [project_setup.md](project_setup.md). Feel fr
 
 ## Installation
 
-Install eitprocessing as follows:
+It is advised to install eitprocessing in a dedicated virtual environment. See e.g. [Install packages in a virtual environment using pip and venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) or
+[Getting started with conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html). 
 
-- Create fresh environment
-  - Make sure you are in your base environment: `conda activate`
-  - Create a new environment: `conda create -n <envname> python=3.10`
-  - Activate new environment: `conda activate <envname>`
-- Clone and install
-  - Clone the repository: `git clone git@github.com:EIT-ALIVE/eitprocessing.git`
-  - Install:
-    - For basic use: `pip install -e .`
-    - For full developer options (testing, etc): `pip install -e .[dev]`
+eitprocessing can be installed from PyPi as follows:
+
+- Install
+  - For basic use: `pip install eitprocessing`
+  - For full developer options (testing, etc): `pip install "eitprocessing[dev]"`
 
 ## Documentation
 
