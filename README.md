@@ -1,4 +1,4 @@
-## Badges
+## Badges <!-- omit in toc -->
 
 | fair-software.eu recommendations | |
 | :-- | :--  |
@@ -12,6 +12,15 @@
 | Build                              | [![build](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/build.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/build.yml) |
 | Citation data consistency               | [![cffconvert](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/cffconvert.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/cffconvert.yml) |
 | MarkDown link checker              | [![markdown-link-check](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/markdown-link-check.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/markdown-link-check.yml) |
+
+## Contents <!-- omit in toc -->
+
+- [How to use eitprocessing](#how-to-use-eitprocessing)
+- [Installation](#installation)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Credits](#credits)
+
 
 ## How to use eitprocessing
 
