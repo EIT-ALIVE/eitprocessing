@@ -1,0 +1,12 @@
+
+site_name: EITprocessing
+nav:
+  - Home: index.md
+  - About: about.md
+
+theme:
+  name: material
+
+plugins:
+- search
+- mkdocstrings
