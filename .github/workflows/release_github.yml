@@ -71,3 +71,38 @@ jobs:
               --title="Release ${{ steps.bump.outputs.RELEASE_TAG }}" \
               --generate-notes \
               --draft
+
+  tidy_workspace:
+    # only run if action above succeeds
+    needs: github_release
+    runs-on: "ubuntu-latest"
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Configure git
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git pull
+
+      - name: Merge updates into develop
+        run: |
+          git switch test_protected_develop
+          git merge origin/test_protected_main
+          git push
+
+      - name: Delete release branch other than main or develop
+        run: |
+          if [[ ${{ github.event.inputs.release_branch}} != "test_protected_main" && ${{ github.event.inputs.release_branch}} != "test_protected_develop" ]]; then
+            echo "-- deleting branch '${{ github.event.inputs.release_branch }}'"
+            git push origin -d ${{ github.event.inputs.release_branch }}
+          else
+            echo "-- branch '${{ github.event.inputs.release_branch}}' will not be deleted from remote"
+          fi
