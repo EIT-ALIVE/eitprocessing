@@ -145,6 +145,37 @@ make doctest
 
 ## Making a release
 
+### Trigger the automated release workflow:
+
+0. **IMP0RTANT:** Create a PR for your release and make sure that all checks pass!
+1. Navigate to [Draft Github Release](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/release_github.yml)
+   on the [Actions](https://github.com/EIT-ALIVE/eitprocessing/actions) tab.
+2. On the right hand side, you can select the level increase (patch, minor, or major) and which branch to release from.
+3. Visit [Actions](https://github.com/EIT-ALIVE/eitprocessing/actions) tab to check whether everything went as expected.
+4. Navigate to the [Releases](https://github.com/EIT-ALIVE/eitprocessing/releases) tab and click on the newest draft
+   release (which was just automatically generated)
+5. Click on the edit (pencil) icon on the right side of the draft release.
+6. Check/adapt the release notes and make sure that everything is as expected.
+7. Check that "Set as the latest release is checked"
+8. Click green "Publish Release" button to convert the draft to a published release on GitHub.
+   - This will automatically trigger [the GitHub action](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/release.yml) that will take care of publishing the package on PyPi.
+   - Note that the PR associated to this release will be closed.
+   - Note that if released from another branch than `develop`, it will try to merge into `develop` and delete the branch
+     from the remote if succesfull.
+
+#### Updating the token:
+
+NOTE: the current token (associated to @DaniBodor) allowing to bypass branch protection will expire on June 20th, 2025. To update the token do the following:
+
+1. [Create a personal access token](https://github.com/settings/tokens/new) from a GitHub user account with admin priviliges for eitprocessing
+2. Check all the "repo" boxes and the "workflow" box, set an expiration date, and give the token a note.
+3. Click green "Generate token" button on the bottom
+4. Copy the token immediately, as it will not be visible again later.
+5. Navigate to the [secrets settings of eitprocessing](https://github.com/EIT-ALIVE/eitprocessing/settings/secrets/actions).
+6. Edit the `GH_PAT` key giving your access token as the new value.
+
+### Manually create a release:
+
 0. Make sure you have all required developers tools installed `pip install -e .'[dev]'`
 1. Branch from `main` and prepare the branch for the release (e.g., removing the unnecessary files, fix minor bugs if necessary).
 2. Ensure all tests pass `pytest -v` and that linting (`ruff check`) and formatting (`ruff format --check`) conventions
@@ -161,4 +192,5 @@ make doctest
    3. Click "Generate release notes" to automatically load release notes from merged PRs since the last release.
    4. Adjust the notes as required
    5. Ensure that "Set as latest release" is checked and that both other boxes are unchecked.
-   6. Hit "Publish release". This will automatically trigger [the GitHub action](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/release.yml) that will take care of publishing the package on PyPi.
+   6. Hit "Publish release".
+      - This will automatically trigger [the GitHub action](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/release.yml) that will take care of publishing the package on PyPi.
