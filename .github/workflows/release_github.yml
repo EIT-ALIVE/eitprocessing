@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   release:
@@ -107,6 +108,23 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git pull
+
+      - name: Close PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "-- install jq"
+          apt install -y jq
+          echo "-- searching for associated PR"
+          branch_name=${{ github.event.inputs.release_branch }}
+          json=$(gh pr list -H $branch_name --json number)
+          pr_number=$(echo $json | jq -r '.[0].number')
+          if [ -n "$pr_number" ]; then
+            echo "-- closing PR #$pr_number"
+            gh pr close $pr_number
+          else
+            echo "-- no open pull request found for branch $branch_name"
+          fi
 
       - name: Merge updates into develop
         run: |
