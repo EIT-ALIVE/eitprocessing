@@ -12,6 +12,16 @@ on:
       - "**.ipynb"
     branches:
       - main
+      - develop
+      - more
+      - and_more
+      - even_more
+      - muchly_much_much_more
+      - and_again
+      - lalalalala
+      - lululululu
+      - lilililili
+      - lolololololo
 
 jobs:
   lint:
