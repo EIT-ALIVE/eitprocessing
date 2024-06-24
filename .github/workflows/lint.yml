@@ -20,6 +20,7 @@ on:
       - and_again
       - lalalalala
       - lululululu
+      - lilililili
 
 jobs:
   lint:
