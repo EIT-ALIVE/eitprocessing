@@ -21,17 +21,11 @@ authors:
     affiliation: Erasmus MC
     orcid: "https://orcid.org/0000-0001-8778-5135"
 
-  - given-names: Candace Makeda
-    family-names: Moore
-    email: c.moore@esciencecenter.nl
-    affiliation: Netherlands eScience Center
-    orcid: 'https://orcid.org/0000-0003-1672-7565'
-
   - given-names: Walter
     family-names: Baccinelli
     email: w.baccinelli@esciencecenter.nl
     affiliation: Netherlands eScience Center
-    orcid: 'https://orcid.org/0000-0001-8888-4792'
+    orcid: "https://orcid.org/0000-0001-8888-4792"
 
   - family-names: Wisse-Smit
     given-names: Jantine
@@ -39,9 +33,15 @@ authors:
     affiliation: Erasmus MC
     orcid: "https://orcid.org/0000-0000-0000-0000"
 
+  - family-names: Francovich
+    given-names: Juliette
+    email: xxx@xxx.xx
+    affiliation: Erasmus MC
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+
 date-released: 2023-03-23
-doi: 10.0000/FIXME
-version: "1.0.2"
+doi: 10.5281/zenodo.7869553
+version: "1.1.0"
 repository-code: "git@github.com:EIT-ALIVE/eitprocessing"
 keywords:
   - Mechanical lung ventilation
