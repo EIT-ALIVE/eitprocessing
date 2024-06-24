@@ -15,6 +15,7 @@ on:
       - develop
       - more
       - and_more
+      - even_more
 
 jobs:
   lint:
