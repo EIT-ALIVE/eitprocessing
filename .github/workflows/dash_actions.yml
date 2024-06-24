@@ -1,4 +1,4 @@
-name: Dashboard
+name: Build Dashboard
 
 on:
   push:

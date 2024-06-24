@@ -1,17 +1,13 @@
 ## Badges <!-- omit in toc -->
 
-| fair-software.eu recommendations | |
-| :-- | :--  |
-| (1/5) code repository              | [![github repo badge](https://img.shields.io/badge/github-repo-000.svg?logo=github&labelColor=gray&color=blue)](git@github.com:EIT-ALIVE/eitprocessing) |
-| (2/5) license                      | [![github license badge](https://img.shields.io/github/license/EIT-ALIVE/eitprocessing)](git@github.com:EIT-ALIVE/eitprocessing) |
-| (3/5) community registry           | [![RSD](https://img.shields.io/badge/rsd-eitprocessing-00a3e3.svg)](https://www.research-software.nl/software/eitprocessing) [![workflow pypi badge](https://img.shields.io/pypi/v/eitprocessing.svg?colorB=blue)](https://pypi.python.org/project/eitprocessing/) |
-| (4/5) citation                     |  [![DOI](https://zenodo.org/badge/617944717.svg)](https://zenodo.org/badge/latestdoi/617944717) |
-| (5/5) checklist                    | [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9147/badge)](https://www.bestpractices.dev/projects/9147) |
-| howfairis                          | [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu) |
-| **GitHub Actions**                 | &nbsp; |
-| Build                              | [![build](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/build.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/build.yml) |
-| Citation data consistency               | [![cffconvert](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/cffconvert.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/cffconvert.yml) |
-| MarkDown link checker              | [![markdown-link-check](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/markdown-link-check.yml/badge.svg)](git@github.com:EIT-ALIVE/eitprocessing/actions/workflows/markdown-link-check.yml) |
+| Badges         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| :------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Registry       | [![RSD](https://img.shields.io/badge/rsd-eitprocessing-00a3e3.svg)](https://www.research-software.nl/software/eitprocessing) [![workflow pypi badge](https://img.shields.io/pypi/v/eitprocessing.svg?colorB=blue)](https://pypi.python.org/project/eitprocessing/) [![github repo badge](https://img.shields.io/badge/github-repo-000.svg?logo=github&labelColor=gray&color=blue)](git@github.com:EIT-ALIVE/eitprocessing)                                                                                   |
+| License        | [![github license badge](https://img.shields.io/github/license/EIT-ALIVE/eitprocessing)](git@github.com:EIT-ALIVE/eitprocessing)                                                                                                                                                                                                                                                                                                                                                                             |
+| Citation       | [![DOI](https://zenodo.org/badge/617944717.svg)](https://zenodo.org/badge/latestdoi/617944717)                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Fairness       | [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9147/badge)](https://www.bestpractices.dev/projects/9147) [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu)                                                                                                                                                                                                  |
+| GitHub Actions | ![build](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/build.yml/badge.svg) ![dash_actions](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/dash_actions.yml/badge.svg) ![lint](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/lint.yml/badge.svg) ![documentation](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/documentation.yml/badge.svg) ![cffconvert](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/cffconvert.yml/badge.svg) |
+| Python         | ![Python](https://img.shields.io/badge/python-3.10-blue.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ## Contents <!-- omit in toc -->
 
@@ -20,7 +16,6 @@
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 - [Credits](#credits)
-
 
 ## How to use eitprocessing
 
@@ -32,18 +27,18 @@ eitprocessing aims to provide a versatile, user-friendly, reproducible and relia
 analysis of EIT data and related waveform data, like pressures and flow.
 
 eitprocessing includes tools to load data exported from EIT-devices from several manufacturers, including Dräger, SenTec and
-Timpel, as well as data from other sources. 
-Several pre-processing tools and analysis tools are provided. 
+Timpel, as well as data from other sources.
+Several pre-processing tools and analysis tools are provided.
+
 <!-- TODO when available, add summarisation and reporting -->
 <!-- TODO extend with short list of available tools when applicable -->
 
-[eit_dash](https://github.com/EIT-ALIVE/eit_dash) provides an accompanying GUI. 
-
+[eit_dash](https://github.com/EIT-ALIVE/eit_dash) provides an accompanying GUI.
 
 ## Installation
 
 It is advised to install eitprocessing in a dedicated virtual environment. See e.g. [Install packages in a virtual environment using pip and venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) or
-[Getting started with conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html). 
+[Getting started with conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html).
 
 eitprocessing can be installed from PyPi as follows:
 
