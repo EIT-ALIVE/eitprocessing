@@ -49,6 +49,8 @@ dev = [
     "pytest-runner",
     "coveralls",
     "tox",
+]
+docs = [
     "mkdocs",
     "mkdocs-material",
     "mkdocstrings",
