@@ -21,34 +21,19 @@ permissions:
   pull-requests: write
 
 jobs:
-  release:
+  github_release:
     runs-on: "ubuntu-latest"
     defaults:
       run:
         shell: bash -l {0}
 
     steps:
-      - name: Check inputs
-        run: |
-          echo "-- check for valid bumpversion level"
-          if [[ "${{ github.event.inputs.version_level }}" != "patch" && "${{ github.event.inputs.version_level }}" != "minor" && "${{ github.event.inputs.version_level }}" != "major" ]]; then
-            echo "::error::Invalid version_type provided: ${{ github.event.inputs.version_level }}."
-            echo "Please use 'patch', 'minor', or 'major' instead."
-            exit 1
-          fi
-        # TODO: check what happens if release_branch = main (or test_protected_main)
-        # TODO: check that build and lint (and other?) actions have passed.
-        # option 1: check whether other actions have passed already
-        # option 2: trigger actions from here
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # token must be associated to an admin (currently @DaniBodor, expires 20 June 2025), as admins can bypass branch protection
-          # TODO: add documentation on updating the token
           token: ${{ secrets.GH_PAT }}
 
-      - name: Configure Git
+      - name: Configure git
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
@@ -88,8 +73,9 @@ jobs:
               --generate-notes \
               --draft
 
-  update_develop:
-    needs: release # only run if action above succeeds
+  sync_develop:
+    # only run if action above succeeds
+    needs: github_release
     runs-on: "ubuntu-latest"
     defaults:
       run:
@@ -99,11 +85,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # token must be associated to an admin (currently @DaniBodor, expires 20 June 2025), as admins can bypass branch protection
-          # TODO: add documentation on updating the token
           token: ${{ secrets.GH_PAT }}
 
-      - name: Configure Git
+      - name: Configure git
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
@@ -113,8 +97,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "-- install jq"
-          apt install -y jq
           echo "-- searching for associated PR"
           branch_name=${{ github.event.inputs.release_branch }}
           json=$(gh pr list -H $branch_name --json number)
