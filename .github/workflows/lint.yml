@@ -19,6 +19,7 @@ on:
       - muchly_much_much_more
       - and_again
       - lalalalala
+      - lululululu
 
 jobs:
   lint:
