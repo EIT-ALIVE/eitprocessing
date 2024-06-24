@@ -15,6 +15,10 @@ on:
         description: "Branch to use for releasing."
         type: string
         default: "test_protected_develop"
+      required_dash:
+        description: "Select whether this release needs the dashboard build to succeed."
+        type: boolean
+        default: true
 
 permissions:
   contents: write
