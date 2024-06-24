@@ -12,6 +12,7 @@ on:
       - "**.ipynb"
     branches:
       - main
+      - develop
 
 jobs:
   lint:
