@@ -21,6 +21,7 @@ on:
       - lalalalala
       - lululululu
       - lilililili
+      - lolololololo
 
 jobs:
   lint:
