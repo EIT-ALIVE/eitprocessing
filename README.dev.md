@@ -149,7 +149,7 @@ make doctest
 1. Branch from `main` and prepare the branch for the release (e.g., removing the unnecessary files, fix minor bugs if necessary).
 2. Ensure all tests pass `pytest -v` and that linting (`ruff check`) and formatting (`ruff format --check`) conventions
    are adhered to.
-3. Bump the version using [bumpversion](https://github.com/c4urself/bump2version): `bumpversion <level>`
+3. Bump the version using [bump-my-version](https://github.com/callowayproject/bump-my-version): `bump-my-version bump <level>`
    where level must be one of the following ([following semantic versioning conventions](https://semver.org/)):
    - `major`: when API-incompatible changes have been made
    - `minor`: when functionality was added in a backward compatible manner

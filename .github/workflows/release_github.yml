@@ -51,14 +51,14 @@ jobs:
       - name: Bump version
         id: bump
         run: |
-          echo "-- install bumpversion"
-          python3 -m pip install bumpversion
+          echo "-- install bump-my-version"
+          python3 -m pip install bump-my-version
           echo "-- merge release branch into main"
           git switch test_protected_main
           git merge ${{ github.event.inputs.release_branch }}
           echo "-- bump the version"
-          bumpversion ${{ github.event.inputs.version_level }} --commit --tag
-          echo "-- push bumpversion"
+          bump-my-version bump ${{ github.event.inputs.version_level }} --commit --tag
+          echo "-- push bumped version"
           echo "RELEASE_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
           git push --tags -f
           git push
