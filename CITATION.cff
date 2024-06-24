@@ -1,6 +1,6 @@
 # YAML 1.2
 ---
-cff-version: "3.0.6"
+cff-version: "3.0.7"
 title: "eitprocessing"
 authors:
   - family-names: Bodor
@@ -41,7 +41,7 @@ authors:
 
 date-released: 2023-03-23
 doi: 10.5281/zenodo.7869553
-version: "3.0.6"
+version: "3.0.7"
 repository-code: "git@github.com:EIT-ALIVE/eitprocessing"
 keywords:
   - Mechanical lung ventilation
