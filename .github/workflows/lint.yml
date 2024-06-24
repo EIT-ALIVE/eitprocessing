@@ -16,6 +16,7 @@ on:
       - more
       - and_more
       - even_more
+      - muchly_much_much_more
 
 jobs:
   lint:
