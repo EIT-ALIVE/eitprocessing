@@ -18,6 +18,7 @@ on:
       - even_more
       - muchly_much_much_more
       - and_again
+      - lalalalala
 
 jobs:
   lint:
