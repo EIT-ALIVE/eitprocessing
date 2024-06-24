@@ -32,6 +32,53 @@ jobs:
         shell: bash -l {0}
 
     steps:
+      - name: Check build action
+        id: check_build_action
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const branchName = '${{ github.event.inputs.release_branch }}';
+            const workflowFile = 'build.yml';
+
+            github.actions.createWorkflowDispatch({
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
+              workflow_id: 'check_or_run_workflow.yml',
+              ref: github.context.ref,
+              inputs: {
+                branch_name: branchName,
+                read_workflow: workflowFile
+              }
+            }).then(response => {
+              core.info('Successfully triggered Check or Run Workflow for $workflowFile');
+            }).catch(error => {
+              core.setFailed(`Failed to trigger Check or Run Workflow for $workflowFile: ${error.message}`);
+            });
+
+      - name: Check dashboard action
+        if: github.event.inputs.required_dash == 'true'
+        id: check_dashboard_action
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const branchName = '${{ github.event.inputs.release_branch }}';
+            const workflowFile = 'dashboard.yml';
+
+            github.actions.createWorkflowDispatch({
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
+              workflow_id: 'check_or_run_workflow.yml',
+              ref: github.context.ref,
+              inputs: {
+                branch_name: branchName,
+                read_workflow: workflowFile
+              }
+            }).then(response => {
+              core.info('Successfully triggered Check or Run Workflow for $workflowFile');
+            }).catch(error => {
+              core.setFailed(`Failed to trigger Check or Run Workflow for $workflowFile: ${error.message}`);
+            });
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
