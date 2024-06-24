@@ -21,12 +21,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ["ubuntu-latest"]
-        python-version: ["3.10"]
+    runs-on: "ubuntu-latest"
     defaults:
       run:
         shell: bash -l {0}
@@ -52,21 +47,16 @@ jobs:
           # TODO: add documentation on updating the token
           token: ${{ secrets.GH_PAT }}
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-
       - name: Configure Git
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
+          git pull
 
       - name: Check for conflicts
         # TODO: check what happens if merge conflicts arise and compare to desired behavior
         run: |
           echo "-- check whether merging main into release_branch is possible"
-          git pull
           git switch ${{ github.event.inputs.release_branch }}
           git merge origin/test_protected_main --no-ff --no-commit
           git merge --abort
