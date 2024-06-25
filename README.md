@@ -1,4 +1,4 @@
-## Badges <!-- omit in toc -->
+# Badges <!-- omit in toc -->
 
 | Badges         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | :------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -9,7 +9,7 @@
 | GitHub Actions | ![build](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/build.yml/badge.svg) ![dash_actions](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/dash_actions.yml/badge.svg) ![lint](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/lint.yml/badge.svg) ![documentation](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/documentation.yml/badge.svg) ![cffconvert](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/cffconvert.yml/badge.svg) |
 | Python         | ![Python](https://img.shields.io/badge/python-3.10-blue.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
-## Contents <!-- omit in toc -->
+# Contents <!-- omit in toc -->
 
 - [What is eitprocessing?](#what-is-eitprocessing)
 - [Installation](#installation)
@@ -19,18 +19,17 @@
 - [Contributing](#contributing)
 - [Credits](#credits)
 
-## What is eitprocessing?
+# What is eitprocessing?
 
 Processing of data from electrical impedance tomography and other respiratory monitoring tools.
 
-[Electrical Impedance Tomography](https://en.wikipedia.org/wiki/Electrical_impedance_tomography) (EIT) is a noninvasive and radiation-free continuous imaging tool for monitoring respiratory
-mechanics.
-eitprocessing aims to provide a versatile, user-friendly, reproducible and reliable workflow for the processing and
-analysis of EIT data and related waveform data, like pressures and flow.
+[Electrical Impedance Tomography](https://en.wikipedia.org/wiki/Electrical_impedance_tomography) (EIT) is a noninvasive
+and radiation-free continuous imaging tool for monitoring respiratory mechanics. eitprocessing aims to provide a
+versatile, user-friendly, reproducible and reliable workflow for the processing and analysis of EIT data and related
+waveform data, like pressures and flow.
 
-eitprocessing includes tools to load data exported from EIT-devices from several manufacturers, including Dräger, SenTec and
-Timpel, as well as data from other sources.
-Several pre-processing tools and analysis tools are provided.
+eitprocessing includes tools to load data exported from EIT-devices from several manufacturers, including Dräger, SenTec
+and Timpel, as well as data from other sources. Several pre-processing tools and analysis tools are provided.
 
 <!-- TODO when available, add summarisation and reporting -->
 <!-- TODO extend with short list of available tools when applicable -->
@@ -39,9 +38,9 @@ Several pre-processing tools and analysis tools are provided.
 
 We welcome any [contributions or suggestions](CONTRIBUTING.md)
 
-## Installation
+# Installation
 
-### Virtual environment
+## Virtual environment
 
 It is advised to install eitprocessing in a dedicated virtual environment. See e.g. [Install packages in a virtual
 environment using pip and
@@ -54,7 +53,7 @@ conda create -n eit-alive python=3.10
 conda activate eit-alive
 ```
 
-### Install using `pip`
+## Install using `pip`
 
 eitprocessing can be installed from PyPi as follows:
 
@@ -64,15 +63,15 @@ eitprocessing can be installed from PyPi as follows:
   - `cd eitprocessing`
   - `pip install -e ".[dev]"`
 
-## Documentation
+# Documentation
 
 Please see our [usage documentation](https://eit-alive.github.io/eitprocessing/) for a detailed explanation of the package.
 
-## Contributing
+# Contributing
 
 If you want to contribute to the development of eitprocessing,
 have a look at the [contribution guidelines](CONTRIBUTING.md) and the [developer documentation](README.dev.md).
 
-## Credits
+# Credits
 
 This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter) and the [NLeSC/python-template](https://github.com/NLeSC/python-template).
