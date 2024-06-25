@@ -113,6 +113,11 @@ def test_illegal_first_frame():
         _ = load_eit_data(draeger_file1, "draeger", first_frame=ff2)
 
 
+def test_max_frames_too_large():
+    with pytest.warns():
+        _ = load_eit_data(draeger_file1, "draeger", max_frames=1e12)
+
+
 def test_event_on_first_frame(draeger2: Sequence):
     draeger3 = load_eit_data(draeger_file3, vendor="draeger")
     draeger3_events = draeger3.sparse_data["events_(draeger)"]
