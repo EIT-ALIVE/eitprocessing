@@ -37,6 +37,8 @@ Several pre-processing tools and analysis tools are provided.
 
 [eit_dash](https://github.com/EIT-ALIVE/eit_dash) provides an accompanying GUI.
 
+We welcome any [contributions or suggestions](CONTRIBUTING.md)
+
 ## Installation
 
 ### Virtual environment
