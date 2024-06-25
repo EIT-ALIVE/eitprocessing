@@ -111,38 +111,6 @@ Otherwise, please ensure check both linting (`ruff fix .`) and formatting (`ruff
 
 We use [prettier](https://prettier.io/) for formatting most other files. If you are editing or adding non-python files and using VS code, the [Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) can be installed to auto-format these files as well.
 
-# The following sections are untested
-
-## Generating the API docs
-
-```shell
-cd docs
-make html
-```
-
-The documentation will be in `docs/_build/html`
-
-If you do not have `make` use
-
-```shell
-sphinx-build -b html docs docs/_build/html
-```
-
-To find undocumented Python objects run
-
-```shell
-cd docs
-make coverage
-cat _build/coverage/python.txt
-```
-
-To [test snippets](https://www.sphinx-doc.org/en/master/usage/extensions/doctest.html) in documentation run
-
-```shell
-cd docs
-make doctest
-```
-
 ## Making a release
 
 ### Automated release workflow:
