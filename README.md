@@ -13,6 +13,8 @@
 
 - [What is eitprocessing?](#what-is-eitprocessing)
 - [Installation](#installation)
+  - [Virtual environment](#virtual-environment)
+  - [Install using `pip`](#install-using-pip)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 - [Credits](#credits)
@@ -37,14 +39,28 @@ Several pre-processing tools and analysis tools are provided.
 
 ## Installation
 
-It is advised to install eitprocessing in a dedicated virtual environment. See e.g. [Install packages in a virtual environment using pip and venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) or
-[Getting started with conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html).
+### Virtual environment
+
+It is advised to install eitprocessing in a dedicated virtual environment. See e.g. [Install packages in a virtual
+environment using pip and
+venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) or [Getting started
+with conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html).
+
+For conda (using 'eit-alive' as example environment name; you can choose your own):
+```
+conda create -n eit-alive python=3.10
+conda activate eit-alive
+```
+
+### Install using `pip`
 
 eitprocessing can be installed from PyPi as follows:
 
-- Install
-  - For basic use: `pip install eitprocessing`
-  - For full developer options (testing, etc): `pip install "eitprocessing[dev]"`
+- For basic use: `pip install eitprocessing`
+- For full developer options (testing, etc): 
+  - `git clone git@github.com:EIT-ALIVE/eitprocessing.git`
+  - `cd eitprocessing`
+  - `pip install -e ".[dev]"`
 
 ## Documentation
 
