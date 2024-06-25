@@ -22,7 +22,7 @@ draeger_file2 = data_directory / "Draeger_Test.bin"
 timpel_file = data_directory / "Timpel_Test.txt"
 
 
-def _make_cosine_wave(sample_frequency: float, length: int, frequency: float):
+def _make_cosine_wave(sample_frequency: float, length: int, frequency: float) -> tuple[np.ndarray, np.ndarray]:
     """Generate a cosine wave with the given parameters and amplitude 1.
 
     A cosine wave starts and ends at a value of 1, passing through -1 halfway between the maximum values. This makes it
@@ -276,7 +276,7 @@ def test_no_remove_low_amplitudes(
 
 def test_remove_no_breaths_around_valid_data():
     sample_frequency = 20
-    time, y = make_cosine_wave(sample_frequency, 1000, 1)
+    time, y = _make_cosine_wave(sample_frequency, 1000, 1)
     bd = BreathDetection(sample_frequency)
 
     peak_indices, valley_indices = bd._detect_peaks_and_valleys(y)
@@ -367,7 +367,7 @@ def test_remove_breaths_around_invalid_data():
     sample_frequency = 10
     length = 100
     frequency = 1
-    time, y = make_cosine_wave(sample_frequency, length, frequency)
+    time, y = _make_cosine_wave(sample_frequency, length, frequency)
 
     peak_indices = np.arange(10, 100, 10)
     valley_indices = np.arange(5, 100, 10)
@@ -406,7 +406,7 @@ def test_detect_invalid_data():
     sample_frequency = 10
     bd = BreathDetection(sample_frequency)
 
-    _, y = make_cosine_wave(sample_frequency, 200, 1)
+    _, y = _make_cosine_wave(sample_frequency, 200, 1)
     lower_percentile = np.percentile(y, bd.invalid_data_removal_percentile)
     upper_percentile = np.percentile(y, 100 - bd.invalid_data_removal_percentile)
 
@@ -454,7 +454,7 @@ def test_find_breaths():
     sample_frequency = 25
     length = sample_frequency * 70
     frequency = 1 / 3.5  # one breath every 3.5 seconds
-    time, y = make_cosine_wave(sample_frequency, length, frequency)
+    time, y = _make_cosine_wave(sample_frequency, length, frequency)
 
     label = "waveform_data"
     cd = ContinuousData(label, "Generated waveform data", None, "mock", "", time=time, values=y)
