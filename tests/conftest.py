@@ -12,10 +12,11 @@ environment = os.environ.get(
     Path.resolve(Path(__file__).parent.parent),
 )
 data_directory = Path(environment) / "tests" / "test_data"
-draeger_file1 = Path(data_directory) / "Draeger_Test3.bin"
-draeger_file2 = Path(data_directory) / "Draeger_Test.bin"
-timpel_file = Path(data_directory) / "Timpel_test.txt"
-dummy_file = Path(data_directory) / "not_a_file.dummy"
+draeger_file1 = data_directory / "Draeger_Test3.bin"
+draeger_file2 = data_directory / "Draeger_Test.bin"
+draeger_file3 = data_directory / "Draeger_Test_event_on_first_frame.bin"
+timpel_file = data_directory / "Timpel_test.txt"
+dummy_file = data_directory / "not_a_file.dummy"
 
 
 @pytest.fixture(scope="session")

@@ -2,8 +2,9 @@ import pytest
 
 from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.loading import load_eit_data
+from eitprocessing.datahandling.loading.draeger import DRAEGER_FRAMERATE
 from eitprocessing.datahandling.sequence import Sequence
-from tests.conftest import draeger_file1, draeger_file2, dummy_file, timpel_file
+from tests.conftest import draeger_file1, draeger_file2, draeger_file3, dummy_file, timpel_file
 
 # ruff: noqa: ERA001  #TODO: remove this line
 
@@ -105,9 +106,26 @@ def test_load_partial(
 
 
 def test_illegal_first_frame():
-    for ff in [0.5, -1, "fdw"]:
+    for ff in [0.5, -1, "fdw", 1e12]:
         with pytest.raises((TypeError, ValueError)):
             _ = load_eit_data(draeger_file1, "draeger", first_frame=ff)
 
     for ff2 in [0, 0.0, 1.0, None]:
         _ = load_eit_data(draeger_file1, "draeger", first_frame=ff2)
+
+
+def test_max_frames_too_large():
+    with pytest.warns():
+        _ = load_eit_data(draeger_file1, "draeger", max_frames=1e12)
+
+
+def test_framerate_unset():
+    loaded_draeger = load_eit_data(draeger_file1, "draeger", framerate=None)
+    assert loaded_draeger.eit_data["raw"].framerate == DRAEGER_FRAMERATE
+
+
+def test_event_on_first_frame(draeger2: Sequence):
+    draeger3 = load_eit_data(draeger_file3, vendor="draeger")
+    draeger3_events = draeger3.sparse_data["events_(draeger)"]
+    assert draeger3_events == draeger2.sparse_data["events_(draeger)"]
+    assert draeger3_events.time[0] == draeger3.eit_data["raw"].time[0]

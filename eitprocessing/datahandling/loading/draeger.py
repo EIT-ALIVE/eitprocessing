@@ -233,7 +233,7 @@ def _read_frame(
     # The event marker stays the same until the next event occurs.
     # Therefore, check whether the event marker has changed with
     # respect to the most recent event. If so, create a new event.
-    if (previous_marker is not None) and (event_marker > previous_marker):
+    if ((previous_marker is not None) and (event_marker > previous_marker)) or (index == 0 and event_text):
         events.append((frame_time, Event(event_marker, event_text)))
     if timing_error:
         warnings.warn("A timing error was encountered during loading.")
