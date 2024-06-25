@@ -105,7 +105,7 @@ def test_load_partial(
 
 
 def test_illegal_first_frame():
-    for ff in [0.5, -1, "fdw"]:
+    for ff in [0.5, -1, "fdw", 1e12]:
         with pytest.raises((TypeError, ValueError)):
             _ = load_eit_data(draeger_file1, "draeger", first_frame=ff)
 
