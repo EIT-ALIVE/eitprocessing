@@ -11,13 +11,13 @@
 
 ## Contents <!-- omit in toc -->
 
-- [How to use eitprocessing](#how-to-use-eitprocessing)
+- [What is eitprocessing?](#what-is-eitprocessing)
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 - [Credits](#credits)
 
-## How to use eitprocessing
+## What is eitprocessing?
 
 Processing of data from electrical impedance tomography and other respiratory monitoring tools.
 
