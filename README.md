@@ -64,7 +64,7 @@ eitprocessing can be installed from PyPi as follows:
 
 ## Documentation
 
-We have custom documentation on a dedicated page [here](https://eit-alive.github.io/eitprocessing/).
+Please see our [usage documentation](https://eit-alive.github.io/eitprocessing/) for a detailed explanation of the package.
 
 ## Contributing
 
