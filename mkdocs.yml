@@ -9,15 +9,15 @@ theme:
   palette:
   - media: "(prefers-color-scheme: light)"
     scheme: default
-    primary: teal
-    accent: orange
+    primary: darkblue
+    accent: pink
     toggle:
       icon: material/weather-sunny
       name: "Switch to dark mode"
   - media: "(prefers-color-scheme: dark)"
     scheme: slate
-    primary: teal
-    accent: orange
+    primary: darkblue
+    accent: pink
     toggle:
       icon: material/weather-night
       name: "Switch to light mode"
@@ -33,7 +33,7 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
   icon:
-    logo: 'material/library-outline'
+    logo: 'material/home'
     next: fontawesome/solid/angle-right
     previous: fontawesome/solid/angle-left
     repo: fontawesome/brands/github-alt
@@ -53,8 +53,8 @@ nav:
 - API Documentation: APIindex.md
 - About:
   - Contributing: contributing_doc.md
-  - Code of Conduct: code_of_conduct.md
-  - License: license.md
+  - Code of Conduct: code_of_conduct_doc.md
+  - License: license_doc.md
 
 extra:
   version:
