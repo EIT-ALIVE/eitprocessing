@@ -250,17 +250,15 @@ def test_remove_low_amplitudes(
         "data",
         "peak_indices",
         "valley_indices",
-        "expected_peak_indices",
-        "expected_valley_indices",
     ),
-    test_data_remove_low_amplitude,
+    # only use the first three elements in each case in test_data_remove_low_amplitude
+    # the expected peak and valley indices are not used in this test
+    [test_case[:3] for test_case in test_data_remove_low_amplitude],
 )
 def test_no_remove_low_amplitudes(
     data: np.ndarray,
     peak_indices: np.ndarray,
     valley_indices: np.ndarray,
-    expected_peak_indices: np.ndarray,  # noqa: ARG001
-    expected_valley_indices: np.ndarray,  # noqa: ARG001
 ):
     """This test uses the same data as test_remove_low_amplitudes, expects output to be the same as the input."""
     bd = BreathDetection(1, amplitude_cutoff_fraction=None)
