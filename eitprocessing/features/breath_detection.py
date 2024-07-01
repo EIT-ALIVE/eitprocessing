@@ -318,15 +318,8 @@ class BreathDetection:
     ) -> list[Breath]:
         """Remove breaths overlapping with invalid data.
 
-        This function defines a lower and upper cutoff. Data beyond those cutoffs is considered invalid for the
-        purposes of breath detection. Breaths that start within a window length of invalid data are removed.
-
-        The lower cutoff is a distance away from the mean. The distance is m times the distance between the
-        mean and the nth percentile of the data. m is given by `invalid_data_removal_multiplier` and n is given by
-        `invalid_data_removal_percentile`.
-
-        For example, with m = 4 and n = 5, the mean = 100, and 5% of the data is below/equal to 90, all data below 100 -
-        (4 * 10) = 60 and above 100 + (4 * 10) = 140 is considerd invalid.
+        Breaths that start within a window length (given by invalid_data_removal_window_length) of invalid data are
+        removed.
 
         Args:
             breaths: list of detected breath objects
@@ -393,6 +386,24 @@ class BreathDetection:
         return peak_indices, valley_indices
 
     def _detect_invalid_data(self, data: np.ndarray) -> np.ndarray:
+        """Detects invalid data as outliers outside an upper and lower cutoff.
+
+        This function defines a lower and upper cutoff. Data beyond those cutoffs is considered invalid for the purposes
+        of breath detection.
+
+        The lower cutoff is a distance away from the mean. The distance is m times the distance between the mean and the
+        nth percentile of the data. The upper cutoff is m times the distance between the mean and the (100 - n)th
+        percentile. m is given by `invalid_data_removal_multiplier` and n is given by `invalid_data_removal_percentile`.
+
+        For example, with m = 4 and n = 5, the mean = 100, 5% of the data is below/equal to 90, and 5% of the data is
+        above/equal to 120, all data below 100 - (4 * 10) = 60 and above 100 + (4 * 20) = 180 is considerd invalid.
+
+        Args:
+            data (np.ndarray): _description_
+
+        Returns:
+            np.ndarray: the indices of the data points with values outside the lower and upper cutoff values.
+        """
         data_mean = np.mean(data)
 
         lower_percentile = np.percentile(data, self.invalid_data_removal_percentile)
