@@ -289,7 +289,7 @@ class BreathDetection:
             valley_indices (np.ndarray): the indices of the valleys
 
         Returns:
-            A tuple (peak_indices, peak_values, valley_indices, valley_values)
+            A tuple (peak_indices, valley_indices)
             with low-amplitude breaths removed.
         """
         if not self.amplitude_cutoff_fraction:
