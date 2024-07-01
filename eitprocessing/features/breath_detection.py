@@ -344,7 +344,7 @@ class BreathDetection:
             breath_start_minus_window = max(0, np.argmax(time == breath.start_time) - window_length)
             breath_end_plus_window = min(len(invalid_data_values), np.argmax(time == breath.end_time) + window_length)
 
-            # is no invalid datapoints are within the window, np.max() will return 0
+            # if no invalid datapoints are within the window, np.max() will return 0
             # if any invalid datapoints are within the window, np.max() will return 1
             if np.max(invalid_data_values[breath_start_minus_window:breath_end_plus_window]):
                 new_breaths.remove(breath)
