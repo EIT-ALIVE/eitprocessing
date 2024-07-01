@@ -433,10 +433,10 @@ def test_detect_invalid_data():
 
 
 def test_remove_outlier_data(monkeypatch: pytest.MonkeyPatch):
-    outliers = np.arange(20, 30)
+    expected_invalid_data_indices = np.arange(20, 30)
 
     def mock_detect_invalid_data(_: np.ndarray) -> np.ndarray:
-        return np.copy(outliers)
+        return np.copy(expected_invalid_data_indices)
 
     bd = BreathDetection(1)
     monkeypatch.setattr(bd, "_detect_invalid_data", mock_detect_invalid_data)
@@ -445,8 +445,9 @@ def test_remove_outlier_data(monkeypatch: pytest.MonkeyPatch):
     expected_data = np.copy(data)
     expected_data[20:25] = expected_data[19]
     expected_data[25:30] = expected_data[30]
-    result_data, result_outliers = bd._remove_outlier_data(data)
-    assert np.array_equal(result_outliers, outliers)
+    invalid_data_indices = bd._detect_invalid_data(data)
+    result_data = bd._remove_invalid_data(data, invalid_data_indices)
+    assert np.array_equal(invalid_data_indices, expected_invalid_data_indices)
     assert np.array_equal(result_data, expected_data)
 
 
