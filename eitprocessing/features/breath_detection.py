@@ -381,7 +381,7 @@ class BreathDetection:
 
     def _detect_peaks_and_valleys(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         window_size = int(self.sample_frequency * self.averaging_window_length)
-        averager = MovingAverage(window_size=window_size, window_function=np.bartlett)
+        averager = MovingAverage(window_size=window_size, window_function=self.averaging_window_fun)
         moving_average = averager.apply(data)
 
         peak_indices = self._find_features(data, moving_average)
