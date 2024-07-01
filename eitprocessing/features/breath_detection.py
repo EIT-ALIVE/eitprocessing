@@ -370,8 +370,7 @@ class BreathDetection:
         """Removes invalid data points and replace them with a twosided fill."""
         data = np.copy(data)
         data[invalid_data_indices] = np.nan
-        data = self._twosidedfill(data)
-        return data
+        return self._twosidedfill(data)
 
     def _detect_peaks_and_valleys(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         window_size = int(self.sample_frequency * self.averaging_window_length)
