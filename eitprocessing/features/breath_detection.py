@@ -408,9 +408,9 @@ class BreathDetection:
     def _twosidedfill(data: np.ndarray) -> np.ndarray:
         """Forward-fill and backward-fill sequences of np.nan values.
 
-        Any np.nan value following a non-nan-value is set to the preceding value. Then np.nan value preceding a
-        non-nan-value is set to the following value. These two rules are repeated until all np.nan values are filled
-        out.
+        Any np.nan value following a non-nan value is set to the preceding value (forward filling rule). Then any
+        np.nan value preceding a non-nan value is set to the following value (backward filling rule). These two rules
+        are repeated until all np.nan values are filled out.
 
         Example:
             foo = np.ndarray([np.nan, 1, np.nan, np.nan, np.nan, 3, np.nan, np.nan])
