@@ -86,7 +86,8 @@ class BreathDetection:
         data = continuous_data.values
         time = continuous_data.time
 
-        data, outliers = self._remove_outlier_data(data)
+        invalid_data_indices = self._detect_invalid_data(data)
+        data = self._remove_invalid_data(data, invalid_data_indices)
 
         peak_indices, valley_indices = self._detect_peaks_and_valleys(data)
 
@@ -95,7 +96,7 @@ class BreathDetection:
             peak_indices,
             valley_indices,
         )
-        breaths = self._remove_breaths_around_invalid_data(breaths, time, outliers)
+        breaths = self._remove_breaths_around_invalid_data(breaths, time, invalid_data_indices)
 
         sequence.interval_data.add(
             IntervalData(
@@ -314,7 +315,7 @@ class BreathDetection:
         self,
         breaths: list[Breath],
         time: np.ndarray,
-        outliers: np.ndarray,
+        invalid_data_indices: np.ndarray,
     ) -> list[Breath]:
         """Remove breaths overlapping with invalid data.
 
@@ -325,26 +326,27 @@ class BreathDetection:
             breaths: list of detected breath objects
             data: data the breaths were detected in
             time: time axis belonging to the data
-            outliers: indices of outlier data points
+            invalid_data_indices: indices of invalid data points
         """
         # TODO: write more general(ized) method of determining invalid data
 
         new_breaths = breaths[:]
 
-        if not len(outliers):
+        if not len(invalid_data_indices):
             return new_breaths
 
-        outlier_values = np.zeros(time.shape)
-        outlier_values[outliers] = 1
+        invalid_data_values = np.zeros(time.shape)
+        invalid_data_values[invalid_data_indices] = 1  # gives the value 1 to each invalid datapoint
+
         window_length = math.ceil(self.invalid_data_removal_window_length * self.sample_frequency)
 
         for breath in new_breaths[:]:
             breath_start_minus_window = max(0, np.argmax(time == breath.start_time) - window_length)
-            breath_end_plus_window = min(len(outlier_values), np.argmax(time == breath.end_time) + window_length)
+            breath_end_plus_window = min(len(invalid_data_values), np.argmax(time == breath.end_time) + window_length)
 
-            # is no outliers are within the window, np.max() will return 0
-            # if any outliers are within the window, np.max() will return 1
-            if np.max(outlier_values[breath_start_minus_window:breath_end_plus_window]):
+            # is no invalid datapoints are within the window, np.max() will return 0
+            # if any invalid datapoints are within the window, np.max() will return 1
+            if np.max(invalid_data_values[breath_start_minus_window:breath_end_plus_window]):
                 new_breaths.remove(breath)
 
         return new_breaths
@@ -364,13 +366,12 @@ class BreathDetection:
             )
         ]
 
-    def _remove_outlier_data(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        outliers = self._detect_invalid_data(data)
-
+    def _remove_invalid_data(self, data: np.ndarray, invalid_data_indices: np.ndarray) -> np.ndarray:
+        """Removes invalid data points and replace them with a twosided fill."""
         data = np.copy(data)
-        data[outliers] = np.nan
+        data[invalid_data_indices] = np.nan
         data = self._twosidedfill(data)
-        return data, outliers
+        return data
 
     def _detect_peaks_and_valleys(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         window_size = int(self.sample_frequency * self.averaging_window_length)
