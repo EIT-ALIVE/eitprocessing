@@ -147,7 +147,7 @@ class BreathDetection:
         """Removes invalid data points and replace them with a twosided fill."""
         data = np.copy(data)
         data[invalid_data_indices] = np.nan
-        return self._twosidedfill(data)
+        return self._fill_nan_with_nearest_neighbour(data)
 
     def _detect_peaks_and_valleys(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         window_size = int(self.sample_frequency * self.averaging_window_length)
@@ -416,21 +416,40 @@ class BreathDetection:
         return new_breaths
 
     @staticmethod
-    def _twosidedfill(data: np.ndarray) -> np.ndarray:
-        """Forward-fill and backward-fill sequences of np.nan values.
+    def _fill_nan_with_nearest_neighbour(data: np.ndarray) -> np.ndarray:
+        """Fill np.nan values in a 1D array with the nearest non-np.nan value.
 
-        Any np.nan value following a non-nan value is set to the preceding value (forward filling rule). Then any
-        np.nan value preceding a non-nan value is set to the following value (backward filling rule). These two rules
-        are repeated until all np.nan values are filled out.
+        Each np.nan-value is replaced with the nearest (backwards and forwards) non-np.nan value. If the nearest earlier
+        and a later value are the same distance away, the earlier value is preferred. np.nan-values at the start are
+        filled with the first non-nan value.
 
         Example:
             foo = np.ndarray([np.nan, 1, np.nan, np.nan, np.nan, 3, np.nan, np.nan])
-            bar = _twosidedfill(foo)
-            # after first loop: np.ndarray([1, 1, 1, np.nan, 3, 3, 3, np.nan])
-            # after second loop: np.ndarray([1, 1, 1, 1, 3, 3, 3, 3])
+            bar = BreathDetection._fill_nan_with_nearest_neighbour(foo)
             assert bar == np.ndarray([1, 1, 1, 1, 3, 3, 3, 3])
         """
-        while any(np.isnan(data)):
-            data = np.where(np.isnan(data), np.concatenate([data[:1], data[:-1]]), data)
-            data = np.where(np.isnan(data), np.concatenate([data[1:], data[-1:]]), data)
+        data = np.copy(data)
+        nan_indices = np.flatnonzero(np.isnan(data))
+
+        if not len(nan_indices):
+            return data
+
+        if len(nan_indices) == len(data):
+            msg = "`data` only contains np.nan values. "
+            raise ValueError(msg)
+
+        grouped_nan_indices = np.split(nan_indices, np.where(np.diff(nan_indices) != 1)[0] + 1)
+
+        for group in grouped_nan_indices:
+            if group[0] == 0:
+                data[group] = data[group[-1] + 1]
+                continue
+
+            if group[-1] == len(data) - 1:
+                data[group] = data[group[0] - 1]
+                continue
+
+            middle = len(group) // 2
+            data[group[:middle]] = data[group[0] - 1]
+            data[group[middle:]] = data[group[-1] + 1]
         return data
