@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Breath:
-    """Represents a breath with a start, middle and end index."""
+    """Represents a breath with a start, middle and end time."""
 
     start_time: float
     middle_time: float
