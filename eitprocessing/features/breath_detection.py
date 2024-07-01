@@ -113,6 +113,55 @@ class BreathDetection:
 
         return sequence.interval_data["breaths"]
 
+    def _detect_invalid_data(self, data: np.ndarray) -> np.ndarray:
+        """Detects invalid data as outliers outside an upper and lower cutoff.
+
+        This function defines a lower and upper cutoff. Data beyond those cutoffs is considered invalid for the purposes
+        of breath detection.
+
+        The lower cutoff is a distance away from the mean. The distance is m times the distance between the mean and the
+        nth percentile of the data. The upper cutoff is m times the distance between the mean and the (100 - n)th
+        percentile. m is given by `invalid_data_removal_multiplier` and n is given by `invalid_data_removal_percentile`.
+
+        For example, with m = 4 and n = 5, the mean = 100, 5% of the data is below/equal to 90, and 5% of the data is
+        above/equal to 120, all data below 100 - (4 * 10) = 60 and above 100 + (4 * 20) = 180 is considerd invalid.
+
+        Args:
+            data (np.ndarray): _description_
+
+        Returns:
+            np.ndarray: the indices of the data points with values outside the lower and upper cutoff values.
+        """
+        data_mean = np.mean(data)
+
+        lower_percentile = np.percentile(data, self.invalid_data_removal_percentile)
+        cutoff_low = data_mean - (data_mean - lower_percentile) * self.invalid_data_removal_multiplier
+
+        upper_percentile = np.percentile(data, 100 - self.invalid_data_removal_percentile)
+        cutoff_high = data_mean + (upper_percentile - data_mean) * self.invalid_data_removal_multiplier
+
+        # detect indices of outliers
+        return np.flatnonzero((data < cutoff_low) | (data > cutoff_high))
+
+    def _remove_invalid_data(self, data: np.ndarray, invalid_data_indices: np.ndarray) -> np.ndarray:
+        """Removes invalid data points and replace them with a twosided fill."""
+        data = np.copy(data)
+        data[invalid_data_indices] = np.nan
+        return self._twosidedfill(data)
+
+    def _detect_peaks_and_valleys(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        window_size = int(self.sample_frequency * self.averaging_window_length)
+        averager = MovingAverage(window_size=window_size, window_function=self.averaging_window_fun)
+        moving_average = averager.apply(data)
+
+        peak_indices = self._find_features(data, moving_average)
+        valley_indices = self._find_features(data, moving_average, invert=True)
+
+        peak_indices, valley_indices = self._remove_edge_cases(data, peak_indices, valley_indices, moving_average)
+        peak_indices, valley_indices = self._remove_doubles(data, peak_indices, valley_indices)
+        peak_indices, valley_indices = self._remove_low_amplitudes(data, peak_indices, valley_indices)
+        return peak_indices, valley_indices
+
     def _find_features(
         self,
         data: np.ndarray,
@@ -311,6 +360,21 @@ class BreathDetection:
 
         return self._remove_doubles(data, peak_indices, valley_indices)
 
+    def _create_breaths_from_peak_valley_data(
+        self,
+        time: np.ndarray,
+        peak_indices: np.ndarray,
+        valley_indices: np.ndarray,
+    ) -> list[Breath]:
+        return [
+            Breath(time[start], time[middle], time[end])
+            for middle, (start, end) in zip(
+                peak_indices,
+                itertools.pairwise(valley_indices),
+                strict=True,
+            )
+        ]
+
     def _remove_breaths_around_invalid_data(
         self,
         breaths: list[Breath],
@@ -350,70 +414,6 @@ class BreathDetection:
                 new_breaths.remove(breath)
 
         return new_breaths
-
-    def _create_breaths_from_peak_valley_data(
-        self,
-        time: np.ndarray,
-        peak_indices: np.ndarray,
-        valley_indices: np.ndarray,
-    ) -> list[Breath]:
-        return [
-            Breath(time[start], time[middle], time[end])
-            for middle, (start, end) in zip(
-                peak_indices,
-                itertools.pairwise(valley_indices),
-                strict=True,
-            )
-        ]
-
-    def _remove_invalid_data(self, data: np.ndarray, invalid_data_indices: np.ndarray) -> np.ndarray:
-        """Removes invalid data points and replace them with a twosided fill."""
-        data = np.copy(data)
-        data[invalid_data_indices] = np.nan
-        return self._twosidedfill(data)
-
-    def _detect_peaks_and_valleys(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        window_size = int(self.sample_frequency * self.averaging_window_length)
-        averager = MovingAverage(window_size=window_size, window_function=self.averaging_window_fun)
-        moving_average = averager.apply(data)
-
-        peak_indices = self._find_features(data, moving_average)
-        valley_indices = self._find_features(data, moving_average, invert=True)
-
-        peak_indices, valley_indices = self._remove_edge_cases(data, peak_indices, valley_indices, moving_average)
-        peak_indices, valley_indices = self._remove_doubles(data, peak_indices, valley_indices)
-        peak_indices, valley_indices = self._remove_low_amplitudes(data, peak_indices, valley_indices)
-        return peak_indices, valley_indices
-
-    def _detect_invalid_data(self, data: np.ndarray) -> np.ndarray:
-        """Detects invalid data as outliers outside an upper and lower cutoff.
-
-        This function defines a lower and upper cutoff. Data beyond those cutoffs is considered invalid for the purposes
-        of breath detection.
-
-        The lower cutoff is a distance away from the mean. The distance is m times the distance between the mean and the
-        nth percentile of the data. The upper cutoff is m times the distance between the mean and the (100 - n)th
-        percentile. m is given by `invalid_data_removal_multiplier` and n is given by `invalid_data_removal_percentile`.
-
-        For example, with m = 4 and n = 5, the mean = 100, 5% of the data is below/equal to 90, and 5% of the data is
-        above/equal to 120, all data below 100 - (4 * 10) = 60 and above 100 + (4 * 20) = 180 is considerd invalid.
-
-        Args:
-            data (np.ndarray): _description_
-
-        Returns:
-            np.ndarray: the indices of the data points with values outside the lower and upper cutoff values.
-        """
-        data_mean = np.mean(data)
-
-        lower_percentile = np.percentile(data, self.invalid_data_removal_percentile)
-        cutoff_low = data_mean - (data_mean - lower_percentile) * self.invalid_data_removal_multiplier
-
-        upper_percentile = np.percentile(data, 100 - self.invalid_data_removal_percentile)
-        cutoff_high = data_mean + (upper_percentile - data_mean) * self.invalid_data_removal_multiplier
-
-        # detect indices of outliers
-        return np.flatnonzero((data < cutoff_low) | (data > cutoff_high))
 
     @staticmethod
     def _twosidedfill(data: np.ndarray) -> np.ndarray:
