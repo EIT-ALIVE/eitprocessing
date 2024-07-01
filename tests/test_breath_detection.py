@@ -83,18 +83,18 @@ def test_remove_edge_cases(
 
 test_data_remove_doubles = [
     (  # test removal of the first valley
-        np.array([5, 1, 2, 5]),
-        np.array([0, 3]),
-        np.array([1, 2]),
-        np.array([0, 3]),
-        np.array([1]),
-    ),
-    (  # test removal of the second valley
         np.array([5, 2, 1, 5]),
         np.array([0, 3]),
         np.array([1, 2]),
         np.array([0, 3]),
         np.array([2]),
+    ),
+    (  # test removal of the second valley
+        np.array([5, 1, 2, 5]),
+        np.array([0, 3]),
+        np.array([1, 2]),
+        np.array([0, 3]),
+        np.array([1]),
     ),
     (  # test removal of valleys with same value
         np.array([0, 1, 1, 0]),
