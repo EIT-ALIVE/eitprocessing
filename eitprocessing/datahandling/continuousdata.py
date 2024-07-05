@@ -21,9 +21,9 @@ class ContinuousData(DataContainer, SelectByTime):
     """Container for data with a continuous time axis.
 
     Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and
-    continuously measured/created at a fixed sampling rate. However, a fixed interval between consecutive time points is
-    not enforced to account for floating point arithmetic, devices with imperfect sampling rates, and other sources of
-    variation.
+    continuously measured/created at a fixed sampling frequency. However, a fixed interval between consecutive time
+    points is not enforced to account for floating point arithmetic, devices with imperfect sampling frequencies, and
+    other sources of variation.
 
     Args:
         label: Computer readable naming of the instance.
