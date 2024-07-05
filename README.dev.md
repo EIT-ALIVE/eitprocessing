@@ -69,7 +69,7 @@ E.g., `feat: added module to calculate the answer to life, the universe, and eve
 We use a workflow where `main` always contains the latest stable release version of `eitprocessing` and where `develop` contains the next release version under construction.
 
 When creating a new feature, one should branch from `develop`.
-When a feature is finished, a PR to pull the feature into `develop` should be created. After one of multiple features
+When a feature is finished, a PR to pull the feature into `develop` should be created. After one or multiple features
 have been pulled into `develop`, the [release workflow](#making-a-release) can be triggered to automatically create the
 new feature (minor) release originating from `develop`.
 
