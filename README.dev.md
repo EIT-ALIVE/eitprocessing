@@ -64,6 +64,21 @@ E.g., `feat: added module to calculate the answer to life, the universe, and eve
 
 ### Creating a PR
 
+#### Branching strategy
+
+We use a workflow where `main` always contains the latest stable release version of `eitprocessing` and where `develop` contains the next release version under construction.
+
+When creating a new feature, one should branch from `develop`.
+When a feature is finished, a PR to pull the feature into `develop` should be created. After one of multiple features
+have been pulled into `develop`, the [release workflow](#making-a-release) can be triggered to automatically create the
+new feature (minor) release originating from `develop`.
+
+For bug fixes that can't wait on a feature release, one should branch from `main`.
+When the bug fix is finished, the [release workflow](#making-a-release) can be triggered originating from
+the created branch, usually with a patch update.
+
+In principle, no releases should originate from branches other than `develop` and bug fix branches.
+
 #### Code review and continuous integration
 
 All contributions to the project are subject to code review and require at least one
