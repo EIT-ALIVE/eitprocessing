@@ -130,8 +130,8 @@ We use [prettier](https://prettier.io/) for formatting most other files. If you 
 
 ### Automated release workflow:
 
-0. **IMP0RTANT:** Create a PR for the release branch and make sure that all checks pass!
-   - if everything goes well, this PR will automatically be closed.
+0. **IMP0RTANT:** [Create a PR](#creating-a-pr) for the release branch (usually `develop`) and make sure that all checks pass!
+   - if everything goes well, this PR will automatically be closed after the draft release is created.
 1. Navigate to [Draft Github Release](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/release_github.yml)
    on the [Actions](https://github.com/EIT-ALIVE/eitprocessing/actions) tab.
 2. On the right hand side, you can select the level increase (patch, minor, or major) and which branch to release from.
@@ -143,7 +143,7 @@ We use [prettier](https://prettier.io/) for formatting most other files. If you 
      - `major`: when API-incompatible changes have been made
 3. Visit [Actions](https://github.com/EIT-ALIVE/eitprocessing/actions) tab to check whether everything went as expected.
 4. Navigate to the [Releases](https://github.com/EIT-ALIVE/eitprocessing/releases) tab and click on the newest draft
-   release (which was just automatically generated)
+   release that was just generated.
 5. Click on the edit (pencil) icon on the right side of the draft release.
 6. Check/adapt the release notes and make sure that everything is as expected.
 7. Check that "Set as the latest release is checked".
@@ -164,8 +164,9 @@ NOTE: the current token (associated to @DaniBodor) allowing to bypass branch pro
 
 ### Manually create a release:
 
-0. Make sure you have all required developers tools installed `pip install -e .'[dev]'`
-1. Branch from `main` and prepare the branch for the release (e.g., removing the unnecessary files, fix minor bugs if necessary).
+0. Make sure you have all required developers tools installed `pip install -e .'[dev]'`.
+1. Create a `release` branch from `main` and merge the changes into this branch.
+   - Ensure that the `release` branch is ready to be merged back into `main` (e.g., removing the unnecessary files, fix minor bugs if necessary).
 2. Ensure all tests pass `pytest -v` and that linting (`ruff check`) and formatting (`ruff format --check`) conventions
    are adhered to.
 3. Bump the version using [bump-my-version](https://github.com/callowayproject/bump-my-version): `bump-my-version bump <level>`
@@ -173,7 +174,7 @@ NOTE: the current token (associated to @DaniBodor) allowing to bypass branch pro
    - `major`: when API-incompatible changes have been made
    - `minor`: when functionality was added in a backward compatible manner
    - `patch`: when backward compatible bug fixes were made
-4. Merge the release branch into `main` (and `develop`).
+4. Merge the release branch into `main` and `develop`.
 5. On the [Releases page](https://github.com/EIT-ALIVE/eitprocessing/releases):
    1. Click "Draft a new release"
    2. By convention, use `v<version number>` as both the release title and as a tag for the release.
