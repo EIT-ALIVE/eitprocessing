@@ -21,7 +21,7 @@ class BreathDetection:
 
     This algorithm detects the position of breaths in data by detecting valleys
     (local minimum values) and peaks (local maximum values) in data. When
-    initializing BreathDetection, the sample frequency of the data and the
+    initializing `BreathDetection`, the sample frequency of the data and the
     minimum duration of a breath have to be provided. The minimum duration
     should be short enough to include the shortest expected breath in the data.
 
@@ -57,11 +57,11 @@ class BreathDetection:
     def find_breaths(self, container: Sequence | ContinuousData) -> IntervalData:
         """Find breaths in the data.
 
-        You can either pass a ContinuousData object as first argument, or a
-        Sequence as first argument and the label of a ContinuousData object.
-        When passing a ContinuousData object, optionally, you can pass a
-        Sequence object as second argument.
-        If a Sequence is passed to `find_breaths()`, the resulting breaths
+        You can either pass a `ContinuousData` object as first argument, or a
+        `Sequence` as first argument and the label of a `ContinuousData` object.
+        When passing a `ContinuousData` object, optionally, you can pass a
+        `Sequence` object as second argument.
+        If a `Sequence` is passed to `find_breaths()`, the resulting breaths
         are stored in the Sequence as `intervaldata["breaths"]`.
 
         This method attempts to find peaks and valleys in the data in a
