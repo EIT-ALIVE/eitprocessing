@@ -97,7 +97,7 @@ class BreathDetection:
             A list of Breath objects.
         """
         msg = f"`find_breaths()` expects a Sequence or ContinuousData object as first argument, not {type(container)}."
-        raise NotImplementedError(msg)
+        raise TypeError(msg)
 
     @find_breaths.register(Sequence)
     def _(self, sequence: Sequence, continuousdata_label: str) -> IntervalData:
