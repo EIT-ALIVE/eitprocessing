@@ -14,7 +14,7 @@ on:
       release_branch:
         description: "Branch to use for releasing."
         type: string
-        default: "test_protected_develop"
+        default: "develop"
 
 permissions:
   contents: write
@@ -41,7 +41,7 @@ jobs:
 
       - name: Merge changes into main
         run: |
-          git switch test_protected_main
+          git switch main
           git merge ${{ github.event.inputs.release_branch }} --no-ff --no-commit
           git merge --continue
 
@@ -103,13 +103,13 @@ jobs:
 
       - name: Merge updates into develop
         run: |
-          git switch test_protected_develop
-          git merge origin/test_protected_main
+          git switch develop
+          git merge origin/main
           git push
 
       - name: Delete release branch other than main or develop
         run: |
-          if [[ ${{ github.event.inputs.release_branch}} != "test_protected_main" && ${{ github.event.inputs.release_branch}} != "test_protected_develop" ]]; then
+          if [[ ${{ github.event.inputs.release_branch}} != "main" && ${{ github.event.inputs.release_branch}} != "develop" ]]; then
             echo "-- deleting branch '${{ github.event.inputs.release_branch }}'"
             git push origin -d ${{ github.event.inputs.release_branch }}
           else
