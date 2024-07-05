@@ -29,6 +29,9 @@ class BreathDetection:
     >>> bd = BreathDetection(sample_frequency=50, minimum_distance=0.5)
     >>> breaths = bd.find_breaths(sequency=seq, continuousdata_label="global_impedance_(raw)")
 
+    >>> global_impedance = seq.continuous_data["global_impedance_(raw)"]
+    >>> breaths = bd.find_breaths(continuous_data=global_impedance)
+
     Args:
         sample_frequency: sample frequency of the data
         minimum_distance: minimum expected distance between breaths, defaults to 0.67 seconds
@@ -53,6 +56,13 @@ class BreathDetection:
     @singledispatchmethod
     def find_breaths(self, container: Sequence | ContinuousData) -> IntervalData:
         """Find breaths in the data.
+
+        You can either pass a ContinuousData object as first argument, or a
+        Sequence as first argument and the label of a ContinuousData object.
+        When passing a ContinuousData object, optionally, you can pass a
+        Sequence object as second argument.
+        If a sequence is passed to `find_breaths()`, the resulting breaths
+        are stored in the Sequence as `intervaldata["breaths"]`.
 
         This method attempts to find peaks and valleys in the data in a
         multi-step process. First, it naively finds any peaks that are a
@@ -79,13 +89,14 @@ class BreathDetection:
         expiration, and end of expiration.
 
         Args:
-            sequence: the sequence that contains the data
-            continuousdata_label: label of the continuous data to apply the algorithm to
+            container: a ContinuousData object that contains the data or a Sequence object
+                that that contains the continuous data
+            continuousdata_label: optional, label of the continuous data contained in the sequence
 
         Returns:
             A list of Breath objects.
         """
-        msg = "find_breaths expects a Sequence or ContinuousData object as first argument."
+        msg = f"`find_breaths()` expects a Sequence or ContinuousData object as first argument, not {type(container)}."
         raise NotImplementedError(msg)
 
     @find_breaths.register(Sequence)
