@@ -129,4 +129,4 @@ class Vendor(LowercaseStrEnum):
     TIMPEL = auto()
     SENTEC = auto()
     DRAGER = DRAEGER
-    DRÄGER = DRAEGER
+    DRÄGER = DRAEGER  # noqa: PLC2401

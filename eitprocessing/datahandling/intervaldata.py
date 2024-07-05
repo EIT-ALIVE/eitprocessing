@@ -204,7 +204,7 @@ class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
         cls = type(self)
         newlabel = newlabel or self.label
 
-        if type(self.values) is not type(other.values):  # noqa: E721
+        if type(self.values) is not type(other.values):
             msg = "Concatenation failed because value types are non-identical."
             raise TypeError(msg)
         if not self.has_values:
