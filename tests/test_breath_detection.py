@@ -299,7 +299,7 @@ def test_pass_invalid(obj: Any):  # noqa: ANN401
 def test_pass_continuousdata(draeger1: Sequence):
     draeger1 = copy.deepcopy(draeger1)  # prevents writing results to original file
     cd = draeger1.continuous_data["global_impedance_(raw)"]
-    bd = BreathDetection(draeger1.eit_data["raw"].framerate)
+    bd = BreathDetection(draeger1.eit_data["raw"].sample_frequency)
 
     breaths_container = bd.find_breaths(cd)
     assert isinstance(breaths_container, IntervalData)
@@ -322,7 +322,7 @@ def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, py
     timpel1 = copy.deepcopy(timpel1)
     for sequence in draeger1, draeger2, timpel1:
         bd = BreathDetection(
-            sample_frequency=sequence.eit_data["raw"].framerate,
+            sample_frequency=sequence.eit_data["raw"].sample_frequency,
         )
 
         cd = sequence.continuous_data["global_impedance_(raw)"]

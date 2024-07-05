@@ -84,26 +84,26 @@ def test_with_data(draeger1: Sequence, pytestconfig: pytest.Config):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
     cd = draeger1.continuous_data["global_impedance_(raw)"]
-    framerate = draeger1.eit_data["raw"].framerate
+    sample_frequency = draeger1.eit_data["raw"].sample_frequency
     eeli_values = EELI().compute_parameter(
         cd,
-        framerate,
+        sample_frequency,
     )
 
-    breaths = BreathDetection(framerate).find_breaths(cd)
+    breaths = BreathDetection(sample_frequency).find_breaths(cd)
 
     assert len(eeli_values) == len(breaths)
 
 
 def test_non_impedance_data(draeger1: Sequence) -> None:
     cd = draeger1.continuous_data["global_impedance_(raw)"]
-    framerate = draeger1.eit_data["raw"].framerate
+    sample_frequency = draeger1.eit_data["raw"].sample_frequency
     original_category = cd.category
 
-    _ = EELI().compute_parameter(cd, framerate)
+    _ = EELI().compute_parameter(cd, sample_frequency)
 
     cd.category = "foo"
     with pytest.raises(ValueError):
-        _ = EELI().compute_parameter(cd, framerate)
+        _ = EELI().compute_parameter(cd, sample_frequency)
 
     cd.category = original_category
