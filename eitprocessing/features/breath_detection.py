@@ -169,7 +169,7 @@ class BreathDetection:
         return np.flatnonzero((data < cutoff_low) | (data > cutoff_high))
 
     def _remove_invalid_data(self, data: np.ndarray, invalid_data_indices: np.ndarray) -> np.ndarray:
-        """Removes invalid data points and replace them with a twosided fill."""
+        """Removes invalid data points and replace them with the nearest non-np.nan value.."""
         data = np.copy(data)
         data[invalid_data_indices] = np.nan
         return self._fill_nan_with_nearest_neighbour(data)
