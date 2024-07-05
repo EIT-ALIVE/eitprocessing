@@ -61,7 +61,7 @@ class BreathDetection:
         Sequence as first argument and the label of a ContinuousData object.
         When passing a ContinuousData object, optionally, you can pass a
         Sequence object as second argument.
-        If a sequence is passed to `find_breaths()`, the resulting breaths
+        If a Sequence is passed to `find_breaths()`, the resulting breaths
         are stored in the Sequence as `intervaldata["breaths"]`.
 
         This method attempts to find peaks and valleys in the data in a
