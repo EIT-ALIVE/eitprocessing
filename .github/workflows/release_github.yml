@@ -39,11 +39,10 @@ jobs:
           git config user.name "GitHub Actions"
           git pull
 
-      - name: Check for conflicts
+      - name: Merge changes into main
         run: |
-          echo "-- merge main into release_branch"
-          git switch ${{ github.event.inputs.release_branch }}
-          git merge origin/test_protected_main --no-ff --no-commit
+          git switch test_protected_main
+          git merge ${{ github.event.inputs.release_branch }} --no-ff --no-commit
           git merge --continue
 
       - name: Bump version
@@ -51,9 +50,6 @@ jobs:
         run: |
           echo "-- install bump-my-version"
           python3 -m pip install bump-my-version
-          echo "-- merge release branch into main"
-          git switch test_protected_main
-          git merge ${{ github.event.inputs.release_branch }}
           echo "-- bump the version"
           bump-my-version bump ${{ github.event.inputs.version_level }} --commit --tag
           echo "-- push bumped version"
