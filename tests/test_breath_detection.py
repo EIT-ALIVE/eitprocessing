@@ -290,7 +290,7 @@ def test_remove_no_breaths_around_valid_data():
 @pytest.mark.parametrize("obj", ["", 1, (1,), []])
 def test_pass_invalid(obj: Any):  # noqa: ANN401
     bd = BreathDetection(1)
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(TypeError):
         bd.find_breaths(obj)
 
 
