@@ -139,11 +139,10 @@ We use [prettier](https://prettier.io/) for formatting most other files. If you 
      - `patch`: when backward compatible bug fixes were made
      - `minor`: when functionality was added in a backward compatible manner
      - `major`: when API-incompatible changes have been made
-   - Note that if you choose `main` (the default shown) as the release branch, this will be re-defaulted to develop
-     instead. To release from `main` directly, you must follow the [manual release
-     instructions](#manually-create-a-release) below.
    - If the release branch is not `develop`, the workflow will attempt to merge the changes into develop as well. If
      succesfull, the release branch will be deleted from the remote repository.
+   - Note that you cannot release from `main` (the default shown) using the automated workflow. To release from `main`
+     directly, you must [create the release manually](#manually-create-a-release).
 3. Visit [Actions](https://github.com/EIT-ALIVE/eitprocessing/actions) tab to check whether everything went as expected.
 4. Navigate to the [Releases](https://github.com/EIT-ALIVE/eitprocessing/releases) tab and click on the newest draft
    release that was just generated.

@@ -24,15 +24,11 @@ jobs:
         shell: bash -l {0}
 
     steps:
-      - name: Release from develop branch by default
+      - name: Fail if main branch was selected
         if: ${{ github.ref_name }} == 'main'
         run: |
-          echo "RELEASE_BRANCH=develop" >> $GITHUB_ENV
-
-      - name: Release from specified branch
-        if: ${{ github.ref_name }} != 'main'
-        run: |
-          echo "RELEASE_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "Cannot release from main branch, please select valid release branch."
+          exit 1
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -48,7 +44,7 @@ jobs:
       - name: Merge changes into main
         run: |
           git switch main
-          git merge $RELEASE_BRANCH --no-ff --no-commit
+          git merge ${{ github.ref_name }} --no-ff --no-commit
           git merge --continue
 
       - name: Bump version
@@ -98,7 +94,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "-- searching for associated PR"
-          pr_number=$(gh pr list --head $RELEASE_BRANCH --json number --jq '.[0].number')
+          pr_number=$(gh pr list --head ${{ github.ref_name }} --json number --jq '.[0].number')
           if [ -n "$pr_number" ]; then
             echo "-- closing PR #$pr_number"
             gh pr close $pr_number
@@ -114,9 +110,9 @@ jobs:
 
       - name: Delete release branch other than main or develop
         run: |
-          if [[ $RELEASE_BRANCH != "main" && $RELEASE_BRANCH != "develop" ]]; then
-            echo "-- deleting branch '$RELEASE_BRANCH'"
-            git push origin -d $RELEASE_BRANCH
+          if [[ ${{ github.ref_name }} != "main" && ${{ github.ref_name }} != "develop" ]]; then
+            echo "-- deleting branch '${{ github.ref_name }}'"
+            git push origin -d ${{ github.ref_name }}
           else
-            echo "-- branch '$RELEASE_BRANCH' will not be deleted from remote"
+            echo "-- branch '${{ github.ref_name }}' will not be deleted from remote"
           fi
