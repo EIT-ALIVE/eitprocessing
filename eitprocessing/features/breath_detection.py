@@ -101,8 +101,8 @@ class BreathDetection:
 
     @find_breaths.register(Sequence)
     def _(self, sequence: Sequence, continuousdata_label: str) -> IntervalData:
-        cd = sequence.continuous_data[continuousdata_label]
-        return self._find_breaths(cd, sequence)
+        continuous_data = sequence.continuous_data[continuousdata_label]
+        return self._find_breaths(continuous_data, sequence)
 
     @find_breaths.register(ContinuousData)
     def _(self, continuous_data: ContinuousData, sequence: Sequence | None = None) -> IntervalData:
