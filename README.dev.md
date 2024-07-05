@@ -167,6 +167,7 @@ NOTE: the current token (associated to @DaniBodor) allowing to bypass branch pro
 0. Make sure you have all required developers tools installed `pip install -e .'[dev]'`.
 1. Create a `release` branch from `main` and merge the changes into this branch.
    - Ensure that the `release` branch is ready to be merged back into `main` (e.g., removing the unnecessary files, fix minor bugs if necessary).
+   - Also see our [branching strategy](#branching-strategy) above.
 2. Ensure all tests pass `pytest -v` and that linting (`ruff check`) and formatting (`ruff format --check`) conventions
    are adhered to.
 3. Bump the version using [bump-my-version](https://github.com/callowayproject/bump-my-version): `bump-my-version bump <level>`
