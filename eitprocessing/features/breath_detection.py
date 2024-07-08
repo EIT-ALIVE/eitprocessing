@@ -202,7 +202,7 @@ class BreathDetection:
         time) between peaks is determined by the `minimum_duration` attribute.
 
         To find peaks, `invert` should be False. To find valleys, `invert`
-        should be True, which flips the data before finding peaks.
+        should be True, which inverts the data before finding peaks.
 
         Args:
             data (np.ndarray): a 1D array containing the data.
