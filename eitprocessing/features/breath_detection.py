@@ -19,14 +19,14 @@ from eitprocessing.features.moving_average import MovingAverage
 class BreathDetection:
     """Algorithm for detecting breaths in data representing respiration.
 
-    This algorithm detects the position of breaths in data by detecting valleys
-    (local minimum values) and peaks (local maximum values) in data. When
-    initializing `BreathDetection`, the sample frequency of the data and the
-    minimum duration of a breath have to be provided. The minimum duration
-    should be short enough to include the shortest expected breath in the data.
+    This algorithm detects the position of breaths in data by detecting valleys (local minimum values) and peaks (local
+    maximum values) in data. When initializing `BreathDetection`, the sample frequency of the data and the minimum
+    duration of a breath have to be provided. The minimum duration should be short enough to include the shortest
+    expected breath in the data. The minimum duraiton is implemted as the minimum time between peaks and between
+    valleys.
 
     Examples:
-    >>> bd = BreathDetection(sample_frequency=50, minimum_distance=0.5)
+    >>> bd = BreathDetection(sample_frequency=50, minimum_duration=0.5)
     >>> breaths = bd.find_breaths(sequency=seq, continuousdata_label="global_impedance_(raw)")
 
     >>> global_impedance = seq.continuous_data["global_impedance_(raw)"]
@@ -34,8 +34,9 @@ class BreathDetection:
 
     Args:
         sample_frequency: sample frequency of the data
-        minimum_distance: minimum expected distance between breaths, defaults to 0.67 seconds
-        averaging_window_length: length of window used for averaging the data, defaults to 15 seconds
+        minimum_duration: minimum expected duration of breaths, defaults
+        to 2/3 of a second
+        averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
         averaging_window_fun: function used to average the data, defaults to np.blackman
         amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed
         invalid_data_removal_window_length: window around invalid data in which breaths are removed
@@ -45,8 +46,8 @@ class BreathDetection:
 
     # TODO: remove after continuousdata gets its own sample frequency #209
     sample_frequency: float
-    minimum_distance: float = 2 / 3
-    averaging_window_length: float = 15
+    minimum_duration: float = 2 / 3
+    averaging_window_duration: float = 15
     averaging_window_fun: Callable[[int], ArrayLike] | None = np.blackman
     amplitude_cutoff_fraction: float | None = 0.25
     invalid_data_removal_window_length: float = 0.5
@@ -175,7 +176,7 @@ class BreathDetection:
         return self._fill_nan_with_nearest_neighbour(data)
 
     def _detect_peaks_and_valleys(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        window_size = int(self.sample_frequency * self.averaging_window_length)
+        window_size = int(self.sample_frequency * self.averaging_window_duration)
         averager = MovingAverage(window_size=window_size, window_function=self.averaging_window_fun)
         moving_average = averager.apply(data)
 
@@ -198,7 +199,7 @@ class BreathDetection:
 
         This method finds features (either peaks or valleys) in the data using
         the `scipy.signal.find_peaks()` function. The minimum distance (in
-        time) between peaks is determined by the `minimum_distance` attribute.
+        time) between peaks is determined by the `minimum_duration` attribute.
 
         To find peaks, `invert` should be False. To find valleys, `invert`
         should be True, which flips the data before finding peaks.
@@ -219,7 +220,7 @@ class BreathDetection:
         moving_average_ = -moving_average if invert else moving_average
         feature_indices, _ = signal.find_peaks(
             data_,
-            distance=self.minimum_distance * self.sample_frequency,
+            distance=self.minimum_duration * self.sample_frequency,
             height=moving_average_,
         )
 

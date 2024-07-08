@@ -487,7 +487,7 @@ def test_find_breaths():
     seq.continuous_data.add(cd)
 
     # every breath should be detected as normal
-    bd = BreathDetection(sample_frequency, minimum_distance=3)
+    bd = BreathDetection(sample_frequency, minimum_duration=3)
     breaths = bd.find_breaths(seq, label)
     assert breaths is seq.interval_data["breaths"]
     assert len(breaths) == len(breaths.values)
@@ -495,12 +495,12 @@ def test_find_breaths():
     assert len(breaths) == 19
 
     # too long minimum distance, number of breaths reduced
-    bd = BreathDetection(sample_frequency, minimum_distance=4)
+    bd = BreathDetection(sample_frequency, minimum_duration=4)
     breaths = bd.find_breaths(seq, label)
     assert len(breaths) < 19
 
     # very short breaths expected, but no influence due to lack of disturbances
-    bd = BreathDetection(sample_frequency, minimum_distance=1 / 25)
+    bd = BreathDetection(sample_frequency, minimum_duration=1 / 25)
     breaths = bd.find_breaths(seq, label)
     assert len(breaths) == 19
 
