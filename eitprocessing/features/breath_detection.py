@@ -269,7 +269,7 @@ class BreathDetection:
         keep_peaks = peak_indices > valley_indices[0]
         peak_indices = peak_indices[keep_peaks]
 
-        # remove peak that come after the last valley
+        # remove peaks that come after the last valley
         keep_peaks = peak_indices < valley_indices[-1]
         peak_indices = peak_indices[keep_peaks]
 
