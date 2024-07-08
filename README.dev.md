@@ -134,13 +134,15 @@ We use [prettier](https://prettier.io/) for formatting most other files. If you 
    - if everything goes well, this PR will automatically be closed after the draft release is created.
 1. Navigate to [Draft Github Release](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/release_github.yml)
    on the [Actions](https://github.com/EIT-ALIVE/eitprocessing/actions) tab.
-2. On the right hand side, you can select the level increase (patch, minor, or major) and which branch to release from.
-   - if released from a different branch than `develop`, then the workflow will attempt to merge the changes into develop
-     as well. If succesfull, the release branch will be deleted from the remote repository.
-   - [follow semantic versioning conventions](https://semver.org/) to chose the level increase:
+2. On the right hand side, you can select the level increase ("patch", "minor", or "major") and which branch to release from.
+   - [Follow semantic versioning conventions](https://semver.org/) to chose the level increase:
      - `patch`: when backward compatible bug fixes were made
      - `minor`: when functionality was added in a backward compatible manner
      - `major`: when API-incompatible changes have been made
+   - If the release branch is not `develop`, the workflow will attempt to merge the changes into develop as well. If
+     succesfull, the release branch will be deleted from the remote repository.
+   - Note that you cannot release from `main` (the default shown) using the automated workflow. To release from `main`
+     directly, you must [create the release manually](#manually-create-a-release).
 3. Visit [Actions](https://github.com/EIT-ALIVE/eitprocessing/actions) tab to check whether everything went as expected.
 4. Navigate to the [Releases](https://github.com/EIT-ALIVE/eitprocessing/releases) tab and click on the newest draft
    release that was just generated.
