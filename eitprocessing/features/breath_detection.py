@@ -2,7 +2,6 @@ import itertools
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
-from functools import singledispatchmethod
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -54,62 +53,54 @@ class BreathDetection:
     invalid_data_removal_percentile: int = 5
     invalid_data_removal_multiplier: int = 4
 
-    @singledispatchmethod
-    def find_breaths(self, container: Sequence | ContinuousData) -> IntervalData:
+    def find_breaths(
+        self,
+        continuous_data: ContinuousData,
+        result_label: str = "breaths",
+        sequence: Sequence | None = None,
+        store: bool | None = None,
+    ) -> IntervalData:
         """Find breaths in the data.
 
-        You can either pass a `ContinuousData` object as first argument, or a
-        `Sequence` as first argument and the label of a `ContinuousData` object.
-        When passing a `ContinuousData` object, optionally, you can pass a
-        `Sequence` object as second argument.
-        If a `Sequence` is passed to `find_breaths()`, the resulting breaths
-        are stored in the Sequence as `intervaldata["breaths"]`.
+        This method attempts to find peaks and valleys in the provided data in a multi-step process.
 
-        This method attempts to find peaks and valleys in the data in a
-        multi-step process. First, it naively finds any peaks that are a
-        certain distance apart and higher than the moving average, and
-        similarly valleys that are a certain distance apart and below the
-        moving average.
+        First, it naively finds any peaks that are a certain distance apart and higher than the moving average, and
+        similarly valleys that are a certain distance apart and below the moving average.
 
-        Next, valleys at the start and end of the signal are removed
-        to ensure the first and last valleys are actual valleys, and not just
-        the start or end of the signal. Peaks before the first or after the
-        last valley are removed, to ensure peaks always fall between two
-        valleys.
+        Next, valleys at the start and end of the signal are removed to ensure the first and last valleys are actual
+        valleys, and not just the start or end of the signal. Peaks before the first or after the last valley are
+        removed, to ensure peaks always fall between two valleys.
 
-        At this point, it is possible multiple peaks exist between two valleys.
-        Lower peaks are removed leaving only the highest peak between two
-        valleys. Similarly, multiple valleys between two peaks are reduced to
-        only the lowest valley.
+        At this point, it is possible multiple peaks exist between two valleys. Lower peaks are removed leaving only the
+        highest peak between two valleys. Similarly, multiple valleys between two peaks are reduced to only the lowest
+        valley.
 
-        As a last step, breaths with a low amplitude (the average between the
-        inspiratory and expiratory amplitudes) are removed.
+        As a last step, breaths with a low amplitude (the average between the inspiratory and expiratory amplitudes) are
+        removed.
 
-        Breaths are constructed as a valley-peak-valley combination,
-        representing the start of inspiration, the end of inspiration/start of
-        expiration, and end of expiration.
+        Breaths are constructed as a valley-peak-valley combination, representing the start of inspiration, the end of
+        inspiration/start of expiration, and end of expiration.
 
         Args:
-            container: a ContinuousData object that contains the data or a Sequence object
-                that that contains the continuous data
-            continuousdata_label: optional, label of the continuous data contained in the sequence
+            continuous_data: optional, a ContinuousData object that contains the data
+            result_label: label of the returned IntervalData object, defaults to `'breaths'`.
+            sequence: optional, Sequence that contains the object to detect breaths in, and/or to store the result in
+            store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
 
         Returns:
-            A list of Breath objects.
+            An IntervalData object containing Breath objects.
         """
-        msg = f"`find_breaths()` expects a Sequence or ContinuousData object as first argument, not {type(container)}."
-        raise TypeError(msg)
+        if not isinstance(continuous_data, ContinuousData):
+            msg = f"`continuous_data` should be a ContinuousData object, not {type(continuous_data)}"
+            raise TypeError(msg)
 
-    @find_breaths.register(Sequence)
-    def _(self, sequence: Sequence, continuousdata_label: str) -> IntervalData:
-        continuous_data = sequence.continuous_data[continuousdata_label]
-        return self._find_breaths(continuous_data, sequence)
+        if store is None and sequence:
+            store = True
 
-    @find_breaths.register(ContinuousData)
-    def _(self, continuous_data: ContinuousData, sequence: Sequence | None = None) -> IntervalData:
-        return self._find_breaths(continuous_data, sequence=sequence)
+        if store and sequence is None:
+            msg = "Can't store the result if not Sequence is provided."
+            raise RuntimeError(msg)
 
-    def _find_breaths(self, continuous_data: ContinuousData, sequence: Sequence | None = None) -> IntervalData:
         data = continuous_data.values
         time = continuous_data.time
 
@@ -125,7 +116,7 @@ class BreathDetection:
         )
         breaths = self._remove_breaths_around_invalid_data(breaths, time, invalid_data_indices)
         breaths_container = IntervalData(
-            label="breaths",
+            label=result_label,
             name="Breaths as determined by BreathDetection",
             unit=None,
             category="breath",
@@ -134,7 +125,8 @@ class BreathDetection:
             parameters={type(self): dict(vars(self))},
             derived_from=[continuous_data],
         )
-        if sequence:
+
+        if store:
             sequence.interval_data.add(breaths_container)
 
         return breaths_container

@@ -304,7 +304,7 @@ def test_pass_continuousdata(draeger1: Sequence):
     # results are not stored
     assert "breaths" not in draeger1.interval_data
 
-    bd.find_breaths(cd, draeger1)
+    bd.find_breaths(cd, sequence=draeger1)
     # results are now stored
     assert "breaths" in draeger1.interval_data
     assert draeger1.interval_data["breaths"] == breaths_container
@@ -324,7 +324,7 @@ def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, py
         )
 
         cd = sequence.continuous_data["global_impedance_(raw)"]
-        breaths = bd.find_breaths(sequence, "global_impedance_(raw)")
+        breaths = bd.find_breaths(cd)
 
         for breath in breaths.values:
             # Test whether the indices are in the proper order within a breath
@@ -488,7 +488,7 @@ def test_find_breaths():
 
     # every breath should be detected as normal
     bd = BreathDetection(sample_frequency, minimum_duration=3)
-    breaths = bd.find_breaths(seq, label)
+    breaths = bd.find_breaths(cd, sequence=seq)
     assert breaths is seq.interval_data["breaths"]
     assert len(breaths) == len(breaths.values)
     assert len(breaths) == len(breaths.intervals)
@@ -496,12 +496,12 @@ def test_find_breaths():
 
     # too long minimum distance, number of breaths reduced
     bd = BreathDetection(sample_frequency, minimum_duration=4)
-    breaths = bd.find_breaths(seq, label)
+    breaths = bd.find_breaths(cd)
     assert len(breaths) < 19
 
     # very short breaths expected, but no influence due to lack of disturbances
     bd = BreathDetection(sample_frequency, minimum_duration=1 / 25)
-    breaths = bd.find_breaths(seq, label)
+    breaths = bd.find_breaths(cd)
     assert len(breaths) == 19
 
     y_copy = np.copy(y)
@@ -511,10 +511,10 @@ def test_find_breaths():
 
     # single breath invalidated
     bd = BreathDetection(sample_frequency)
-    breaths = bd.find_breaths(seq, label)
+    breaths = bd.find_breaths(cd)
     assert len(breaths) == 18
 
     # three breaths invalidated
     bd = BreathDetection(sample_frequency, invalid_data_removal_window_length=3.5)
-    breaths = bd.find_breaths(seq, label)
+    breaths = bd.find_breaths(cd)
     assert len(breaths) == 16
