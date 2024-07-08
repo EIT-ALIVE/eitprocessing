@@ -37,7 +37,7 @@ class BreathDetection:
         minimum_duration: minimum expected duration of breaths, defaults
         to 2/3 of a second
         averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
-        averaging_window_fun: function used to average the data, defaults to np.blackman
+        averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
         amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed
         invalid_data_removal_window_length: window around invalid data in which breaths are removed
         invalid_data_removal_percentile: the nth percentile of values used to remove outliers
@@ -48,7 +48,7 @@ class BreathDetection:
     sample_frequency: float
     minimum_duration: float = 2 / 3
     averaging_window_duration: float = 15
-    averaging_window_fun: Callable[[int], ArrayLike] | None = np.blackman
+    averaging_window_function: Callable[[int], ArrayLike] | None = np.blackman
     amplitude_cutoff_fraction: float | None = 0.25
     invalid_data_removal_window_length: float = 0.5
     invalid_data_removal_percentile: int = 5
@@ -177,7 +177,7 @@ class BreathDetection:
 
     def _detect_peaks_and_valleys(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         window_size = int(self.sample_frequency * self.averaging_window_duration)
-        averager = MovingAverage(window_size=window_size, window_function=self.averaging_window_fun)
+        averager = MovingAverage(window_size=window_size, window_function=self.averaging_window_function)
         moving_average = averager.apply(data)
 
         peak_indices = self._find_features(data, moving_average)
