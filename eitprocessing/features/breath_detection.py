@@ -212,9 +212,7 @@ class BreathDetection:
             detecting peaks. Defaults to False.
 
         Returns:
-            A tuple containing two 1D arrays of length N with the indices (int)
-            and values (float) of the features, where N is the number of
-            features found.
+            np.ndarray: a 1D-array containing the indices of the features.
         """
         data_ = -data if invert else data
         moving_average_ = -moving_average if invert else moving_average
@@ -301,7 +299,7 @@ class BreathDetection:
             valley_indices: indices of the valleys
 
         Returns:
-            A tuple (peak_indices, peak_values, valley_indices, valley_values)
+            tuple: a tuple of length 2 with the peak_indices and valley_indices
             with double peaks/valleys removed.
         """
         peak_values = data[peak_indices]
