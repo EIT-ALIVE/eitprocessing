@@ -38,10 +38,10 @@ class BreathDetection:
         to 2/3 of a second
         averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
         averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
-        amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed
-        invalid_data_removal_window_length: window around invalid data in which breaths are removed
-        invalid_data_removal_percentile: the nth percentile of values used to remove outliers
-        invalid_data_removal_multiplier: the multiplier used to remove outliers
+        amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed, defaults to 0.25.
+        invalid_data_removal_window_length: window around invalid data in which breaths are removed, defaults to 0.5.
+        invalid_data_removal_percentile: the nth percentile of values used to remove outliers, defaults to 5
+        invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4.
     """
 
     # TODO: remove after continuousdata gets its own sample frequency #209
