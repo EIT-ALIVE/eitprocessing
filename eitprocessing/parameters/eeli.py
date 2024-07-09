@@ -14,14 +14,6 @@ class EELI(ParameterExtraction):
     """Compute the end-expiratory lung impedance (EELI) per breath."""
 
     method: Literal["extremes"] = "extremes"
-    summary_stats: dict = field(
-        default_factory=lambda: {
-            "values": lambda v: v,
-            "mean": np.mean,
-            "standard deviation": np.std,
-            "median": np.median,
-        },
-    )
     breath_detection_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -52,10 +44,4 @@ class EELI(ParameterExtraction):
         eeli_indices = list(eeli_indices)
         eeli_values = data[eeli_indices]
 
-        result = {}
-        for name, function in self.summary_stats.items():
-            result[name] = function(eeli_values)
-
-        result["indices"] = eeli_indices
-
-        return result
+        return eeli_values
