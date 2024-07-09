@@ -12,7 +12,7 @@ from eitprocessing.parameters import ParameterExtraction
 class EELI(ParameterExtraction):
     """Compute the end-expiratory lung impedance (EELI) per breath."""
 
-    method: Literal["extremes"] = "extremes"
+    method: Literal["breath_detection"] = "breath_detection"
     breath_detection_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -27,7 +27,7 @@ class EELI(ParameterExtraction):
         """
         # TODO: remove sample_frequency as soon as ContinuousData gets it as attribute
 
-        if self.method != "extremes":
+        if self.method != "breath_detection":
             msg = f"Method {self.method} is not implemented."
             raise NotImplementedError(msg)
 
