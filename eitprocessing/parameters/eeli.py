@@ -40,8 +40,7 @@ class EELI(ParameterExtraction):
         breath_detection = BreathDetection(**bd_kwargs)
         breaths = breath_detection.find_breaths(data)
 
-        _, _, eeli_indices = zip(*breaths, strict=True)
-        eeli_indices = list(eeli_indices)
-        eeli_values = data[eeli_indices]
+        _, _, eeli_times = zip(*breaths, strict=True)
+        eeli_indices = np.flatnonzero(np.isin(continuousdata.time, eeli_times))
 
-        return eeli_values
+        return data[eeli_indices]
