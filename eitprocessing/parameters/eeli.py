@@ -3,8 +3,7 @@ from typing import Literal
 
 import numpy as np
 
-from eitprocessing.datahandling.eitdata import EITData
-from eitprocessing.datahandling.sequence import Sequence
+from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.parameters import ParameterExtraction
 
@@ -19,24 +18,23 @@ class EELI(ParameterExtraction):
     def __post_init__(self) -> None:
         pass
 
-    def compute_parameter(self, sequence: Sequence, data_label: str) -> dict | list[dict]:
+    def compute_parameter(self, continuous_data: ContinuousData, sample_frequency: float) -> np.ndarray:
         """Compute the EELI per breath.
 
         Args:
-            sequence: the sequence containing the data.
-            data_label: the label of the continuous data in the sequence to determine the EELI of.
-            breaths_label: the label of the breaths in the sequence.
+            continuous_data: a ContinuousData object containing the data.
+            sample_frequency: the sample frequency at which the data is recorded.
         """
+        # TODO: remove sample_frequency as soon as ContinuousData gets it as attribute
+
         if self.method != "extremes":
             msg = f"Method {self.method} is not implemented."
             raise NotImplementedError(msg)
 
-        continuousdata = sequence.continuous_data[data_label]
-        eitdata = next(filter(lambda x: isinstance(x, EITData), continuousdata.derived_from))
         data = continuousdata.values
 
         bd_kwargs = self.breath_detection_kwargs.copy()
-        bd_kwargs["sample_frequency"] = eitdata.framerate
+        bd_kwargs["sample_frequency"] = sample_frequency
         breath_detection = BreathDetection(**bd_kwargs)
         breaths = breath_detection.find_breaths(data)
 
