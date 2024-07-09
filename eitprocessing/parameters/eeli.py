@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Literal, get_args
 
 import numpy as np
 
@@ -15,8 +15,11 @@ class EELI(ParameterCalculation):
     method: Literal["breath_detection"] = "breath_detection"
     breath_detection_kwargs: dict = field(default_factory=dict)
 
-    def __post_init__(self) -> None:
-        pass
+    def __post_init__(self):
+        _methods = get_args(EELI.__dataclass_fields__["method"].type)
+        if self.method not in _methods:
+            msg = f"Method {self.method} is not valid. Use any of {', '.join(_methods)}"
+            raise ValueError(msg)
 
     def compute_parameter(self, continuous_data: ContinuousData, sample_frequency: float) -> np.ndarray:
         """Compute the EELI per breath.
@@ -26,10 +29,6 @@ class EELI(ParameterCalculation):
             sample_frequency: the sample frequency at which the data is recorded.
         """
         # TODO: remove sample_frequency as soon as ContinuousData gets it as attribute
-
-        if self.method != "breath_detection":
-            msg = f"Method {self.method} is not implemented."
-            raise NotImplementedError(msg)
 
         data = continuous_data.values
 
