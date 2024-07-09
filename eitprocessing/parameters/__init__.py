@@ -1,5 +1,13 @@
-class ParameterExtraction:
-    available_in_gui = True
+from abc import ABC, abstractmethod
 
-    def compute_parameter(self, input_data):
-        raise NotImplementedError("Implement in subclass")
+import numpy as np
+
+from eitprocessing.datahandling.continuousdata import ContinuousData
+
+
+class ParameterCalculation(ABC):
+    """Base class for parameter extraction classes."""
+
+    @abstractmethod
+    def compute_parameter(self, input_data: ContinuousData) -> np.ndarray:
+        """Computes the parameter."""

@@ -5,11 +5,11 @@ import numpy as np
 
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.features.breath_detection import BreathDetection
-from eitprocessing.parameters import ParameterExtraction
+from eitprocessing.parameters import ParameterCalculation
 
 
 @dataclass
-class EELI(ParameterExtraction):
+class EELI(ParameterCalculation):
     """Compute the end-expiratory lung impedance (EELI) per breath."""
 
     method: Literal["breath_detection"] = "breath_detection"
