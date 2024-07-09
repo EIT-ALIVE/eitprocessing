@@ -35,6 +35,9 @@ class EELI(ParameterCalculation):
         breath_detection = BreathDetection(**bd_kwargs)
         breaths = breath_detection.find_breaths(continuous_data)
 
+        if not len(breaths):
+            return np.array([], dtype=float)
+
         _, _, end_expiratory_times = zip(*breaths.values, strict=True)
         end_expiratory_indices = np.flatnonzero(np.isin(continuous_data.time, end_expiratory_times))
 
