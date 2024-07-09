@@ -21,7 +21,7 @@ class BreathDetection:
     This algorithm detects the position of breaths in data by detecting valleys (local minimum values) and peaks (local
     maximum values) in data. When initializing `BreathDetection`, the sample frequency of the data and the minimum
     duration of a breath have to be provided. The minimum duration should be short enough to include the shortest
-    expected breath in the data. The minimum duraiton is implemted as the minimum time between peaks and between
+    expected breath in the data. The minimum duration is implemented as the minimum time between peaks and between
     valleys.
 
     Examples:
@@ -33,14 +33,13 @@ class BreathDetection:
 
     Args:
         sample_frequency: sample frequency of the data
-        minimum_duration: minimum expected duration of breaths, defaults
-        to 2/3 of a second
+        minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
         averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
         averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
-        amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed, defaults to 0.25.
-        invalid_data_removal_window_length: window around invalid data in which breaths are removed, defaults to 0.5.
+        amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed, defaults to 0.25
+        invalid_data_removal_window_length: window around invalid data in which breaths are removed, defaults to 0.5
         invalid_data_removal_percentile: the nth percentile of values used to remove outliers, defaults to 5
-        invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4.
+        invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4
     """
 
     # TODO: remove after continuousdata gets its own sample frequency #209
@@ -60,9 +59,7 @@ class BreathDetection:
         sequence: Sequence | None = None,
         store: bool | None = None,
     ) -> IntervalData:
-        """Find breaths in the data.
-
-        This method attempts to find peaks and valleys in the provided data in a multi-step process.
+        """Find breaths based on peaks and valleys, removing edge cases and breaths during invalid data.
 
         First, it naively finds any peaks that are a certain distance apart and higher than the moving average, and
         similarly valleys that are a certain distance apart and below the moving average.
@@ -145,7 +142,7 @@ class BreathDetection:
         above/equal to 120, all data below 100 - (4 * 10) = 60 and above 100 + (4 * 20) = 180 is considerd invalid.
 
         Args:
-            data (np.ndarray): _description_
+            data (np.ndarray): 1D array with impedance data
 
         Returns:
             np.ndarray: the indices of the data points with values outside the lower and upper cutoff values.
@@ -162,7 +159,7 @@ class BreathDetection:
         return np.flatnonzero((data < cutoff_low) | (data > cutoff_high))
 
     def _remove_invalid_data(self, data: np.ndarray, invalid_data_indices: np.ndarray) -> np.ndarray:
-        """Removes invalid data points and replace them with the nearest non-np.nan value.."""
+        """Removes invalid data points and replace them with the nearest non-np.nan value."""
         data = np.copy(data)
         data[invalid_data_indices] = np.nan
         return self._fill_nan_with_nearest_neighbour(data)
@@ -186,20 +183,17 @@ class BreathDetection:
         moving_average: np.ndarray,
         invert: float = False,
     ) -> np.ndarray:
-        """
-        Find features (peaks or valleys) in the data.
+        """Find features (peaks or valleys) in the data.
 
-        This method finds features (either peaks or valleys) in the data using
-        the `scipy.signal.find_peaks()` function. The minimum distance (in
-        time) between peaks is determined by the `minimum_duration` attribute.
+        This method finds extrema (either peaks or valleys) in the data using the `scipy.signal.find_peaks()` function.
+        The minimum distance (in time) between peaks is determined by the `minimum_duration` attribute.
 
-        To find peaks, `invert` should be False. To find valleys, `invert`
-        should be True, which inverts the data before finding peaks.
+        To find peaks, `invert` should be False. To find valleys, `invert` should be True, which inverts the data before
+        finding peaks.
 
         Args:
             data (np.ndarray): a 1D array containing the data.
-            moving_average (NDArrag): a 1D array containing the moving average
-                of the data.
+            moving_average (np.ndarray): a 1D array containing the moving average of the data.
             invert (float, optional): whether to invert the data before
             detecting peaks. Defaults to False.
 
@@ -223,28 +217,23 @@ class BreathDetection:
         valley_indices: np.ndarray,
         moving_average: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Remove overdetected peaks/valleys at the start and end of the data.
+        """Remove overdetected peaks/valleys at the start and end of the data.
 
-        This method removes a valley at the start of the data if the data before said valley stays below the moving
-        average of the data at said valley. Likewise, it removes the last valley if the data after the last valley stays
-        below the moving average of the data at said valley. This ensures a valley is a true valley, and not just a
-        local minimum while the true valley is cut off.
+        A valley at the start of the data is deemed invalid if the data before the first valley stays below the moving
+        average at the valley. The same is true for the last valley and the data after that valley. This ensures a
+        valley is a true valley and not just a local minimum with the true valley cut off.
 
-        Then, all peaks that occur before the first and after the last valley
-        are removed. This ensures peaks only fall between valleys.
+        Then, all peaks that occur before the first and after the last valley are removed. This ensures peaks only fall
+        between valleys.
 
         Args:
-            peak_indices (np.ndarray): indices of the peaks
-            peak_values (np.ndarray): values of the peaks
-            valley_indices (np.ndarray): indices of the valleys
-            valley_values (np.ndarray): values of the valleys
             data (np.ndarray): the data in which the peaks/valleys were detected
+            peak_indices (np.ndarray): indices of the peaks
+            valley_indices (np.ndarray): indices of the valleys
             moving_average (np.ndarray): the moving average of data
 
         Returns:
-            A tuple (peak_indices, peak_values, valley_indices, valley_values)
-            with edge cases removed.
+            A tuple (peak_indices, peak_values) with edge cases removed.
         """
         if max(data[: valley_indices[0]]) < moving_average[valley_indices[0]]:
             # remove the first valley, if the data before that valley is not
@@ -272,18 +261,14 @@ class BreathDetection:
         peak_indices: np.ndarray,
         valley_indices: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Remove double peaks/valleys.
+        """Remove double peaks/valleys.
 
-        This method ensures there is only one peak between valleys, and only
-        one valley between peaks. If there are multiple peaks between two
-        valleys, the peak with the highest value is kept and the others are
-        removed. If there are no peaks between several valleys (i.e. multiple
-        valleys between peaks) the valley with the lowest value is kept, while
-        the others are removed.
+        This method ensures there is only one peak between valleys, and only one valley between peaks. If there are
+        multiple peaks between two valleys, the peak with the highest value is kept and the others are removed. If there
+        are no peaks between several valleys (i.e. multiple valleys between peaks) the valley with the lowest value is
+        kept, while the others are removed.
 
-        This method does not remove peaks before the first or after the last
-        valley.
+        This method does not remove peaks before the first or after the last valley.
 
         Args:
             data: data the peaks and valleys were found in
@@ -291,8 +276,7 @@ class BreathDetection:
             valley_indices: indices of the valleys
 
         Returns:
-            tuple: a tuple of length 2 with the peak_indices and valley_indices
-            with double peaks/valleys removed.
+            tuple: a tuple of length 2 with the peak_indices and valley_indices with double peaks/valleys removed.
         """
         peak_values = data[peak_indices]
         valley_values = data[valley_indices]
@@ -336,18 +320,14 @@ class BreathDetection:
         peak_indices: np.ndarray,
         valley_indices: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Remove peaks if the amplitude is low compared to the median amplitude.
+        """Remove peaks if the amplitude is low compared to the median amplitude.
 
-        The amplitude of a peak is determined as the average vertical distance
-        between the peak value and the two valley values besides it. The cutoff
-        value for the amplitude is calculated as the median amplitude times
-        `amplitude_cutoff_fraction`. Peaks that have an amplitude below the
-        cutoff are removed. Then, `_remove_doubles()` is called to remove
-        either of the valleys next to the peak.
+        The amplitude of a peak is determined as the average vertical distance between the peak value and the two valley
+        values besides it. The cutoff value for the amplitude is calculated as the median amplitude times
+        `amplitude_cutoff_fraction`. Peaks that have an amplitude below the cutoff are removed. Then,
+        `_remove_doubles()` is called to remove either of the valleys next to the peak.
 
-        If `amplitude_cutoff_fraction` is None, the input is returned
-        unchanged.
+        If `amplitude_cutoff_fraction` is None, the input is returned unchanged.
 
         Args:
             data: the data the peaks and valleys were found in
@@ -355,8 +335,7 @@ class BreathDetection:
             valley_indices (np.ndarray): the indices of the valleys
 
         Returns:
-            A tuple (peak_indices, valley_indices)
-            with low-amplitude breaths removed.
+            A tuple (peak_indices, valley_indices) with low-amplitude breaths removed.
         """
         if not self.amplitude_cutoff_fraction:
             return peak_indices, valley_indices
