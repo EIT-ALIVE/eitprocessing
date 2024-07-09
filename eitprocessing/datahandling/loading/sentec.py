@@ -139,8 +139,7 @@ def _read_frame(
     reader: BinReader,
     first_frame: int = 0,
 ) -> NDArray | None:
-    """
-    Read a single frame in the file.
+    """Read a single frame in the file.
 
     The current position of the file has to be already set to the point where the image should be read (data_id 5).
 

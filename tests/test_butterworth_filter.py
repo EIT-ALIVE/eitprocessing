@@ -215,7 +215,7 @@ def test_butterworth_functionality():
     # create a matrix containing signal1 multiplied by a scalar in each row
     signal2 = np.array([[10], [20], [30], [40], [50]]) @ np.expand_dims(signal1.T, 0)
 
-    def compare_filters(  # noqa:D417
+    def compare_filters(
         cutoff: float | tuple[float, float],
         filter_type: Literal["lowpass", "highpass", "bandpass", "bandstop"],
         class_: SpecifiedFilter,
