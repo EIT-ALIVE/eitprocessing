@@ -204,7 +204,7 @@ class BreathDetection:
         moving_average_ = -moving_average if invert else moving_average
         extrema_indices, _ = signal.find_peaks(
             data_,
-            distance=self.minimum_duration * self.sample_frequency,
+            distance=max(self.minimum_duration * self.sample_frequency, 1),
             height=moving_average_,
         )
 
