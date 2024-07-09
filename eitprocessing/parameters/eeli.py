@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Literal
 
 import numpy as np
 
@@ -12,7 +13,7 @@ from eitprocessing.parameters import ParameterExtraction
 class EELI(ParameterExtraction):
     """Compute the end-expiratory lung impedance (EELI) per breath."""
 
-    method: str = "extremes"
+    method: Literal["extremes"] = "extremes"
     summary_stats: dict = field(
         default_factory=lambda: {
             "values": lambda v: v,
