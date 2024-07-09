@@ -31,14 +31,14 @@ class EELI(ParameterExtraction):
             msg = f"Method {self.method} is not implemented."
             raise NotImplementedError(msg)
 
-        data = continuousdata.values
+        data = continuous_data.values
 
         bd_kwargs = self.breath_detection_kwargs.copy()
         bd_kwargs["sample_frequency"] = sample_frequency
         breath_detection = BreathDetection(**bd_kwargs)
         breaths = breath_detection.find_breaths(data)
 
-        _, _, eeli_times = zip(*breaths, strict=True)
-        eeli_indices = np.flatnonzero(np.isin(continuousdata.time, eeli_times))
+        _, _, end_expiratory_times = zip(*breaths, strict=True)
+        end_expiratory_indices = np.flatnonzero(np.isin(continuous_data.time, end_expiratory_times))
 
-        return data[eeli_indices]
+        return data[end_expiratory_indices]
