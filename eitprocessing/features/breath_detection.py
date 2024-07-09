@@ -169,21 +169,21 @@ class BreathDetection:
         averager = MovingAverage(window_size=window_size, window_function=self.averaging_window_function)
         moving_average = averager.apply(data)
 
-        peak_indices = self._find_features(data, moving_average)
-        valley_indices = self._find_features(data, moving_average, invert=True)
+        peak_indices = self._find_extrema(data, moving_average)
+        valley_indices = self._find_extrema(data, moving_average, invert=True)
 
         peak_indices, valley_indices = self._remove_edge_cases(data, peak_indices, valley_indices, moving_average)
         peak_indices, valley_indices = self._remove_doubles(data, peak_indices, valley_indices)
         peak_indices, valley_indices = self._remove_low_amplitudes(data, peak_indices, valley_indices)
         return peak_indices, valley_indices
 
-    def _find_features(
+    def _find_extrema(
         self,
         data: np.ndarray,
         moving_average: np.ndarray,
         invert: float = False,
     ) -> np.ndarray:
-        """Find features (peaks or valleys) in the data.
+        """Find extrema (peaks or valleys) in the data.
 
         This method finds extrema (either peaks or valleys) in the data using the `scipy.signal.find_peaks()` function.
         The minimum distance (in time) between peaks is determined by the `minimum_duration` attribute.
@@ -198,17 +198,17 @@ class BreathDetection:
             detecting peaks. Defaults to False.
 
         Returns:
-            np.ndarray: a 1D-array containing the indices of the features.
+            np.ndarray: a 1D-array containing the indices of peaks or valleys.
         """
         data_ = -data if invert else data
         moving_average_ = -moving_average if invert else moving_average
-        feature_indices, _ = signal.find_peaks(
+        extrema_indices, _ = signal.find_peaks(
             data_,
             distance=self.minimum_duration * self.sample_frequency,
             height=moving_average_,
         )
 
-        return feature_indices
+        return extrema_indices
 
     def _remove_edge_cases(
         self,
