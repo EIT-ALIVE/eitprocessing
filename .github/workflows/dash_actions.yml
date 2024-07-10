@@ -1,9 +1,10 @@
-name: Dashboard
+name: Build Dashboard
 
 on:
   push:
     branches:
       - main
+      - develop
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
@@ -12,6 +13,7 @@ on:
       - "**.ipynb"
     branches:
       - main
+      - develop
 
 jobs:
   call-build-workflow:

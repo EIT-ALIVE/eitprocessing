@@ -67,7 +67,7 @@ def test_has_values(
 
 
 def test_index_slicing(sparsedata_novalues: SparseData) -> None:
-    _sliced_copy = sparsedata_novalues._sliced_copy(0, 10, newlabel="sliced_copy")  # noqa: SLF001
+    _sliced_copy = sparsedata_novalues._sliced_copy(0, 10, newlabel="sliced_copy")
     assert len(_sliced_copy) == 10
     sliced_copy = sparsedata_novalues[:10]
     assert _sliced_copy == sliced_copy

@@ -215,7 +215,7 @@ def test_butterworth_functionality():
     # create a matrix containing signal1 multiplied by a scalar in each row
     signal2 = np.array([[10], [20], [30], [40], [50]]) @ np.expand_dims(signal1.T, 0)
 
-    def compare_filters(  # noqa:D417
+    def compare_filters(
         cutoff: float | tuple[float, float],
         filter_type: Literal["lowpass", "highpass", "bandpass", "bandstop"],
         class_: SpecifiedFilter,
@@ -224,12 +224,11 @@ def test_butterworth_functionality():
     ) -> None:
         """Compare filters created using ButterworthFilter to filters created using the corresponding subclass.
 
-        This function creates two filter instances, one using the ButterworthFilter, and one using
-        either of the four subclasses. It then compares whether those filters are equal, and have
-        equal results.
+        This function creates two filter instances, one using the ButterworthFilter, and one using either of the four
+        subclasses. It then compares whether those filters are equal, and have equal results.
 
-        The function then filters the data `signal_` using the created ButterworthFilter, and
-        compares the result to the same data filtered using `scipy`.
+        The function then filters the data `signal_` using the created ButterworthFilter, and compares the result to the
+        same data filtered using `scipy`.
 
         Parameters:
             cutoff: the cutoff frequency to use

@@ -103,7 +103,7 @@ def test_has_values(
 
 
 def test_index_slicing(intervaldata_novalues_partialtrue: IntervalData):
-    _sliced_copy = intervaldata_novalues_partialtrue._sliced_copy(0, 10, newlabel="sliced_copy")  # noqa: SLF001
+    _sliced_copy = intervaldata_novalues_partialtrue._sliced_copy(0, 10, newlabel="sliced_copy")
     assert len(_sliced_copy) == 10
     sliced_copy = intervaldata_novalues_partialtrue[:10]
     assert _sliced_copy == sliced_copy
