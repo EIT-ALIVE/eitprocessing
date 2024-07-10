@@ -34,6 +34,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_PAT }}
+          ref: main
 
       - name: Configure git
         run: |
@@ -44,7 +45,7 @@ jobs:
       - name: Merge changes into main
         run: |
           git switch main
-          git merge ${{ github.ref_name }} --no-ff --no-commit
+          git merge origin/${{ github.ref_name }} --no-ff --no-commit
           git merge --continue
 
       - name: Bump version
