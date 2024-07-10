@@ -24,6 +24,11 @@ class EELI(ParameterCalculation):
     def compute_parameter(self, continuous_data: ContinuousData, sample_frequency: float) -> np.ndarray:
         """Compute the EELI per breath.
 
+        Example:
+        >>> global_impedance = sequence.continuous_data["global_impedance_(raw)"]
+        >>> sample_frequency = sequence.eit_data["raw"].framerate
+        >>> eeli_values = EELI().compute_parameter(global_impedance, sample_frequency=sample_frequency)
+
         Args:
             continuous_data: a ContinuousData object containing the data.
             sample_frequency: the sample frequency at which the data is recorded.
