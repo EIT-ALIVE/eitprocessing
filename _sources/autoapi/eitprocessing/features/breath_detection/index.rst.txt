@@ -1,0 +1,270 @@
+eitprocessing.features.breath_detection
+=======================================
+
+.. py:module:: eitprocessing.features.breath_detection
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   eitprocessing.features.breath_detection.BreathDetection
+
+
+Module Contents
+---------------
+
+.. py:class:: BreathDetection
+
+   Algorithm for detecting breaths in data representing respiration.
+
+   This algorithm detects the position of breaths in data by detecting valleys (local minimum values) and peaks (local
+   maximum values) in data. When initializing `BreathDetection`, the sample frequency of the data and the minimum
+   duration of a breath have to be provided. The minimum duration should be short enough to include the shortest
+   expected breath in the data. The minimum duration is implemented as the minimum time between peaks and between
+   valleys.
+
+   Examples:
+   >>> bd = BreathDetection(sample_frequency=50, minimum_duration=0.5)
+   >>> breaths = bd.find_breaths(sequency=seq, continuousdata_label="global_impedance_(raw)")
+
+   >>> global_impedance = seq.continuous_data["global_impedance_(raw)"]
+   >>> breaths = bd.find_breaths(continuous_data=global_impedance)
+
+   :param sample_frequency: sample frequency of the data
+   :param minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
+   :param averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
+   :param averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
+   :param amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed, defaults to 0.25
+   :param invalid_data_removal_window_length: window around invalid data in which breaths are removed, defaults to 0.5
+   :param invalid_data_removal_percentile: the nth percentile of values used to remove outliers, defaults to 5
+   :param invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4
+
+
+   .. py:attribute:: sample_frequency
+      :type:  float
+
+
+   .. py:attribute:: minimum_duration
+      :type:  float
+
+
+   .. py:attribute:: averaging_window_duration
+      :type:  float
+      :value: 15
+
+
+
+   .. py:attribute:: averaging_window_function
+      :type:  collections.abc.Callable[[int], numpy.typing.ArrayLike] | None
+
+
+   .. py:attribute:: amplitude_cutoff_fraction
+      :type:  float | None
+      :value: 0.25
+
+
+
+   .. py:attribute:: invalid_data_removal_window_length
+      :type:  float
+      :value: 0.5
+
+
+
+   .. py:attribute:: invalid_data_removal_percentile
+      :type:  int
+      :value: 5
+
+
+
+   .. py:attribute:: invalid_data_removal_multiplier
+      :type:  int
+      :value: 4
+
+
+
+   .. py:method:: find_breaths(continuous_data: eitprocessing.datahandling.continuousdata.ContinuousData, result_label: str = 'breaths', sequence: eitprocessing.datahandling.sequence.Sequence | None = None, store: bool | None = None) -> eitprocessing.datahandling.intervaldata.IntervalData
+
+      Find breaths based on peaks and valleys, removing edge cases and breaths during invalid data.
+
+      First, it naively finds any peaks that are a certain distance apart and higher than the moving average, and
+      similarly valleys that are a certain distance apart and below the moving average.
+
+      Next, valleys at the start and end of the signal are removed to ensure the first and last valleys are actual
+      valleys, and not just the start or end of the signal. Peaks before the first or after the last valley are
+      removed, to ensure peaks always fall between two valleys.
+
+      At this point, it is possible multiple peaks exist between two valleys. Lower peaks are removed leaving only the
+      highest peak between two valleys. Similarly, multiple valleys between two peaks are reduced to only the lowest
+      valley.
+
+      As a last step, breaths with a low amplitude (the average between the inspiratory and expiratory amplitudes) are
+      removed.
+
+      Breaths are constructed as a valley-peak-valley combination, representing the start of inspiration, the end of
+      inspiration/start of expiration, and end of expiration.
+
+      :param continuous_data: optional, a ContinuousData object that contains the data
+      :param result_label: label of the returned IntervalData object, defaults to `'breaths'`.
+      :param sequence: optional, Sequence that contains the object to detect breaths in, and/or to store the result in
+      :param store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
+
+      :returns: An IntervalData object containing Breath objects.
+
+
+
+   .. py:method:: _detect_invalid_data(data: numpy.ndarray) -> numpy.ndarray
+
+      Detects invalid data as outliers outside an upper and lower cutoff.
+
+      This function defines a lower and upper cutoff. Data beyond those cutoffs is considered invalid for the purposes
+      of breath detection.
+
+      The lower cutoff is a distance away from the mean. The distance is m times the distance between the mean and the
+      nth percentile of the data. The upper cutoff is m times the distance between the mean and the (100 - n)th
+      percentile. m is given by `invalid_data_removal_multiplier` and n is given by `invalid_data_removal_percentile`.
+
+      For example, with m = 4 and n = 5, the mean = 100, 5% of the data is below/equal to 90, and 5% of the data is
+      above/equal to 120, all data below 100 - (4 * 10) = 60 and above 100 + (4 * 20) = 180 is considerd invalid.
+
+      :param data: 1D array with impedance data
+      :type data: np.ndarray
+
+      :returns: the indices of the data points with values outside the lower and upper cutoff values.
+      :rtype: np.ndarray
+
+
+
+   .. py:method:: _remove_invalid_data(data: numpy.ndarray, invalid_data_indices: numpy.ndarray) -> numpy.ndarray
+
+      Removes invalid data points and replace them with the nearest non-np.nan value.
+
+
+
+   .. py:method:: _detect_peaks_and_valleys(data: numpy.ndarray) -> tuple[numpy.ndarray, numpy.ndarray]
+
+
+   .. py:method:: _find_extrema(data: numpy.ndarray, moving_average: numpy.ndarray, invert: float = False) -> numpy.ndarray
+
+      Find extrema (peaks or valleys) in the data.
+
+      This method finds extrema (either peaks or valleys) in the data using the `scipy.signal.find_peaks()` function.
+      The minimum distance (in time) between peaks is determined by the `minimum_duration` attribute.
+
+      To find peaks, `invert` should be False. To find valleys, `invert` should be True, which inverts the data before
+      finding peaks.
+
+      :param data: a 1D array containing the data.
+      :type data: np.ndarray
+      :param moving_average: a 1D array containing the moving average of the data.
+      :type moving_average: np.ndarray
+      :param invert: whether to invert the data before
+      :type invert: float, optional
+      :param detecting peaks. Defaults to False.:
+
+      :returns: a 1D-array containing the indices of peaks or valleys.
+      :rtype: np.ndarray
+
+
+
+   .. py:method:: _remove_edge_cases(data: numpy.ndarray, peak_indices: numpy.ndarray, valley_indices: numpy.ndarray, moving_average: numpy.ndarray) -> tuple[numpy.ndarray, numpy.ndarray]
+
+      Remove overdetected peaks/valleys at the start and end of the data.
+
+      A valley at the start of the data is deemed invalid if the data before the first valley stays below the moving
+      average at the valley. The same is true for the last valley and the data after that valley. This ensures a
+      valley is a true valley and not just a local minimum with the true valley cut off.
+
+      Then, all peaks that occur before the first and after the last valley are removed. This ensures peaks only fall
+      between valleys.
+
+      :param data: the data in which the peaks/valleys were detected
+      :type data: np.ndarray
+      :param peak_indices: indices of the peaks
+      :type peak_indices: np.ndarray
+      :param valley_indices: indices of the valleys
+      :type valley_indices: np.ndarray
+      :param moving_average: the moving average of data
+      :type moving_average: np.ndarray
+
+      :returns: A tuple (peak_indices, peak_values) with edge cases removed.
+
+
+
+   .. py:method:: _remove_doubles(data: numpy.ndarray, peak_indices: numpy.ndarray, valley_indices: numpy.ndarray) -> tuple[numpy.ndarray, numpy.ndarray]
+
+      Remove double peaks/valleys.
+
+      This method ensures there is only one peak between valleys, and only one valley between peaks. If there are
+      multiple peaks between two valleys, the peak with the highest value is kept and the others are removed. If there
+      are no peaks between several valleys (i.e. multiple valleys between peaks) the valley with the lowest value is
+      kept, while the others are removed.
+
+      This method does not remove peaks before the first or after the last valley.
+
+      :param data: data the peaks and valleys were found in
+      :param peak_indices: indices of the peaks
+      :param valley_indices: indices of the valleys
+
+      :returns: a tuple of length 2 with the peak_indices and valley_indices with double peaks/valleys removed.
+      :rtype: tuple
+
+
+
+   .. py:method:: _remove_low_amplitudes(data: numpy.ndarray, peak_indices: numpy.ndarray, valley_indices: numpy.ndarray) -> tuple[numpy.ndarray, numpy.ndarray]
+
+      Remove peaks if the amplitude is low compared to the median amplitude.
+
+      The amplitude of a peak is determined as the average vertical distance between the peak value and the two valley
+      values besides it. The cutoff value for the amplitude is calculated as the median amplitude times
+      `amplitude_cutoff_fraction`. Peaks that have an amplitude below the cutoff are removed. Then,
+      `_remove_doubles()` is called to remove either of the valleys next to the peak.
+
+      If `amplitude_cutoff_fraction` is None, the input is returned unchanged.
+
+      :param data: the data the peaks and valleys were found in
+      :param peak_indices: the indices of the peaks
+      :type peak_indices: np.ndarray
+      :param valley_indices: the indices of the valleys
+      :type valley_indices: np.ndarray
+
+      :returns: A tuple (peak_indices, valley_indices) with low-amplitude breaths removed.
+
+
+
+   .. py:method:: _create_breaths_from_peak_valley_data(time: numpy.ndarray, peak_indices: numpy.ndarray, valley_indices: numpy.ndarray) -> list[eitprocessing.datahandling.breath.Breath]
+
+
+   .. py:method:: _remove_breaths_around_invalid_data(breaths: list[eitprocessing.datahandling.breath.Breath], time: numpy.ndarray, invalid_data_indices: numpy.ndarray) -> list[eitprocessing.datahandling.breath.Breath]
+
+      Remove breaths overlapping with invalid data.
+
+      Breaths that start within a window length (given by invalid_data_removal_window_length) of invalid data are
+      removed.
+
+      :param breaths: list of detected breath objects
+      :param data: data the breaths were detected in
+      :param time: time axis belonging to the data
+      :param invalid_data_indices: indices of invalid data points
+
+
+
+   .. py:method:: _fill_nan_with_nearest_neighbour(data: numpy.ndarray) -> numpy.ndarray
+      :staticmethod:
+
+
+      Fill np.nan values in a 1D array with the nearest non-np.nan value.
+
+      Each np.nan-value is replaced with the nearest (backwards and forwards) non-np.nan value. If the nearest earlier
+      and a later value are the same distance away, the earlier value is preferred. np.nan-values at the start are
+      filled with the first non-nan value.
+
+      .. rubric:: Example
+
+      foo = np.ndarray([np.nan, 1, np.nan, np.nan, np.nan, 3, np.nan, np.nan])
+      bar = BreathDetection._fill_nan_with_nearest_neighbour(foo)
+      assert bar == np.ndarray([1, 1, 1, 1, 3, 3, 3, 3])
+
+
+
