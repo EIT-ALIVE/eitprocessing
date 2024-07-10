@@ -46,7 +46,7 @@ jobs:
         run: |
           git switch main
           git merge origin/${{ github.ref_name }} --no-ff --no-commit
-          git merge --continue --no-edit
+          git commit --no-edit
 
       - name: Bump version
         id: bump
