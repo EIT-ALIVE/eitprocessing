@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Fail if main branch was selected
-        if: ${{ github.ref_name }} == 'main'
+        if: ${{ github.ref_name == 'main' }}
         run: |
           echo "Cannot release from main branch, please select valid release branch."
           exit 1
