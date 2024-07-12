@@ -22,7 +22,7 @@ class EELI(ParameterCalculation):
             raise ValueError(msg)
 
     def compute_parameter(self, continuous_data: ContinuousData, sample_frequency: float) -> np.ndarray:
-        """Compute the EELI per breath.
+        """Compute the EELI for each breath in the impedance data.
 
         Example:
         >>> global_impedance = sequence.continuous_data["global_impedance_(raw)"]
@@ -30,8 +30,11 @@ class EELI(ParameterCalculation):
         >>> eeli_values = EELI().compute_parameter(global_impedance, sample_frequency=sample_frequency)
 
         Args:
-            continuous_data: a ContinuousData object containing the data.
+            continuous_data: a ContinuousData object containing impedance data.
             sample_frequency: the sample frequency at which the data is recorded.
+
+        Returns:
+            np.ndarray: the end-expiratory values of all breaths in the impedance data.
         """
         # TODO: remove sample_frequency as soon as ContinuousData gets it as attribute
 
