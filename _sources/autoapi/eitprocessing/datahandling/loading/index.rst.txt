@@ -122,7 +122,7 @@ Package Contents
 
 .. py:class:: EITData
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`
+   Bases: :py:obj:`eitprocessing.datahandling.DataContainer`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
 
 
    Container for EIT impedance data.

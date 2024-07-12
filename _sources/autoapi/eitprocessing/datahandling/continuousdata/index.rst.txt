@@ -27,7 +27,7 @@ Module Contents
 
 .. py:class:: ContinuousData
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
+   Bases: :py:obj:`eitprocessing.datahandling.DataContainer`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
 
 
    Container for data with a continuous time axis.
@@ -106,14 +106,14 @@ Module Contents
    .. py:method:: concatenate(other: T, newlabel: str | None = None) -> T
 
 
-   .. py:method:: derive(label: str, function: collections.abc.Callable, func_args: dict, **kwargs) -> typing_extensions.Self
+   .. py:method:: derive(label: str, function: collections.abc.Callable, func_args: dict | None = None, **kwargs) -> typing_extensions.Self
 
       Create a copy deriving data from values attribute.
 
       :param label: New label for the derived object.
       :param function: Function that takes the values and returns the derived values.
-      :param func_args: Arguments to pass to function.
-      :param \*\*kwargs: New values for attributes of
+      :param func_args: Arguments to pass to function, if any.
+      :param \*\*kwargs: Values for changed attributes of derived object.
 
       Example:
       ```

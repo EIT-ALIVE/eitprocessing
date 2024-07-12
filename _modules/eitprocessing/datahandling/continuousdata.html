@@ -25,7 +25,8 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" accesskey="U">eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../datahandling.html" accesskey="U">eitprocessing.datahandling</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.continuousdata</a></li> 
       </ul>
     </div>  
@@ -43,7 +44,7 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.mixins.equality</span> <span class="kn">import</span> <span class="n">Equivalence</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.datahandling</span> <span class="kn">import</span> <span class="n">DataContainer</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.mixins.slicing</span> <span class="kn">import</span> <span class="n">SelectByTime</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -60,7 +61,7 @@
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <div class="viewcode-block" id="ContinuousData">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData">[docs]</a>
-<span class="k">class</span> <span class="nc">ContinuousData</span><span class="p">(</span><span class="n">Equivalence</span><span class="p">,</span> <span class="n">SelectByTime</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ContinuousData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">,</span> <span class="n">SelectByTime</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for data with a continuous time axis.</span>
 
 <span class="sd">    Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and</span>
@@ -204,14 +205,20 @@
 
 <div class="viewcode-block" id="ContinuousData.derive">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.derive">[docs]</a>
-    <span class="k">def</span> <span class="nf">derive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">func_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">derive</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">func_args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a copy deriving data from values attribute.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            label: New label for the derived object.</span>
 <span class="sd">            function: Function that takes the values and returns the derived values.</span>
-<span class="sd">            func_args: Arguments to pass to function.</span>
-<span class="sd">            **kwargs: New values for attributes of</span>
+<span class="sd">            func_args: Arguments to pass to function, if any.</span>
+<span class="sd">            **kwargs: Values for changed attributes of derived object.</span>
 
 <span class="sd">        Example:</span>
 <span class="sd">        ```</span>
@@ -233,6 +240,8 @@
 <span class="sd">        derived = data.derive(&quot;volume_L&quot;, convert_data, {&quot;divide&quot;: 1000}, name=&quot;Lung volume (in L)&quot;, unit=&quot;L&quot;)</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">func_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">func_args</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">copy</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">func_args</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">copy</span></div>
@@ -376,6 +385,7 @@
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../datahandling.html" >eitprocessing.datahandling</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.continuousdata</a></li> 
       </ul>
     </div>
