@@ -129,8 +129,8 @@ class ContinuousData(Equivalence, SelectByTime):
         Args:
             label: New label for the derived object.
             function: Function that takes the values and returns the derived values.
-            func_args: Arguments to pass to function.
-            **kwargs: New values for attributes of
+            func_args: Arguments to pass to function, if any.
+            **kwargs: Values for changed attributes of derived object.
 
         Example:
         ```
