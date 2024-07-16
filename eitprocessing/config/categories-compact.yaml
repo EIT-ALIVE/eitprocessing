@@ -1,0 +1,97 @@
+root:
+- physical measurements:
+  - gas content:
+    - partial pressure:
+      - partial pressure of carbon dioxide
+      - end-tidal partial pressure of carbon dioxide
+    - gas percentage:
+      - fraction inspired oxygen
+      - carbon dioxide percentage
+      - end-tidal carbon dioxide percentage
+  - pressure:
+    - pressure relative to atmospheric pressure:
+      - airway pressure:
+        - P0.1
+        - mean airway pressure
+        - plateau pressure
+        - positive end-expiratory pressure:
+          - total positive end-expiratory pressure
+          - intrinsic positive end-expiratory pressure
+        - peak inspiratory pressure
+        - negative inspiratory pressure
+      - gastric pressure
+      - pleural pressure
+    - relative pressure:
+      - transpulmonary pressure
+      - transdiaphragmatic pressure
+    - pressure difference
+  - impedance:
+    - absolute impedance
+    - relative impedance
+    - impedance difference
+  - volume:
+    - absolute volume:
+      - end-expiratory lung volume
+      - end-inspiratory lung volume
+      - functional residual capacity
+      - dead space volume
+    - volume difference:
+      - tidal volume:
+        - inspiratory tidal volume:
+          - mandatory inspiratory tidal volume
+          - spontaneous inspiratory tidal volume
+        - expiratory tidal volume:
+          - mandatory expiratory tidal volume
+          - spontaneous expiratory tidal volume
+        - mean of inspiratory and expiratory tidal volume
+        - mandatory tidal volume
+        - spontaneous tidal volume
+      - change in end-expiratory lung volume
+      - trapped volume
+    - minute volume:
+      - mandatory minute volume
+      - spontaneous minute volume
+      - leak minute volume
+  - flow:
+    - airflow
+    - bloodflow:
+      - cardiac output
+    - gas flow:
+      - carbon dioxide flow
+  - compliance:
+    - lung compliance
+    - thoracic wall compliance
+  - elastance:
+    - lung elastance
+    - thoracic wall elastance
+  - resistance:
+    - airway resistance
+  - duration:
+    - inspiratory time:
+      - spontaneous inspiratory time
+      - mandatory inspiratory time
+    - expiratoory time:
+      - mandatory expiratory time
+      - spontaneous expiratory time
+    - time at low pressure
+  - rate:
+    - respiratory rate:
+      - mandatory respiratory rate
+      - spontaneous respiratory rate
+    - heart rate
+  - temperature:
+    - airway temperature
+  - time constant
+- calculated value:
+  - index:
+    - rapid shallow breathing index
+  - ratio:
+    - leak percentage
+    - percentage of spontaneous minute volume
+    - inspiratory to expiratory ratio:
+      - spontaneous inspiratory to expiratory ratio
+      - mandatory inspiratory to expiratory ratio
+    - percentage dead space of expiratory tidal volume
+    - ratio between upper 20% pressure range and total dynamic compliance
+- other
+  
