@@ -8,6 +8,7 @@ authors:
     equal-contrib: true
     affiliation: 1
   - name: Dani Bodor
+    equal-contrib: true
     orcid: 0000-0003-2109-2349
     affiliation: 2
   - name: Juliette Francovich
