@@ -1,18 +1,28 @@
 ---
-title: 'eitprocessing: A Python package for ??X?X?X?X'
+title: 'eitprocessing: A Python package for ...'
 tags:
   - Python
 authors:
   - name: Peter Somhorst
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0003-3490-2080
     equal-contrib: true
-    affiliation: "1"
+    affiliation: 1
   - name: Dani Bodor
-  - name: 
-  - name:
-  - name:
-  - name:
-
+    orcid: 0000-0003-2109-2349
+    affiliation: 2
+  - name: Juliette Francovich
+    affiliation: 1
+    orcid: 0000-0000-0000-0000
+  - name: Jantine Wisse-Smit
+    affiliation: 1
+    orcid: 0000-0000-0000-0000
+  - name: Walter Baccinelli
+    affiliation: 2
+    orcid: 0000-0001-8888-4792
+  - name: Annemijn Jonkman
+    orcid: 0000-0001-8778-5135
+    affiliation: 1
+  
 affiliations:
  - name: Department of Intensive Care adults, Erasmus MC, Rotterdam, The Netherlands
    index: 1
