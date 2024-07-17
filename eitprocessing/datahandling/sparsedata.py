@@ -5,14 +5,14 @@ from typing import Any, TypeVar
 import numpy as np
 from typing_extensions import Self
 
-from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 T = TypeVar("T", bound="SparseData")
 
 
 @dataclass(eq=False)
-class SparseData(Equivalence, SelectByTime):
+class SparseData(DataContainer, SelectByTime):
     """Container for data related to individual time points.
 
     Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs

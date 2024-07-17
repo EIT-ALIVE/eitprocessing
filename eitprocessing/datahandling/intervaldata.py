@@ -5,7 +5,7 @@ from typing import Any, NamedTuple, TypeVar
 import numpy as np
 from typing_extensions import Self
 
-from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer, SelectByIndex
 
 T = TypeVar("T", bound="IntervalData")
@@ -19,7 +19,7 @@ class Interval(NamedTuple):
 
 
 @dataclass(eq=False)
-class IntervalData(Equivalence, SelectByIndex, HasTimeIndexer):
+class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
     """Container for interval data existing over a period of time.
 
     Interval data is data that consists for a given time interval. Examples are a ventilator setting (e.g.
