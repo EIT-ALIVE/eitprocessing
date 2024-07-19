@@ -1,6 +1,7 @@
 import collections
 import copy
 import itertools
+from collections.abc import Sequence
 from functools import lru_cache
 from importlib import resources
 
@@ -50,6 +51,9 @@ class Category(Node):
       - sub a (without subcategories)
     ```
 
+    Categories are read-only by default, as they should not be edited by the end-user during runtime. Consider editing
+    the config file instead.
+
     Each type of data that is attached to an eitprocessing object should be categorized as one of the available types of
     data. This allows algorithms to check whether it can apply itself to the provided data, preventing misuse of
     algorithms.
@@ -60,6 +64,8 @@ class Category(Node):
     >>> print("pressure" in categories)  # True
     >>> categories["pressure"]  # Category('/category/physical measurements/pressure')
     """
+
+    readonly = True
 
     def has_subcategory(self, subcategory: str) -> bool:
         """Check whether this category contains a subcategory.
@@ -82,6 +88,11 @@ class Category(Node):
 
         return bool(find_by_attr(self, subcategory, name="name"))
 
+    def __init__(self, name: str, parent: Self | None = None) -> None:
+        super().__init__(name=name)
+        with _IgnoreReadonly(self):
+            self.parent = parent
+
     def __getitem__(self, name: str | tuple[str]):
         if isinstance(name, str):
             node = find_by_attr(self, name, name="name")
@@ -91,7 +102,11 @@ class Category(Node):
             return node
 
         temporary_root = Category(name="temporary root")
-        temporary_root.children = [copy.deepcopy(self[name_]) for name_ in name]
+
+        child_categories = [copy.deepcopy(self[name_]) for name_ in name]
+
+        with _IgnoreReadonly(child_categories):
+            temporary_root.children = child_categories
 
         return temporary_root
 
@@ -116,10 +131,12 @@ class Category(Node):
                 if len(node) > 1:
                     msg = "Category data is malformed."
                     raise ValueError(msg)
-
                 key = next(iter(node.keys()))
                 category = Category(name=key)
-                category.children = [parse_node(child_node) for child_node in node[key]]
+                child_categories = [parse_node(child_node) for child_node in node[key]]
+
+                with _IgnoreReadonly(child_categories):
+                    category.children = child_categories
 
                 return category
 
@@ -151,6 +168,16 @@ class Category(Node):
                     msg = f"Can't add non-unique category '{child.name}'"
                     raise ValueError(msg)
 
+    def _pre_attach(self, parent: Self) -> None:  # noqa: ARG002
+        if self.readonly:
+            msg = "Can't attach read-only Category to another Category."
+            raise RuntimeError(msg)
+
+    def _pre_detach(self, parent: Self) -> None:  # noqa: ARG002
+        if self.readonly:
+            msg = "Can't detach read-only Category from another Category."
+            raise RuntimeError(msg)
+
     def _check_unique(self, raise_: bool = False) -> bool:
         names = [self.name, *(node.name for node in self.descendants)]
 
@@ -179,3 +206,32 @@ def get_default_categories() -> Category:
     yaml_file_path = resources.files(COMPACT_YAML_FILE_MODULE).joinpath(COMPACT_YAML_FILE_NAME)
     with yaml_file_path.open("r") as fh:
         return Category.from_compact_yaml(fh.read())
+
+
+class _IgnoreReadonly:
+    """Context manager allowing temporarily ignoring the read-only attribute.
+
+    For internal use only.
+
+    Example:
+    >>> foo = categories["foo"]
+    >>> foo.parent = None  # raises RuntimeError
+    >>> with _IgnoreReadonly(foo):
+    >>>    foo.parent = None  # does not raise RuntimeError
+    """
+
+    items: Sequence[Category]
+
+    def __init__(self, items: Category | Sequence[Category]):
+        if not isinstance(items, Sequence):
+            items = (items,)
+
+        self.items = items
+
+    def __enter__(self) -> None:
+        for item in self.items:
+            item.readonly = False
+
+    def __exit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
+        for item in self.items:
+            item.readonly = True
