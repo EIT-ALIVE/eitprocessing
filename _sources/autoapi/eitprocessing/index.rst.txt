@@ -16,6 +16,15 @@ Subpackages
    /autoapi/eitprocessing/plotting/index
 
 
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/eitprocessing/categories/index
+
+
 Attributes
 ----------
 
