@@ -1,6 +1,6 @@
 import pytest
 
-from eitprocessing.categories import Category, get_default_categories
+from eitprocessing.categories import Category, _IgnoreReadonly, get_default_categories
 
 yaml_string = """
 name: category
@@ -118,3 +118,30 @@ def test_contains(categories_from_dict: Category):
     assert categories_from_dict["pressure"] in categories_from_dict
     assert categories_from_dict["impedance"] not in categories_from_dict["pressure"]
     assert categories_from_dict["physical measurements"] not in categories_from_dict[["pressure", "impedance"]]
+
+
+def test_readonly(categories_from_dict: Category):
+    assert categories_from_dict.readonly
+    assert categories_from_dict["pressure"].readonly
+    with _IgnoreReadonly(categories_from_dict):
+        assert not categories_from_dict.readonly
+        assert categories_from_dict["pressure"].readonly
+
+    # removing children raises RuntimeError, unless overridden for the children
+    with pytest.raises(RuntimeError):
+        categories_from_dict.children = []
+
+    children = categories_from_dict.children
+    with _IgnoreReadonly(children):
+        categories_from_dict.children = []
+        categories_from_dict.children = children
+
+    # removing a parent raises RuntimeError, unless overridden
+    with pytest.raises(RuntimeError):
+        categories_from_dict["pressure"].parent = None
+
+    pressure = categories_from_dict["pressure"]
+    parent = pressure.parent
+    with _IgnoreReadonly(pressure):
+        pressure.parent = None
+        pressure.parent = parent
