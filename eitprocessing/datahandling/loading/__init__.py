@@ -109,9 +109,9 @@ def _check_first_frame(first_frame: int | None) -> int:
 
 
 def _ensure_vendor(vendor: Vendor | str) -> Vendor:
-    """Check whether vendor exists, and assure it's a Vendor object."""
+    """Check whether loading method for vendor exists, and ensure it's a Vendor object."""
     try:
         return Vendor(vendor)
     except ValueError as e:
-        msg = f"Unknown vendor {vendor}."
-        raise ValueError(msg) from e
+        msg = f"No loading method for {vendor} exists."
+        raise NotImplementedError(msg) from e
