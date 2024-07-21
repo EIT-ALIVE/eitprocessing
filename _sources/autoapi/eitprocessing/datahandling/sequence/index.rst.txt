@@ -17,7 +17,7 @@ Module Contents
 
 .. py:class:: Sequence
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
 
 
    Sequence of timepoints containing respiratory data.

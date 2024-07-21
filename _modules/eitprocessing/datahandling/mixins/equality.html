@@ -25,8 +25,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../../eitprocessing.html" >eitprocessing</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="../../datahandling.html" accesskey="U">eitprocessing.datahandling</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../eitprocessing.html" accesskey="U">eitprocessing</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.mixins.equality</a></li> 
       </ul>
     </div>  
@@ -50,13 +49,13 @@
 
 
 <div class="viewcode-block" id="Equivalence">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.Equivalence">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence">[docs]</a>
 <span class="k">class</span> <span class="nc">Equivalence</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class that adds an equality and equivalence check.&quot;&quot;&quot;</span>
 
     <span class="c1"># inspired by: https://stackoverflow.com/a/51743960/5170442</span>
 <div class="viewcode-block" id="Equivalence.__eq__">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.Equivalence.__eq__">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence.__eq__">[docs]</a>
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -74,7 +73,7 @@
 
 
 <div class="viewcode-block" id="Equivalence._eq_dataclass">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.Equivalence._eq_dataclass">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence._eq_dataclass">[docs]</a>
     <span class="k">def</span> <span class="nf">_eq_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compare two dataclasses for equality.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
@@ -94,7 +93,7 @@
 
 
 <div class="viewcode-block" id="Equivalence._eq_userdict">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.Equivalence._eq_userdict">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence._eq_userdict">[docs]</a>
     <span class="k">def</span> <span class="nf">_eq_userdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compare two userdicts for equality.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">UserDict</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">UserDict</span><span class="p">):</span>
@@ -108,7 +107,7 @@
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="Equivalence._array_safe_eq">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.Equivalence._array_safe_eq">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence._array_safe_eq">[docs]</a>
     <span class="k">def</span> <span class="nf">_array_safe_eq</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: ANN401, PLR0911</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a and b are equal, even if they are numpy arrays containing nans.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">b</span><span class="p">)):</span>
@@ -138,7 +137,7 @@
 
 
 <div class="viewcode-block" id="Equivalence.isequivalent">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.Equivalence.isequivalent">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.Equivalence.isequivalent">[docs]</a>
     <span class="k">def</span> <span class="nf">isequivalent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">raise_</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: C901, PLR0912</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Test whether the data structure between two objects are equivalent.</span>
 
@@ -211,7 +210,7 @@
 
 
 <div class="viewcode-block" id="EquivalenceError">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.EquivalenceError">[docs]</a>
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/mixins/equality/index.html#eitprocessing.datahandling.mixins.equality.EquivalenceError">[docs]</a>
 <span class="k">class</span> <span class="nc">EquivalenceError</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised if objects are not equivalent.&quot;&quot;&quot;</span></div>
 
@@ -249,13 +248,12 @@
         <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../../../eitprocessing.html" >eitprocessing</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="../../datahandling.html" >eitprocessing.datahandling</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.mixins.equality</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

@@ -25,8 +25,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="../datahandling.html" accesskey="U">eitprocessing.datahandling</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" accesskey="U">eitprocessing</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.loading</a></li> 
       </ul>
     </div>  
@@ -156,12 +155,12 @@
 <div class="viewcode-block" id="_ensure_vendor">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/loading/index.html#eitprocessing.datahandling.loading._ensure_vendor">[docs]</a>
 <span class="k">def</span> <span class="nf">_ensure_vendor</span><span class="p">(</span><span class="n">vendor</span><span class="p">:</span> <span class="n">Vendor</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vendor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether vendor exists, and assure it&#39;s a Vendor object.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether loading method for vendor exists, and ensure it&#39;s a Vendor object.&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Vendor</span><span class="p">(</span><span class="n">vendor</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unknown vendor </span><span class="si">{</span><span class="n">vendor</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;No loading method for </span><span class="si">{</span><span class="n">vendor</span><span class="si">}</span><span class="s2"> exists.&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
 
 </pre></div>
 
@@ -197,13 +196,12 @@
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="../datahandling.html" >eitprocessing.datahandling</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.loading</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

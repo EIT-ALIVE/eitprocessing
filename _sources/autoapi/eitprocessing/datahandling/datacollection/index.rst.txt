@@ -48,6 +48,9 @@ Module Contents
       :type:  type
 
 
+   .. py:attribute:: data_type
+
+
    .. py:method:: __setitem__(__key: str, __value: V) -> None
 
 
