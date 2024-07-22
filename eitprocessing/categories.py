@@ -41,8 +41,8 @@ class Category(Node):
     format. [anytree documentation on YAML import/export](https://anytree.readthedocs.io/en/latest/tricks/yaml.html)
     shows the relevant structure of a normal YAML string.
 
-    Categories also supports a compact YAML format, where each category containing a subcategory is sequence. Categories
-    without subcategories are strings in those sequences.
+    Categories also supports a compact YAML format, where each category containing a subcategory is a sequence.
+    Categories without subcategories are strings in those sequences.
 
     ```yaml
     root:
@@ -74,7 +74,7 @@ class Category(Node):
         subcategory does not. Raises a ValueError
 
         Attr:
-            category: the category to be checked as an ancestor of the subcategory. This categroy should exist.
+            category: the category to be checked as an ancestor of the subcategory. This category should exist.
             subcategory: the subcategory to be checked as a descendent of the category.
 
         Returns:
