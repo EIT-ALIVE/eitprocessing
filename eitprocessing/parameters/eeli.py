@@ -3,6 +3,7 @@ from typing import Literal, get_args
 
 import numpy as np
 
+from eitprocessing.categories import check_category
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.parameters import ParameterCalculation
@@ -37,6 +38,8 @@ class EELI(ParameterCalculation):
             np.ndarray: the end-expiratory values of all breaths in the impedance data.
         """
         # TODO: remove sample_frequency as soon as ContinuousData gets it as attribute
+
+        check_category(continuous_data, "impedance", raise_=True)
 
         bd_kwargs = self.breath_detection_kwargs.copy()
         bd_kwargs["sample_frequency"] = sample_frequency
