@@ -11,6 +11,8 @@ from anytree.importer import DictImporter
 from anytree.search import find_by_attr
 from typing_extensions import Self
 
+from eitprocessing.datahandling import DataContainer
+
 COMPACT_YAML_FILE_MODULE = "eitprocessing.config"
 COMPACT_YAML_FILE_NAME = "categories-compact.yaml"
 
@@ -206,6 +208,44 @@ def get_default_categories() -> Category:
     yaml_file_path = resources.files(COMPACT_YAML_FILE_MODULE).joinpath(COMPACT_YAML_FILE_NAME)
     with yaml_file_path.open("r") as fh:
         return Category.from_compact_yaml(fh.read())
+
+
+def check_category(data: DataContainer, category: str, *, raise_: bool = False) -> bool:
+    """Check whether the category of a dataset is a given category or one of it's subcategories.
+
+    Example:
+    >>> data = ContinuousData(..., category="impedance", ...)
+    >>> check_category(data, "impedance")  # True
+    >>> check_category(data, "pressure")  # False
+    >>> check_category(data, "pressure", raise_=True)  # raises ValueError
+    >>> check_category(data, "does not exist", raise_=False)  # raises ValuError
+
+    Args:
+        data: DataContainer object with a `category` attribute.
+        category: Category that the object should be (a subcategory of).
+        raise_: Keyword only. Whether to raise an exception if the data is not a (sub)category.
+
+    Returns:
+        bool: Whether the data category matches.
+
+    Raises:
+        ValueError: If the provided category does not exist.
+        ValueError: If the data category does not match the given category.
+    """
+    categories = get_default_categories()
+
+    if category not in categories:
+        msg = f"Category '{category}' does not exist in the default categories."
+        raise ValueError(msg)
+
+    if data.category in categories[category]:
+        return True
+
+    if raise_:
+        msg = f"`This method will only work on '{category}' data, not '{data.category}'."
+        raise ValueError(msg)
+
+    return False
 
 
 class _IgnoreReadonly:
