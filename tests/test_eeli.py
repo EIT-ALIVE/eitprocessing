@@ -17,7 +17,7 @@ MINUTE = 60
 def create_continuous_data_object():
     def internal(sample_frequency: float, duration: float, frequency: float) -> ContinuousData:
         time, values = _make_cosine_wave(sample_frequency, duration, frequency)
-        return ContinuousData("label", "name", "unit", "category", time=time, values=values)
+        return ContinuousData("label", "name", "unit", "impedance", time=time, values=values)
 
     return internal
 
@@ -68,7 +68,7 @@ def test_eeli_values(repeat_n: int):  # noqa: ARG001
 
     expected_n_breaths = n_valleys - 1
 
-    cd = ContinuousData("label", "name", "unit", "category", time=time, values=data)
+    cd = ContinuousData(label="label", name="name", unit="unit", category="impedance", time=time, values=data)
     eeli = EELI(breath_detection_kwargs={"minimum_duration": 0})
     eeli_values = eeli.compute_parameter(
         cd,
@@ -93,3 +93,17 @@ def test_with_data(draeger1: Sequence, pytestconfig: pytest.Config):
     breaths = BreathDetection(framerate).find_breaths(cd)
 
     assert len(eeli_values) == len(breaths)
+
+
+def test_non_impedance_data(draeger1: Sequence) -> None:
+    cd = draeger1.continuous_data["global_impedance_(raw)"]
+    framerate = draeger1.eit_data["raw"].framerate
+    original_category = cd.category
+
+    _ = EELI().compute_parameter(cd, framerate)
+
+    cd.category = "foo"
+    with pytest.raises(ValueError):
+        _ = EELI().compute_parameter(cd, framerate)
+
+    cd.category = original_category
