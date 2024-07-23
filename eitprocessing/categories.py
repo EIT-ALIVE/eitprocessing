@@ -218,11 +218,11 @@ def check_category(data: DataContainer, category: str, *, raise_: bool = False) 
     >>> check_category(data, "impedance")  # True
     >>> check_category(data, "pressure")  # False
     >>> check_category(data, "pressure", raise_=True)  # raises ValueError
-    >>> check_category(data, "does not exist", raise_=False)  # raises ValuError
+    >>> check_category(data, "does not exist", raise_=False)  # raises ValueError
 
     Args:
         data: DataContainer object with a `category` attribute.
-        category: Category that the object should be (a subcategory of).
+        category: Category to match the data category against. The data category will match this and all subcategories.
         raise_: Keyword only. Whether to raise an exception if the data is not a (sub)category.
 
     Returns:
@@ -230,7 +230,7 @@ def check_category(data: DataContainer, category: str, *, raise_: bool = False) 
 
     Raises:
         ValueError: If the provided category does not exist.
-        ValueError: If the data category does not match the given category.
+        ValueError: If the data category does not match the provided category.
     """
     categories = get_default_categories()
 
