@@ -61,9 +61,9 @@ class PixelInflation:
         bd_kwargs = self.breath_detection_kwargs.copy()
         bd_kwargs["sample_frequency"] = eitdata.framerate
         breath_detection = BreathDetection(**bd_kwargs)
-        breaths = breath_detection.find_breaths(sequence, continuousdata_label)
+        breaths = breath_detection.find_breaths(sequence.continuous_data[continuousdata_label])
 
-        middle_times = np.array(
+        breath_middle_indices = np.array(
             [
                 np.argmax(eitdata.time == middle_time)
                 for middle_time in [breath.middle_time for breath in breaths.values]
@@ -86,13 +86,13 @@ class PixelInflation:
                     start = [
                         np.argmin(
                             eitdata.pixel_impedance[
-                                middle_times[i] : middle_times[i + 1],
+                                breath_middle_indices[i] : breath_middle_indices[i + 1],
                                 row,
                                 col,
                             ],
                         )
-                        + middle_times[i]
-                        for i in range(len(middle_times) - 1)
+                        + breath_middle_indices[i]
+                        for i in range(len(breath_middle_indices) - 1)
                     ]
 
                     end = [start[i + 1] for i in range(len(start) - 1)]
@@ -125,7 +125,10 @@ class PixelInflation:
                 name="Pixel in- and deflation timing as determined by PixelInflation",
                 unit=None,
                 category="breath",
-                intervals=[(time[middle_times[i]], time[middle_times[i + 1]]) for i in range(len(middle_times) - 1)],
+                intervals=[
+                    (time[breath_middle_indices[i]], time[breath_middle_indices[i + 1]])
+                    for i in range(len(breath_middle_indices) - 1)
+                ],
                 values=pixel_inflations,
                 parameters={},
                 derived_from=[eitdata],
