@@ -99,10 +99,10 @@ class EITData(SelectByTime, Equivalence):
         newlabel: str,  # noqa: ARG002
     ) -> Self:
         cls = self.__class__
-        time = self.time[start_index:end_index]
+        time = np.copy(self.time[start_index:end_index])
         nframes = len(time)
 
-        pixel_impedance = self.pixel_impedance[start_index:end_index, :, :]
+        pixel_impedance = np.copy(self.pixel_impedance[start_index:end_index, :, :])
 
         return cls(
             path=self.path,
