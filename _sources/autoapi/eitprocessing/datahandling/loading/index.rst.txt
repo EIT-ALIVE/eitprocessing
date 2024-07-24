@@ -60,9 +60,6 @@ Package Contents
       :type:  type
 
 
-   .. py:attribute:: data_type
-
-
    .. py:method:: __setitem__(__key: str, __value: V) -> None
 
 
@@ -372,6 +369,6 @@ Package Contents
 
 .. py:function:: _ensure_vendor(vendor: eitprocessing.datahandling.eitdata.Vendor | str) -> eitprocessing.datahandling.eitdata.Vendor
 
-   Check whether loading method for vendor exists, and ensure it's a Vendor object.
+   Check whether vendor exists, and assure it's a Vendor object.
 
 
