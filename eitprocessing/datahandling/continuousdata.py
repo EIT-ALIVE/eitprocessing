@@ -229,8 +229,8 @@ class ContinuousData(DataContainer, SelectByTime):
     ) -> Self:
         # TODO: check correct implementation
         cls = self.__class__
-        time = self.time[start_index:end_index]
-        values = self.values[start_index:end_index]
+        time = np.copy(self.time[start_index:end_index])
+        values = np.copy(self.values[start_index:end_index])
         description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
 
         return cls(
