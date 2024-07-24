@@ -106,7 +106,7 @@ jobs:
       - name: Merge updates into develop
         run: |
           git switch develop
-          git merge origin/main
+          git merge --no-ff origin/main
           git push
 
       - name: Delete release branch other than main or develop
