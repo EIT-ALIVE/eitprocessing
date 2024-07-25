@@ -29,6 +29,8 @@ def _make_cosine_wave(sample_frequency: float, length: int, frequency: float) ->
 
     A cosine wave starts and ends at a value of 1, passing through -1 halfway between the maximum values. This makes it
     a very predictable signal for breath detection and will be used as simplified test data by some of the tests below.
+
+    Returns tuple(time, values).
     """
     time = np.arange(length) / sample_frequency
     return time, np.cos(time * np.pi * 2 * frequency)

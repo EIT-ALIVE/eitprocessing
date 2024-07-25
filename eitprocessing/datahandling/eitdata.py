@@ -9,14 +9,14 @@ import numpy as np
 from strenum import LowercaseStrEnum
 from typing_extensions import Self
 
-from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 T = TypeVar("T", bound="EITData")
 
 
 @dataclass(eq=False)
-class EITData(SelectByTime, Equivalence):
+class EITData(DataContainer, SelectByTime):
     """Container for EIT impedance data.
 
     This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The

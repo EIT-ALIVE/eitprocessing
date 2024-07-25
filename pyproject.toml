@@ -36,6 +36,7 @@ dependencies = [
     "tqdm >= 4.65.0",
     "strenum >= 0.4.10",
     "ruff >= 0.3",
+    "anytree >= 2.12.1 ",
 ]
 
 [project.optional-dependencies]

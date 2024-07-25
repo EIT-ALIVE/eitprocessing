@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 
-from eitprocessing.datahandling.mixins.equality import Equivalence
+from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ T = TypeVar("T", bound="ContinuousData")
 
 
 @dataclass(eq=False)
-class ContinuousData(Equivalence, SelectByTime):
+class ContinuousData(DataContainer, SelectByTime):
     """Container for data with a continuous time axis.
 
     Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and
@@ -117,14 +117,20 @@ class ContinuousData(Equivalence, SelectByTime):
             derived_from=[*self.derived_from, *other.derived_from, self, other],
         )
 
-    def derive(self, label: str, function: Callable, func_args: dict, **kwargs) -> Self:
+    def derive(
+        self,
+        label: str,
+        function: Callable,
+        func_args: dict | None = None,
+        **kwargs,
+    ) -> Self:
         """Create a copy deriving data from values attribute.
 
         Args:
             label: New label for the derived object.
             function: Function that takes the values and returns the derived values.
-            func_args: Arguments to pass to function.
-            **kwargs: New values for attributes of
+            func_args: Arguments to pass to function, if any.
+            **kwargs: Values for changed attributes of derived object.
 
         Example:
         ```
@@ -146,6 +152,8 @@ class ContinuousData(Equivalence, SelectByTime):
         derived = data.derive("volume_L", convert_data, {"divide": 1000}, name="Lung volume (in L)", unit="L")
         ```
         """
+        if func_args is None:
+            func_args = {}
         copy = self.copy(label, **kwargs)
         copy.values = function(copy.values, **func_args)
         return copy
