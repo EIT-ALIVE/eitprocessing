@@ -44,7 +44,7 @@ Module Contents
 
 .. py:class:: IntervalData
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByIndex`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
+   Bases: :py:obj:`eitprocessing.datahandling.DataContainer`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByIndex`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
 
 
    Container for interval data existing over a period of time.

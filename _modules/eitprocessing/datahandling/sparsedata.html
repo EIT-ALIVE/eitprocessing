@@ -25,7 +25,8 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" accesskey="U">eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../datahandling.html" accesskey="U">eitprocessing.datahandling</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.sparsedata</a></li> 
       </ul>
     </div>  
@@ -43,7 +44,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
-<span class="kn">from</span> <span class="nn">eitprocessing.datahandling.mixins.equality</span> <span class="kn">import</span> <span class="n">Equivalence</span>
+<span class="kn">from</span> <span class="nn">eitprocessing.datahandling</span> <span class="kn">import</span> <span class="n">DataContainer</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.mixins.slicing</span> <span class="kn">import</span> <span class="n">SelectByTime</span>
 
 <div class="viewcode-block" id="T">
@@ -55,7 +56,7 @@
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <div class="viewcode-block" id="SparseData">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/sparsedata/index.html#eitprocessing.datahandling.sparsedata.SparseData">[docs]</a>
-<span class="k">class</span> <span class="nc">SparseData</span><span class="p">(</span><span class="n">Equivalence</span><span class="p">,</span> <span class="n">SelectByTime</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SparseData</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">,</span> <span class="n">SelectByTime</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Container for data related to individual time points.</span>
 
 <span class="sd">    Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs</span>
@@ -245,6 +246,7 @@
         <li class="nav-item nav-item-0"><a href="../../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../../eitprocessing.html" >eitprocessing</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../datahandling.html" >eitprocessing.datahandling</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.sparsedata</a></li> 
       </ul>
     </div>

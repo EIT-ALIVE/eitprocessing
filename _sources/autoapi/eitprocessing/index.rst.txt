@@ -13,7 +13,17 @@ Subpackages
    /autoapi/eitprocessing/datahandling/index
    /autoapi/eitprocessing/features/index
    /autoapi/eitprocessing/filters/index
+   /autoapi/eitprocessing/parameters/index
    /autoapi/eitprocessing/plotting/index
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/eitprocessing/categories/index
 
 
 Attributes
@@ -28,6 +38,6 @@ Package Contents
 ----------------
 
 .. py:data:: __version__
-   :value: '1.1.1'
+   :value: '1.2.0'
 
 

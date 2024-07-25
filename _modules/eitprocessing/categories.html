@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eitprocessing.categories &#8212; eitprocessing 0.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=0f882399" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <script src="../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../eitprocessing.html" accesskey="U">eitprocessing</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.categories</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for eitprocessing.categories</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">resources</span>
+
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">anytree</span> <span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span> <span class="nn">anytree.importer</span> <span class="kn">import</span> <span class="n">DictImporter</span>
+<span class="kn">from</span> <span class="nn">anytree.search</span> <span class="kn">import</span> <span class="n">find_by_attr</span>
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
+
+<span class="kn">from</span> <span class="nn">eitprocessing.datahandling</span> <span class="kn">import</span> <span class="n">DataContainer</span>
+
+<div class="viewcode-block" id="COMPACT_YAML_FILE_MODULE">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.COMPACT_YAML_FILE_MODULE">[docs]</a>
+<span class="n">COMPACT_YAML_FILE_MODULE</span> <span class="o">=</span> <span class="s2">&quot;eitprocessing.config&quot;</span></div>
+
+<div class="viewcode-block" id="COMPACT_YAML_FILE_NAME">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.COMPACT_YAML_FILE_NAME">[docs]</a>
+<span class="n">COMPACT_YAML_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;categories-compact.yaml&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Category">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category">[docs]</a>
+<span class="k">class</span> <span class="nc">Category</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Data category indicating what type of information is saved in an object.</span>
+
+<span class="sd">    Categories are nested, where more specific categories are nested inside more general categories. The root category</span>
+<span class="sd">    is simply named &#39;category&#39;. Categories have a unique name within the entire tree.</span>
+
+<span class="sd">    To check the existence of a category with name &lt;name&gt; within a category tree, either as subcategory or</span>
+<span class="sd">    subsub(...)category, `category.has_subcategory(&quot;&lt;name&gt;&quot;)` can be used. The keyword `in` can be used as a shorthand.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt;&gt; &quot;tea&quot; in category  # is the same as:</span>
+<span class="sd">    &gt;&gt;&gt; category.has_subcategory(&quot;tea&quot;)</span>
+
+<span class="sd">    To select a subcategory, category[&quot;&lt;name&gt;&quot;] can be used. You can select multiple categories at once. This will</span>
+<span class="sd">    create a new tree with a temporary root, containing only the selected categories.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt;&gt; foobar = categories[&quot;foo&quot;, &quot;bar&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; print(foobar)  # Category(&#39;/temporary root&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print(foobar.children)  # (Category(&#39;/temporary root/foo&#39;), Category(&#39;/temporary root/bar&#39;))</span>
+
+<span class="sd">    Categories can be hand-crafted, created from a dictionary or a YAML string. See [`anytree.DictionaryImporter`</span>
+<span class="sd">    documentation](https://anytree.readthedocs.io/en/latest/importer/dictimporter.html) for more info on the dictionary</span>
+<span class="sd">    format. [anytree documentation on YAML import/export](https://anytree.readthedocs.io/en/latest/tricks/yaml.html)</span>
+<span class="sd">    shows the relevant structure of a normal YAML string.</span>
+
+<span class="sd">    Categories also supports a compact YAML format, where each category containing a subcategory is a sequence.</span>
+<span class="sd">    Categories without subcategories are strings in those sequences.</span>
+
+<span class="sd">    ```yaml</span>
+<span class="sd">    root:</span>
+<span class="sd">    - sub 1 (without subcategories)</span>
+<span class="sd">    - sub 2 (with subcategories):</span>
+<span class="sd">      - sub a (without subcategories)</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Categories are read-only by default, as they should not be edited by the end-user during runtime. Consider editing</span>
+<span class="sd">    the config file instead.</span>
+
+<span class="sd">    Each type of data that is attached to an eitprocessing object should be categorized as one of the available types of</span>
+<span class="sd">    data. This allows algorithms to check whether it can apply itself to the provided data, preventing misuse of</span>
+<span class="sd">    algorithms.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt;&gt; categories = get_default_categories()</span>
+<span class="sd">    &gt;&gt;&gt; print(categories)  # Category(&#39;/category&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print(&quot;pressure&quot; in categories)  # True</span>
+<span class="sd">    &gt;&gt;&gt; categories[&quot;pressure&quot;]  # Category(&#39;/category/physical measurements/pressure&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Category.readonly">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category.readonly">[docs]</a>
+    <span class="n">readonly</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Category.has_subcategory">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category.has_subcategory">[docs]</a>
+    <span class="k">def</span> <span class="nf">has_subcategory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subcategory</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether this category contains a subcategory.</span>
+
+<span class="sd">        Returns True if the category and subcategory both exist. Returns False if the category exists, but the</span>
+<span class="sd">        subcategory does not. Raises a ValueError</span>
+
+<span class="sd">        Attr:</span>
+<span class="sd">            category: the category to be checked as an ancestor of the subcategory. This category should exist.</span>
+<span class="sd">            subcategory: the subcategory to be checked as a descendent of the category.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: whether subcategory exists as a descendent of category.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if category does not exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subcategory</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">subcategory</span> <span class="ow">is</span> <span class="bp">self</span> <span class="ow">or</span> <span class="n">subcategory</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span>
+
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">find_by_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subcategory</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">))</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Self</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">_IgnoreReadonly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+
+<div class="viewcode-block" id="Category.__getitem__">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category.__getitem__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">find_by_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">node</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Category </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">node</span>
+
+        <span class="n">temporary_root</span> <span class="o">=</span> <span class="n">Category</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;temporary root&quot;</span><span class="p">)</span>
+
+        <span class="n">child_categories</span> <span class="o">=</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">name_</span><span class="p">])</span> <span class="k">for</span> <span class="n">name_</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
+
+        <span class="k">with</span> <span class="n">_IgnoreReadonly</span><span class="p">(</span><span class="n">child_categories</span><span class="p">):</span>
+            <span class="n">temporary_root</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">child_categories</span>
+
+        <span class="k">return</span> <span class="n">temporary_root</span></div>
+
+
+<div class="viewcode-block" id="Category.__contains__">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category.__contains__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_subcategory</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Category.from_yaml">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category.from_yaml">[docs]</a>
+    <span class="k">def</span> <span class="nf">from_yaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load categories from YAML file.&quot;&quot;&quot;</span>
+        <span class="n">dict_</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">dict_</span><span class="p">)</span></div>
+
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Category.from_compact_yaml">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category.from_compact_yaml">[docs]</a>
+    <span class="k">def</span> <span class="nf">from_compact_yaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load categories from compact YAML file.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">parse_node</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Category</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">Category</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Category data is malformed.&quot;</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                <span class="n">category</span> <span class="o">=</span> <span class="n">Category</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+                <span class="n">child_categories</span> <span class="o">=</span> <span class="p">[</span><span class="n">parse_node</span><span class="p">(</span><span class="n">child_node</span><span class="p">)</span> <span class="k">for</span> <span class="n">child_node</span> <span class="ow">in</span> <span class="n">node</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+
+                <span class="k">with</span> <span class="n">_IgnoreReadonly</span><span class="p">(</span><span class="n">child_categories</span><span class="p">):</span>
+                    <span class="n">category</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">child_categories</span>
+
+                <span class="k">return</span> <span class="n">category</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Supplied node should be str or dict, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parse_node</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Category.from_dict">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category.from_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create categories from dictionary.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DictImporter</span><span class="p">(</span><span class="n">nodecls</span><span class="o">=</span><span class="n">Category</span><span class="p">)</span><span class="o">.</span><span class="n">import_</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Category._pre_attach_children">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category._pre_attach_children">[docs]</a>
+    <span class="k">def</span> <span class="nf">_pre_attach_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">children</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Self</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks for non-unique categories before adding them to an existing category tree.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="p">[</span><span class="n">child</span><span class="p">,</span> <span class="o">*</span><span class="n">child</span><span class="o">.</span><span class="n">descendants</span><span class="p">]:</span>
+                <span class="c1"># Checks whether the names of children to be added and their descendents don&#39;t already exist in the</span>
+                <span class="c1"># tree.</span>
+                <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Can&#39;t add non-unique category </span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">child_a</span><span class="p">,</span> <span class="n">child_b</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="p">[</span><span class="n">child_a</span><span class="p">,</span> <span class="o">*</span><span class="n">child_a</span><span class="o">.</span><span class="n">descendants</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">child_b</span><span class="p">:</span>
+                    <span class="c1"># Checks whether any child or their descendents exist in other children to be added</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Can&#39;t add non-unique category &#39;</span><span class="si">{</span><span class="n">child</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Category._pre_attach">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category._pre_attach">[docs]</a>
+    <span class="k">def</span> <span class="nf">_pre_attach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: ARG002</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">readonly</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Can&#39;t attach read-only Category to another Category.&quot;</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Category._pre_detach">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category._pre_detach">[docs]</a>
+    <span class="k">def</span> <span class="nf">_pre_detach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: ARG002</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">readonly</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Can&#39;t detach read-only Category from another Category.&quot;</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Category._check_unique">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.Category._check_unique">[docs]</a>
+    <span class="k">def</span> <span class="nf">_check_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raise_</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">names</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">raise_</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+        <span class="n">non_unique_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">count</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">joined_names</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">non_unique_names</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Some nodes have non-unique names: </span><span class="si">{</span><span class="n">joined_names</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="nd">@lru_cache</span>
+<div class="viewcode-block" id="get_default_categories">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.get_default_categories">[docs]</a>
+<span class="k">def</span> <span class="nf">get_default_categories</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Category</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads the default categories from file.</span>
+
+<span class="sd">    This returns the categories used in the eitprocessing package. The root category is simply called &#39;root&#39;. All other</span>
+<span class="sd">    categories are subdivided into physical measurements, calculated values and others.</span>
+
+<span class="sd">    This function is cached, meaning it only loads the data once, and returns the same object every time afterwards.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">yaml_file_path</span> <span class="o">=</span> <span class="n">resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="n">COMPACT_YAML_FILE_MODULE</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">COMPACT_YAML_FILE_NAME</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">yaml_file_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Category</span><span class="o">.</span><span class="n">from_compact_yaml</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="check_category">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories.check_category">[docs]</a>
+<span class="k">def</span> <span class="nf">check_category</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataContainer</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">raise_</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether the category of a dataset is a given category or one of it&#39;s subcategories.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt;&gt; data = ContinuousData(..., category=&quot;impedance&quot;, ...)</span>
+<span class="sd">    &gt;&gt;&gt; check_category(data, &quot;impedance&quot;)  # True</span>
+<span class="sd">    &gt;&gt;&gt; check_category(data, &quot;pressure&quot;)  # False</span>
+<span class="sd">    &gt;&gt;&gt; check_category(data, &quot;pressure&quot;, raise_=True)  # raises ValueError</span>
+<span class="sd">    &gt;&gt;&gt; check_category(data, &quot;does not exist&quot;, raise_=False)  # raises ValueError</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: DataContainer object with a `category` attribute.</span>
+<span class="sd">        category: Category to match the data category against. The data category will match this and all subcategories.</span>
+<span class="sd">        raise_: Keyword only. Whether to raise an exception if the data is not a (sub)category.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: Whether the data category matches.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the provided category does not exist.</span>
+<span class="sd">        ValueError: If the data category does not match the provided category.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">categories</span> <span class="o">=</span> <span class="n">get_default_categories</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">category</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Category &#39;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2">&#39; does not exist in the default categories.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">[</span><span class="n">category</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">raise_</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;`This method will only work on &#39;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2">&#39; data, not &#39;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">category</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="_IgnoreReadonly">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories._IgnoreReadonly">[docs]</a>
+<span class="k">class</span> <span class="nc">_IgnoreReadonly</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager allowing temporarily ignoring the read-only attribute.</span>
+
+<span class="sd">    For internal use only.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt;&gt; foo = categories[&quot;foo&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; foo.parent = None  # raises RuntimeError</span>
+<span class="sd">    &gt;&gt;&gt; with _IgnoreReadonly(foo):</span>
+<span class="sd">    &gt;&gt;&gt;    foo.parent = None  # does not raise RuntimeError</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="_IgnoreReadonly.items">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories._IgnoreReadonly.items">[docs]</a>
+    <span class="n">items</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Category</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">:</span> <span class="n">Category</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Category</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">(</span><span class="n">items</span><span class="p">,)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="n">items</span>
+
+<div class="viewcode-block" id="_IgnoreReadonly.__enter__">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories._IgnoreReadonly.__enter__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">readonly</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="_IgnoreReadonly.__exit__">
+<a class="viewcode-back" href="../../autoapi/eitprocessing/categories/index.html#eitprocessing.categories._IgnoreReadonly.__exit__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">traceback</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">readonly</span> <span class="o">=</span> <span class="kc">True</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">eitprocessing 0.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../eitprocessing.html" >eitprocessing</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.categories</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    </div>
+  </body>
+</html>

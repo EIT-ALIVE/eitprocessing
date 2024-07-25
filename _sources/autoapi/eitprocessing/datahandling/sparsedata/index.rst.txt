@@ -27,7 +27,7 @@ Module Contents
 
 .. py:class:: SparseData
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
+   Bases: :py:obj:`eitprocessing.datahandling.DataContainer`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
 
 
    Container for data related to individual time points.

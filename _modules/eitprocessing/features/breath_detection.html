@@ -282,7 +282,7 @@
         <span class="n">moving_average_</span> <span class="o">=</span> <span class="o">-</span><span class="n">moving_average</span> <span class="k">if</span> <span class="n">invert</span> <span class="k">else</span> <span class="n">moving_average</span>
         <span class="n">extrema_indices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">(</span>
             <span class="n">data_</span><span class="p">,</span>
-            <span class="n">distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">minimum_duration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">,</span>
+            <span class="n">distance</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minimum_duration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="n">height</span><span class="o">=</span><span class="n">moving_average_</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -424,6 +424,9 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A tuple (peak_indices, valley_indices) with low-amplitude breaths removed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">peak_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">valley_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">peak_indices</span><span class="p">,</span> <span class="n">valley_indices</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_cutoff_fraction</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">peak_indices</span><span class="p">,</span> <span class="n">valley_indices</span>
 

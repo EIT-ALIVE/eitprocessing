@@ -30,3 +30,74 @@ Submodules
    /autoapi/eitprocessing/datahandling/sparsedata/index
 
 
+Classes
+-------
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.Equivalence
+   eitprocessing.datahandling.DataContainer
+
+
+Package Contents
+----------------
+
+.. py:class:: Equivalence
+
+   Mixin class that adds an equality and equivalence check.
+
+
+   .. py:method:: __eq__(other: object) -> bool
+
+      Return self==value.
+
+
+
+   .. py:method:: _eq_dataclass(other: object) -> bool
+
+      Compare two dataclasses for equality.
+
+
+
+   .. py:method:: _eq_userdict(other: object) -> bool
+
+      Compare two userdicts for equality.
+
+
+
+   .. py:method:: _array_safe_eq(a: Any, b: Any) -> bool
+      :staticmethod:
+
+
+      Check if a and b are equal, even if they are numpy arrays containing nans.
+
+
+
+   .. py:method:: isequivalent(other: typing_extensions.Self, raise_: bool = False) -> bool
+
+      Test whether the data structure between two objects are equivalent.
+
+      Equivalence, in this case means that objects are compatible e.g. to be
+      merged. Data content can vary, but e.g. the category of data (e.g.
+      airway pressure, flow, tidal volume) and unit, etc., must match.
+
+      :param other: object that will be compared to self.
+      :param raise_: sets this method's behavior in case of non-equivalence. If
+                     True, an `EquivalenceError` is raised, otherwise `False` is
+                     returned.
+
+      :raises EquivalenceError: if `raise_ == True` and the objects are not
+      :raises equivalent.:
+
+      :returns: bool describing result of equivalence comparison.
+
+
+
+.. py:class:: DataContainer
+
+   Bases: :py:obj:`mixins.equality.Equivalence`
+
+
+   Base class for data container classes.
+
+

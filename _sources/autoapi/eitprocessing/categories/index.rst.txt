@@ -1,0 +1,227 @@
+eitprocessing.categories
+========================
+
+.. py:module:: eitprocessing.categories
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   eitprocessing.categories.COMPACT_YAML_FILE_MODULE
+   eitprocessing.categories.COMPACT_YAML_FILE_NAME
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   eitprocessing.categories.Category
+   eitprocessing.categories._IgnoreReadonly
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   eitprocessing.categories.get_default_categories
+   eitprocessing.categories.check_category
+
+
+Module Contents
+---------------
+
+.. py:data:: COMPACT_YAML_FILE_MODULE
+   :value: 'eitprocessing.config'
+
+
+.. py:data:: COMPACT_YAML_FILE_NAME
+   :value: 'categories-compact.yaml'
+
+
+.. py:class:: Category(name: str, parent: typing_extensions.Self | None = None)
+
+   Bases: :py:obj:`anytree.Node`
+
+
+   Data category indicating what type of information is saved in an object.
+
+   Categories are nested, where more specific categories are nested inside more general categories. The root category
+   is simply named 'category'. Categories have a unique name within the entire tree.
+
+   To check the existence of a category with name <name> within a category tree, either as subcategory or
+   subsub(...)category, `category.has_subcategory("<name>")` can be used. The keyword `in` can be used as a shorthand.
+
+   Example:
+   >>> "tea" in category  # is the same as:
+   >>> category.has_subcategory("tea")
+
+   To select a subcategory, category["<name>"] can be used. You can select multiple categories at once. This will
+   create a new tree with a temporary root, containing only the selected categories.
+
+   Example:
+   >>> foobar = categories["foo", "bar"]
+   >>> print(foobar)  # Category('/temporary root')
+   >>> print(foobar.children)  # (Category('/temporary root/foo'), Category('/temporary root/bar'))
+
+   Categories can be hand-crafted, created from a dictionary or a YAML string. See [`anytree.DictionaryImporter`
+   documentation](https://anytree.readthedocs.io/en/latest/importer/dictimporter.html) for more info on the dictionary
+   format. [anytree documentation on YAML import/export](https://anytree.readthedocs.io/en/latest/tricks/yaml.html)
+   shows the relevant structure of a normal YAML string.
+
+   Categories also supports a compact YAML format, where each category containing a subcategory is a sequence.
+   Categories without subcategories are strings in those sequences.
+
+   ```yaml
+   root:
+   - sub 1 (without subcategories)
+   - sub 2 (with subcategories):
+     - sub a (without subcategories)
+   ```
+
+   Categories are read-only by default, as they should not be edited by the end-user during runtime. Consider editing
+   the config file instead.
+
+   Each type of data that is attached to an eitprocessing object should be categorized as one of the available types of
+   data. This allows algorithms to check whether it can apply itself to the provided data, preventing misuse of
+   algorithms.
+
+   Example:
+   >>> categories = get_default_categories()
+   >>> print(categories)  # Category('/category')
+   >>> print("pressure" in categories)  # True
+   >>> categories["pressure"]  # Category('/category/physical measurements/pressure')
+
+
+   .. py:attribute:: readonly
+      :value: True
+
+
+
+   .. py:method:: has_subcategory(subcategory: str) -> bool
+
+      Check whether this category contains a subcategory.
+
+      Returns True if the category and subcategory both exist. Returns False if the category exists, but the
+      subcategory does not. Raises a ValueError
+
+      Attr:
+          category: the category to be checked as an ancestor of the subcategory. This category should exist.
+          subcategory: the subcategory to be checked as a descendent of the category.
+
+      :returns: whether subcategory exists as a descendent of category.
+      :rtype: bool
+
+      :raises ValueError: if category does not exist.
+
+
+
+   .. py:method:: __getitem__(name: str | tuple[str])
+
+
+   .. py:method:: __contains__(item: str | typing_extensions.Self)
+
+
+   .. py:method:: from_yaml(string: str) -> typing_extensions.Self
+      :classmethod:
+
+
+      Load categories from YAML file.
+
+
+
+   .. py:method:: from_compact_yaml(string: str) -> typing_extensions.Self
+      :classmethod:
+
+
+      Load categories from compact YAML file.
+
+
+
+   .. py:method:: from_dict(dictionary: dict) -> typing_extensions.Self
+      :classmethod:
+
+
+      Create categories from dictionary.
+
+
+
+   .. py:method:: _pre_attach_children(children: list[typing_extensions.Self]) -> None
+
+      Checks for non-unique categories before adding them to an existing category tree.
+
+
+
+   .. py:method:: _pre_attach(parent: typing_extensions.Self) -> None
+
+      Method call before attaching to `parent`.
+
+
+
+   .. py:method:: _pre_detach(parent: typing_extensions.Self) -> None
+
+      Method call before detaching from `parent`.
+
+
+
+   .. py:method:: _check_unique(raise_: bool = False) -> bool
+
+
+.. py:function:: get_default_categories() -> Category
+
+   Loads the default categories from file.
+
+   This returns the categories used in the eitprocessing package. The root category is simply called 'root'. All other
+   categories are subdivided into physical measurements, calculated values and others.
+
+   This function is cached, meaning it only loads the data once, and returns the same object every time afterwards.
+
+
+.. py:function:: check_category(data: eitprocessing.datahandling.DataContainer, category: str, *, raise_: bool = False) -> bool
+
+   Check whether the category of a dataset is a given category or one of it's subcategories.
+
+   Example:
+   >>> data = ContinuousData(..., category="impedance", ...)
+   >>> check_category(data, "impedance")  # True
+   >>> check_category(data, "pressure")  # False
+   >>> check_category(data, "pressure", raise_=True)  # raises ValueError
+   >>> check_category(data, "does not exist", raise_=False)  # raises ValueError
+
+   :param data: DataContainer object with a `category` attribute.
+   :param category: Category to match the data category against. The data category will match this and all subcategories.
+   :param raise_: Keyword only. Whether to raise an exception if the data is not a (sub)category.
+
+   :returns: Whether the data category matches.
+   :rtype: bool
+
+   :raises ValueError: If the provided category does not exist.
+   :raises ValueError: If the data category does not match the provided category.
+
+
+.. py:class:: _IgnoreReadonly(items: Category | collections.abc.Sequence[Category])
+
+   Context manager allowing temporarily ignoring the read-only attribute.
+
+   For internal use only.
+
+   Example:
+   >>> foo = categories["foo"]
+   >>> foo.parent = None  # raises RuntimeError
+   >>> with _IgnoreReadonly(foo):
+   >>>    foo.parent = None  # does not raise RuntimeError
+
+
+   .. py:attribute:: items
+      :type:  collections.abc.Sequence[Category]
+
+
+   .. py:method:: __enter__() -> None
+
+
+   .. py:method:: __exit__(exc_type: object, exc_value: object, traceback: object) -> None
+
+

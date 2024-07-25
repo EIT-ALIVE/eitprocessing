@@ -1,0 +1,55 @@
+eitprocessing.parameters.eeli
+=============================
+
+.. py:module:: eitprocessing.parameters.eeli
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   eitprocessing.parameters.eeli.EELI
+
+
+Module Contents
+---------------
+
+.. py:class:: EELI
+
+   Bases: :py:obj:`eitprocessing.parameters.ParameterCalculation`
+
+
+   Compute the end-expiratory lung impedance (EELI) per breath.
+
+
+   .. py:attribute:: method
+      :type:  Literal['breath_detection']
+      :value: 'breath_detection'
+
+
+
+   .. py:attribute:: breath_detection_kwargs
+      :type:  dict
+
+
+   .. py:method:: __post_init__()
+
+
+   .. py:method:: compute_parameter(continuous_data: eitprocessing.datahandling.continuousdata.ContinuousData, sample_frequency: float) -> numpy.ndarray
+
+      Compute the EELI for each breath in the impedance data.
+
+      Example:
+      >>> global_impedance = sequence.continuous_data["global_impedance_(raw)"]
+      >>> sample_frequency = sequence.eit_data["raw"].framerate
+      >>> eeli_values = EELI().compute_parameter(global_impedance, sample_frequency=sample_frequency)
+
+      :param continuous_data: a ContinuousData object containing impedance data.
+      :param sample_frequency: the sample frequency at which the data is recorded.
+
+      :returns: the end-expiratory values of all breaths in the impedance data.
+      :rtype: np.ndarray
+
+
+

@@ -122,7 +122,7 @@ Package Contents
 
 .. py:class:: EITData
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`
+   Bases: :py:obj:`eitprocessing.datahandling.DataContainer`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
 
 
    Container for EIT impedance data.
@@ -238,7 +238,7 @@ Package Contents
 
 .. py:class:: Sequence
 
-   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`
 
 
    Sequence of timepoints containing respiratory data.
@@ -369,6 +369,6 @@ Package Contents
 
 .. py:function:: _ensure_vendor(vendor: eitprocessing.datahandling.eitdata.Vendor | str) -> eitprocessing.datahandling.eitdata.Vendor
 
-   Check whether vendor exists, and assure it's a Vendor object.
+   Check whether loading method for vendor exists, and ensure it's a Vendor object.
 
 
