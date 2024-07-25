@@ -158,6 +158,6 @@ class Sequence(Equivalence, SelectByTime):
                     start_inclusive=start_inclusive,
                     end_inclusive=end_inclusive,
                 )
-                for key in ("eit_data", "continuous_data", "sparse_data")
+                for key in ("eit_data", "continuous_data", "sparse_data", "interval_data")
             },
         )
