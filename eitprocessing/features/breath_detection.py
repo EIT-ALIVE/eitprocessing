@@ -204,7 +204,7 @@ class BreathDetection:
         moving_average_ = -moving_average if invert else moving_average
         extrema_indices, _ = signal.find_peaks(
             data_,
-            distance=self.minimum_duration * self.sample_frequency,
+            distance=max(self.minimum_duration * self.sample_frequency, 1),
             height=moving_average_,
         )
 
@@ -337,6 +337,9 @@ class BreathDetection:
         Returns:
             A tuple (peak_indices, valley_indices) with low-amplitude breaths removed.
         """
+        if len(peak_indices) == 0 or len(valley_indices) == 0:
+            return peak_indices, valley_indices
+
         if not self.amplitude_cutoff_fraction:
             return peak_indices, valley_indices
 
