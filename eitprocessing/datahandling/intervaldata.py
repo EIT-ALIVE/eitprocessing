@@ -17,6 +17,11 @@ class Interval(NamedTuple):
     start_time: float
     end_time: float
 
+    @property
+    def duration(self) -> float:
+        """Difference between the end time and start time."""
+        return self.end_time - self.start_time
+
 
 @dataclass(eq=False)
 class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
