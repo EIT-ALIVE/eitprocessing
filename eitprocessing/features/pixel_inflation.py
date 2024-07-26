@@ -61,7 +61,8 @@ class PixelInflation:
         bd_kwargs = self.breath_detection_kwargs.copy()
         bd_kwargs["sample_frequency"] = eitdata.framerate
         breath_detection = BreathDetection(**bd_kwargs)
-        breaths = breath_detection.find_breaths(sequence, continuousdata_label)
+        continuous_data = sequence.continuous_data[continuousdata_label]
+        breaths = breath_detection.find_breaths(continuous_data)
 
         middle_times = np.array(
             [
