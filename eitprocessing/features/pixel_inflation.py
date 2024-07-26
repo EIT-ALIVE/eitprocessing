@@ -22,12 +22,12 @@ class PixelInflation:
     inflation/deflation in pixel impedance data.
 
     Examples:
-    pi = PixelInflation(sample_frequency=FRAMERATE)
-    pixel_inflations = pi.find_pixel_inflations(sequence, eitdata_label='low pass filtered',
-    continuousdata_label='global_impedance_(raw)')
+    pi = PixelInflation()
+    eit_data = sequence.eit_data['raw']
+    continuous_data = sequence.continuous_data['global_impedance_(raw)']
+    pixel_inflations = pi.find_pixel_inflations(eit_data, continuous_data)
     """
 
-    sample_frequency: float
     breath_detection_kwargs: dict = field(default_factory=dict)
 
     def find_pixel_inflations(
@@ -68,11 +68,10 @@ class PixelInflation:
             store = True
 
         if store and sequence is None:
-            msg = "Can't store the result if not Sequence is provided."
+            msg = "Can't store the result if no Sequence is provided."
             raise RuntimeError(msg)
 
         bd_kwargs = self.breath_detection_kwargs.copy()
-        bd_kwargs["sample_frequency"] = eit_data.framerate
         breath_detection = BreathDetection(**bd_kwargs)
         breaths = breath_detection.find_breaths(continuous_data)
 
