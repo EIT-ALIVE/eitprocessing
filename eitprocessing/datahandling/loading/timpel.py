@@ -114,6 +114,7 @@ def load_from_single_path(
             "Global impedance calculated from raw EIT data",
             time=time,
             values=eit_data.calculate_global_impedance(),
+            sample_frequency=sample_frequency,
         ),
     )
     continuousdata_collection.add(
@@ -125,6 +126,7 @@ def load_from_single_path(
             description="Airway pressure measured by Timpel device",
             time=time,
             values=data[:, 1024],
+            sample_frequency=sample_frequency,
         ),
     )
 
@@ -137,6 +139,7 @@ def load_from_single_path(
             description="Flow measures by Timpel device",
             time=time,
             values=data[:, 1025],
+            sample_frequency=sample_frequency,
         ),
     )
 
@@ -149,6 +152,7 @@ def load_from_single_path(
             description="Volume measured by Timpel device",
             time=time,
             values=data[:, 1026],
+            sample_frequency=sample_frequency,
         ),
     )
 

@@ -104,7 +104,7 @@ def load_from_single_path(
     (
         continuousdata_collection,
         sparsedata_collection,
-    ) = _convert_medibus_data(medibus_data, time)
+    ) = _convert_medibus_data(medibus_data, time, sample_frequency)
     intervaldata_collection = DataCollection(IntervalData)
     # TODO: move some medibus data to sparse / interval
     # TODO: move phases and events to sparse / interval
@@ -118,6 +118,7 @@ def load_from_single_path(
             derived_from=[eit_data],
             time=eit_data.time,
             values=eit_data.calculate_global_impedance(),
+            sample_frequency=sample_frequency,
         ),
     )
     sparsedata_collection.add(
@@ -169,6 +170,7 @@ def load_from_single_path(
 def _convert_medibus_data(
     medibus_data: NDArray,
     time: NDArray,
+    sample_frequency: float,
 ) -> tuple[DataCollection, DataCollection]:
     continuousdata_collection = DataCollection(ContinuousData)
     sparsedata_collection = DataCollection(SparseData)
@@ -183,6 +185,7 @@ def _convert_medibus_data(
                 time=time,
                 values=data,
                 category=field_info.signal_name,
+                sample_frequency=sample_frequency,
             )
             continuous_data.lock()
             continuousdata_collection.add(continuous_data)
