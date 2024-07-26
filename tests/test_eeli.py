@@ -17,7 +17,15 @@ MINUTE = 60
 def create_continuous_data_object():
     def internal(sample_frequency: float, duration: float, frequency: float) -> ContinuousData:
         time, values = _make_cosine_wave(sample_frequency, duration, frequency)
-        return ContinuousData("label", "name", "unit", "impedance", time=time, values=values)
+        return ContinuousData(
+            "label",
+            "name",
+            "unit",
+            "impedance",
+            time=time,
+            values=values,
+            sample_frequency=sample_frequency,
+        )
 
     return internal
 
@@ -64,11 +72,20 @@ def test_eeli_values(repeat_n: int):  # noqa: ARG001
     valley_values = np.random.default_rng().integers(-100, -50, n_valleys)
     data = np.zeros(2 * n_valleys + 1)
     data[1::2] = valley_values
-    time = np.arange(len(data))
+    sample_frequency = 1
+    time = np.arange(len(data)) / sample_frequency
 
     expected_n_breaths = n_valleys - 1
 
-    cd = ContinuousData(label="label", name="name", unit="unit", category="impedance", time=time, values=data)
+    cd = ContinuousData(
+        label="label",
+        name="name",
+        unit="unit",
+        category="impedance",
+        time=time,
+        values=data,
+        sample_frequency=sample_frequency,
+    )
     eeli = EELI(breath_detection_kwargs={"minimum_duration": 0})
     eeli_values = eeli.compute_parameter(
         cd,

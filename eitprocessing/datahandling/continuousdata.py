@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypeVar
 
@@ -45,11 +46,19 @@ class ContinuousData(DataContainer, SelectByTime):
     derived_from: Any | list[Any] = field(default_factory=list, repr=False, compare=False)
     time: np.ndarray = field(kw_only=True, repr=False)
     values: np.ndarray = field(kw_only=True, repr=False)
+    sample_frequency: float | None = field(kw_only=True, repr=False, metadata={"check_equivalence": True}, default=None)
 
     def __post_init__(self) -> None:
         if self.loaded:
             self.lock()
         self.lock("time")
+
+        if self.sample_frequency is None:
+            msg = (
+                "`sample_frequency` is set to `None`. This will not be supported in future versions. "
+                "Provide a sample frequency when creating a ContinuousData object."
+            )
+            warnings.warn(msg, DeprecationWarning)
 
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
         try:
@@ -89,6 +98,7 @@ class ContinuousData(DataContainer, SelectByTime):
             # make a copy if they want to edit the data directly
             time=np.copy(self.time),
             values=np.copy(self.values),
+            sample_frequency=self.sample_frequency,
         )
         obj.unlock()
         return obj
@@ -115,6 +125,7 @@ class ContinuousData(DataContainer, SelectByTime):
             time=np.concatenate((self.time, other.time)),
             values=np.concatenate((self.values, other.values)),
             derived_from=[*self.derived_from, *other.derived_from, self, other],
+            sample_frequency=self.sample_frequency,
         )
 
     def derive(
@@ -242,4 +253,5 @@ class ContinuousData(DataContainer, SelectByTime):
             derived_from=[*self.derived_from, self],
             time=time,
             values=values,
+            sample_frequency=self.sample_frequency,
         )

@@ -484,7 +484,16 @@ def test_find_breaths():
     time, y = _make_cosine_wave(sample_frequency, length, frequency)
 
     label = "waveform_data"
-    cd = ContinuousData(label, "Generated waveform data", None, "mock", "", time=time, values=y)
+    cd = ContinuousData(
+        label,
+        "Generated waveform data",
+        None,
+        "mock",
+        "",
+        time=time,
+        values=y,
+        sample_frequency=sample_frequency,
+    )
     seq = Sequence("sequence_label")
     seq.continuous_data.add(cd)
 
@@ -508,7 +517,16 @@ def test_find_breaths():
 
     y_copy = np.copy(y)
     y_copy[438] = -100  # single timepoint around the peak of the 4th breath
-    cd = ContinuousData(label, "Generated waveform data", None, "mock", "", time=time, values=y_copy)
+    cd = ContinuousData(
+        label,
+        "Generated waveform data",
+        None,
+        "mock",
+        "",
+        time=time,
+        values=y_copy,
+        sample_frequency=sample_frequency,
+    )
     seq.continuous_data.add(cd, overwrite=True)
 
     # single breath invalidated
