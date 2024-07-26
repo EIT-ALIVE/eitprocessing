@@ -14,7 +14,7 @@ from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.moving_average import MovingAverage
 
 
-@dataclass
+@dataclass(kw_only=True)
 class BreathDetection:
     """Algorithm for detecting breaths in data representing respiration.
 
@@ -25,14 +25,13 @@ class BreathDetection:
     valleys.
 
     Examples:
-    >>> bd = BreathDetection(sample_frequency=50, minimum_duration=0.5)
+    >>> bd = BreathDetection(minimum_duration=0.5)
     >>> breaths = bd.find_breaths(sequency=seq, continuousdata_label="global_impedance_(raw)")
 
     >>> global_impedance = seq.continuous_data["global_impedance_(raw)"]
     >>> breaths = bd.find_breaths(continuous_data=global_impedance)
 
     Args:
-        sample_frequency: sample frequency of the data
         minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
         averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
         averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
@@ -43,7 +42,6 @@ class BreathDetection:
     """
 
     # TODO: remove after continuousdata gets its own sample frequency #209
-    sample_frequency: float
     minimum_duration: float = 2 / 3
     averaging_window_duration: float = 15
     averaging_window_function: Callable[[int], ArrayLike] | None = np.blackman
@@ -100,18 +98,19 @@ class BreathDetection:
 
         data = continuous_data.values
         time = continuous_data.time
+        sample_frequency = continuous_data.sample_frequency
 
         invalid_data_indices = self._detect_invalid_data(data)
         data = self._remove_invalid_data(data, invalid_data_indices)
 
-        peak_indices, valley_indices = self._detect_peaks_and_valleys(data)
+        peak_indices, valley_indices = self._detect_peaks_and_valleys(data, sample_frequency)
 
         breaths = self._create_breaths_from_peak_valley_data(
             time,
             peak_indices,
             valley_indices,
         )
-        breaths = self._remove_breaths_around_invalid_data(breaths, time, invalid_data_indices)
+        breaths = self._remove_breaths_around_invalid_data(breaths, time, sample_frequency, invalid_data_indices)
         breaths_container = IntervalData(
             label=result_label,
             name="Breaths as determined by BreathDetection",
@@ -164,13 +163,13 @@ class BreathDetection:
         data[invalid_data_indices] = np.nan
         return self._fill_nan_with_nearest_neighbour(data)
 
-    def _detect_peaks_and_valleys(self, data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        window_size = int(self.sample_frequency * self.averaging_window_duration)
+    def _detect_peaks_and_valleys(self, data: np.ndarray, sample_frequency: float) -> tuple[np.ndarray, np.ndarray]:
+        window_size = int(sample_frequency * self.averaging_window_duration)
         averager = MovingAverage(window_size=window_size, window_function=self.averaging_window_function)
         moving_average = averager.apply(data)
 
-        peak_indices = self._find_extrema(data, moving_average)
-        valley_indices = self._find_extrema(data, moving_average, invert=True)
+        peak_indices = self._find_extrema(data, moving_average, sample_frequency)
+        valley_indices = self._find_extrema(data, moving_average, sample_frequency, invert=True)
 
         peak_indices, valley_indices = self._remove_edge_cases(data, peak_indices, valley_indices, moving_average)
         peak_indices, valley_indices = self._remove_doubles(data, peak_indices, valley_indices)
@@ -181,7 +180,8 @@ class BreathDetection:
         self,
         data: np.ndarray,
         moving_average: np.ndarray,
-        invert: float = False,
+        sample_frequency: float,
+        invert: bool = False,
     ) -> np.ndarray:
         """Find extrema (peaks or valleys) in the data.
 
@@ -194,6 +194,7 @@ class BreathDetection:
         Args:
             data (np.ndarray): a 1D array containing the data.
             moving_average (np.ndarray): a 1D array containing the moving average of the data.
+            sample_frequency (float): sample frequency of the data and moving average
             invert (float, optional): whether to invert the data before
             detecting peaks. Defaults to False.
 
@@ -204,7 +205,7 @@ class BreathDetection:
         moving_average_ = -moving_average if invert else moving_average
         extrema_indices, _ = signal.find_peaks(
             data_,
-            distance=max(self.minimum_duration * self.sample_frequency, 1),
+            distance=max(self.minimum_duration * sample_frequency, 1),
             height=moving_average_,
         )
 
@@ -377,6 +378,7 @@ class BreathDetection:
         self,
         breaths: list[Breath],
         time: np.ndarray,
+        sample_frequency: float,
         invalid_data_indices: np.ndarray,
     ) -> list[Breath]:
         """Remove breaths overlapping with invalid data.
@@ -386,8 +388,8 @@ class BreathDetection:
 
         Args:
             breaths: list of detected breath objects
-            data: data the breaths were detected in
             time: time axis belonging to the data
+            sample_frequency: sample frequency of the data and time
             invalid_data_indices: indices of invalid data points
         """
         # TODO: write more general(ized) method of determining invalid data
@@ -400,7 +402,7 @@ class BreathDetection:
         invalid_data_values = np.zeros(time.shape)
         invalid_data_values[invalid_data_indices] = 1  # gives the value 1 to each invalid datapoint
 
-        window_length = math.ceil(self.invalid_data_removal_window_length * self.sample_frequency)
+        window_length = math.ceil(self.invalid_data_removal_window_length * sample_frequency)
 
         for breath in new_breaths[:]:
             breath_start_minus_window = max(0, np.argmax(time == breath.start_time) - window_length)
