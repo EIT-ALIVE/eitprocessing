@@ -23,13 +23,13 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 _FRAME_SIZE_BYTES = 4358
-DRAEGER_FRAMERATE = 20
+DRAEGER_SAMPLE_FREQUENCY = 20
 load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
 
 
 def load_from_single_path(
     path: Path,
-    framerate: float | None = 20,
+    sample_frequency: float | None = 20,
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> dict[str, DataCollection]:
@@ -87,13 +87,13 @@ def load_from_single_path(
                 previous_marker,
             )
 
-    if not framerate:
-        framerate = DRAEGER_FRAMERATE
+    if not sample_frequency:
+        sample_frequency = DRAEGER_SAMPLE_FREQUENCY
 
     eit_data = EITData(
         vendor=Vendor.DRAEGER,
         path=path,
-        framerate=framerate,
+        sample_frequency=sample_frequency,
         nframes=n_frames,
         time=time,
         label="raw",

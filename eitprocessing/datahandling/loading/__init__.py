@@ -12,7 +12,7 @@ def load_eit_data(
     label: str | None = None,
     name: str | None = None,
     description: str = "",
-    framerate: float | None = None,
+    sample_frequency: float | None = None,
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> Sequence:
@@ -28,7 +28,7 @@ def load_eit_data(
         name: short description of sequence for human interpretation.
             Defaults to the same value as label.
         description: long description of sequence for human interpretation.
-        framerate: framerate at which the data was recorded.
+        sample_frequency: sample frequency at which the data was recorded.
             Default for Draeger: 20
             Default for Timpel: 50
             Default for Sentec: 50.2
@@ -75,7 +75,7 @@ def load_eit_data(
     for single_path in paths:
         loaded_data = load_from_single_path(
             path=single_path,
-            framerate=framerate,
+            sample_frequency=sample_frequency,
             first_frame=first_frame,
             max_frames=max_frames,
         )

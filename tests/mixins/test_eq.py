@@ -38,7 +38,7 @@ def test_equals(
         data_copy.path = deepcopy(data.path)
         data_copy.time = deepcopy(data.time)
         data_copy.nframes = deepcopy(data.nframes)
-        data_copy.framerate = deepcopy(data.framerate)
+        data_copy.sample_frequency = deepcopy(data.sample_frequency)
         data_copy.framesets = deepcopy(data.framesets)
         data_copy.timing_errors = deepcopy(data.timing_errors)
         data_copy.vendor = deepcopy(data.vendor)

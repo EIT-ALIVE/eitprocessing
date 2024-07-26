@@ -150,12 +150,12 @@ def test_illegal_concatenation(timpel1: Sequence, draeger1: Sequence, draeger2: 
     with pytest.raises(TypeError):
         _ = Sequence.concatenate(timpel1, draeger1)
 
-    # Concatenate different framerate (for EITData)
-    draeger1_framerate = deepcopy(draeger1)
-    _ = Sequence.concatenate(draeger2, draeger1_framerate)
-    draeger1_framerate.eit_data["raw"].framerate = 50
+    # Concatenate different sample_frequency (for EITData)
+    draeger1_sample_frequency = deepcopy(draeger1)
+    _ = Sequence.concatenate(draeger2, draeger1_sample_frequency)
+    draeger1_sample_frequency.eit_data["raw"].sample_frequency = 50
     with pytest.raises(ValueError):
-        _ = Sequence.concatenate(draeger2, draeger1_framerate)
+        _ = Sequence.concatenate(draeger2, draeger1_sample_frequency)
 
     # Not sure what this one is testing exactly.
     # My guess is that adjusting the vendor of an EIData instance should not be allowed once it has been instantiated.
