@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Literal
 
 import numpy as np
 
@@ -110,8 +111,8 @@ class TIV(ParameterExtraction):
         self,
         sequence: Sequence,
         data_label: str,
-        tiv_method: str = "inspiratory",
-        tiv_timing: str = "pixel",
+        tiv_method: Literal["inspiratory", "expiratory", "mean"] = "inspiratory",
+        tiv_timing: Literal["pixel", "global"] = "pixel",
         continuous_data_label: str | None = None,
     ) -> dict | list[dict]:
         """Compute the tidal impedance variation per breath on pixel level.
@@ -133,6 +134,7 @@ class TIV(ParameterExtraction):
             ValueError: If tiv_timing is not one of 'global' or 'pixel'.
             ValueError: If tiv_timing is 'global' and continuous_data_label is not provided.
         """
+        # TODO: think about other name for 'global', since it can also be regional, functional, etc.
         if self.method != "extremes":
             msg = f"Method {self.method} is not implemented."
             raise NotImplementedError(msg)
