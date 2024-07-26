@@ -11,7 +11,7 @@ Attributes
 
    eitprocessing.datahandling.loading.timpel._COLUMN_WIDTH
    eitprocessing.datahandling.loading.timpel._NAN_VALUE
-   eitprocessing.datahandling.loading.timpel.TIMPEL_FRAMERATE
+   eitprocessing.datahandling.loading.timpel.TIMPEL_SAMPLE_FREQUENCY
    eitprocessing.datahandling.loading.timpel.load_timpel_data
 
 
@@ -33,13 +33,13 @@ Module Contents
 
 .. py:data:: _NAN_VALUE
 
-.. py:data:: TIMPEL_FRAMERATE
+.. py:data:: TIMPEL_SAMPLE_FREQUENCY
    :value: 50
 
 
 .. py:data:: load_timpel_data
 
-.. py:function:: load_from_single_path(path: pathlib.Path, framerate: float | None = 20, first_frame: int = 0, max_frames: int | None = None) -> dict[str, eitprocessing.datahandling.datacollection.DataCollection]
+.. py:function:: load_from_single_path(path: pathlib.Path, sample_frequency: float | None = 20, first_frame: int = 0, max_frames: int | None = None) -> dict[str, eitprocessing.datahandling.datacollection.DataCollection]
 
    Load Timpel EIT data from path.
 

@@ -9,7 +9,7 @@ Attributes
 
 .. autoapisummary::
 
-   eitprocessing.datahandling.loading.sentec.SENTEC_FRAMERATE
+   eitprocessing.datahandling.loading.sentec.SENTEC_SAMPLE_FREQUENCY
    eitprocessing.datahandling.loading.sentec.load_sentec_data
 
 
@@ -35,13 +35,13 @@ Functions
 Module Contents
 ---------------
 
-.. py:data:: SENTEC_FRAMERATE
+.. py:data:: SENTEC_SAMPLE_FREQUENCY
    :value: 50.2
 
 
 .. py:data:: load_sentec_data
 
-.. py:function:: load_from_single_path(path: pathlib.Path, framerate: float | None = 50.2, first_frame: int = 0, max_frames: int | None = None) -> dict[str, eitprocessing.datahandling.datacollection.DataCollection]
+.. py:function:: load_from_single_path(path: pathlib.Path, sample_frequency: float | None = 50.2, first_frame: int = 0, max_frames: int | None = None) -> dict[str, eitprocessing.datahandling.datacollection.DataCollection]
 
    Load Sentec EIT data from path.
 
@@ -107,7 +107,7 @@ Module Contents
    ID of configuration data.
 
 
-   .. py:attribute:: FRAMERATE
+   .. py:attribute:: SAMPLE_FREQUENCY
       :value: 1
 
 

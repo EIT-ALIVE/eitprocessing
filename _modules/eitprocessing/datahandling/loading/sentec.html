@@ -62,9 +62,9 @@
 
     <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
 
-<div class="viewcode-block" id="SENTEC_FRAMERATE">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/sentec/index.html#eitprocessing.datahandling.loading.sentec.SENTEC_FRAMERATE">[docs]</a>
-<span class="n">SENTEC_FRAMERATE</span> <span class="o">=</span> <span class="mf">50.2</span></div>
+<div class="viewcode-block" id="SENTEC_SAMPLE_FREQUENCY">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/sentec/index.html#eitprocessing.datahandling.loading.sentec.SENTEC_SAMPLE_FREQUENCY">[docs]</a>
+<span class="n">SENTEC_SAMPLE_FREQUENCY</span> <span class="o">=</span> <span class="mf">50.2</span></div>
 
 
 <div class="viewcode-block" id="load_sentec_data">
@@ -77,7 +77,7 @@
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/sentec/index.html#eitprocessing.datahandling.loading.sentec.load_from_single_path">[docs]</a>
 <span class="k">def</span> <span class="nf">load_from_single_path</span><span class="p">(</span>  <span class="c1"># noqa: C901, PLR0912</span>
     <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-    <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">50.2</span><span class="p">,</span>
+    <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">50.2</span><span class="p">,</span>
     <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
@@ -130,11 +130,14 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">fh</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">payload_size</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_CUR</span><span class="p">)</span>
 
-                <span class="c1"># read the framerate from the file, if present</span>
-                <span class="c1"># (domain 64 = configuration, data 5 = framerate)</span>
-                <span class="k">elif</span> <span class="n">domain_id</span> <span class="o">==</span> <span class="n">Domain</span><span class="o">.</span><span class="n">CONFIGURATION</span> <span class="ow">and</span> <span class="n">data_id</span> <span class="o">==</span> <span class="n">ConfigurationDataID</span><span class="o">.</span><span class="n">FRAMERATE</span><span class="p">:</span>
-                    <span class="n">framerate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">float32</span><span class="p">(),</span> <span class="mi">4</span><span class="p">)</span>
-                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Framerate value found in file. The framerate value will be set to </span><span class="si">{</span><span class="n">framerate</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="c1"># read the sample frequency from the file, if present</span>
+                <span class="c1"># (domain 64 = configuration, data 5 = sample frequency)</span>
+                <span class="k">elif</span> <span class="n">domain_id</span> <span class="o">==</span> <span class="n">Domain</span><span class="o">.</span><span class="n">CONFIGURATION</span> <span class="ow">and</span> <span class="n">data_id</span> <span class="o">==</span> <span class="n">ConfigurationDataID</span><span class="o">.</span><span class="n">SAMPLE_FREQUENCY</span><span class="p">:</span>
+                    <span class="n">sample_frequency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">float32</span><span class="p">(),</span> <span class="mi">4</span><span class="p">)</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="s2">&quot;Sample frequency value found in file. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;The sample frequency value will be set to </span><span class="si">{</span><span class="n">sample_frequency</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
                 <span class="k">else</span><span class="p">:</span>
@@ -155,15 +158,15 @@
         <span class="p">)</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">framerate</span><span class="p">:</span>
-        <span class="n">framerate</span> <span class="o">=</span> <span class="n">SENTEC_FRAMERATE</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">sample_frequency</span><span class="p">:</span>
+        <span class="n">sample_frequency</span> <span class="o">=</span> <span class="n">SENTEC_SAMPLE_FREQUENCY</span>
 
     <span class="n">eitdata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">)</span>
     <span class="n">eitdata_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
         <span class="n">EITData</span><span class="p">(</span>
             <span class="n">vendor</span><span class="o">=</span><span class="n">Vendor</span><span class="o">.</span><span class="n">SENTEC</span><span class="p">,</span>
             <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-            <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
+            <span class="n">sample_frequency</span><span class="o">=</span><span class="n">sample_frequency</span><span class="p">,</span>
             <span class="n">nframes</span><span class="o">=</span><span class="n">n_frames</span><span class="p">,</span>
             <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="n">period</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000000</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
@@ -273,9 +276,9 @@
 <span class="k">class</span> <span class="nc">ConfigurationDataID</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;ID of configuration data.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ConfigurationDataID.FRAMERATE">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/sentec/index.html#eitprocessing.datahandling.loading.sentec.ConfigurationDataID.FRAMERATE">[docs]</a>
-    <span class="n">FRAMERATE</span> <span class="o">=</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="ConfigurationDataID.SAMPLE_FREQUENCY">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/sentec/index.html#eitprocessing.datahandling.loading.sentec.ConfigurationDataID.SAMPLE_FREQUENCY">[docs]</a>
+    <span class="n">SAMPLE_FREQUENCY</span> <span class="o">=</span> <span class="mi">1</span></div>
 </div>
 
 </pre></div>

@@ -69,9 +69,9 @@
 <span class="n">_NAN_VALUE</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1000</span></div>
 
 
-<div class="viewcode-block" id="TIMPEL_FRAMERATE">
-<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/timpel/index.html#eitprocessing.datahandling.loading.timpel.TIMPEL_FRAMERATE">[docs]</a>
-<span class="n">TIMPEL_FRAMERATE</span> <span class="o">=</span> <span class="mi">50</span></div>
+<div class="viewcode-block" id="TIMPEL_SAMPLE_FREQUENCY">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/timpel/index.html#eitprocessing.datahandling.loading.timpel.TIMPEL_SAMPLE_FREQUENCY">[docs]</a>
+<span class="n">TIMPEL_SAMPLE_FREQUENCY</span> <span class="o">=</span> <span class="mi">50</span></div>
 
 
 
@@ -85,13 +85,13 @@
 <a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/timpel/index.html#eitprocessing.datahandling.loading.timpel.load_from_single_path">[docs]</a>
 <span class="k">def</span> <span class="nf">load_from_single_path</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-    <span class="n">framerate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
     <span class="n">first_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">max_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataCollection</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load Timpel EIT data from path.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">framerate</span><span class="p">:</span>
-        <span class="n">framerate</span> <span class="o">=</span> <span class="n">TIMPEL_FRAMERATE</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">sample_frequency</span><span class="p">:</span>
+        <span class="n">sample_frequency</span> <span class="o">=</span> <span class="n">TIMPEL_SAMPLE_FREQUENCY</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
@@ -136,7 +136,7 @@
     <span class="c1"># The implemented method seems convoluted: it&#39;s easier to create an array</span>
     <span class="c1"># with nframes and add a time_offset. However, this results in floating</span>
     <span class="c1"># point errors, creating issues with comparing times later on.</span>
-    <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nframes</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">)</span> <span class="o">/</span> <span class="n">framerate</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nframes</span> <span class="o">+</span> <span class="n">first_frame</span><span class="p">)</span> <span class="o">/</span> <span class="n">sample_frequency</span>
     <span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">first_frame</span><span class="p">:]</span>
 
     <span class="n">pixel_impedance</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1024</span><span class="p">]</span>
@@ -150,7 +150,7 @@
         <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
         <span class="n">nframes</span><span class="o">=</span><span class="n">nframes</span><span class="p">,</span>
         <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
-        <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">,</span>
+        <span class="n">sample_frequency</span><span class="o">=</span><span class="n">sample_frequency</span><span class="p">,</span>
         <span class="n">pixel_impedance</span><span class="o">=</span><span class="n">pixel_impedance</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">eitdata_collection</span> <span class="o">=</span> <span class="n">DataCollection</span><span class="p">(</span><span class="n">EITData</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="n">eit_data</span><span class="p">)</span>
