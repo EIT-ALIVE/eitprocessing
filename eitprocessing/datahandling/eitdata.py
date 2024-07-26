@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from enum import auto
 from pathlib import Path
@@ -54,6 +55,15 @@ class EITData(DataContainer, SelectByTime):
             self.path = self.path[0]
 
         self.name = self.name or self.label
+
+    @property
+    def framerate(self) -> float:
+        """Deprecated alias to `sample_frequency`."""
+        warnings.warn(
+            "The `framerate` attribute has been deprecated. Use `sample_frequency` instead.",
+            DeprecationWarning,
+        )
+        return self.sample_frequency
 
     @staticmethod
     def ensure_path_list(
