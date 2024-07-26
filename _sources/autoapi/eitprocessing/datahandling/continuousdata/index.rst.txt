@@ -83,6 +83,10 @@ Module Contents
       :type:  numpy.ndarray
 
 
+   .. py:attribute:: sample_frequency
+      :type:  float | None
+
+
    .. py:method:: __post_init__() -> None
 
 

@@ -39,6 +39,7 @@
   <h1>Source code for eitprocessing.datahandling.continuousdata</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">TypeVar</span>
 
@@ -116,13 +117,24 @@
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.values">[docs]</a>
     <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="ContinuousData.sample_frequency">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.sample_frequency">[docs]</a>
+    <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_equivalence&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="ContinuousData.__post_init__">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/continuousdata/index.html#eitprocessing.datahandling.continuousdata.ContinuousData.__post_init__">[docs]</a>
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;`sample_frequency` is set to `None`. This will not be supported in future versions. &quot;</span>
+                <span class="s2">&quot;Provide a sample frequency when creating a ContinuousData object.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ContinuousData.__setattr__">
@@ -168,6 +180,7 @@
             <span class="c1"># make a copy if they want to edit the data directly</span>
             <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
             <span class="n">values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
+            <span class="n">sample_frequency</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">obj</span></div>
@@ -200,6 +213,7 @@
             <span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">time</span><span class="p">)),</span>
             <span class="n">values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">)),</span>
             <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">derived_from</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="o">.</span><span class="n">derived_from</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">],</span>
+            <span class="n">sample_frequency</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -348,6 +362,7 @@
             <span class="n">derived_from</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">derived_from</span><span class="p">,</span> <span class="bp">self</span><span class="p">],</span>
             <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span>
             <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">sample_frequency</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">,</span>
         <span class="p">)</span></div>
 </div>
 

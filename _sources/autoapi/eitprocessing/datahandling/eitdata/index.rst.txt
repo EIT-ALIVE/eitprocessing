@@ -42,7 +42,7 @@ Module Contents
    :param path: The path of list of paths of the source from which data was derived.
    :param nframes: Number of frames.
    :param time: The time of each frame (since start measurement).
-   :param sample_frequency: The (average) frequency at which the frames are collection, in Hz.
+   :param sample_frequency: The (average) frequency at which the frames are collected, in Hz.
    :param vendor: The vendor of the device the data was collected with.
    :param label: Computer readable label identifying this dataset.
    :param name: Human readable name for the data.
@@ -82,6 +82,12 @@ Module Contents
 
 
    .. py:method:: __post_init__()
+
+
+   .. py:property:: framerate
+      :type: float
+
+      Deprecated alias to `sample_frequency`.
 
 
    .. py:method:: ensure_path_list(path: str | pathlib.Path | list[str | pathlib.Path]) -> list[pathlib.Path]

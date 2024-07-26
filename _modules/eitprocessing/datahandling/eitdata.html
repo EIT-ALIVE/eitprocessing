@@ -39,6 +39,7 @@
   <h1>Source code for eitprocessing.datahandling.eitdata</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">auto</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
@@ -73,7 +74,7 @@
 <span class="sd">        path: The path of list of paths of the source from which data was derived.</span>
 <span class="sd">        nframes: Number of frames.</span>
 <span class="sd">        time: The time of each frame (since start measurement).</span>
-<span class="sd">        sample_frequency: The (average) frequency at which the frames are collection, in Hz.</span>
+<span class="sd">        sample_frequency: The (average) frequency at which the frames are collected, in Hz.</span>
 <span class="sd">        vendor: The vendor of the device the data was collected with.</span>
 <span class="sd">        label: Computer readable label identifying this dataset.</span>
 <span class="sd">        name: Human readable name for the data.</span>
@@ -124,6 +125,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span></div>
+
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="EITData.framerate">
+<a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.eitdata.EITData.framerate">[docs]</a>
+    <span class="k">def</span> <span class="nf">framerate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated alias to `sample_frequency`.&quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The `framerate` attribute has been deprecated. Use `sample_frequency` instead.&quot;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span></div>
 
 
     <span class="nd">@staticmethod</span>

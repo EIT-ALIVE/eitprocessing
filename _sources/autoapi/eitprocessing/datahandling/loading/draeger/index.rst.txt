@@ -51,7 +51,7 @@ Module Contents
    Load Dräger EIT data from path.
 
 
-.. py:function:: _convert_medibus_data(medibus_data: numpy.typing.NDArray, time: numpy.typing.NDArray) -> tuple[eitprocessing.datahandling.datacollection.DataCollection, eitprocessing.datahandling.datacollection.DataCollection]
+.. py:function:: _convert_medibus_data(medibus_data: numpy.typing.NDArray, time: numpy.typing.NDArray, sample_frequency: float) -> tuple[eitprocessing.datahandling.datacollection.DataCollection, eitprocessing.datahandling.datacollection.DataCollection]
 
 .. py:function:: _read_frame(reader: eitprocessing.datahandling.loading.binreader.BinReader, index: int, time: numpy.typing.NDArray, pixel_impedance: numpy.typing.NDArray, medibus_data: numpy.typing.NDArray, events: list, phases: list, previous_marker: int | None) -> int
 
