@@ -7,30 +7,14 @@ from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.features.pixel_inflation import PixelInflation
-from eitprocessing.parameters import ParameterExtraction
+from eitprocessing.parameters import ParameterCalculation
 
 
 @dataclass
-class TIV(ParameterExtraction):
+class TIV(ParameterCalculation):
     """Compute the tidal impedance variation (TIV) per breath."""
 
     method: str = "extremes"
-    summary_stats_global: dict = field(
-        default_factory=lambda: {
-            "values": lambda v: v,
-            "mean": np.mean,
-            "standard deviation": np.std,
-            "median": np.median,
-        },
-    )
-    summary_stats_pixel: dict = field(
-        default_factory=lambda: {
-            "values": lambda v: v,
-            "mean": lambda v: np.mean(v, axis=0),
-            "standard deviation": lambda v: np.std(v, axis=0),
-            "median": lambda v: np.median(v, axis=0),
-        },
-    )
     breath_detection_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -77,6 +61,9 @@ class TIV(ParameterExtraction):
 
         return tiv_values
 
+    def compute_parameter():
+        pass
+
     def compute_global_parameter(
         self,
         sequence: Sequence,
@@ -102,10 +89,7 @@ class TIV(ParameterExtraction):
         breaths = self._detect_breaths(continuousdata, eitdata.framerate, self.breath_detection_kwargs)
         tiv_values = self._calculate_tiv_values(continuousdata.values, continuousdata.time, breaths.values, tiv_method)
 
-        result = {name: function(tiv_values) for name, function in self.summary_stats_global.items()}
-        result["peak indices"] = [middle for _, middle, _ in breaths.values]
-
-        return result
+        return tiv_values
 
     def compute_pixel_parameter(
         self,
@@ -190,6 +174,5 @@ class TIV(ParameterExtraction):
                         tiv_values_array[i, row, col] = tiv_values[i]
 
         tiv_values_array = tiv_values_array.astype(float)
-        result = {name: function(tiv_values_array) for name, function in self.summary_stats_pixel.items()}
 
-        return result
+        return tiv_values_array
