@@ -22,7 +22,7 @@ class EELI(ParameterCalculation):
             msg = f"Method {self.method} is not valid. Use any of {', '.join(_methods)}"
             raise ValueError(msg)
 
-    def compute_parameter(self, continuous_data: ContinuousData, sample_frequency: float) -> np.ndarray:
+    def compute_parameter(self, continuous_data: ContinuousData) -> np.ndarray:
         """Compute the EELI for each breath in the impedance data.
 
         Example:
@@ -32,7 +32,6 @@ class EELI(ParameterCalculation):
 
         Args:
             continuous_data: a ContinuousData object containing impedance data.
-            sample_frequency: the sample frequency at which the data is recorded.
 
         Returns:
             np.ndarray: the end-expiratory values of all breaths in the impedance data.
@@ -42,7 +41,6 @@ class EELI(ParameterCalculation):
         check_category(continuous_data, "impedance", raise_=True)
 
         bd_kwargs = self.breath_detection_kwargs.copy()
-        bd_kwargs["sample_frequency"] = sample_frequency
         breath_detection = BreathDetection(**bd_kwargs)
         breaths = breath_detection.find_breaths(continuous_data)
 
