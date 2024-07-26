@@ -84,7 +84,7 @@ class PixelInflation:
 
         _, rows, cols = eit_data.pixel_impedance.shape
 
-        pixel_inflations = np.empty((rows, cols), dtype=object)
+        pixel_inflations = np.empty((len(breaths), rows, cols), dtype=object)
         for row in range(rows):
             for col in range(cols):
                 end = []
@@ -127,9 +127,12 @@ class PixelInflation:
                             strict=True,
                         )
                     ]
+                    # First and last inflation are not detected by definition (need two breaths to find one inflation)
+                    inflations = [None, *inflations, None]
+
                 else:
-                    inflations = []
-                pixel_inflations[row, col] = inflations
+                    inflations = None
+                pixel_inflations[:, row, col] = inflations
 
         pixel_inflations_container = IntervalData(
             label=result_label,
