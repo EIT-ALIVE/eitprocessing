@@ -85,8 +85,7 @@
 <dd><p>Compute the EELI for each breath in the impedance data.</p>
 <p>Example:
 &gt;&gt;&gt; global_impedance = sequence.continuous_data[“global_impedance_(raw)”]
-&gt;&gt;&gt; sample_frequency = sequence.eit_data[“raw”].sample_frequency
-&gt;&gt;&gt; eeli_values = EELI().compute_parameter(global_impedance, sample_frequency=sample_frequency)</p>
+&gt;&gt;&gt; eeli_values = EELI().compute_parameter(global_impedance)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>continuous_data</strong> – a ContinuousData object containing impedance data.</p>

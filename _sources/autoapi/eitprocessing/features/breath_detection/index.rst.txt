@@ -20,10 +20,9 @@ Module Contents
    Algorithm for detecting breaths in data representing respiration.
 
    This algorithm detects the position of breaths in data by detecting valleys (local minimum values) and peaks (local
-   maximum values) in data. When initializing `BreathDetection`, the sample frequency of the data and the minimum
-   duration of a breath have to be provided. The minimum duration should be short enough to include the shortest
-   expected breath in the data. The minimum duration is implemented as the minimum time between peaks and between
-   valleys.
+   maximum values) in data. BreathDetection has a default minimum duration of breaths to be detected. The minimum
+   duration should be short enough to include the shortest expected breath in the data. The minimum duration is
+   implemented as the minimum time between peaks and between valleys.
 
    Examples:
    >>> bd = BreathDetection(minimum_duration=0.5)

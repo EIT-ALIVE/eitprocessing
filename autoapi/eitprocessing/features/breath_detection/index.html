@@ -64,10 +64,9 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.features.breath_detection.</span></span><span class="sig-name descname"><span class="pre">BreathDetection</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/features/breath_detection.html#BreathDetection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.features.breath_detection.BreathDetection" title="Link to this definition">¶</a></dt>
 <dd><p>Algorithm for detecting breaths in data representing respiration.</p>
 <p>This algorithm detects the position of breaths in data by detecting valleys (local minimum values) and peaks (local
-maximum values) in data. When initializing <cite>BreathDetection</cite>, the sample frequency of the data and the minimum
-duration of a breath have to be provided. The minimum duration should be short enough to include the shortest
-expected breath in the data. The minimum duration is implemented as the minimum time between peaks and between
-valleys.</p>
+maximum values) in data. BreathDetection has a default minimum duration of breaths to be detected. The minimum
+duration should be short enough to include the shortest expected breath in the data. The minimum duration is
+implemented as the minimum time between peaks and between valleys.</p>
 <p>Examples:
 &gt;&gt;&gt; bd = BreathDetection(minimum_duration=0.5)
 &gt;&gt;&gt; breaths = bd.find_breaths(sequency=seq, continuousdata_label=”global_impedance_(raw)”)</p>

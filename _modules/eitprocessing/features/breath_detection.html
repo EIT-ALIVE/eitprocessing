@@ -59,10 +59,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Algorithm for detecting breaths in data representing respiration.</span>
 
 <span class="sd">    This algorithm detects the position of breaths in data by detecting valleys (local minimum values) and peaks (local</span>
-<span class="sd">    maximum values) in data. When initializing `BreathDetection`, the sample frequency of the data and the minimum</span>
-<span class="sd">    duration of a breath have to be provided. The minimum duration should be short enough to include the shortest</span>
-<span class="sd">    expected breath in the data. The minimum duration is implemented as the minimum time between peaks and between</span>
-<span class="sd">    valleys.</span>
+<span class="sd">    maximum values) in data. BreathDetection has a default minimum duration of breaths to be detected. The minimum</span>
+<span class="sd">    duration should be short enough to include the shortest expected breath in the data. The minimum duration is</span>
+<span class="sd">    implemented as the minimum time between peaks and between valleys.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">    &gt;&gt;&gt; bd = BreathDetection(minimum_duration=0.5)</span>
@@ -81,7 +80,6 @@
 <span class="sd">        invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># TODO: remove after continuousdata gets its own sample frequency #209</span>
 <div class="viewcode-block" id="BreathDetection.minimum_duration">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.features.breath_detection.BreathDetection.minimum_duration">[docs]</a>
     <span class="n">minimum_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span></div>
