@@ -30,7 +30,7 @@ class EITData(DataContainer, SelectByTime):
         path: The path of list of paths of the source from which data was derived.
         nframes: Number of frames.
         time: The time of each frame (since start measurement).
-        sample_frequency: The (average) frequency at which the frames are collection, in Hz.
+        sample_frequency: The (average) frequency at which the frames are collected, in Hz.
         vendor: The vendor of the device the data was collected with.
         label: Computer readable label identifying this dataset.
         name: Human readable name for the data.
