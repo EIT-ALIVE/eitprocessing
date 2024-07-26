@@ -74,7 +74,7 @@ def test_remove_edge_cases(
 ):
     data = np.array([2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
 
-    bd = BreathDetection(1)
+    bd = BreathDetection()
     result_peak_indices, result_valley_indices = bd._remove_edge_cases(
         data,
         peak_indices,
@@ -162,7 +162,7 @@ def test_remove_doubles(
     expected_peak_indices: np.ndarray,
     expected_valley_indices: np.ndarray,
 ):
-    bd = BreathDetection(sample_frequency=1)
+    bd = BreathDetection()
     result_peak_indices, result_valley_indices = bd._remove_doubles(
         data,
         peak_indices,
@@ -243,7 +243,7 @@ def test_remove_low_amplitudes(
     expected_peak_indices: np.ndarray,
     expected_valley_indices: np.ndarray,
 ):
-    bd = BreathDetection(1)
+    bd = BreathDetection()
     result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)
     assert np.array_equal(result_peak_indices, expected_peak_indices)
     assert np.array_equal(result_valley_indices, expected_valley_indices)
@@ -265,12 +265,12 @@ def test_no_remove_low_amplitudes(
     valley_indices: np.ndarray,
 ):
     """This test uses the same data as test_remove_low_amplitudes, expects output to be the same as the input."""
-    bd = BreathDetection(1, amplitude_cutoff_fraction=None)
+    bd = BreathDetection(amplitude_cutoff_fraction=None)
     result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)
     assert np.array_equal(result_peak_indices, peak_indices)
     assert np.array_equal(result_valley_indices, valley_indices)
 
-    bd = BreathDetection(1, amplitude_cutoff_fraction=0)
+    bd = BreathDetection(amplitude_cutoff_fraction=0)
     result_peak_indices, result_valley_indices = bd._remove_low_amplitudes(data, peak_indices, valley_indices)
     assert np.array_equal(result_peak_indices, peak_indices)
     assert np.array_equal(result_valley_indices, valley_indices)
@@ -279,9 +279,9 @@ def test_no_remove_low_amplitudes(
 def test_remove_no_breaths_around_valid_data():
     sample_frequency = 20
     time, y = _make_cosine_wave(sample_frequency, 1000, 1)
-    bd = BreathDetection(sample_frequency)
+    bd = BreathDetection()
 
-    peak_indices, valley_indices = bd._detect_peaks_and_valleys(y)
+    peak_indices, valley_indices = bd._detect_peaks_and_valleys(y, sample_frequency)
     assert np.array_equal(time[peak_indices], np.arange(1, 50))
     assert np.array_equal(
         time[valley_indices],
@@ -291,7 +291,7 @@ def test_remove_no_breaths_around_valid_data():
 
 @pytest.mark.parametrize("obj", ["", 1, (1,), []])
 def test_pass_invalid(obj: Any):  # noqa: ANN401
-    bd = BreathDetection(1)
+    bd = BreathDetection()
     with pytest.raises(TypeError):
         bd.find_breaths(obj)
 
@@ -299,7 +299,7 @@ def test_pass_invalid(obj: Any):  # noqa: ANN401
 def test_pass_continuousdata(draeger1: Sequence):
     draeger1 = copy.deepcopy(draeger1)  # prevents writing results to original file
     cd = draeger1.continuous_data["global_impedance_(raw)"]
-    bd = BreathDetection(draeger1.eit_data["raw"].sample_frequency)
+    bd = BreathDetection()
 
     breaths_container = bd.find_breaths(cd)
     assert isinstance(breaths_container, IntervalData)
@@ -321,9 +321,7 @@ def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, py
     draeger2 = copy.deepcopy(draeger2)
     timpel1 = copy.deepcopy(timpel1)
     for sequence in draeger1, draeger2, timpel1:
-        bd = BreathDetection(
-            sample_frequency=sequence.eit_data["raw"].sample_frequency,
-        )
+        bd = BreathDetection()
 
         cd = sequence.continuous_data["global_impedance_(raw)"]
         breaths = bd.find_breaths(cd)
@@ -360,7 +358,7 @@ def test_create_breaths_from_peak_valley_data():
     peak_indices = np.array([10, 20, 30, 40, 50])
     valley_indices = np.array([5, 15, 25, 35, 45, 55])
 
-    bd = BreathDetection(1)
+    bd = BreathDetection()
     breaths = bd._create_breaths_from_peak_valley_data(time, peak_indices, valley_indices)
     assert len(breaths) == 5
     assert all(isinstance(breath, Breath) for breath in breaths)
@@ -401,17 +399,17 @@ def test_remove_breaths_around_invalid_data():
     assert np.array_equal(y[peak_indices], np.array([1.0] * 9))
     assert np.array_equal(y[valley_indices], np.array([-1.0] * 10))
 
-    bd = BreathDetection(sample_frequency, invalid_data_removal_window_length=0.4)
+    bd = BreathDetection(invalid_data_removal_window_length=0.4)
     breaths = bd._create_breaths_from_peak_valley_data(time, peak_indices, valley_indices)
 
     outliers = np.array([], dtype=int)
-    no_breaths_removed = bd._remove_breaths_around_invalid_data(breaths, time, outliers)
+    no_breaths_removed = bd._remove_breaths_around_invalid_data(breaths, time, sample_frequency, outliers)
     assert no_breaths_removed == breaths
     assert no_breaths_removed is not breaths
 
     # a single outlier at a peak at t=6 should remove only breaths within 5.6 < t < 6.4
     outliers = np.array([60])
-    breaths_with_some_removed = bd._remove_breaths_around_invalid_data(breaths, time, outliers)
+    breaths_with_some_removed = bd._remove_breaths_around_invalid_data(breaths, time, sample_frequency, outliers)
     removed_breath = Breath(5.5, 6, 6.5)
     assert len(breaths_with_some_removed) == len(breaths) - 1
     assert removed_breath in breaths
@@ -420,7 +418,7 @@ def test_remove_breaths_around_invalid_data():
 
     # a single outlier at a valley at t=6.5 should remove breaths overlapping with 6.1 < t < 6.9
     outliers = np.array([65])
-    breaths_with_some_removed = bd._remove_breaths_around_invalid_data(breaths, time, outliers)
+    breaths_with_some_removed = bd._remove_breaths_around_invalid_data(breaths, time, sample_frequency, outliers)
     removed_breaths = [Breath(5.5, 6, 6.5), Breath(6.5, 7, 7.5)]
     assert len(breaths_with_some_removed) == len(breaths) - 2
     assert all(removed_breath in breaths for removed_breath in removed_breaths)
@@ -430,7 +428,7 @@ def test_remove_breaths_around_invalid_data():
 
 def test_detect_invalid_data():
     sample_frequency = 10
-    bd = BreathDetection(sample_frequency)
+    bd = BreathDetection()
 
     _, y = _make_cosine_wave(sample_frequency, 200, 1)
     lower_percentile = np.percentile(y, bd.invalid_data_removal_percentile)
@@ -464,7 +462,7 @@ def test_remove_outlier_data(monkeypatch: pytest.MonkeyPatch):
     def mock_detect_invalid_data(_: np.ndarray) -> np.ndarray:
         return np.copy(expected_invalid_data_indices)
 
-    bd = BreathDetection(1)
+    bd = BreathDetection()
     monkeypatch.setattr(bd, "_detect_invalid_data", mock_detect_invalid_data)
 
     data = np.arange(100, dtype=float)
@@ -498,7 +496,7 @@ def test_find_breaths():
     seq.continuous_data.add(cd)
 
     # every breath should be detected as normal
-    bd = BreathDetection(sample_frequency, minimum_duration=3)
+    bd = BreathDetection(minimum_duration=3)
     breaths = bd.find_breaths(cd, sequence=seq)
     assert breaths is seq.interval_data["breaths"]
     assert len(breaths) == len(breaths.values)
@@ -506,12 +504,12 @@ def test_find_breaths():
     assert len(breaths) == 19
 
     # too long minimum distance, number of breaths reduced
-    bd = BreathDetection(sample_frequency, minimum_duration=4)
+    bd = BreathDetection(minimum_duration=4)
     breaths = bd.find_breaths(cd)
     assert len(breaths) < 19
 
     # very short breaths expected, but no influence due to lack of disturbances
-    bd = BreathDetection(sample_frequency, minimum_duration=1 / 25)
+    bd = BreathDetection(minimum_duration=1 / 25)
     breaths = bd.find_breaths(cd)
     assert len(breaths) == 19
 
@@ -530,11 +528,11 @@ def test_find_breaths():
     seq.continuous_data.add(cd, overwrite=True)
 
     # single breath invalidated
-    bd = BreathDetection(sample_frequency)
+    bd = BreathDetection()
     breaths = bd.find_breaths(cd)
     assert len(breaths) == 18
 
     # three breaths invalidated
-    bd = BreathDetection(sample_frequency, invalid_data_removal_window_length=3.5)
+    bd = BreathDetection(invalid_data_removal_window_length=3.5)
     breaths = bd.find_breaths(cd)
     assert len(breaths) == 16
