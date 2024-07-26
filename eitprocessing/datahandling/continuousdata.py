@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypeVar
 
@@ -45,12 +46,19 @@ class ContinuousData(DataContainer, SelectByTime):
     derived_from: Any | list[Any] = field(default_factory=list, repr=False, compare=False)
     time: np.ndarray = field(kw_only=True, repr=False)
     values: np.ndarray = field(kw_only=True, repr=False)
-    sample_frequency: float = field(kw_only=True, repr=False, metadata={"check_equivalence": True})
+    sample_frequency: float | None = field(kw_only=True, repr=False, metadata={"check_equivalence": True}, default=None)
 
     def __post_init__(self) -> None:
         if self.loaded:
             self.lock()
         self.lock("time")
+
+        if self.sample_frequency is None:
+            msg = (
+                "`sample_frequency` is set to `None`. This will not be supported in future versions. "
+                "Provide a sample frequency when creating a ContinuousData object."
+            )
+            warnings.warn(msg, DeprecationWarning)
 
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
         try:
