@@ -17,7 +17,15 @@ MINUTE = 60
 def create_continuous_data_object():
     def internal(sample_frequency: float, duration: float, frequency: float) -> ContinuousData:
         time, values = _make_cosine_wave(sample_frequency, duration, frequency)
-        return ContinuousData("label", "name", "unit", "impedance", time=time, values=values)
+        return ContinuousData(
+            "label",
+            "name",
+            "unit",
+            "impedance",
+            time=time,
+            values=values,
+            sample_frequency=sample_frequency,
+        )
 
     return internal
 
@@ -64,11 +72,20 @@ def test_eeli_values(repeat_n: int):  # noqa: ARG001
     valley_values = np.random.default_rng().integers(-100, -50, n_valleys)
     data = np.zeros(2 * n_valleys + 1)
     data[1::2] = valley_values
-    time = np.arange(len(data))
+    sample_frequency = 1
+    time = np.arange(len(data)) / sample_frequency
 
     expected_n_breaths = n_valleys - 1
 
-    cd = ContinuousData(label="label", name="name", unit="unit", category="impedance", time=time, values=data)
+    cd = ContinuousData(
+        label="label",
+        name="name",
+        unit="unit",
+        category="impedance",
+        time=time,
+        values=data,
+        sample_frequency=sample_frequency,
+    )
     eeli = EELI(breath_detection_kwargs={"minimum_duration": 0})
     eeli_values = eeli.compute_parameter(
         cd,
@@ -84,26 +101,26 @@ def test_with_data(draeger1: Sequence, pytestconfig: pytest.Config):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
     cd = draeger1.continuous_data["global_impedance_(raw)"]
-    framerate = draeger1.eit_data["raw"].framerate
+    sample_frequency = draeger1.eit_data["raw"].sample_frequency
     eeli_values = EELI().compute_parameter(
         cd,
-        framerate,
+        sample_frequency,
     )
 
-    breaths = BreathDetection(framerate).find_breaths(cd)
+    breaths = BreathDetection(sample_frequency).find_breaths(cd)
 
     assert len(eeli_values) == len(breaths)
 
 
 def test_non_impedance_data(draeger1: Sequence) -> None:
     cd = draeger1.continuous_data["global_impedance_(raw)"]
-    framerate = draeger1.eit_data["raw"].framerate
+    sample_frequency = draeger1.eit_data["raw"].sample_frequency
     original_category = cd.category
 
-    _ = EELI().compute_parameter(cd, framerate)
+    _ = EELI().compute_parameter(cd, sample_frequency)
 
     cd.category = "foo"
     with pytest.raises(ValueError):
-        _ = EELI().compute_parameter(cd, framerate)
+        _ = EELI().compute_parameter(cd, sample_frequency)
 
     cd.category = original_category

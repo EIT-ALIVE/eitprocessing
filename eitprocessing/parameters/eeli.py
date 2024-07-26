@@ -27,7 +27,7 @@ class EELI(ParameterCalculation):
 
         Example:
         >>> global_impedance = sequence.continuous_data["global_impedance_(raw)"]
-        >>> sample_frequency = sequence.eit_data["raw"].framerate
+        >>> sample_frequency = sequence.eit_data["raw"].sample_frequency
         >>> eeli_values = EELI().compute_parameter(global_impedance, sample_frequency=sample_frequency)
 
         Args:

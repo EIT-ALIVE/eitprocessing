@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 _COLUMN_WIDTH = 1030
 _NAN_VALUE = -1000
 
-TIMPEL_FRAMERATE = 50
+TIMPEL_SAMPLE_FREQUENCY = 50
 
 
 load_timpel_data = partial(load_eit_data, vendor=Vendor.TIMPEL)
@@ -31,13 +31,13 @@ load_timpel_data = partial(load_eit_data, vendor=Vendor.TIMPEL)
 
 def load_from_single_path(
     path: Path,
-    framerate: float | None = 20,
+    sample_frequency: float | None = 20,
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> dict[str, DataCollection]:
     """Load Timpel EIT data from path."""
-    if not framerate:
-        framerate = TIMPEL_FRAMERATE
+    if not sample_frequency:
+        sample_frequency = TIMPEL_SAMPLE_FREQUENCY
 
     try:
         data: NDArray = np.loadtxt(
@@ -82,7 +82,7 @@ def load_from_single_path(
     # The implemented method seems convoluted: it's easier to create an array
     # with nframes and add a time_offset. However, this results in floating
     # point errors, creating issues with comparing times later on.
-    time = np.arange(nframes + first_frame) / framerate
+    time = np.arange(nframes + first_frame) / sample_frequency
     time = time[first_frame:]
 
     pixel_impedance = data[:, :1024]
@@ -96,7 +96,7 @@ def load_from_single_path(
         path=path,
         nframes=nframes,
         time=time,
-        framerate=framerate,
+        sample_frequency=sample_frequency,
         pixel_impedance=pixel_impedance,
     )
     eitdata_collection = DataCollection(EITData, raw=eit_data)
@@ -114,6 +114,7 @@ def load_from_single_path(
             "Global impedance calculated from raw EIT data",
             time=time,
             values=eit_data.calculate_global_impedance(),
+            sample_frequency=sample_frequency,
         ),
     )
     continuousdata_collection.add(
@@ -125,6 +126,7 @@ def load_from_single_path(
             description="Airway pressure measured by Timpel device",
             time=time,
             values=data[:, 1024],
+            sample_frequency=sample_frequency,
         ),
     )
 
@@ -137,6 +139,7 @@ def load_from_single_path(
             description="Flow measures by Timpel device",
             time=time,
             values=data[:, 1025],
+            sample_frequency=sample_frequency,
         ),
     )
 
@@ -149,6 +152,7 @@ def load_from_single_path(
             description="Volume measured by Timpel device",
             time=time,
             values=data[:, 1026],
+            sample_frequency=sample_frequency,
         ),
     )
 

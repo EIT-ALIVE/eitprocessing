@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from enum import auto
 from pathlib import Path
@@ -29,7 +30,7 @@ class EITData(DataContainer, SelectByTime):
         path: The path of list of paths of the source from which data was derived.
         nframes: Number of frames.
         time: The time of each frame (since start measurement).
-        framerate: The (average) rate at which the frames are collection, in Hz.
+        sample_frequency: The (average) frequency at which the frames are collected, in Hz.
         vendor: The vendor of the device the data was collected with.
         label: Computer readable label identifying this dataset.
         name: Human readable name for the data.
@@ -39,7 +40,7 @@ class EITData(DataContainer, SelectByTime):
     path: str | Path | list[Path | str] = field(compare=False, repr=False)
     nframes: int = field(repr=False)
     time: np.ndarray = field(repr=False)
-    framerate: float = field(metadata={"check_equivalence": True}, repr=False)
+    sample_frequency: float = field(metadata={"check_equivalence": True}, repr=False)
     vendor: Vendor = field(metadata={"check_equivalence": True}, repr=False)
     label: str | None = field(default=None, compare=False, metadata={"check_equivalence": True})
     name: str | None = field(default=None, compare=False, repr=False)
@@ -54,6 +55,15 @@ class EITData(DataContainer, SelectByTime):
             self.path = self.path[0]
 
         self.name = self.name or self.label
+
+    @property
+    def framerate(self) -> float:
+        """Deprecated alias to `sample_frequency`."""
+        warnings.warn(
+            "The `framerate` attribute has been deprecated. Use `sample_frequency` instead.",
+            DeprecationWarning,
+        )
+        return self.sample_frequency
 
     @staticmethod
     def ensure_path_list(
@@ -86,7 +96,7 @@ class EITData(DataContainer, SelectByTime):
             vendor=self.vendor,
             path=[*self_path, *other_path],
             label=self.label,  # TODO: using newlabel leads to errors
-            framerate=self.framerate,
+            sample_frequency=self.sample_frequency,
             nframes=self.nframes + other.nframes,
             time=np.concatenate((self.time, other.time)),
             pixel_impedance=np.concatenate((self.pixel_impedance, other.pixel_impedance), axis=0),
@@ -109,7 +119,7 @@ class EITData(DataContainer, SelectByTime):
             nframes=nframes,
             vendor=self.vendor,
             time=time,
-            framerate=self.framerate,
+            sample_frequency=self.sample_frequency,
             label=self.label,  # newlabel gives errors
             pixel_impedance=pixel_impedance,
         )

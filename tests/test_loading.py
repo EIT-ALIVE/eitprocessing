@@ -2,7 +2,7 @@ import pytest
 
 from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.loading import load_eit_data
-from eitprocessing.datahandling.loading.draeger import DRAEGER_FRAMERATE
+from eitprocessing.datahandling.loading.draeger import DRAEGER_SAMPLE_FREQUENCY
 from eitprocessing.datahandling.sequence import Sequence
 from tests.conftest import draeger_file1, draeger_file2, draeger_file3, dummy_file, timpel_file
 
@@ -16,7 +16,7 @@ def test_loading_draeger(
 ):
     assert isinstance(draeger1, Sequence)
     assert isinstance(draeger1.eit_data["raw"], EITData)
-    assert draeger1.eit_data["raw"].framerate == 20
+    assert draeger1.eit_data["raw"].sample_frequency == 20
     assert len(draeger1.eit_data["raw"]) == len(draeger1.eit_data["raw"].time)
     assert len(draeger2.eit_data["raw"].time) == 20740
 
@@ -119,9 +119,9 @@ def test_max_frames_too_large():
         _ = load_eit_data(draeger_file1, "draeger", max_frames=1e12)
 
 
-def test_framerate_unset():
-    loaded_draeger = load_eit_data(draeger_file1, "draeger", framerate=None)
-    assert loaded_draeger.eit_data["raw"].framerate == DRAEGER_FRAMERATE
+def test_sample_frequency_unset():
+    loaded_draeger = load_eit_data(draeger_file1, "draeger", sample_frequency=None)
+    assert loaded_draeger.eit_data["raw"].sample_frequency == DRAEGER_SAMPLE_FREQUENCY
 
 
 def test_event_on_first_frame(draeger2: Sequence):

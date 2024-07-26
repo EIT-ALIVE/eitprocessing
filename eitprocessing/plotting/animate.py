@@ -71,6 +71,6 @@ def animate_EITDataVariant(
         frames=range(1, len(eit_data_variant)),
         repeat=False,
     )
-    display(HTML(anim.to_jshtml(eit_data_variant.params["framerate"])))
+    display(HTML(anim.to_jshtml(eit_data_variant.params["sample_frequency"])))
 
     plt.close()

@@ -22,14 +22,14 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-SENTEC_FRAMERATE = 50.2
+SENTEC_SAMPLE_FREQUENCY = 50.2
 
 load_sentec_data = partial(load_eit_data, vendor=Vendor.SENTEC)
 
 
 def load_from_single_path(  # noqa: C901, PLR0912
     path: Path,
-    framerate: float | None = 50.2,
+    sample_frequency: float | None = 50.2,
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> dict[str, DataCollection]:
@@ -82,11 +82,14 @@ def load_from_single_path(  # noqa: C901, PLR0912
                     else:
                         fh.seek(payload_size, os.SEEK_CUR)
 
-                # read the framerate from the file, if present
-                # (domain 64 = configuration, data 5 = framerate)
-                elif domain_id == Domain.CONFIGURATION and data_id == ConfigurationDataID.FRAMERATE:
-                    framerate = np.round(reader.float32(), 4)
-                    msg = f"Framerate value found in file. The framerate value will be set to {framerate:.2f}"
+                # read the sample frequency from the file, if present
+                # (domain 64 = configuration, data 5 = sample frequency)
+                elif domain_id == Domain.CONFIGURATION and data_id == ConfigurationDataID.SAMPLE_FREQUENCY:
+                    sample_frequency = np.round(reader.float32(), 4)
+                    msg = (
+                        "Sample frequency value found in file. "
+                        f"The sample frequency value will be set to {sample_frequency:.2f}"
+                    )
                     warnings.warn(msg)
 
                 else:
@@ -107,15 +110,15 @@ def load_from_single_path(  # noqa: C901, PLR0912
         )
         warnings.warn(msg)
 
-    if not framerate:
-        framerate = SENTEC_FRAMERATE
+    if not sample_frequency:
+        sample_frequency = SENTEC_SAMPLE_FREQUENCY
 
     eitdata_collection = DataCollection(EITData)
     eitdata_collection.add(
         EITData(
             vendor=Vendor.SENTEC,
             path=path,
-            framerate=framerate,
+            sample_frequency=sample_frequency,
             nframes=n_frames,
             time=np.unwrap(np.array(time), period=np.iinfo(np.uint32).max) / 1000000,
             label="raw",
@@ -201,4 +204,4 @@ class MeasurementDataID(IntEnum):
 class ConfigurationDataID(IntEnum):
     """ID of configuration data."""
 
-    FRAMERATE = 1
+    SAMPLE_FREQUENCY = 1
