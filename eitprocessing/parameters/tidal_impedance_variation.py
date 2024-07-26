@@ -30,7 +30,7 @@ class TIV(ParameterCalculation):
 
     def _detect_pixel_inflations(self, eit_data, continuous_data, sequence, breath_detection_kwargs):
         bd_kwargs = breath_detection_kwargs.copy()
-        bd_kwargs["sample_frequency"] = sample_frequency
+        bd_kwargs["sample_frequency"] = continuous_data.sample_frequency
         pi = PixelInflation(**bd_kwargs)
         return pi.find_pixel_inflations(eit_data, continuous_data, result_label="pixel inflations", sequence=sequence)
 
@@ -86,9 +86,7 @@ class TIV(ParameterCalculation):
             msg = f"Method {self.method} is not implemented."
             raise NotImplementedError(msg)
 
-        eitdata = next(filter(lambda x: isinstance(x, EITData), continuous_data.derived_from))
-
-        breaths = self._detect_breaths(continuous_data, eitdata.sample_frequency, self.breath_detection_kwargs)
+        breaths = self._detect_breaths(continuous_data, continuous_data.sample_frequency, self.breath_detection_kwargs)
         return self._calculate_tiv_values(
             continuous_data.values,
             continuous_data.time,
