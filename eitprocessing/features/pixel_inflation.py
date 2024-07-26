@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 import numpy as np
 
 from eitprocessing.datahandling.breath import Breath
+from eitprocessing.datahandling.continuousdata import ContinuousData
+from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
@@ -30,9 +32,11 @@ class PixelInflation:
 
     def find_pixel_inflations(
         self,
-        sequence: Sequence,
-        eitdata_label: str,
-        continuousdata_label: str,
+        eit_data: EITData,
+        continuous_data: ContinuousData,
+        result_label: str = "pixel inflations",
+        sequence: Sequence | None = None,
+        store: bool | None = None,
     ) -> IntervalData:
         """Find pixel inflations in the data.
 
@@ -50,28 +54,36 @@ class PixelInflation:
 
         Args:
             sequence: the sequence that contains the data
-            eitdata_label: label of eit data to apply the algorithm to
-            continuousdata_label: label of the continuous data to use for global breath detection
+            eit_data: eit data to apply the algorithm to
+            continuous_data: continuous data to use for global breath detection
+            result_label: label of the returned IntervalData object, defaults to `'pixel inflations'`.
+            sequence: optional, Sequence that contains the object to detect pixel inflations in,
+            and/or to store the result in.
+            store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
 
         Returns:
-            np.ndarray, where each element contains a list of PixelInflation objects
+            An IntervalData object containing Breath objects.
         """
-        eitdata = sequence.eit_data[eitdata_label]
+        if store is None and sequence:
+            store = True
+
+        if store and sequence is None:
+            msg = "Can't store the result if not Sequence is provided."
+            raise RuntimeError(msg)
 
         bd_kwargs = self.breath_detection_kwargs.copy()
-        bd_kwargs["sample_frequency"] = eitdata.framerate
+        bd_kwargs["sample_frequency"] = eit_data.framerate
         breath_detection = BreathDetection(**bd_kwargs)
-        continuous_data = sequence.continuous_data[continuousdata_label]
         breaths = breath_detection.find_breaths(continuous_data)
 
         middle_times = np.array(
             [
-                np.argmax(eitdata.time == middle_time)
+                np.argmax(eit_data.time == middle_time)
                 for middle_time in [breath.middle_time for breath in breaths.values]
             ],
         )
 
-        _, rows, cols = eitdata.pixel_impedance.shape
+        _, rows, cols = eit_data.pixel_impedance.shape
 
         pixel_inflations = np.empty((rows, cols), dtype=object)
         for row in range(rows):
@@ -80,13 +92,13 @@ class PixelInflation:
                 middle = []
 
                 if not np.isnan(
-                    eitdata.pixel_impedance[:, row, col],
+                    eit_data.pixel_impedance[:, row, col],
                 ).any() and not np.all(
-                    eitdata.pixel_impedance[:, row, col] == 0.0,
+                    eit_data.pixel_impedance[:, row, col] == 0.0,
                 ):
                     start = [
                         np.argmin(
-                            eitdata.pixel_impedance[
+                            eit_data.pixel_impedance[
                                 middle_times[i] : middle_times[i + 1],
                                 row,
                                 col,
@@ -99,13 +111,13 @@ class PixelInflation:
                     end = [start[i + 1] for i in range(len(start) - 1)]
                     middle = [
                         np.argmax(
-                            eitdata.pixel_impedance[start[i] : start[i + 1], row, col],
+                            eit_data.pixel_impedance[start[i] : start[i + 1], row, col],
                         )
                         + start[i]
                         for i in range(len(start) - 1)
                     ]
 
-                    time = eitdata.time
+                    time = eit_data.time
 
                     inflations = [
                         Breath(time[s], time[m], time[e])
@@ -120,17 +132,18 @@ class PixelInflation:
                     inflations = []
                 pixel_inflations[row, col] = inflations
 
-        sequence.interval_data.add(
-            IntervalData(
-                label="pixel_inflation",
-                name="Pixel in- and deflation timing as determined by PixelInflation",
-                unit=None,
-                category="breath",
-                intervals=[(time[middle_times[i]], time[middle_times[i + 1]]) for i in range(len(middle_times) - 1)],
-                values=pixel_inflations,
-                parameters={},
-                derived_from=[eitdata],
-            ),
+        pixel_inflations_container = IntervalData(
+            label=result_label,
+            name="Pixel in- and deflation timing as determined by PixelInflation",
+            unit=None,
+            category="breath",
+            intervals=[(time[middle_times[i]], time[middle_times[i + 1]]) for i in range(len(middle_times) - 1)],
+            values=pixel_inflations,
+            parameters={},
+            derived_from=[eit_data],
         )
 
-        return sequence.interval_data["pixel_inflation"]
+        if store:
+            sequence.interval_data.add(pixel_inflations_container)
+
+        return pixel_inflations_container
