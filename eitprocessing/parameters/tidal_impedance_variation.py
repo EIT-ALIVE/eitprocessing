@@ -1,8 +1,10 @@
 from dataclasses import dataclass, field
+from functools import singledispatchmethod
 from typing import Literal
 
 import numpy as np
 
+from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
@@ -20,21 +22,17 @@ class TIV(ParameterCalculation):
     def __post_init__(self) -> None:
         pass
 
-    def _detect_breaths(self, data, framerate, breath_detection_kwargs):
+    def _detect_breaths(self, data, sample_frequency, breath_detection_kwargs):
         bd_kwargs = breath_detection_kwargs.copy()
-        bd_kwargs["sample_frequency"] = framerate
+        bd_kwargs["sample_frequency"] = sample_frequency
         breath_detection = BreathDetection(**bd_kwargs)
         return breath_detection.find_breaths(data)
 
-    def _detect_pixel_inflations(self, sequence, framerate, breath_detection_kwargs):
+    def _detect_pixel_inflations(self, eit_data, continuous_data, sequence, breath_detection_kwargs):
         bd_kwargs = breath_detection_kwargs.copy()
-        bd_kwargs["sample_frequency"] = framerate
+        bd_kwargs["sample_frequency"] = sample_frequency
         pi = PixelInflation(**bd_kwargs)
-        return pi.find_pixel_inflations(
-            sequence,
-            eitdata_label="raw",
-            continuousdata_label="global_impedance_(raw)",
-        )
+        return pi.find_pixel_inflations(eit_data, continuous_data, result_label="pixel inflations", sequence=sequence)
 
     def _calculate_tiv_values(self, data, time, breaths, tiv_method):
         start_indices = [np.argmax(time == start_time) for start_time in [breath.start_time for breath in breaths]]
@@ -61,14 +59,19 @@ class TIV(ParameterCalculation):
 
         return tiv_values
 
-    def compute_parameter():
-        pass
+    @singledispatchmethod
+    def compute_parameter(
+        self,
+        data: ContinuousData | EITData,
+    ):
+        msg = f"This method is implemented for ContinuousData or EITData, not {type(data)}."
+        raise TypeError(msg)
 
+    @compute_parameter.register(ContinuousData)
     def compute_global_parameter(
         self,
-        sequence: Sequence,
-        data_label: str,
-        tiv_method="inspiratory",
+        continuous_data: ContinuousData,
+        tiv_method: Literal["inspiratory", "expiratory", "mean"] = "inspiratory",
     ) -> dict | list[dict]:
         """Compute the tidal impedance variation per breath.
 
@@ -83,42 +86,42 @@ class TIV(ParameterCalculation):
             msg = f"Method {self.method} is not implemented."
             raise NotImplementedError(msg)
 
-        continuousdata = sequence.continuous_data[data_label]
-        eitdata = next(filter(lambda x: isinstance(x, EITData), continuousdata.derived_from))
+        eitdata = next(filter(lambda x: isinstance(x, EITData), continuous_data.derived_from))
 
-        breaths = self._detect_breaths(continuousdata, eitdata.framerate, self.breath_detection_kwargs)
-        tiv_values = self._calculate_tiv_values(continuousdata.values, continuousdata.time, breaths.values, tiv_method)
+        breaths = self._detect_breaths(continuous_data, eitdata.sample_frequency, self.breath_detection_kwargs)
+        return self._calculate_tiv_values(
+            continuous_data.values,
+            continuous_data.time,
+            breaths.values,
+            tiv_method,
+        )
 
-        return tiv_values
-
+    @compute_parameter.register(EITData)
     def compute_pixel_parameter(
         self,
+        eit_data: EITData,
+        continuous_data: ContinuousData,
         sequence: Sequence,
-        data_label: str,
         tiv_method: Literal["inspiratory", "expiratory", "mean"] = "inspiratory",
-        tiv_timing: Literal["pixel", "global"] = "pixel",
-        continuous_data_label: str | None = None,
+        tiv_timing: Literal["pixel", "continuous"] = "pixel",
     ) -> dict | list[dict]:
         """Compute the tidal impedance variation per breath on pixel level.
 
         Args:
             sequence: The sequence containing the data.
-            data_label: The label of the eit data in the sequence to determine the TIV of.
+            eit_data: The eit pixel level date to determine the TIV of.
+            continuous_data: The continuous data to determine the continuous data breaths or pixel level inflations.
             tiv_method: The label of which part of the breath the TIV should be determined on
                         (inspiratory, expiratory or mean). Defaults to 'inspiratory'.
-            tiv_timing: The label of which timing should be used to compute the TIV,
-                        either based on the global breaths ('global') or pixel inflations ('pixel').
+            tiv_timing: The label of which timing should be used to compute the TIV, either based on breaths
+                        detected in continuous data ('continuous') or based on pixel inflations ('pixel').
                         Defaults to 'pixel'.
-            continuous_data_label: The label of the continuous data in the sequence to determine
-                                the TIV of, required if tiv_timing is 'global'.
 
         Raises:
             NotImplementedError: If the method is not 'extremes'.
             ValueError: If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.
-            ValueError: If tiv_timing is not one of 'global' or 'pixel'.
-            ValueError: If tiv_timing is 'global' and continuous_data_label is not provided.
+            ValueError: If tiv_timing is not one of 'continuous' or 'pixel'.
         """
-        # TODO: think about other name for 'global', since it can also be regional, functional, etc.
         if self.method != "extremes":
             msg = f"Method {self.method} is not implemented."
             raise NotImplementedError(msg)
@@ -127,28 +130,25 @@ class TIV(ParameterCalculation):
             msg = "tiv_method must be either 'inspiratory', 'expiratory' or 'mean'"
             raise ValueError(msg)
 
-        if tiv_timing not in ["global", "pixel"]:
-            msg = "tiv_timing must be either 'global' or 'pixel'"
+        if tiv_timing not in ["continuous", "pixel"]:
+            msg = "tiv_timing must be either 'continuous' or 'pixel'"
             raise ValueError(msg)
 
-        if tiv_timing == "global" and not continuous_data_label:
-            msg = "continuous_data_label must be provided when tiv_timing is 'global'"
-            raise ValueError(msg)
-
-        data = sequence.eit_data[data_label].pixel_impedance
+        data = eit_data.pixel_impedance
         _, rows, cols = data.shape
 
         if tiv_timing == "pixel":
             pixel_inflations = self._detect_pixel_inflations(
+                eit_data,
+                continuous_data,
                 sequence,
-                sequence.eit_data[data_label].framerate,
                 self.breath_detection_kwargs,
             )
             breath_data = pixel_inflations.values
         else:  # tiv_timing == "global"
             global_breaths = self._detect_breaths(
-                sequence.continuous_data[continuous_data_label],
-                sequence.eit_data[data_label].framerate,
+                continuous_data,
+                eit_data.sample_frequency,
                 self.breath_detection_kwargs,
             )
             breath_data = global_breaths.values
@@ -167,12 +167,10 @@ class TIV(ParameterCalculation):
                         time_series = data[:, row, col]
                         tiv_values = self._calculate_tiv_values(
                             time_series,
-                            sequence.eit_data[data_label].time,
+                            eit_data.time,
                             breath_data[row, col] if tiv_timing == "pixel" else breath_data,
                             tiv_method,
                         )
                         tiv_values_array[i, row, col] = tiv_values[i]
 
-        tiv_values_array = tiv_values_array.astype(float)
-
-        return tiv_values_array
+        return tiv_values_array.astype(float)
