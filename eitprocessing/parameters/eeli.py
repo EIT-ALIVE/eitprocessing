@@ -35,8 +35,6 @@ class EELI(ParameterCalculation):
         Returns:
             np.ndarray: the end-expiratory values of all breaths in the impedance data.
         """
-        # TODO: remove sample_frequency as soon as ContinuousData gets it as attribute
-
         check_category(continuous_data, "impedance", raise_=True)
 
         bd_kwargs = self.breath_detection_kwargs.copy()

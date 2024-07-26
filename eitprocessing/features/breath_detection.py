@@ -40,7 +40,6 @@ class BreathDetection:
         invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4
     """
 
-    # TODO: remove after continuousdata gets its own sample frequency #209
     minimum_duration: float = 2 / 3
     averaging_window_duration: float = 15
     averaging_window_function: Callable[[int], ArrayLike] | None = np.blackman
