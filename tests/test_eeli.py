@@ -59,7 +59,7 @@ def test_compute_parameter(
     expected_number_breaths = duration * frequency - 1
     cd = create_continuous_data_object(sample_frequency, duration * sample_frequency, frequency)
     eeli = EELI()
-    eeli_values = eeli.compute_parameter(cd, duration)
+    eeli_values = eeli.compute_parameter(cd)
     assert len(eeli_values) == expected_number_breaths
     if len(eeli_values) > 0:
         assert set(eeli_values.tolist()) == {-1.0}
@@ -87,10 +87,7 @@ def test_eeli_values(repeat_n: int):  # noqa: ARG001
         sample_frequency=sample_frequency,
     )
     eeli = EELI(breath_detection_kwargs={"minimum_duration": 0})
-    eeli_values = eeli.compute_parameter(
-        cd,
-        1,
-    )
+    eeli_values = eeli.compute_parameter(cd)
 
     assert len(eeli_values) == expected_n_breaths
     assert np.array_equal(eeli_values, valley_values[1:])
@@ -101,26 +98,21 @@ def test_with_data(draeger1: Sequence, pytestconfig: pytest.Config):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
     cd = draeger1.continuous_data["global_impedance_(raw)"]
-    sample_frequency = draeger1.eit_data["raw"].sample_frequency
-    eeli_values = EELI().compute_parameter(
-        cd,
-        sample_frequency,
-    )
+    eeli_values = EELI().compute_parameter(cd)
 
-    breaths = BreathDetection(sample_frequency).find_breaths(cd)
+    breaths = BreathDetection().find_breaths(cd)
 
     assert len(eeli_values) == len(breaths)
 
 
 def test_non_impedance_data(draeger1: Sequence) -> None:
     cd = draeger1.continuous_data["global_impedance_(raw)"]
-    sample_frequency = draeger1.eit_data["raw"].sample_frequency
     original_category = cd.category
 
-    _ = EELI().compute_parameter(cd, sample_frequency)
+    _ = EELI().compute_parameter(cd)
 
     cd.category = "foo"
     with pytest.raises(ValueError):
-        _ = EELI().compute_parameter(cd, sample_frequency)
+        _ = EELI().compute_parameter(cd)
 
     cd.category = original_category
