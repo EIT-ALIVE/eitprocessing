@@ -26,13 +26,12 @@ Module Contents
    valleys.
 
    Examples:
-   >>> bd = BreathDetection(sample_frequency=50, minimum_duration=0.5)
+   >>> bd = BreathDetection(minimum_duration=0.5)
    >>> breaths = bd.find_breaths(sequency=seq, continuousdata_label="global_impedance_(raw)")
 
    >>> global_impedance = seq.continuous_data["global_impedance_(raw)"]
    >>> breaths = bd.find_breaths(continuous_data=global_impedance)
 
-   :param sample_frequency: sample frequency of the data
    :param minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
    :param averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
    :param averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
@@ -40,10 +39,6 @@ Module Contents
    :param invalid_data_removal_window_length: window around invalid data in which breaths are removed, defaults to 0.5
    :param invalid_data_removal_percentile: the nth percentile of values used to remove outliers, defaults to 5
    :param invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4
-
-
-   .. py:attribute:: sample_frequency
-      :type:  float
 
 
    .. py:attribute:: minimum_duration
@@ -142,10 +137,10 @@ Module Contents
 
 
 
-   .. py:method:: _detect_peaks_and_valleys(data: numpy.ndarray) -> tuple[numpy.ndarray, numpy.ndarray]
+   .. py:method:: _detect_peaks_and_valleys(data: numpy.ndarray, sample_frequency: float) -> tuple[numpy.ndarray, numpy.ndarray]
 
 
-   .. py:method:: _find_extrema(data: numpy.ndarray, moving_average: numpy.ndarray, invert: float = False) -> numpy.ndarray
+   .. py:method:: _find_extrema(data: numpy.ndarray, moving_average: numpy.ndarray, sample_frequency: float, invert: bool = False) -> numpy.ndarray
 
       Find extrema (peaks or valleys) in the data.
 
@@ -159,6 +154,8 @@ Module Contents
       :type data: np.ndarray
       :param moving_average: a 1D array containing the moving average of the data.
       :type moving_average: np.ndarray
+      :param sample_frequency: sample frequency of the data and moving average
+      :type sample_frequency: float
       :param invert: whether to invert the data before
       :type invert: float, optional
       :param detecting peaks. Defaults to False.:
@@ -236,7 +233,7 @@ Module Contents
    .. py:method:: _create_breaths_from_peak_valley_data(time: numpy.ndarray, peak_indices: numpy.ndarray, valley_indices: numpy.ndarray) -> list[eitprocessing.datahandling.breath.Breath]
 
 
-   .. py:method:: _remove_breaths_around_invalid_data(breaths: list[eitprocessing.datahandling.breath.Breath], time: numpy.ndarray, invalid_data_indices: numpy.ndarray) -> list[eitprocessing.datahandling.breath.Breath]
+   .. py:method:: _remove_breaths_around_invalid_data(breaths: list[eitprocessing.datahandling.breath.Breath], time: numpy.ndarray, sample_frequency: float, invalid_data_indices: numpy.ndarray) -> list[eitprocessing.datahandling.breath.Breath]
 
       Remove breaths overlapping with invalid data.
 
@@ -244,8 +241,8 @@ Module Contents
       removed.
 
       :param breaths: list of detected breath objects
-      :param data: data the breaths were detected in
       :param time: time axis belonging to the data
+      :param sample_frequency: sample frequency of the data and time
       :param invalid_data_indices: indices of invalid data points
 
 

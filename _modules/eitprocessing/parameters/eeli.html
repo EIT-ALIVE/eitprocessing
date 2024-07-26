@@ -74,7 +74,7 @@
 
 <div class="viewcode-block" id="EELI.compute_parameter">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/parameters/eeli/index.html#eitprocessing.parameters.eeli.EELI.compute_parameter">[docs]</a>
-    <span class="k">def</span> <span class="nf">compute_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">continuous_data</span><span class="p">:</span> <span class="n">ContinuousData</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">compute_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">continuous_data</span><span class="p">:</span> <span class="n">ContinuousData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the EELI for each breath in the impedance data.</span>
 
 <span class="sd">        Example:</span>
@@ -84,7 +84,6 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            continuous_data: a ContinuousData object containing impedance data.</span>
-<span class="sd">            sample_frequency: the sample frequency at which the data is recorded.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            np.ndarray: the end-expiratory values of all breaths in the impedance data.</span>
@@ -94,7 +93,6 @@
         <span class="n">check_category</span><span class="p">(</span><span class="n">continuous_data</span><span class="p">,</span> <span class="s2">&quot;impedance&quot;</span><span class="p">,</span> <span class="n">raise_</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">bd_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">breath_detection_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">bd_kwargs</span><span class="p">[</span><span class="s2">&quot;sample_frequency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_frequency</span>
         <span class="n">breath_detection</span> <span class="o">=</span> <span class="n">BreathDetection</span><span class="p">(</span><span class="o">**</span><span class="n">bd_kwargs</span><span class="p">)</span>
         <span class="n">breaths</span> <span class="o">=</span> <span class="n">breath_detection</span><span class="o">.</span><span class="n">find_breaths</span><span class="p">(</span><span class="n">continuous_data</span><span class="p">)</span>
 

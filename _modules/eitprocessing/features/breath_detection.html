@@ -52,7 +52,7 @@
 <span class="kn">from</span> <span class="nn">eitprocessing.features.moving_average</span> <span class="kn">import</span> <span class="n">MovingAverage</span>
 
 
-<span class="nd">@dataclass</span>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <div class="viewcode-block" id="BreathDetection">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.features.breath_detection.BreathDetection">[docs]</a>
 <span class="k">class</span> <span class="nc">BreathDetection</span><span class="p">:</span>
@@ -65,14 +65,13 @@
 <span class="sd">    valleys.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">    &gt;&gt;&gt; bd = BreathDetection(sample_frequency=50, minimum_duration=0.5)</span>
+<span class="sd">    &gt;&gt;&gt; bd = BreathDetection(minimum_duration=0.5)</span>
 <span class="sd">    &gt;&gt;&gt; breaths = bd.find_breaths(sequency=seq, continuousdata_label=&quot;global_impedance_(raw)&quot;)</span>
 
 <span class="sd">    &gt;&gt;&gt; global_impedance = seq.continuous_data[&quot;global_impedance_(raw)&quot;]</span>
 <span class="sd">    &gt;&gt;&gt; breaths = bd.find_breaths(continuous_data=global_impedance)</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        sample_frequency: sample frequency of the data</span>
 <span class="sd">        minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second</span>
 <span class="sd">        averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds</span>
 <span class="sd">        averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman</span>
@@ -83,10 +82,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: remove after continuousdata gets its own sample frequency #209</span>
-<div class="viewcode-block" id="BreathDetection.sample_frequency">
-<a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.features.breath_detection.BreathDetection.sample_frequency">[docs]</a>
-    <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span></div>
-
 <div class="viewcode-block" id="BreathDetection.minimum_duration">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.features.breath_detection.BreathDetection.minimum_duration">[docs]</a>
     <span class="n">minimum_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span></div>
@@ -166,18 +161,19 @@
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">continuous_data</span><span class="o">.</span><span class="n">values</span>
         <span class="n">time</span> <span class="o">=</span> <span class="n">continuous_data</span><span class="o">.</span><span class="n">time</span>
+        <span class="n">sample_frequency</span> <span class="o">=</span> <span class="n">continuous_data</span><span class="o">.</span><span class="n">sample_frequency</span>
 
         <span class="n">invalid_data_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_invalid_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_invalid_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">invalid_data_indices</span><span class="p">)</span>
 
-        <span class="n">peak_indices</span><span class="p">,</span> <span class="n">valley_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_peaks_and_valleys</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">peak_indices</span><span class="p">,</span> <span class="n">valley_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_peaks_and_valleys</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">)</span>
 
         <span class="n">breaths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_breaths_from_peak_valley_data</span><span class="p">(</span>
             <span class="n">time</span><span class="p">,</span>
             <span class="n">peak_indices</span><span class="p">,</span>
             <span class="n">valley_indices</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">breaths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_breaths_around_invalid_data</span><span class="p">(</span><span class="n">breaths</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">invalid_data_indices</span><span class="p">)</span>
+        <span class="n">breaths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_breaths_around_invalid_data</span><span class="p">(</span><span class="n">breaths</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">,</span> <span class="n">invalid_data_indices</span><span class="p">)</span>
         <span class="n">breaths_container</span> <span class="o">=</span> <span class="n">IntervalData</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="n">result_label</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Breaths as determined by BreathDetection&quot;</span><span class="p">,</span>
@@ -239,13 +235,13 @@
 
 <div class="viewcode-block" id="BreathDetection._detect_peaks_and_valleys">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/features/breath_detection/index.html#eitprocessing.features.breath_detection.BreathDetection._detect_peaks_and_valleys">[docs]</a>
-    <span class="k">def</span> <span class="nf">_detect_peaks_and_valleys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-        <span class="n">window_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">averaging_window_duration</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_detect_peaks_and_valleys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+        <span class="n">window_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_frequency</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">averaging_window_duration</span><span class="p">)</span>
         <span class="n">averager</span> <span class="o">=</span> <span class="n">MovingAverage</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="n">window_size</span><span class="p">,</span> <span class="n">window_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">averaging_window_function</span><span class="p">)</span>
         <span class="n">moving_average</span> <span class="o">=</span> <span class="n">averager</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-        <span class="n">peak_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_extrema</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">moving_average</span><span class="p">)</span>
-        <span class="n">valley_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_extrema</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">moving_average</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">peak_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_extrema</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">moving_average</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">)</span>
+        <span class="n">valley_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_extrema</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">moving_average</span><span class="p">,</span> <span class="n">sample_frequency</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">peak_indices</span><span class="p">,</span> <span class="n">valley_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_edge_cases</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">peak_indices</span><span class="p">,</span> <span class="n">valley_indices</span><span class="p">,</span> <span class="n">moving_average</span><span class="p">)</span>
         <span class="n">peak_indices</span><span class="p">,</span> <span class="n">valley_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_doubles</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">peak_indices</span><span class="p">,</span> <span class="n">valley_indices</span><span class="p">)</span>
@@ -259,7 +255,8 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">moving_average</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">invert</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">invert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Find extrema (peaks or valleys) in the data.</span>
 
@@ -272,6 +269,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            data (np.ndarray): a 1D array containing the data.</span>
 <span class="sd">            moving_average (np.ndarray): a 1D array containing the moving average of the data.</span>
+<span class="sd">            sample_frequency (float): sample frequency of the data and moving average</span>
 <span class="sd">            invert (float, optional): whether to invert the data before</span>
 <span class="sd">            detecting peaks. Defaults to False.</span>
 
@@ -282,7 +280,7 @@
         <span class="n">moving_average_</span> <span class="o">=</span> <span class="o">-</span><span class="n">moving_average</span> <span class="k">if</span> <span class="n">invert</span> <span class="k">else</span> <span class="n">moving_average</span>
         <span class="n">extrema_indices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">(</span>
             <span class="n">data_</span><span class="p">,</span>
-            <span class="n">distance</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minimum_duration</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">distance</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minimum_duration</span> <span class="o">*</span> <span class="n">sample_frequency</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="n">height</span><span class="o">=</span><span class="n">moving_average_</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -470,6 +468,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">breaths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Breath</span><span class="p">],</span>
         <span class="n">time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">sample_frequency</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">invalid_data_indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Breath</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove breaths overlapping with invalid data.</span>
@@ -479,8 +478,8 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            breaths: list of detected breath objects</span>
-<span class="sd">            data: data the breaths were detected in</span>
 <span class="sd">            time: time axis belonging to the data</span>
+<span class="sd">            sample_frequency: sample frequency of the data and time</span>
 <span class="sd">            invalid_data_indices: indices of invalid data points</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: write more general(ized) method of determining invalid data</span>
@@ -493,7 +492,7 @@
         <span class="n">invalid_data_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="n">invalid_data_values</span><span class="p">[</span><span class="n">invalid_data_indices</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># gives the value 1 to each invalid datapoint</span>
 
-        <span class="n">window_length</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">invalid_data_removal_window_length</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_frequency</span><span class="p">)</span>
+        <span class="n">window_length</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">invalid_data_removal_window_length</span> <span class="o">*</span> <span class="n">sample_frequency</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">breath</span> <span class="ow">in</span> <span class="n">new_breaths</span><span class="p">[:]:</span>
             <span class="n">breath_start_minus_window</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">time</span> <span class="o">==</span> <span class="n">breath</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span> <span class="o">-</span> <span class="n">window_length</span><span class="p">)</span>

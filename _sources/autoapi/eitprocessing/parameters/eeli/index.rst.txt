@@ -36,7 +36,7 @@ Module Contents
    .. py:method:: __post_init__()
 
 
-   .. py:method:: compute_parameter(continuous_data: eitprocessing.datahandling.continuousdata.ContinuousData, sample_frequency: float) -> numpy.ndarray
+   .. py:method:: compute_parameter(continuous_data: eitprocessing.datahandling.continuousdata.ContinuousData) -> numpy.ndarray
 
       Compute the EELI for each breath in the impedance data.
 
@@ -46,7 +46,6 @@ Module Contents
       >>> eeli_values = EELI().compute_parameter(global_impedance, sample_frequency=sample_frequency)
 
       :param continuous_data: a ContinuousData object containing impedance data.
-      :param sample_frequency: the sample frequency at which the data is recorded.
 
       :returns: the end-expiratory values of all breaths in the impedance data.
       :rtype: np.ndarray
