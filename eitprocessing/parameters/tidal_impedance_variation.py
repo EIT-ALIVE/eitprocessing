@@ -22,22 +22,34 @@ class TIV(ParameterCalculation):
     def __post_init__(self) -> None:
         pass
 
-    def _detect_breaths(self, data, sample_frequency, breath_detection_kwargs):
-        bd_kwargs = breath_detection_kwargs.copy()
-        bd_kwargs["sample_frequency"] = sample_frequency
+    def _detect_breaths(self, data):
+        bd_kwargs = self.breath_detection_kwargs.copy()
         breath_detection = BreathDetection(**bd_kwargs)
         return breath_detection.find_breaths(data)
 
-    def _detect_pixel_inflations(self, eit_data, continuous_data, sequence, breath_detection_kwargs):
-        bd_kwargs = breath_detection_kwargs.copy()
-        bd_kwargs["sample_frequency"] = continuous_data.sample_frequency
+    def _detect_pixel_inflations(self, eit_data, continuous_data, sequence):
+        bd_kwargs = self.breath_detection_kwargs.copy()
         pi = PixelInflation(**bd_kwargs)
         return pi.find_pixel_inflations(eit_data, continuous_data, result_label="pixel inflations", sequence=sequence)
 
-    def _calculate_tiv_values(self, data, time, breaths, tiv_method):
-        start_indices = [np.argmax(time == start_time) for start_time in [breath.start_time for breath in breaths]]
-        middle_indices = [np.argmax(time == middle_time) for middle_time in [breath.middle_time for breath in breaths]]
-        end_indices = [np.argmax(time == end_time) for end_time in [breath.end_time for breath in breaths]]
+    def _calculate_tiv_values(self, data, time, breaths, tiv_method, tiv_timing):
+        start_indices = [
+            np.argmax(time == start_time)
+            for breath in breaths
+            if breath is not None
+            for start_time in [breath.start_time]
+        ]
+
+        middle_indices = [
+            np.argmax(time == middle_time)
+            for breath in breaths
+            if breath is not None
+            for middle_time in [breath.middle_time]
+        ]
+
+        end_indices = [
+            np.argmax(time == end_time) for breath in breaths if breath is not None for end_time in [breath.end_time]
+        ]
 
         if tiv_method == "inspiratory":
             end_inspiratory_values = data[middle_indices]
@@ -56,6 +68,9 @@ class TIV(ParameterCalculation):
             tiv_values = end_inspiratory_values - [
                 np.mean(k) for k in zip(start_inspiratory_values, end_expiratory_values)
             ]
+
+        if tiv_timing == "pixel":
+            tiv_values = [None, *tiv_values, None]
 
         return tiv_values
 
@@ -86,12 +101,13 @@ class TIV(ParameterCalculation):
             msg = f"Method {self.method} is not implemented."
             raise NotImplementedError(msg)
 
-        breaths = self._detect_breaths(continuous_data, continuous_data.sample_frequency, self.breath_detection_kwargs)
+        breaths = self._detect_breaths(continuous_data)
         return self._calculate_tiv_values(
             continuous_data.values,
             continuous_data.time,
             breaths.values,
             tiv_method,
+            tiv_timing="continuous",
         )
 
     @compute_parameter.register(EITData)
@@ -140,34 +156,30 @@ class TIV(ParameterCalculation):
                 eit_data,
                 continuous_data,
                 sequence,
-                self.breath_detection_kwargs,
             )
             breath_data = pixel_inflations.values
-        else:  # tiv_timing == "global"
+        else:  # tiv_timing == "continuous"
             global_breaths = self._detect_breaths(
                 continuous_data,
-                eit_data.sample_frequency,
-                self.breath_detection_kwargs,
             )
             breath_data = global_breaths.values
 
-        number_of_breaths = (
-            len(next(b for b in breath_data.flatten() if b)) if tiv_timing == "pixel" else len(breath_data)
-        )
+        number_of_breaths = breath_data.shape[0] if tiv_timing == "pixel" else len(breath_data)
         tiv_values_array = np.empty((number_of_breaths, rows, cols), dtype=object)
 
         for i in range(number_of_breaths):
             for row in range(rows):
                 for col in range(cols):
-                    if tiv_timing == "pixel" and not breath_data[row, col]:
+                    if tiv_timing == "pixel" and not breath_data[i, row, col]:
                         tiv_values_array[i, row, col] = np.nan
                     else:
                         time_series = data[:, row, col]
                         tiv_values = self._calculate_tiv_values(
                             time_series,
                             eit_data.time,
-                            breath_data[row, col] if tiv_timing == "pixel" else breath_data,
+                            breath_data[:, row, col] if tiv_timing == "pixel" else breath_data,
                             tiv_method,
+                            tiv_timing,
                         )
                         tiv_values_array[i, row, col] = tiv_values[i]
 
