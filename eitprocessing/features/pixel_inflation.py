@@ -34,9 +34,9 @@ class PixelInflation:
         self,
         eit_data: EITData,
         continuous_data: ContinuousData,
-        result_label: str = "pixel inflations",
         sequence: Sequence | None = None,
         store: bool | None = None,
+        result_label: str = "pixel inflations",
     ) -> IntervalData:
         """Find pixel inflations in the data.
 
@@ -84,54 +84,41 @@ class PixelInflation:
 
         _, rows, cols = eit_data.pixel_impedance.shape
 
+        from eitprocessing.parameters.tidal_impedance_variation import TIV
+
+        tiv_result_pixel_inspiratory_global_timing = TIV().compute_pixel_parameter(
+            eit_data,
+            continuous_data,
+            sequence,
+            tiv_method="inspiratory",
+            tiv_timing="continuous",
+        )
+
+        mean_tiv_pixel = np.nanmean(tiv_result_pixel_inspiratory_global_timing, axis=0)
+
         pixel_inflations = np.empty((len(breaths), rows, cols), dtype=object)
+
         for row in range(rows):
             for col in range(cols):
-                end = []
-                middle = []
+                mean_value = mean_tiv_pixel[row, col]
+                time = eit_data.time
+                data = eit_data.pixel_impedance
+                middle_times_range = middle_times
 
-                if not np.isnan(
-                    eit_data.pixel_impedance[:, row, col],
-                ).any() and not np.all(
-                    eit_data.pixel_impedance[:, row, col] == 0.0,
-                ):
-                    start = [
-                        np.argmin(
-                            eit_data.pixel_impedance[
-                                middle_times[i] : middle_times[i + 1],
-                                row,
-                                col,
-                            ],
-                        )
-                        + middle_times[i]
-                        for i in range(len(middle_times) - 1)
-                    ]
+                if mean_value != 0.0:
+                    if mean_value < 0:
+                        mode_start, mode_middle = "argmax", "argmin"
+                    else:
+                        mode_start, mode_middle = "argmin", "argmax"
 
+                    start = _find_extreme_indices(data, middle_times_range, row, col, mode_start)
                     end = [start[i + 1] for i in range(len(start) - 1)]
-                    middle = [
-                        np.argmax(
-                            eit_data.pixel_impedance[start[i] : start[i + 1], row, col],
-                        )
-                        + start[i]
-                        for i in range(len(start) - 1)
-                    ]
+                    middle = _find_extreme_indices(data, start, row, col, mode_middle)
 
-                    time = eit_data.time
-
-                    inflations = [
-                        Breath(time[s], time[m], time[e])
-                        for s, m, e in zip(
-                            start[:-1],
-                            middle,
-                            end,
-                            strict=True,
-                        )
-                    ]
-                    # First and last inflation are not detected by definition (need two breaths to find one inflation)
-                    inflations = [None, *inflations, None]
-
+                    inflations = _compute_inflations(start, middle, end, time)
                 else:
                     inflations = None
+
                 pixel_inflations[:, row, col] = inflations
 
         pixel_inflations_container = IntervalData(
@@ -144,8 +131,23 @@ class PixelInflation:
             parameters={},
             derived_from=[eit_data],
         )
-
         if store:
             sequence.interval_data.add(pixel_inflations_container)
 
         return pixel_inflations_container
+
+
+def _compute_inflations(start: list, middle: list, end: list, time: np.ndarray) -> list:
+    inflations = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start[:-1], middle, end, strict=True)]
+    # First and last inflation are not detected by definition (need two breaths to find one inflation)
+    return [None, *inflations, None]
+
+
+def _find_extreme_indices(data: np.ndarray, times: list, row: int, col: int, mode: str) -> list:
+    return [
+        getattr(np, mode)(
+            data[times[i] : times[i + 1], row, col],
+        )
+        + times[i]
+        for i in range(len(times) - 1)
+    ]

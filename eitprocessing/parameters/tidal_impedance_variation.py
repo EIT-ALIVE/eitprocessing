@@ -4,8 +4,10 @@ from typing import Literal
 
 import numpy as np
 
+from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.features.pixel_inflation import PixelInflation
@@ -22,17 +24,29 @@ class TIV(ParameterCalculation):
     def __post_init__(self) -> None:
         pass
 
-    def _detect_breaths(self, data):
+    def _detect_breaths(self, data: ContinuousData) -> IntervalData:
         bd_kwargs = self.breath_detection_kwargs.copy()
         breath_detection = BreathDetection(**bd_kwargs)
         return breath_detection.find_breaths(data)
 
-    def _detect_pixel_inflations(self, eit_data, continuous_data, sequence):
+    def _detect_pixel_inflations(
+        self,
+        eit_data: EITData,
+        continuous_data: ContinuousData,
+        sequence: Sequence,
+    ) -> IntervalData:
         bd_kwargs = self.breath_detection_kwargs.copy()
         pi = PixelInflation(**bd_kwargs)
         return pi.find_pixel_inflations(eit_data, continuous_data, result_label="pixel inflations", sequence=sequence)
 
-    def _calculate_tiv_values(self, data, time, breaths, tiv_method, tiv_timing):
+    def _calculate_tiv_values(
+        self,
+        data: np.ndarray,
+        time: np.ndarray,
+        breaths: list[Breath],
+        tiv_method: str,
+        tiv_timing: str,
+    ) -> list:
         start_indices = [
             np.argmax(time == start_time)
             for breath in breaths
@@ -66,7 +80,8 @@ class TIV(ParameterCalculation):
             end_inspiratory_values = data[middle_indices]
             end_expiratory_values = data[end_indices]
             tiv_values = end_inspiratory_values - [
-                np.mean(k) for k in zip(start_inspiratory_values, end_expiratory_values)
+                np.mean(k)
+                for k in zip(start_inspiratory_values, end_expiratory_values)  # noqa: B905
             ]
 
         if tiv_timing == "pixel":
@@ -78,12 +93,17 @@ class TIV(ParameterCalculation):
     def compute_parameter(
         self,
         data: ContinuousData | EITData,
-    ):
+    ) -> str:
+        """Compute the tidal impedance variation per breath on either ContinuousData or EITData.
+
+        Args:
+            data: either continuous_data or eit_data to compute TIV on.
+        """
         msg = f"This method is implemented for ContinuousData or EITData, not {type(data)}."
         raise TypeError(msg)
 
     @compute_parameter.register(ContinuousData)
-    def compute_global_parameter(
+    def compute_continuous_parameter(
         self,
         continuous_data: ContinuousData,
         tiv_method: Literal["inspiratory", "expiratory", "mean"] = "inspiratory",
@@ -91,11 +111,10 @@ class TIV(ParameterCalculation):
         """Compute the tidal impedance variation per breath.
 
         Args:
-            sequence: the sequence containing the data.
-            data_label: the label of the continuous data in the sequence to determine the TIV of.
+            continous_data: the ContinuousData to compute the TIV on.
             tiv_method: The label of which part of the breath the TIV
-            should be determined on (inspiratory, expiratory or mean).
-            Defaults to 'inspiratory'
+                should be determined on (inspiratory, expiratory or mean).
+                Defaults to 'inspiratory'
         """
         if self.method != "extremes":
             msg = f"Method {self.method} is not implemented."
