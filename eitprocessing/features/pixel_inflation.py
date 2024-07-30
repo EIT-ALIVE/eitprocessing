@@ -25,7 +25,7 @@ class PixelInflation:
     pi = PixelInflation()
     eit_data = sequence.eit_data['raw']
     continuous_data = sequence.continuous_data['global_impedance_(raw)']
-    pixel_inflations = pi.find_pixel_inflations(eit_data, continuous_data)
+    pixel_inflations = pi.find_pixel_inflations(eit_data, continuous_data, sequence)
     """
 
     breath_detection_kwargs: dict = field(default_factory=dict)
@@ -40,22 +40,33 @@ class PixelInflation:
     ) -> IntervalData:
         """Find pixel inflations in the data.
 
-        This methods finds the pixel start/end of inflation/deflation
-        based on the global start/end of inspiration/expiration.
-        Pixel start of inflation is defined as the local minimum between
-        two global end-inspiration points. Pixel end of deflation is defined
-        as the local minimum between the consecutive two global end-inspiration
-        points. Pixel end of inflation is defined as the local maximum between
+        This method finds the pixel start/end of inflation/deflation
+        based on the start/end of inspiration/expiration as detected
+        in ContinuousData.
+
+        If pixel inflation is in phase with inspiration in the continuous signal,
+        the pixel start of inflation is defined as the local minimum between
+        two end-inspiration points in the continuous signal.
+
+        Pixel end of deflation is defined as the local minimum between the
+        consecutive two end-inspiration points in the continuous signal.
+
+        Pixel end of inflation is defined as the local maximum between
         pixel start of inflation and end of deflation.
+
+        If pixel inflation is out of phase with inspiration in the continuous signal,
+        the pixel start of inflation is defined as the local maximum between
+        two global end-inspiration points.
 
         Pixel inflations are constructed as a valley-peak-valley combination,
         representing the start of inflation, the end of inflation/start of
         deflation, and end of deflation.
 
+
         Args:
             sequence: the sequence that contains the data
-            eit_data: eit data to apply the algorithm to
-            continuous_data: continuous data to use for global breath detection
+            eit_data: EITData to apply the algorithm to
+            continuous_data: ContinuousData to use for global breath detection
             result_label: label of the returned IntervalData object, defaults to `'pixel inflations'`.
             sequence: optional, Sequence that contains the object to detect pixel inflations in,
             and/or to store the result in.
@@ -102,7 +113,7 @@ class PixelInflation:
             for col in range(cols):
                 mean_value = mean_tiv_pixel[row, col]
                 time = eit_data.time
-                data = eit_data.pixel_impedance
+                pixel_impedance = eit_data.pixel_impedance
                 middle_times_range = middle_times
 
                 if mean_value != 0.0:
@@ -111,9 +122,9 @@ class PixelInflation:
                     else:
                         mode_start, mode_middle = "argmin", "argmax"
 
-                    start = _find_extreme_indices(data, middle_times_range, row, col, mode_start)
+                    start = _find_extreme_indices(pixel_impedance, middle_times_range, row, col, mode_start)
                     end = [start[i + 1] for i in range(len(start) - 1)]
-                    middle = _find_extreme_indices(data, start, row, col, mode_middle)
+                    middle = _find_extreme_indices(pixel_impedance, start, row, col, mode_middle)
 
                     inflations = _compute_inflations(start, middle, end, time)
                 else:
