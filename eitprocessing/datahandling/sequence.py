@@ -58,7 +58,7 @@ class Sequence(Equivalence, SelectByTime):
         if len(self.eit_data):
             return self.eit_data["raw"].time
         if len(self.continuous_data):
-            return next(iter(self.continuous_data.values()))
+            return next(iter(self.continuous_data.values())).time
 
         msg = "Sequence has no timed data"
         raise AttributeError(msg)
