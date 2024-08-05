@@ -94,6 +94,7 @@ extras = dev
 [tool.ruff]
 output-format = "concise"
 line-length = 120
+extend-include = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -146,7 +147,7 @@ flake8-tidy-imports.ban-relative-imports = "all" # Disallow all relative imports
 isort.known-first-party = ["eitprocessing"]
 
 [tool.ruff.lint.per-file-ignores]
-"*.ipynb" = ["ERA001"] # Commented out code
+"*.ipynb" = ["ERA001", "T203", "T201"] # Commented out code
 "tests/*" = [
     "S101",    # Use of `assert` detected
     "ANN201",  # Missing return type
