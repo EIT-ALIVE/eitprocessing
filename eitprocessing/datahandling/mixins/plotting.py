@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from matplotlib import pyplot as plt
 
 from eitprocessing.datahandling.continuousdata import ContinuousData
@@ -24,7 +22,7 @@ class Plotting:
                 If False (default), the time (x-) axis starts at t0 (i.e., the first time point in the `Sequence`).
                 If True, the time (x-) axis starts at 0 (i.e. t0 is subtracted from each time point).
         """
-        if not isinstance(self, (Sequence, ContinuousData)):
+        if not isinstance(self, (Sequence | ContinuousData)):
             msg = "XXXXXXXX"  # TODO: write error message
             raise TypeError(msg)
 
