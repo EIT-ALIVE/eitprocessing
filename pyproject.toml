@@ -53,7 +53,8 @@ dev = [
     "mkdocs",
     "mkdocs-material",
     "mkdocstrings",
-    "mkdocs-exlude",
+    "mkdocstrings-python",
+    "mkdocs-exclude",
     "mike",
     "pymdown-extensions",
 ]
