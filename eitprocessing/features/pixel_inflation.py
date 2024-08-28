@@ -87,12 +87,6 @@ class PixelInflation:
         breath_detection = BreathDetection(**bd_kwargs)
         breaths = breath_detection.find_breaths(continuous_data)
 
-        # middle_times = np.array(
-        #     [
-        #         np.argmax(eit_data.time == middle_time)
-        #         for middle_time in [breath.middle_time for breath in breaths.values]
-        #     ],
-        # )
         middle_times = np.searchsorted(eit_data.time, [breath.middle_time for breath in breaths.values])
 
         _, rows, cols = eit_data.pixel_impedance.shape
