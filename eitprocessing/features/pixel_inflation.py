@@ -1,5 +1,6 @@
 """Dataclass for pixel inflation detection."""
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -86,12 +87,13 @@ class PixelInflation:
         breath_detection = BreathDetection(**bd_kwargs)
         breaths = breath_detection.find_breaths(continuous_data)
 
-        middle_times = np.array(
-            [
-                np.argmax(eit_data.time == middle_time)
-                for middle_time in [breath.middle_time for breath in breaths.values]
-            ],
-        )
+        # middle_times = np.array(
+        #     [
+        #         np.argmax(eit_data.time == middle_time)
+        #         for middle_time in [breath.middle_time for breath in breaths.values]
+        #     ],
+        # )
+        middle_times = np.searchsorted(eit_data.time, [breath.middle_time for breath in breaths.values])
 
         _, rows, cols = eit_data.pixel_impedance.shape
 
@@ -106,24 +108,24 @@ class PixelInflation:
         )
 
         mean_tiv_pixel = np.nanmean(tiv_result_pixel_inspiratory_global_timing, axis=0)
+        time = eit_data.time
+        pixel_impedance = eit_data.pixel_impedance
 
         pixel_inflations = np.empty((len(breaths), rows, cols), dtype=object)
 
         for row in range(rows):
             for col in range(cols):
                 mean_value = mean_tiv_pixel[row, col]
-                time = eit_data.time
-                pixel_impedance = eit_data.pixel_impedance
                 middle_times_range = middle_times
 
                 if mean_value != 0.0:
                     if mean_value < 0:
-                        mode_start, mode_middle = "argmax", "argmin"
+                        mode_start, mode_middle = np.argmax, np.argmin
                     else:
-                        mode_start, mode_middle = "argmin", "argmax"
+                        mode_start, mode_middle = np.argmin, np.argmax
 
                     start = _find_extreme_indices(pixel_impedance, middle_times_range, row, col, mode_start)
-                    end = [start[i + 1] for i in range(len(start) - 1)]
+                    end = start[1:]
                     middle = _find_extreme_indices(pixel_impedance, start, row, col, mode_middle)
 
                     inflations = _compute_inflations(start, middle, end, time)
@@ -154,11 +156,5 @@ def _compute_inflations(start: list, middle: list, end: list, time: np.ndarray) 
     return [None, *inflations, None]
 
 
-def _find_extreme_indices(data: np.ndarray, times: list, row: int, col: int, mode: str) -> list:
-    return [
-        getattr(np, mode)(
-            data[times[i] : times[i + 1], row, col],
-        )
-        + times[i]
-        for i in range(len(times) - 1)
-    ]
+def _find_extreme_indices(data: np.ndarray, times: np.ndarray, row: int, col: int, mode: Callable) -> np.ndarray:
+    return np.array([mode(data[times[i] : times[i + 1], row, col]) + times[i] for i in range(len(times) - 1)])
