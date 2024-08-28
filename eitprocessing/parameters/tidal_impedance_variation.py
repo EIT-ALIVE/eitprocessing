@@ -168,23 +168,26 @@ class TIV(ParameterCalculation):
         tiv_method: str,
         tiv_timing: str,
     ) -> list:
-        start_indices = [
-            np.argmax(time == start_time)
-            for breath in breaths
-            if breath is not None
-            for start_time in [breath.start_time]
-        ]
+        # start_indices = [
+        #     np.argmax(time == start_time)
+        #     for breath in breaths
+        #     if breath is not None
+        #     for start_time in [breath.start_time]
+        # ]
 
-        middle_indices = [
-            np.argmax(time == middle_time)
-            for breath in breaths
-            if breath is not None
-            for middle_time in [breath.middle_time]
-        ]
+        # middle_indices = [
+        #     np.argmax(time == middle_time)
+        #     for breath in breaths
+        #     if breath is not None
+        #     for middle_time in [breath.middle_time]
+        # ]
 
-        end_indices = [
-            np.argmax(time == end_time) for breath in breaths if breath is not None for end_time in [breath.end_time]
-        ]
+        # end_indices = [
+        #     np.argmax(time == end_time) for breath in breaths if breath is not None for end_time in [breath.end_time]
+        # ]
+        start_indices = [np.searchsorted(time, breath.start_time) for breath in breaths if breath is not None]
+        middle_indices = [np.searchsorted(time, breath.middle_time) for breath in breaths if breath is not None]
+        end_indices = [np.searchsorted(time, breath.end_time) for breath in breaths if breath is not None]
 
         if tiv_method == "inspiratory":
             end_inspiratory_values = data[middle_indices]
