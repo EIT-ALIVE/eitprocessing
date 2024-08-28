@@ -122,7 +122,15 @@ class PixelInflation:
                     end = start[1:]
                     middle = _find_extreme_indices(pixel_impedance, start, row, col, mode_middle)
 
-                    inflations = _compute_inflations(start, middle, end, time)
+                    ## To discuss: this block of code is implemented to prevent noisy pixels from breaking the code.
+                    # Quick solve is to make entire breath object None if any breath in a pixel does not have
+                    # consecutive start, middle and end.
+                    # However, this might cause problems elsewhere.
+
+                    if (start[:-1] >= middle).any() or (middle >= end).any():
+                        inflations = None
+                    else:
+                        inflations = _compute_inflations(start, middle, end, time)
                 else:
                     inflations = None
 
