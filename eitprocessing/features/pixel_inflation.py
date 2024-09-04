@@ -87,7 +87,7 @@ class PixelInflation:
         breath_detection = BreathDetection(**bd_kwargs)
         breaths = breath_detection.find_breaths(continuous_data)
 
-        middle_times = np.searchsorted(eit_data.time, [breath.middle_time for breath in breaths.values])
+        indices_breath_middles = np.searchsorted(eit_data.time, [breath.middle_time for breath in breaths.values])
 
         _, rows, cols = eit_data.pixel_impedance.shape
 
@@ -105,34 +105,34 @@ class PixelInflation:
         time = eit_data.time
         pixel_impedance = eit_data.pixel_impedance
 
-        pixel_inflations = np.empty((len(breaths), rows, cols), dtype=object)
+        pixel_inflations = np.full((len(breaths), rows, cols), None)
 
         for row in range(rows):
             for col in range(cols):
                 mean_value = mean_tiv_pixel[row, col]
-                middle_times_range = middle_times
 
-                if mean_value != 0.0:
-                    if mean_value < 0:
-                        mode_start, mode_middle = np.argmax, np.argmin
-                    else:
-                        mode_start, mode_middle = np.argmin, np.argmax
+                if mean_value == 0.0:
+                    continue
 
-                    start = _find_extreme_indices(pixel_impedance, middle_times_range, row, col, mode_start)
-                    end = start[1:]
-                    middle = _find_extreme_indices(pixel_impedance, start, row, col, mode_middle)
-
-                    ## To discuss: this block of code is implemented to prevent noisy pixels from breaking the code.
-                    # Quick solve is to make entire breath object None if any breath in a pixel does not have
-                    # consecutive start, middle and end.
-                    # However, this might cause problems elsewhere.
-
-                    if (start[:-1] >= middle).any() or (middle >= end).any():
-                        inflations = None
-                    else:
-                        inflations = _compute_inflations(start, middle, end, time)
+                if mean_value < 0:
+                    mode_start, mode_middle = np.argmax, np.argmin
                 else:
+                    mode_start, mode_middle = np.argmin, np.argmax
+
+                start = _find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, mode_start)
+                end = start[1:]
+                middle = _find_extreme_indices(pixel_impedance, start, row, col, mode_middle)
+
+                ## To discuss: this block of code is implemented to prevent noisy pixels from breaking the code.
+                # Quick solve is to make entire breath object None if any breath in a pixel does not have
+                # consecutive start, middle and end.
+                # However, this might cause problems elsewhere.
+
+                if (start[:-1] >= middle).any() or (middle >= end).any():
                     inflations = None
+                else:
+                    start = start[:-1]
+                    inflations = _compute_inflations(start, middle, end, time)
 
                 pixel_inflations[:, row, col] = inflations
 
@@ -141,7 +141,10 @@ class PixelInflation:
             name="Pixel in- and deflation timing as determined by PixelInflation",
             unit=None,
             category="breath",
-            intervals=[(time[middle_times[i]], time[middle_times[i + 1]]) for i in range(len(middle_times) - 1)],
+            intervals=[
+                (time[indices_breath_middles[i]], time[indices_breath_middles[i + 1]])
+                for i in range(len(indices_breath_middles) - 1)
+            ],
             values=pixel_inflations,
             parameters={},
             derived_from=[eit_data],
@@ -153,7 +156,7 @@ class PixelInflation:
 
 
 def _compute_inflations(start: list, middle: list, end: list, time: np.ndarray) -> list:
-    inflations = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start[:-1], middle, end, strict=True)]
+    inflations = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start, middle, end, strict=True)]
     # First and last inflation are not detected by definition (need two breaths to find one inflation)
     return [None, *inflations, None]
 
