@@ -168,9 +168,9 @@ class TIV(ParameterCalculation):
         tiv_method: str,
         tiv_timing: str,
     ) -> list:
-        start_indices = [np.searchsorted(time, breath.start_time) for breath in breaths if breath is not None]
-        middle_indices = [np.searchsorted(time, breath.middle_time) for breath in breaths if breath is not None]
-        end_indices = [np.searchsorted(time, breath.end_time) for breath in breaths if breath is not None]
+        start_indices = np.searchsorted(time, [breath.start_time for breath in breaths if breath is not None])
+        middle_indices = np.searchsorted(time, [breath.middle_time for breath in breaths if breath is not None])
+        end_indices = np.searchsorted(time, [breath.end_time for breath in breaths if breath is not None])
 
         if tiv_method == "inspiratory":
             end_inspiratory_values = data[middle_indices]
