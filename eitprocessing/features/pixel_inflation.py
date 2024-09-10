@@ -11,6 +11,7 @@ from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
+from eitprocessing.parameters.tidal_impedance_variation import TIV
 
 
 @dataclass
@@ -91,8 +92,6 @@ class PixelInflation:
 
         _, rows, cols = eit_data.pixel_impedance.shape
 
-        from eitprocessing.parameters.tidal_impedance_variation import TIV
-
         tiv_result_pixel_inspiratory_global_timing = TIV().compute_pixel_parameter(
             eit_data,
             continuous_data,
@@ -119,9 +118,9 @@ class PixelInflation:
                 else:
                     mode_start, mode_middle = np.argmin, np.argmax
 
-                start = _find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, mode_start)
+                start = self._find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, mode_start)
                 end = start[1:]
-                middle = _find_extreme_indices(pixel_impedance, start, row, col, mode_middle)
+                middle = self._find_extreme_indices(pixel_impedance, start, row, col, mode_middle)
 
                 ## To discuss: this block of code is implemented to prevent noisy pixels from breaking the code.
                 # Quick solve is to make entire breath object None if any breath in a pixel does not have
@@ -132,7 +131,7 @@ class PixelInflation:
                     inflations = None
                 else:
                     start = start[:-1]
-                    inflations = _compute_inflations(start, middle, end, time)
+                    inflations = self._compute_inflations(start, middle, end, time)
 
                 pixel_inflations[:, row, col] = inflations
 
@@ -154,12 +153,17 @@ class PixelInflation:
 
         return pixel_inflations_container
 
+    def _compute_inflations(self, start: list, middle: list, end: list, time: np.ndarray) -> list:
+        inflations = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start, middle, end, strict=True)]
+        # First and last inflation are not detected by definition (need two breaths to find one inflation)
+        return [None, *inflations, None]
 
-def _compute_inflations(start: list, middle: list, end: list, time: np.ndarray) -> list:
-    inflations = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start, middle, end, strict=True)]
-    # First and last inflation are not detected by definition (need two breaths to find one inflation)
-    return [None, *inflations, None]
-
-
-def _find_extreme_indices(data: np.ndarray, times: np.ndarray, row: int, col: int, mode: Callable) -> np.ndarray:
-    return np.array([mode(data[times[i] : times[i + 1], row, col]) + times[i] for i in range(len(times) - 1)])
+    def _find_extreme_indices(
+        self,
+        data: np.ndarray,
+        times: np.ndarray,
+        row: int,
+        col: int,
+        mode: Callable,
+    ) -> np.ndarray:
+        return np.array([mode(data[times[i] : times[i + 1], row, col]) + times[i] for i in range(len(times) - 1)])
