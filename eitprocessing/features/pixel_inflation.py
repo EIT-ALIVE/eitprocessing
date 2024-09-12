@@ -11,7 +11,6 @@ from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
-from eitprocessing.parameters.tidal_impedance_variation import TIV
 
 
 @dataclass
@@ -77,12 +76,16 @@ class PixelInflation:
         Returns:
             An IntervalData object containing Breath objects.
         """
-        if store is None and sequence:
+        if store is None and isinstance(sequence, Sequence):
             store = True
 
         if store and sequence is None:
             msg = "Can't store the result if no Sequence is provided."
             raise RuntimeError(msg)
+
+        if store and not isinstance(sequence, Sequence):
+            msg = "To store the result a Sequence dataclass must be provided."
+            raise ValueError(msg)
 
         bd_kwargs = self.breath_detection_kwargs.copy()
         breath_detection = BreathDetection(**bd_kwargs)
@@ -91,6 +94,8 @@ class PixelInflation:
         indices_breath_middles = np.searchsorted(eit_data.time, [breath.middle_time for breath in breaths.values])
 
         _, rows, cols = eit_data.pixel_impedance.shape
+
+        from eitprocessing.parameters.tidal_impedance_variation import TIV
 
         tiv_result_pixel_inspiratory_global_timing = TIV().compute_pixel_parameter(
             eit_data,
@@ -132,7 +137,6 @@ class PixelInflation:
                 else:
                     start = start[:-1]
                     inflations = self._compute_inflations(start, middle, end, time)
-
                 pixel_inflations[:, row, col] = inflations
 
         pixel_inflations_container = IntervalData(
