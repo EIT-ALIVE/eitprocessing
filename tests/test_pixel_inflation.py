@@ -1,4 +1,7 @@
+import copy
 import math
+import os
+from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
@@ -9,6 +12,17 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.pixel_inflation import PixelInflation
+
+environment = Path(
+    os.environ.get(
+        "EIT_PROCESSING_TEST_DATA",
+        Path(__file__).parent.parent.resolve(),
+    ),
+)
+data_directory = environment / "tests" / "test_data"
+draeger_file1 = data_directory / "Draeger_Test3.bin"
+draeger_file2 = data_directory / "Draeger_Test.bin"
+timpel_file = data_directory / "Timpel_Test.txt"
 
 
 @pytest.fixture
@@ -249,3 +263,44 @@ def test_with_custom_mean_pixel_tiv(mock_eit_data: MockEITData, mock_continuous_
                             assert math.isclose(value_at_time, -1, abs_tol=0.01)
                         elif mean == 1:
                             assert math.isclose(value_at_time, 1, abs_tol=0.01)
+
+
+def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
+    if pytestconfig.getoption("--cov"):
+        pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
+
+    draeger1 = copy.deepcopy(draeger1)
+    draeger2 = copy.deepcopy(draeger2)
+    timpel1 = copy.deepcopy(timpel1)
+    for sequence in draeger1, draeger2, timpel1:
+        pi = PixelInflation()
+        eit_data = sequence.eit_data["raw"]
+        cd = sequence.continuous_data["global_impedance_(raw)"]
+        pixel_inflations = pi.find_pixel_inflations(eit_data, cd)
+        _, rows, cols = pixel_inflations.values.shape
+
+        for row in range(rows):
+            for col in range(cols):
+                filtered_values = [val for val in pixel_inflations.values[:, row, col] if val is not None]
+                if len(filtered_values) > 0:  # not relevant if all inflations are None and filtered above
+                    start_indices, middle_indices, end_indices = (list(x) for x in zip(*filtered_values, strict=True))
+                    # Test whether pixel inflations are sorted properly
+                    assert start_indices == sorted(start_indices)
+                    assert middle_indices == sorted(middle_indices)
+                    assert end_indices == sorted(end_indices)
+
+                    # Test whether indices are unique. `set` removes non-unique values,
+                    # `sorted(list(...))` converts the set to a sorted list again.
+                    assert list(start_indices) == sorted(set(start_indices))
+                    assert list(middle_indices) == sorted(set(middle_indices))
+                    assert list(end_indices) == sorted(set(end_indices))
+
+                    # Test whether the start of the next inflation is on/after the previous inflation
+                    assert all(
+                        start_index >= end_index
+                        for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
+                    )
+                for inflation in pixel_inflations.values[:, row, col]:
+                    if inflation is not None:
+                        # Test whether the indices are in the proper order within a breath
+                        assert inflation.start_time < inflation.middle_time < inflation.end_time
