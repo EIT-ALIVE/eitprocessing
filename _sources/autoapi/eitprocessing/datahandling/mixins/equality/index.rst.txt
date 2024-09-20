@@ -30,9 +30,6 @@ Module Contents
 
    .. py:method:: __eq__(other: object) -> bool
 
-      Return self==value.
-
-
 
    .. py:method:: _eq_dataclass(other: object) -> bool
 
