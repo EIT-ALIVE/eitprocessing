@@ -1,5 +1,3 @@
-"""Dataclass for pixel inflation detection."""
-
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
@@ -23,10 +21,21 @@ class PixelInflation:
     inflation/deflation in pixel impedance data.
 
     Examples:
-    pi = PixelInflation()
-    eit_data = sequence.eit_data['raw']
-    continuous_data = sequence.continuous_data['global_impedance_(raw)']
-    pixel_inflations = pi.find_pixel_inflations(eit_data, continuous_data, sequence)
+    >>> pi = PixelInflation()
+    >>> eit_data = sequence.eit_data['raw']
+    >>> continuous_data = sequence.continuous_data['global_impedance_(raw)']
+    >>> pixel_inflations = pi.find_pixel_inflations(eit_data, continuous_data, sequence)
+
+    Args:
+    breath_detection_kwargs (dict): A dictionary of keyword arguments for breath detection.
+        The available keyword arguments are:
+        minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
+        averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
+        averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
+        amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed, defaults to 0.25
+        invalid_data_removal_window_length: window around invalid data in which breaths are removed, defaults to 0.5
+        invalid_data_removal_percentile: the nth percentile of values used to remove outliers, defaults to 5
+        invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4
     """
 
     breath_detection_kwargs: dict = field(default_factory=dict)
