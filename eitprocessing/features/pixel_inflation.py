@@ -64,7 +64,11 @@ class PixelInflation:
 
         If pixel impedance is out of phase with the continuous signal,
         the start of inflation of that pixel is defined as the local maximum between
-        two global end-inspiration points. 
+        two global end-inspiration points.
+        The end of deflation of that pixel is defined as the local maximum between two
+        consecutive end-inspiratory points in the continuous data.
+        The end of inflation of that pixel is defined as the local minimum between
+        the start of inflation and end of deflation of that pixel.
 
         Pixel inflations are constructed as a valley-peak-valley combination,
         representing the start of inflation, the end of inflation/start of
