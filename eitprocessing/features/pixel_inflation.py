@@ -52,21 +52,19 @@ class PixelInflation:
 
         This method finds the pixel start/end of inflation/deflation
         based on the start/end of inspiration/expiration as detected
-        in ContinuousData.
+        in the continuous data.
 
         If pixel impedance is in phase (within 180 degrees) with the continuous data,
         the start of inflation of that pixel is defined as the local minimum between
         two end-inspiratory points in the continuous signal.
+        The end of deflation of that pixel is defined as the local minimum between two
+        consecutive end-inspiratory points in the continuous data.
+        The end of inflation of that pixel is defined as the local maximum between
+        the start of inflation and end of deflation of that pixel.
 
-        Pixel end of deflation is defined as the local minimum between the
-        consecutive two end-inspiration points in the continuous signal.
-
-        Pixel end of inflation is defined as the local maximum between
-        pixel start of inflation and end of deflation.
-
-        If pixel inflation is out of phase with inspiration in the continuous signal,
-        the pixel start of inflation is defined as the local maximum between
-        two global end-inspiration points.
+        If pixel impedance is out of phase with the continuous signal,
+        the start of inflation of that pixel is defined as the local maximum between
+        two global end-inspiration points. 
 
         Pixel inflations are constructed as a valley-peak-valley combination,
         representing the start of inflation, the end of inflation/start of
@@ -74,7 +72,6 @@ class PixelInflation:
 
 
         Args:
-            sequence: the sequence that contains the data
             eit_data: EITData to apply the algorithm to
             continuous_data: ContinuousData to use for global breath detection
             result_label: label of the returned IntervalData object, defaults to `'pixel inflations'`.
