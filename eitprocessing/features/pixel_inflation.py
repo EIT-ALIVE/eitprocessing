@@ -103,7 +103,7 @@ class PixelInflation:
 
         indices_breath_middles = np.searchsorted(eit_data.time, [breath.middle_time for breath in breaths.values])
 
-        _, rows, cols = eit_data.pixel_impedance.shape
+        _, n_rows, n_cols = eit_data.pixel_impedance.shape
 
         from eitprocessing.parameters.tidal_impedance_variation import TIV
 
@@ -115,20 +115,20 @@ class PixelInflation:
             tiv_timing="continuous",
         )
 
-        mean_pixel_tiv = np.nanmean(pixel_tiv_with_continuous_data_timing, axis=0)
+        mean_tiv_pixel = np.nanmean(pixel_tiv_with_continuous_data_timing, axis=0)
         time = eit_data.time
         pixel_impedance = eit_data.pixel_impedance
 
-        pixel_inflations = np.full((len(breaths), rows, cols), None)
+        pixel_inflations = np.full((len(breaths), n_rows, n_cols), None)
 
-        for row in range(rows):
-            for col in range(cols):
+        for row in range(n_rows):
+            for col in range(n_cols):
                 mean_tiv = mean_tiv_pixel[row, col]
 
-                if mean_value == 0.0:
+                if mean_tiv == 0.0:
                     continue
 
-                if mean_value < 0:
+                if mean_tiv < 0:
                     mode_start, mode_middle = np.argmax, np.argmin
                 else:
                     mode_start, mode_middle = np.argmin, np.argmax
