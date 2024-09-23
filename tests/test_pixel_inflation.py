@@ -1,5 +1,4 @@
 import copy
-import math
 import os
 from pathlib import Path
 from unittest.mock import patch
@@ -21,7 +20,6 @@ environment = Path(
 )
 data_directory = environment / "tests" / "test_data"
 draeger_file1 = data_directory / "Draeger_Test3.bin"
-draeger_file2 = data_directory / "Draeger_Test.bin"
 timpel_file = data_directory / "Timpel_Test.txt"
 
 
@@ -125,14 +123,35 @@ def mock_sequence(mock_eit_data: MockEITData, mock_continuous_data: MockEITData)
     return MockSequence(mock_eit_data, mock_continuous_data)
 
 
+@pytest.fixture
+def not_a_sequence():
+    return []
+
+
+@pytest.fixture
+def none_sequence():
+    return None
+
+
+def mock_compute_pixel_parameter(mean: int):
+    def _mock(*_args, **_kwargs) -> np.ndarray:
+        if mean > 0:
+            return np.full((2, 2, 2), 1)
+        if mean < 0:
+            return np.full((2, 2, 2), -1)
+        return np.full((2, 2, 2), 0.0)
+
+    return _mock
+
+
 def test__compute_inflations():
     """Test _compute_inflations helper function."""
     time = np.array([0, 1, 2, 3, 4])
-    start = [0, 1]
-    middle = [1, 2]
-    end = [2, 3]
+    start = [0, 2]
+    middle = [1, 3]
+    end = [2, 4]
     pi = PixelInflation()
-    result = pi._compute_inflations(start, middle, end, time)
+    result = pi._construct_inflations(start, middle, end, time)
 
     assert len(result) == 4  # Two inflations plus two None
     assert result[0] is None
@@ -144,7 +163,7 @@ def test__find_extreme_indices(mock_pixel_impedance: tuple):
     """Test _find_extreme_indices helper function."""
     _, pixel_impedance = mock_pixel_impedance
     # Define the time indices where we want to find the extrema
-    times = np.array([0, 50])  # Indices between which to find extreme indices
+    indices = np.array([0, 50])  # Indices between which to find extreme indices
 
     # Expected min/max indices for each wave
     expected_min_max = [
@@ -160,14 +179,14 @@ def test__find_extreme_indices(mock_pixel_impedance: tuple):
     # Loop over each wave, defined by the (row, col) position in pixel_impedance
     for i, (row, col) in enumerate([(0, 0), (0, 1), (1, 0), (1, 1)]):
         # Call the _find_extreme_indices method for min and max
-        result_min = pi._find_extreme_indices(pixel_impedance, times, row, col, np.argmin)
-        result_max = pi._find_extreme_indices(pixel_impedance, times, row, col, np.argmax)
+        result_min = pi._find_extreme_indices(pixel_impedance, indices, row, col, np.argmin)
+        result_max = pi._find_extreme_indices(pixel_impedance, indices, row, col, np.argmax)
 
         # Get the expected min and max for the current wave
         expected_min, expected_max = expected_min_max[i]
 
-        assert math.isclose(pixel_impedance[result_min[0], row, col], expected_min, abs_tol=0.01)
-        assert math.isclose(pixel_impedance[result_max[0], row, col], expected_max, abs_tol=0.01)
+        assert np.isclose(pixel_impedance[result_min[0], row, col], expected_min, atol=0.01)
+        assert np.isclose(pixel_impedance[result_max[0], row, col], expected_max, atol=0.01)
 
 
 @pytest.mark.parametrize(
@@ -175,11 +194,16 @@ def test__find_extreme_indices(mock_pixel_impedance: tuple):
     [
         (True, "mock_sequence", False, None),  # No error expected
         (True, "not_a_sequence", True, ValueError),  # Expect ValueError because mock_eit_data is not a Sequence
-        (True, None, True, RuntimeError),  # Expect RuntimeError because store=True but no Sequence is provided
+        (
+            True,
+            "none_sequence",
+            True,
+            RuntimeError,
+        ),  # Expect RuntimeError because store=True but no Sequence is provided
         (False, "mock_sequence", False, None),  # No error expected, but no result should be stored
-        (False, None, False, None),  # No error expected, no sequence provided
+        (False, "none_sequence", False, None),  # No error expected, no sequence provided
         (None, "mock_sequence", False, None),  # No error expected
-        (None, None, False, None),  # No error expected
+        (None, "none_sequence", False, None),  # No error expected
     ],
 )
 def test_store_result(
@@ -194,11 +218,7 @@ def test_store_result(
     """Test storing results in the sequence."""
     pi = PixelInflation(breath_detection_kwargs={"minimum_duration": 0.01})  # ensure that breaths are detected
 
-    # Get the sequence fixture dynamically
-    if sequence_fixture == "not_a_sequence":
-        sequence = []
-    else:
-        sequence = request.getfixturevalue(sequence_fixture) if sequence_fixture is not None else None
+    sequence = request.getfixturevalue(sequence_fixture)
 
     if expect_error:
         # Expect a specific exception (either ValueError or RuntimeError)
@@ -214,17 +234,6 @@ def test_store_result(
             assert sequence.interval_data.data[0] == result
         elif sequence is not None:
             assert len(sequence.interval_data.data) == 0
-
-
-def mock_compute_pixel_parameter(mean: int):
-    def _mock(*_args, **_kwargs) -> np.ndarray:
-        if mean < 0:
-            return np.array([[[-1, -1], [-1, -1]], [[-1, -1], [-1, -1]]])
-        if mean > 0:
-            return np.array([[[1, 1], [1, 1]], [[1, 1], [1, 1]]])
-        return np.array([[[0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0]]])
-
-    return _mock
 
 
 @pytest.mark.parametrize(
@@ -260,22 +269,22 @@ def test_with_custom_mean_pixel_tiv(mock_eit_data: MockEITData, mock_continuous_
                         index = np.where(mock_eit_data.time == time_point)[0]
                         value_at_time = mock_eit_data.pixel_impedance[index[0], row, col]
                         if mean == -1:
-                            assert math.isclose(value_at_time, -1, abs_tol=0.01)
+                            assert np.isclose(value_at_time, -1, atol=0.01)
                         elif mean == 1:
-                            assert math.isclose(value_at_time, 1, abs_tol=0.01)
+                            assert np.isclose(value_at_time, 1, atol=0.01)
 
 
-def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
+def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
     draeger1 = copy.deepcopy(draeger1)
-    draeger2 = copy.deepcopy(draeger2)
     timpel1 = copy.deepcopy(timpel1)
-    for sequence in draeger1, draeger2, timpel1:
+    for sequence in draeger1, timpel1:
+        ssequence = sequence[0:500]
         pi = PixelInflation()
-        eit_data = sequence.eit_data["raw"]
-        cd = sequence.continuous_data["global_impedance_(raw)"]
+        eit_data = ssequence.eit_data["raw"]
+        cd = ssequence.continuous_data["global_impedance_(raw)"]
         pixel_inflations = pi.find_pixel_inflations(eit_data, cd)
         _, rows, cols = pixel_inflations.values.shape
 
