@@ -146,7 +146,7 @@ class PixelInflation:
                     inflations = None
                 else:
                     start = start[:-1]
-                    inflations = self._compute_inflations(start, middle, end, time)
+                    inflations = self._construct_inflations(start, middle, end, time)
                 pixel_inflations[:, row, col] = inflations
 
         pixel_inflations_container = IntervalData(
@@ -159,7 +159,7 @@ class PixelInflation:
                 for i in range(len(indices_breath_middles) - 1)
             ],
             values=pixel_inflations,
-            parameters={},
+            parameters={self.breath_detection_kwargs},
             derived_from=[eit_data],
         )
         if store:
@@ -167,7 +167,7 @@ class PixelInflation:
 
         return pixel_inflations_container
 
-    def _compute_inflations(self, start: list, middle: list, end: list, time: np.ndarray) -> list:
+    def _construct_inflations(self, start: list, middle: list, end: list, time: np.ndarray) -> list:
         inflations = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start, middle, end, strict=True)]
         # First and last inflation are not detected by definition (need two breaths to find one inflation)
         return [None, *inflations, None]
