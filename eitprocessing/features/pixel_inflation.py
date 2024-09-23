@@ -1,3 +1,4 @@
+import itertools
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
@@ -74,7 +75,6 @@ class PixelInflation:
         representing the start of inflation, the end of inflation/start of
         deflation, and end of deflation.
 
-
         Args:
             eit_data: EITData to apply the algorithm to
             continuous_data: ContinuousData to use for global breath detection
@@ -121,13 +121,10 @@ class PixelInflation:
 
         pixel_inflations = np.full((len(breaths), n_rows, n_cols), None)
 
-        for row in range(n_rows):
-            for col in range(n_cols):
-                mean_tiv = mean_tiv_pixel[row, col]
+        for row, col in itertools.product(range(n_rows), range(n_cols)):
+            mean_tiv = mean_tiv_pixel[row, col]
 
-                if mean_tiv == 0.0:
-                    continue
-
+            if np.any(pixel_impedance[:, row, col] > 0):
                 if mean_tiv < 0:
                     start_func, middle_func = np.argmax, np.argmin
                 else:
@@ -160,7 +157,7 @@ class PixelInflation:
             category="breath",
             intervals=intervals,
             values=pixel_inflations,
-            parameters={self.breath_detection_kwargs},
+            parameters=self.breath_detection_kwargs,
             derived_from=[eit_data],
         )
         if store:
@@ -175,10 +172,34 @@ class PixelInflation:
 
     def _find_extreme_indices(
         self,
-        data: np.ndarray,
+        pixel_impedance: np.ndarray,
         times: np.ndarray,
         row: int,
         col: int,
         function: Callable,
     ) -> np.ndarray:
-        return np.array([function(data[times[i] : times[i + 1], row, col]) + times[i] for i in range(len(times) - 1)])
+        """Finds extreme indices in pixel impedance.
+
+        This method divides the pixel impedance for a single pixel (selected using row and col) into smaller segments
+        based on the `times` array. The times array consists of indices to divide these segments. The function iterates
+        over each index in the times array to select consecutive segments of pixel impedance.
+        For each segment, the method applies the `function` (either np.argmax or np.argmin) to extract an extreme value
+        (local maximum or minimum).
+
+        Args:
+            pixel_impedance (np.ndarray): The pixel impedance array from which the function will extract values.
+                Assumed to be 3-dimensional (e.g., time, rows, and columns).
+            times (np.ndarray): 1D array of time indices. These times define the start
+                and end of each segment in the pixel impedance.
+            row (int): The row index in the pixel impedance
+            col (int): The column index in the pixel impedance
+            function (Callable): A function that is applied to each segment of data to find
+                an extreme value (np.argmax or np.argmin)
+
+        Returns:
+            np.ndarray: An array of indices where the extreme values (based on the function)
+            are located for each time segment.
+        """
+        return np.array(
+            [function(pixel_impedance[times[i] : times[i + 1], row, col]) + times[i] for i in range(len(times) - 1)],
+        )
