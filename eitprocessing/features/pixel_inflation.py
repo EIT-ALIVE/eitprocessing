@@ -54,9 +54,9 @@ class PixelInflation:
         based on the start/end of inspiration/expiration as detected
         in ContinuousData.
 
-        If pixel inflation is in phase with inspiration in the continuous signal,
-        the pixel start of inflation is defined as the local minimum between
-        two end-inspiration points in the continuous signal.
+        If pixel impedance is in phase (within 180 degrees) with the continuous data,
+        the start of inflation of that pixel is defined as the local minimum between
+        two end-inspiratory points in the continuous signal.
 
         Pixel end of deflation is defined as the local minimum between the
         consecutive two end-inspiration points in the continuous signal.
