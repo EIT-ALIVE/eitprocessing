@@ -107,7 +107,7 @@ class PixelInflation:
 
         from eitprocessing.parameters.tidal_impedance_variation import TIV
 
-        tiv_result_pixel_inspiratory_global_timing = TIV().compute_pixel_parameter(
+        pixel_tiv_with_continuous_data_timing = TIV().compute_pixel_parameter(
             eit_data,
             continuous_data,
             sequence,
@@ -115,7 +115,7 @@ class PixelInflation:
             tiv_timing="continuous",
         )
 
-        mean_tiv_pixel = np.nanmean(tiv_result_pixel_inspiratory_global_timing, axis=0)
+        mean_pixel_tiv = np.nanmean(pixel_tiv_with_continuous_data_timing, axis=0)
         time = eit_data.time
         pixel_impedance = eit_data.pixel_impedance
 
@@ -123,7 +123,7 @@ class PixelInflation:
 
         for row in range(rows):
             for col in range(cols):
-                mean_value = mean_tiv_pixel[row, col]
+                mean_tiv = mean_tiv_pixel[row, col]
 
                 if mean_value == 0.0:
                     continue
