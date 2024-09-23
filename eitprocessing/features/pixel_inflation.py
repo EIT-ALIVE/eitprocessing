@@ -129,15 +129,15 @@ class PixelInflation:
                     continue
 
                 if mean_tiv < 0:
-                    mode_start, mode_middle = np.argmax, np.argmin
+                    start_func, middle_func = np.argmax, np.argmin
                 else:
-                    mode_start, mode_middle = np.argmin, np.argmax
+                    start_func, middle_func = np.argmin, np.argmax
 
-                start = self._find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, mode_start)
+                start = self._find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, start_func)
                 end = start[1:]
-                middle = self._find_extreme_indices(pixel_impedance, start, row, col, mode_middle)
+                middle = self._find_extreme_indices(pixel_impedance, start, row, col, middle_func)
 
-                ## To discuss: this block of code is implemented to prevent noisy pixels from breaking the code.
+                # TODO discuss; this block of code is implemented to prevent noisy pixels from breaking the code.
                 # Quick solve is to make entire breath object None if any breath in a pixel does not have
                 # consecutive start, middle and end.
                 # However, this might cause problems elsewhere.
@@ -178,6 +178,6 @@ class PixelInflation:
         times: np.ndarray,
         row: int,
         col: int,
-        mode: Callable,
+        function: Callable,
     ) -> np.ndarray:
-        return np.array([mode(data[times[i] : times[i + 1], row, col]) + times[i] for i in range(len(times) - 1)])
+        return np.array([function(data[times[i] : times[i + 1], row, col]) + times[i] for i in range(len(times) - 1)])
