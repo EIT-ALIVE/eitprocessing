@@ -35,7 +35,6 @@ dependencies = [
     "scipy >= 1.10.1",
     "tqdm >= 4.65.0",
     "strenum >= 0.4.10",
-    "ruff >= 0.3",
     "anytree >= 2.12.1 ",
 ]
 
@@ -53,6 +52,7 @@ dev = [
     "sphinx_rtd_theme",
     "sphinx-autoapi",
     "tox",
+    "ruff < 0.6",
     "myst_parser",
 ]
 notebooks = [
@@ -146,7 +146,7 @@ flake8-tidy-imports.ban-relative-imports = "all" # Disallow all relative imports
 isort.known-first-party = ["eitprocessing"]
 
 [tool.ruff.lint.per-file-ignores]
-"*.ipynb" = ["ERA001"] # Commented out code
+"*.ipynb" = ["ERA001", "T201"] # Commented out code, print() statement
 "tests/*" = [
     "S101",    # Use of `assert` detected
     "ANN201",  # Missing return type
