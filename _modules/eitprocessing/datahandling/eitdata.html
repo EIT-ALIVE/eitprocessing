@@ -43,14 +43,17 @@
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">auto</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypeVar</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">strenum</span> <span class="kn">import</span> <span class="n">LowercaseStrEnum</span>
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling</span> <span class="kn">import</span> <span class="n">DataContainer</span>
 <span class="kn">from</span> <span class="nn">eitprocessing.datahandling.mixins.slicing</span> <span class="kn">import</span> <span class="n">SelectByTime</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
+
 
 <div class="viewcode-block" id="T">
 <a class="viewcode-back" href="../../../autoapi/eitprocessing/datahandling/eitdata/index.html#eitprocessing.datahandling.eitdata.T">[docs]</a>
