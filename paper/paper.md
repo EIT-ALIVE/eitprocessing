@@ -42,8 +42,6 @@ closed and opaque, while custom research software is often ad-hoc, single use an
 `eitprocessing` offers a standardized, open, and highly expandable pipeline for the processing and
 analysis of EIT and related data.
 
-## State of the field
-<!-- Or skip, because it will be very short, better suited as part of statement of need? -->
 
 ## Statement of need
 Acute respiratory failure is the most common reason for admission to the intensive care unit (ICU),
@@ -101,14 +99,5 @@ invited to use and contribute to the software.
 <!-- TODO:  example notebook Dani/Peter -->
 
 ### Data containers
-
-## Future perspective
-
-- include more algorithms as they are necessary and introduced in literature, e.g. @Wisse2024-wi
-- seek international collaboration
-
-## Acknowledgements
-
-??
 
 ## References
