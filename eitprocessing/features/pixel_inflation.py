@@ -146,10 +146,8 @@ class PixelInflation:
                     inflations = self._construct_inflations(start, middle, end, time)
                 pixel_inflations[:, row, col] = inflations
 
-        intervals = [
-            (time[indices_breath_middles[i]], time[indices_breath_middles[i + 1]])
-            for i in range(len(indices_breath_middles) - 1)
-        ]
+        intervals = [(breath.start_time, breath.end_time) for breath in breaths.values]
+
         pixel_inflations_container = IntervalData(
             label=result_label,
             name="Pixel in- and deflation timing as determined by PixelInflation",
