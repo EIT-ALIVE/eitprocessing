@@ -4,14 +4,17 @@ import warnings
 from dataclasses import dataclass, field
 from enum import auto
 from pathlib import Path
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 from strenum import LowercaseStrEnum
-from typing_extensions import Self
 
 from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
+
 
 T = TypeVar("T", bound="EITData")
 
