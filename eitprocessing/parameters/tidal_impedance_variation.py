@@ -58,6 +58,10 @@ class TIV(ParameterCalculation):
             msg = f"Method {self.method} is not implemented."
             raise NotImplementedError(msg)
 
+        if tiv_method not in {"inspiratory", "expiratory", "mean"}:
+            msg = f"Invalid tiv_method: {tiv_method}. Must be one of 'inspiratory', 'expiratory', or 'mean'."
+            raise ValueError(msg)
+
         breaths = self._detect_breaths(continuous_data)
         return self._calculate_tiv_values(
             continuous_data.values,
@@ -80,7 +84,7 @@ class TIV(ParameterCalculation):
 
         Args:
             sequence: The sequence containing the data.
-            eit_data: The eit pixel level date to determine the TIV of.
+            eit_data: The eit pixel level data to determine the TIV of.
             continuous_data: The continuous data to determine the continuous data breaths or pixel level inflations.
             tiv_method: The label of which part of the breath the TIV should be determined on
                         (inspiratory, expiratory or mean). Defaults to 'inspiratory'.
