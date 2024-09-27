@@ -1,5 +1,5 @@
 ---
-title: 'eitprocessing: A Python package for ...'
+title: 'eitprocessing: a Python package for analysis of Electrial Impedance Tomography data'
 tags:
   - Python
 authors:
