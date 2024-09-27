@@ -29,7 +29,7 @@ class TIV(ParameterCalculation):
         self,
         data: ContinuousData | EITData,
     ) -> str:
-        """Compute the tidal impedance variation per breath on either ContinuousData or EITData.
+        """Compute the tidal impedance variation per breath on either ContinuousData or EITData, depending on the input.
 
         Args:
             data: either continuous_data or eit_data to compute TIV on.
@@ -53,6 +53,10 @@ class TIV(ParameterCalculation):
 
         Returns:
             A list with the computed TIV values.
+
+        Raises:
+            NotImplementedError: If the method is not 'extremes'.
+            ValueError: If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.
         """
         if self.method != "extremes":
             msg = f"Method {self.method} is not implemented."
