@@ -30,7 +30,7 @@ affiliations:
  - name: Netherlands eScience Center, Amsterdam, The Netherlands 
    index: 2
 date: xxxxxxx
-bibliography: references.bib
+bibliography: paper.bib
 ---
 
 ## Summary
