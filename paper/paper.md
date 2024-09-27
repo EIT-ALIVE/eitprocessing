@@ -34,8 +34,13 @@ bibliography: paper.bib
 ---
 
 ## Summary
-<!-- Peter -->
-<!-- TODO: finish summary documentation, use here -->
+Electrical Impedance Tomography (EIT) is a promising non-invasive, radiation-free technology for
+monitoring the respiratory system of patients who undergo mechanical ventilation in the Intensive
+Care Unit. While EIT is gaining popularity, the complexity of data processing, analysis and
+interpretation hamper standardization, validation and widespread adoption. Commercial software is
+closed and opaque, while custom research software is often ad-hoc, single use and unverified.
+`eitprocessing` offers a standardized, open, and highly expandable pipeline for the processing and
+analysis of EIT and related data.
 
 ## State of the field
 <!-- Or skip, because it will be very short, better suited as part of statement of need? -->
