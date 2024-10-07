@@ -118,7 +118,7 @@ def mock_eit_data():
 
 
 @pytest.fixture()
-def mock_sequence(mock_eit_data: MockEITData, mock_continuous_data: MockEITData):
+def mock_sequence(mock_eit_data: MockEITData, mock_continuous_data: MockContinuousData):
     """Fixture to provide an instance of MockSequence."""
     return MockSequence(mock_eit_data, mock_continuous_data)
 
@@ -257,10 +257,9 @@ def test_with_custom_mean_pixel_tiv(mock_eit_data: MockEITData, mock_continuous_
         assert result.values.shape == (3, 2, 2)
 
         if mean == 0:
-            pass
-        else:
-            for row in range(2):
-                for col in range(2):
+            return
+
+            for row, col in itertools.product(range(2), range(2)):
                     if mean == 0:
                         # Expect None values when mean == 0
                         assert result.values[1, row, col] is None
