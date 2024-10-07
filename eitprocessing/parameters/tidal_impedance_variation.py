@@ -1,3 +1,4 @@
+import itertools
 from dataclasses import dataclass, field
 from functools import singledispatchmethod
 from typing import Literal
@@ -133,25 +134,21 @@ class TIV(ParameterCalculation):
             breath_data = global_breaths.values
 
         number_of_breaths = breath_data.shape[0] if tiv_timing == "pixel" else len(breath_data)
-        tiv_values_array = np.empty((number_of_breaths, n_rows, n_cols), dtype=object)
+        all_pixels_tiv_values = np.full((number_of_breaths, n_rows, n_cols), None, dtype=object)
 
-        for i in range(number_of_breaths):
-            for row in range(n_rows):
-                for col in range(n_cols):
-                    if tiv_timing == "pixel" and not breath_data[i, row, col]:
-                        tiv_values_array[i, row, col] = np.nan
-                    else:
-                        time_series = data[:, row, col]
-                        tiv_values = self._calculate_tiv_values(
-                            time_series,
-                            eit_data.time,
-                            breath_data[:, row, col] if tiv_timing == "pixel" else breath_data,
-                            tiv_method,
-                            tiv_timing,
-                        )
-                        tiv_values_array[i, row, col] = tiv_values[i]
+        for row, col in itertools.product(range(n_rows), range(n_cols)):
+            time_series = data[:, row, col]
+            breaths = breath_data[:, row, col] if tiv_timing == "pixel" else breath_data
+            pixel_tiv_values = self._calculate_tiv_values(
+                time_series,
+                eit_data.time,
+                breaths,
+                tiv_method,
+                tiv_timing,
+            )
+            all_pixels_tiv_values[:, row, col] = pixel_tiv_values
 
-        return tiv_values_array.astype(float)
+        return all_pixels_tiv_values.astype(float)
 
     def _detect_breaths(self, data: ContinuousData) -> IntervalData:
         bd_kwargs = self.breath_detection_kwargs.copy()
@@ -176,6 +173,13 @@ class TIV(ParameterCalculation):
         tiv_method: str,
         tiv_timing: str,
     ) -> list:
+        # Filter out None breaths
+        valid_breaths = [breath for breath in breaths if breath is not None]
+
+        # If there are no valid breaths, return a list of None with the same length as the number of breaths
+        if not valid_breaths:
+            return [None] * len(breaths)
+
         start_indices = np.searchsorted(time, [breath.start_time for breath in breaths if breath is not None])
         middle_indices = np.searchsorted(time, [breath.middle_time for breath in breaths if breath is not None])
         end_indices = np.searchsorted(time, [breath.end_time for breath in breaths if breath is not None])
