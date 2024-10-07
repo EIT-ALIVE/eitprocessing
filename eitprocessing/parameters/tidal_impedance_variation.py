@@ -18,7 +18,7 @@ from eitprocessing.parameters import ParameterCalculation
 class TIV(ParameterCalculation):
     """Compute the tidal impedance variation (TIV) per breath."""
 
-    method: str = "extremes"
+    method: Literal["extremes"] = "extremes"
     breath_detection_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -117,7 +117,7 @@ class TIV(ParameterCalculation):
             raise ValueError(msg)
 
         data = eit_data.pixel_impedance
-        _, rows, cols = data.shape
+        _, n_rows, n_cols = data.shape
 
         if tiv_timing == "pixel":
             pixel_inflations = self._detect_pixel_inflations(
@@ -181,9 +181,7 @@ class TIV(ParameterCalculation):
         end_indices = np.searchsorted(time, [breath.end_time for breath in breaths if breath is not None])
 
         if tiv_method == "inspiratory":
-            end_inspiratory_values = data[middle_indices]
-            start_inspiratory_values = data[start_indices]
-            tiv_values = end_inspiratory_values - start_inspiratory_values
+            tiv_values = np.squeeze(np.diff(data[[start_indices, middle_indices]], axis=0), axis=0)
 
         elif tiv_method == "expiratory":
             start_expiratory_values = data[middle_indices]
@@ -192,13 +190,9 @@ class TIV(ParameterCalculation):
 
         elif tiv_method == "mean":
             start_inspiratory_values = data[start_indices]
+            mean_outer_values = data[[start_indices, end_indices]].mean(axis=0)
             end_inspiratory_values = data[middle_indices]
-            end_expiratory_values = data[end_indices]
-            tiv_values = end_inspiratory_values - [
-                np.mean(k)
-                for k in zip(start_inspiratory_values, end_expiratory_values)  # noqa: B905
-            ]
-
+            tiv_values = end_inspiratory_values - mean_outer_values
         if tiv_timing == "pixel":
             tiv_values = [None, *tiv_values, None]
 
