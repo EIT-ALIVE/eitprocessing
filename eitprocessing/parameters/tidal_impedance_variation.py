@@ -162,7 +162,7 @@ class TIV(ParameterCalculation):
         sequence: Sequence,
     ) -> IntervalData:
         bd_kwargs = self.breath_detection_kwargs.copy()
-        pi = PixelInflation(**bd_kwargs)
+        pi = PixelInflation(breath_detection_kwargs=bd_kwargs)
         return pi.find_pixel_inflations(eit_data, continuous_data, result_label="pixel inflations", sequence=sequence)
 
     def _calculate_tiv_values(

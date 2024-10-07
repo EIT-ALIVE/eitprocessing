@@ -98,19 +98,19 @@ class MockSequence(Sequence):
         self.interval_data = MockIntervalData()
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_continuous_data(mock_eit_data: MockEITData):
     """Fixture to provide an instance of MockContinuousData."""
     return MockContinuousData(mock_eit_data)
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_eit_data():
     """Fixture to provide an instance of MockEITData."""
     return MockEITData()
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_sequence(mock_eit_data: MockEITData, mock_continuous_data: MockEITData):
     """Fixture to provide an instance of MockSequence."""
     return MockSequence(mock_eit_data, mock_continuous_data)
@@ -398,3 +398,35 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
         assert result_pixel is not None
         assert isinstance(result_continuous, np.ndarray)
         assert result_pixel.ndim == 3
+
+
+@pytest.mark.parametrize(
+    ("bd_kwargs", "expected_error"),
+    [
+        ({"amplitude_cutoff_fraction": 0.1, "minimum_duration": 0.5}, None),
+        ({"amplitude_cutoff_fraction": 0.2, "minimum_duration": 0.3}, None),
+        ({"amplitude_cutoff_fraction": 0.5, "minimum_duration": 0.2}, None),
+        ({"amplitude_cutoff_fraction": 0.3, "minimum_duration": 5.0}, ValueError),  # too long duration
+        ({"amplitude_cutoff_fraction": 2, "minimum_duration": 5.0}, ValueError),  # too high amplitude cutoff
+    ],
+)
+def test_detect_pixel_inflations_with_varying_bd_kwargs(
+    bd_kwargs: dict,
+    expected_error: ValueError | None,
+    mock_eit_data: MockEITData,
+    mock_continuous_data: MockContinuousData,
+    mock_sequence: MockSequence,
+):
+    tiv = TIV(breath_detection_kwargs=bd_kwargs)
+
+    if expected_error:
+        # Check that the expected error is raised
+        with pytest.raises(expected_error):
+            tiv._detect_pixel_inflations(mock_eit_data, mock_continuous_data, mock_sequence)
+    else:
+        # If no error is expected, call the method and assert the result
+        result = tiv._detect_pixel_inflations(mock_eit_data, mock_continuous_data, mock_sequence)
+
+        # Assert that the result is of the expected type and shape
+        assert isinstance(result, IntervalData)
+        assert result.values.shape == (3, 2, 2)  # Adjust this based on your expected output
