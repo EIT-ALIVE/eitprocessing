@@ -1,4 +1,5 @@
 import copy
+import itertools
 import os
 from pathlib import Path
 from unittest.mock import patch
@@ -23,7 +24,7 @@ draeger_file1 = data_directory / "Draeger_Test3.bin"
 timpel_file = data_directory / "Timpel_Test.txt"
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_pixel_impedance():
     """Mock pixel_impedance with phase shifted cosines for testing."""
     # Create a time vector (e.g., 100 points from 0 to 2*pi)
@@ -70,6 +71,10 @@ class MockEITData(EITData):
         self.pixel_impedance = pixel_impedance
         self.label = "raw"
 
+    def _make_one_zero(self) -> np.ndarray:
+        self.pixel_impedance[:, 1, 1] = np.abs(self.pixel_impedance[:, 1, 1] * 0)
+        return self.pixel_impedance
+
 
 class MockContinuousData(ContinuousData):
     """Class to create Mock ContinuousData for running tests."""
@@ -105,30 +110,38 @@ class MockSequence(Sequence):
         self.interval_data = MockIntervalData()
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_continuous_data(mock_eit_data: MockEITData):
     """Fixture to provide an instance of MockContinuousData."""
     return MockContinuousData(mock_eit_data)
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_eit_data():
     """Fixture to provide an instance of MockEITData."""
     return MockEITData()
 
 
-@pytest.fixture()
+@pytest.fixture
+def mock_zero_eit_data():
+    """Fixture to provide an instance of MockEITData with one element set to zero."""
+    mock_eit_data = MockEITData()  # Create an instance of MockEITData
+    mock_eit_data._make_one_zero()  # Set one specific element to zero
+    return mock_eit_data  # Return the modified instance
+
+
+@pytest.fixture
 def mock_sequence(mock_eit_data: MockEITData, mock_continuous_data: MockContinuousData):
     """Fixture to provide an instance of MockSequence."""
     return MockSequence(mock_eit_data, mock_continuous_data)
 
 
-@pytest.fixture()
+@pytest.fixture
 def not_a_sequence():
     return []
 
 
-@pytest.fixture()
+@pytest.fixture
 def none_sequence():
     return None
 
@@ -239,7 +252,6 @@ def test_store_result(
 @pytest.mark.parametrize(
     ("mean"),
     [
-        0,
         -1,
         1,
     ],
@@ -256,21 +268,21 @@ def test_with_custom_mean_pixel_tiv(mock_eit_data: MockEITData, mock_continuous_
 
         assert result.values.shape == (3, 2, 2)
 
-        if mean == 0:
-            return
+        for row, col in itertools.product(range(2), range(2)):
+            time_point = result.values[1, row, col].middle_time
+            index = np.where(mock_eit_data.time == time_point)[0]
+            value_at_time = mock_eit_data.pixel_impedance[index[0], row, col]
+            if mean == -1:
+                assert np.isclose(value_at_time, -1, atol=0.01)
+            elif mean == 1:
+                assert np.isclose(value_at_time, 1, atol=0.01)
 
-            for row, col in itertools.product(range(2), range(2)):
-                    if mean == 0:
-                        # Expect None values when mean == 0
-                        assert result.values[1, row, col] is None
-                    else:
-                        time_point = result.values[1, row, col].middle_time
-                        index = np.where(mock_eit_data.time == time_point)[0]
-                        value_at_time = mock_eit_data.pixel_impedance[index[0], row, col]
-                        if mean == -1:
-                            assert np.isclose(value_at_time, -1, atol=0.01)
-                        elif mean == 1:
-                            assert np.isclose(value_at_time, 1, atol=0.01)
+
+def test_with_zero_impedance(mock_zero_eit_data: MockEITData, mock_continuous_data: MockContinuousData):
+    pi = PixelInflation(breath_detection_kwargs={"minimum_duration": 0.01})
+    inflation_container = pi.find_pixel_inflations(mock_zero_eit_data, mock_continuous_data)
+    assert np.all(inflation_container.values[:, 1, 1] is None)
+    assert inflation_container.values.shape == (3, 2, 2)
 
 
 def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
@@ -285,30 +297,29 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
         eit_data = ssequence.eit_data["raw"]
         cd = ssequence.continuous_data["global_impedance_(raw)"]
         pixel_inflations = pi.find_pixel_inflations(eit_data, cd)
-        _, rows, cols = pixel_inflations.values.shape
+        _, n_rows, n_cols = pixel_inflations.values.shape
 
-        for row in range(rows):
-            for col in range(cols):
-                filtered_values = [val for val in pixel_inflations.values[:, row, col] if val is not None]
-                if len(filtered_values) > 0:  # not relevant if all inflations are None and filtered above
-                    start_indices, middle_indices, end_indices = (list(x) for x in zip(*filtered_values, strict=True))
-                    # Test whether pixel inflations are sorted properly
-                    assert start_indices == sorted(start_indices)
-                    assert middle_indices == sorted(middle_indices)
-                    assert end_indices == sorted(end_indices)
+        for row, col in itertools.product(range(n_rows), range(n_cols)):
+            filtered_values = [val for val in pixel_inflations.values[:, row, col] if val is not None]
+            if not len(filtered_values):
+                return
+            start_indices, middle_indices, end_indices = (list(x) for x in zip(*filtered_values, strict=True))
+            # Test whether pixel inflations are sorted properly
+            assert start_indices == sorted(start_indices)
+            assert middle_indices == sorted(middle_indices)
+            assert end_indices == sorted(end_indices)
 
-                    # Test whether indices are unique. `set` removes non-unique values,
-                    # `sorted(list(...))` converts the set to a sorted list again.
-                    assert list(start_indices) == sorted(set(start_indices))
-                    assert list(middle_indices) == sorted(set(middle_indices))
-                    assert list(end_indices) == sorted(set(end_indices))
+            # Test whether indices are unique. `set` removes non-unique values,
+            # `sorted(list(...))` converts the set to a sorted list again.
+            assert list(start_indices) == sorted(set(start_indices))
+            assert list(middle_indices) == sorted(set(middle_indices))
+            assert list(end_indices) == sorted(set(end_indices))
 
-                    # Test whether the start of the next inflation is on/after the previous inflation
-                    assert all(
-                        start_index >= end_index
-                        for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
-                    )
-                for inflation in pixel_inflations.values[:, row, col]:
-                    if inflation is not None:
-                        # Test whether the indices are in the proper order within a breath
-                        assert inflation.start_time < inflation.middle_time < inflation.end_time
+            # Test whether the start of the next inflation is on/after the previous inflation
+            assert all(
+                start_index >= end_index
+                for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
+            )
+            for inflation in filtered_values:
+                # Test whether the indices are in the proper order within a breath
+                assert inflation.start_time < inflation.middle_time < inflation.end_time
