@@ -59,7 +59,7 @@ class TIV(ParameterCalculation):
             ValueError: If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.
         """
         if self.method != "extremes":
-            msg = f"Method {self.method} is not implemented."
+            msg = f"Method {self.method} is not implemented. The method must be 'extremes'."
             raise NotImplementedError(msg)
 
         if tiv_method not in {"inspiratory", "expiratory", "mean"}:
@@ -105,15 +105,15 @@ class TIV(ParameterCalculation):
             ValueError: If tiv_timing is not one of 'continuous' or 'pixel'.
         """
         if self.method != "extremes":
-            msg = f"Method {self.method} is not implemented."
+            msg = f"Method {self.method} is not implemented. The method must be 'extremes'."
             raise NotImplementedError(msg)
 
         if tiv_method not in ["inspiratory", "expiratory", "mean"]:
-            msg = "tiv_method must be either 'inspiratory', 'expiratory' or 'mean'"
+            msg = f"Invalid {tiv_method}. The tiv_method must be either 'inspiratory', 'expiratory' or 'mean'."
             raise ValueError(msg)
 
         if tiv_timing not in ["continuous", "pixel"]:
-            msg = "tiv_timing must be either 'continuous' or 'pixel'"
+            msg = f"Invalid {tiv_timing}. The tiv_timing must be either 'continuous' or 'pixel'."
             raise ValueError(msg)
 
         data = eit_data.pixel_impedance
@@ -133,11 +133,11 @@ class TIV(ParameterCalculation):
             breath_data = global_breaths.values
 
         number_of_breaths = breath_data.shape[0] if tiv_timing == "pixel" else len(breath_data)
-        tiv_values_array = np.empty((number_of_breaths, rows, cols), dtype=object)
+        tiv_values_array = np.empty((number_of_breaths, n_rows, n_cols), dtype=object)
 
         for i in range(number_of_breaths):
-            for row in range(rows):
-                for col in range(cols):
+            for row in range(n_rows):
+                for col in range(n_cols):
                     if tiv_timing == "pixel" and not breath_data[i, row, col]:
                         tiv_values_array[i, row, col] = np.nan
                     else:
@@ -184,12 +184,9 @@ class TIV(ParameterCalculation):
             tiv_values = np.squeeze(np.diff(data[[start_indices, middle_indices]], axis=0), axis=0)
 
         elif tiv_method == "expiratory":
-            start_expiratory_values = data[middle_indices]
-            end_expiratory_values = data[end_indices]
-            tiv_values = start_expiratory_values - end_expiratory_values
+            tiv_values = np.squeeze(np.diff(data[[end_indices, middle_indices]], axis=0), axis=0)
 
         elif tiv_method == "mean":
-            start_inspiratory_values = data[start_indices]
             mean_outer_values = data[[start_indices, end_indices]].mean(axis=0)
             end_inspiratory_values = data[middle_indices]
             tiv_values = end_inspiratory_values - mean_outer_values
