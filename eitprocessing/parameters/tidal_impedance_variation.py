@@ -133,7 +133,7 @@ class TIV(ParameterCalculation):
             )
             breath_data = global_breaths.values
 
-        number_of_breaths = breath_data.shape[0] if tiv_timing == "pixel" else len(breath_data)
+        number_of_breaths = len(breath_data)
         all_pixels_tiv_values = np.full((number_of_breaths, n_rows, n_cols), None, dtype=object)
 
         for row, col in itertools.product(range(n_rows), range(n_cols)):
