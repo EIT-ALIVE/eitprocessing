@@ -13,19 +13,19 @@ from eitprocessing.features.breath_detection import BreathDetection
 
 
 @dataclass
-class PixelInflation:
-    """Algorithm for detecting timing of pixel inflation and deflation in pixel impedance data.
+class PixelBreath:
+    """Algorithm for detecting timing of pixel breath and deflation in pixel impedance data.
 
-    This algorithm detects the position of start inflation, end inflation/start deflation and
-    end deflation in pixel impedance data. It uses BreathDetection to find the global start and end
+    This algorithm detects the position of start of inspiration, end of inspiration and
+    end of expiration in pixel impedance data. It uses BreathDetection to find the global start and end
     of inspiration and expiration. These points are then used to find the start/end of pixel
-    inflation/deflation in pixel impedance data.
+    inspiration/expiration in pixel impedance data.
 
     Examples:
-    >>> pi = PixelInflation()
+    >>> pi = PixelBreath()
     >>> eit_data = sequence.eit_data['raw']
     >>> continuous_data = sequence.continuous_data['global_impedance_(raw)']
-    >>> pixel_inflations = pi.find_pixel_inflations(eit_data, continuous_data, sequence)
+    >>> pixel_breaths = pi.find_pixel_breaths(eit_data, continuous_data, sequence)
 
     Args:
     breath_detection_kwargs (dict): A dictionary of keyword arguments for breath detection.
@@ -41,45 +41,45 @@ class PixelInflation:
 
     breath_detection_kwargs: dict = field(default_factory=dict)
 
-    def find_pixel_inflations(
+    def find_pixel_breaths(
         self,
         eit_data: EITData,
         continuous_data: ContinuousData,
         sequence: Sequence | None = None,
         store: bool | None = None,
-        result_label: str = "pixel inflations",
+        result_label: str = "pixel breaths",
     ) -> IntervalData:
-        """Find pixel inflations in the data.
+        """Find pixel breaths in the data.
 
-        This method finds the pixel start/end of inflation/deflation
+        This method finds the pixel start/end of inspiration/expiration
         based on the start/end of inspiration/expiration as detected
         in the continuous data.
 
         If pixel impedance is in phase (within 180 degrees) with the continuous data,
-        the start of inflation of that pixel is defined as the local minimum between
+        the start of breath of that pixel is defined as the local minimum between
         two end-inspiratory points in the continuous signal.
-        The end of deflation of that pixel is defined as the local minimum between two
+        The end of expiration of that pixel is defined as the local minimum between two
         consecutive end-inspiratory points in the continuous data.
-        The end of inflation of that pixel is defined as the local maximum between
-        the start of inflation and end of deflation of that pixel.
+        The end of inspiration of that pixel is defined as the local maximum between
+        the start of inspiration and end of expiration of that pixel.
 
         If pixel impedance is out of phase with the continuous signal,
-        the start of inflation of that pixel is defined as the local maximum between
+        the start of inspiration of that pixel is defined as the local maximum between
         two end-inspiration points in the continuous data.
-        The end of deflation of that pixel is defined as the local maximum between two
+        The end of expiration of that pixel is defined as the local maximum between two
         consecutive end-inspiratory points in the continuous data.
-        The end of inflation of that pixel is defined as the local minimum between
-        the start of inflation and end of deflation of that pixel.
+        The end of inspiration of that pixel is defined as the local minimum between
+        the start of inspiration and end of expiration of that pixel.
 
-        Pixel inflations are constructed as a valley-peak-valley combination,
-        representing the start of inflation, the end of inflation/start of
-        deflation, and end of deflation.
+        Pixel breaths are constructed as a valley-peak-valley combination,
+        representing the start of inspiration, the end of inspiration/start of
+        expiration, and end of expiration.
 
         Args:
             eit_data: EITData to apply the algorithm to
             continuous_data: ContinuousData to use for global breath detection
-            result_label: label of the returned IntervalData object, defaults to `'pixel inflations'`.
-            sequence: optional, Sequence that contains the object to detect pixel inflations in,
+            result_label: label of the returned IntervalData object, defaults to `'pixel breaths'`.
+            sequence: optional, Sequence that contains the object to detect pixel breaths in,
             and/or to store the result in.
             store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
 
@@ -99,9 +99,12 @@ class PixelInflation:
 
         bd_kwargs = self.breath_detection_kwargs.copy()
         breath_detection = BreathDetection(**bd_kwargs)
-        breaths = breath_detection.find_breaths(continuous_data)
+        continuous_breaths = breath_detection.find_breaths(continuous_data)
 
-        indices_breath_middles = np.searchsorted(eit_data.time, [breath.middle_time for breath in breaths.values])
+        indices_breath_middles = np.searchsorted(
+            eit_data.time,
+            [breath.middle_time for breath in continuous_breaths.values],
+        )
 
         _, n_rows, n_cols = eit_data.pixel_impedance.shape
 
@@ -119,7 +122,7 @@ class PixelInflation:
         time = eit_data.time
         pixel_impedance = eit_data.pixel_impedance
 
-        pixel_inflations = np.full((len(breaths), n_rows, n_cols), None)
+        pixel_breaths = np.full((len(continuous_breaths), n_rows, n_cols), None)
 
         for row, col in itertools.product(range(n_rows), range(n_cols)):
             mean_tiv = mean_tiv_pixel[row, col]
@@ -140,35 +143,35 @@ class PixelInflation:
                 # However, this might cause problems elsewhere.
 
                 if (start[:-1] >= middle).any() or (middle >= end).any():
-                    inflations = None
+                    pixel_breath = None
                 else:
                     start = start[:-1]
-                    inflations = self._construct_inflations(start, middle, end, time)
-                pixel_inflations[:, row, col] = inflations
+                    pixel_breath = self._construct_breaths(start, middle, end, time)
+                pixel_breaths[:, row, col] = pixel_breath
 
-        intervals = [(breath.start_time, breath.end_time) for breath in breaths.values]
+        intervals = [(breath.start_time, breath.end_time) for breath in continuous_breaths.values]
 
-        pixel_inflations_container = IntervalData(
+        pixel_breaths_container = IntervalData(
             label=result_label,
-            name="Pixel in- and deflation timing as determined by PixelInflation",
+            name="Pixel in- and deflation timing as determined by Pixelbreath",
             unit=None,
             category="breath",
             intervals=intervals,
             values=list(
-                pixel_inflations,
-            ),  ## TODO: change back to pixel_inflations array when IntervalData works with 3D array
+                pixel_breaths,
+            ),  ## TODO: change back to pixel_breaths array when IntervalData works with 3D array
             parameters=self.breath_detection_kwargs,
             derived_from=[eit_data],
         )
         if store:
-            sequence.interval_data.add(pixel_inflations_container)
+            sequence.interval_data.add(pixel_breaths_container)
 
-        return pixel_inflations_container
+        return pixel_breaths_container
 
-    def _construct_inflations(self, start: list, middle: list, end: list, time: np.ndarray) -> list:
-        inflations = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start, middle, end, strict=True)]
-        # First and last inflation are not detected by definition (need two breaths to find one inflation)
-        return [None, *inflations, None]
+    def _construct_breaths(self, start: list, middle: list, end: list, time: np.ndarray) -> list:
+        breaths = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start, middle, end, strict=True)]
+        # First and last breath are not detected by definition (need two breaths to find one breath)
+        return [None, *breaths, None]
 
     def _find_extreme_indices(
         self,

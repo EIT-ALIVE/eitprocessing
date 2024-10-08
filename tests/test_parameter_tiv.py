@@ -332,15 +332,15 @@ def test_tiv_with_no_breaths_pixel(
     mock_continuous_data: MockContinuousData,
     mock_sequence: MockSequence,
 ):
-    """Test compute_pixel_parameter when no pixel inflations are detected."""
+    """Test compute_pixel_parameter when no pixel breaths are detected."""
     tiv = TIV()
     with (
         patch.object(
             tiv,
-            "_detect_pixel_inflations",
+            "_detect_pixel_breaths",
             return_value=IntervalData(
-                label="pixel inflations",
-                name="No Pixel Inflations",
+                label="pixel breaths",
+                name="No Pixel breaths",
                 unit="seconds",
                 category="breath",
                 intervals=[],
@@ -401,18 +401,18 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
         ({"minimum_amplitude": 2, "minimum_duration": 5.0}, TypeError),  # unexpected keyword minimum_amplitude
     ],
 )
-def test_detect_pixel_inflations_with_invalid_bd_kwargs(
+def test_detect_pixel_breaths_with_invalid_bd_kwargs(
     bd_kwargs: dict,
     expected_error: ValueError,
     mock_eit_data: MockEITData,
     mock_continuous_data: MockContinuousData,
     mock_sequence: MockSequence,
 ):
-    """Test detect_pixel_inflations with invalid bd_kwargs that raise errors."""
+    """Test detect_pixel_breaths with invalid bd_kwargs that raise errors."""
     tiv = TIV(breath_detection_kwargs=bd_kwargs)
 
     with pytest.raises(expected_error):
-        tiv._detect_pixel_inflations(mock_eit_data, mock_continuous_data, mock_sequence)
+        tiv._detect_pixel_breaths(mock_eit_data, mock_continuous_data, mock_sequence)
 
 
 @pytest.mark.parametrize(
@@ -423,16 +423,16 @@ def test_detect_pixel_inflations_with_invalid_bd_kwargs(
         ({"amplitude_cutoff_fraction": 0.5, "minimum_duration": 0.2}),
     ],
 )
-def test_detect_pixel_inflations_with_valid_bd_kwargs(
+def test_detect_pixel_breaths_with_valid_bd_kwargs(
     bd_kwargs: dict,
     mock_eit_data: MockEITData,
     mock_continuous_data: MockContinuousData,
     mock_sequence: MockSequence,
 ):
-    """Test detect_pixel_inflations with valid bd_kwargs that return expected results."""
+    """Test detect_pixel_breaths with valid bd_kwargs that return expected results."""
     tiv = TIV(breath_detection_kwargs=bd_kwargs)
 
-    result = tiv._detect_pixel_inflations(mock_eit_data, mock_continuous_data, mock_sequence)
+    result = tiv._detect_pixel_breaths(mock_eit_data, mock_continuous_data, mock_sequence)
     test_result = np.stack(result.values)
     # Assert that the result is of the expected type and shape
     assert isinstance(result, IntervalData)
