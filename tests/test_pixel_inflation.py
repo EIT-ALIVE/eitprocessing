@@ -203,50 +203,61 @@ def test__find_extreme_indices(mock_pixel_impedance: tuple):
 
 
 @pytest.mark.parametrize(
-    ("store_input", "sequence_fixture", "expect_error", "expected_exception"),
+    ("store_input", "sequence_fixture", "expected_exception"),
     [
-        (True, "mock_sequence", False, None),  # No error expected
-        (True, "not_a_sequence", True, ValueError),  # Expect ValueError because mock_eit_data is not a Sequence
-        (
-            True,
-            "none_sequence",
-            True,
-            RuntimeError,
-        ),  # Expect RuntimeError because store=True but no Sequence is provided
-        (False, "mock_sequence", False, None),  # No error expected, but no result should be stored
-        (False, "none_sequence", False, None),  # No error expected, no sequence provided
-        (None, "mock_sequence", False, None),  # No error expected
-        (None, "none_sequence", False, None),  # No error expected
+        (True, "not_a_sequence", ValueError),  # Expect ValueError because mock_eit_data is not a Sequence
+        (True, "none_sequence", RuntimeError),  # Expect RuntimeError because store=True but no Sequence is provided
     ],
 )
-def test_store_result(
+def test_store_result_with_errors(
     mock_eit_data: MockEITData,
     mock_continuous_data: MockContinuousData,
     request: pytest.FixtureRequest,
     store_input: bool,
     sequence_fixture: str,
-    expect_error: bool,
     expected_exception: ValueError | RuntimeError,
 ):
-    """Test storing results in the sequence."""
-    pi = PixelInflation(breath_detection_kwargs={"minimum_duration": 0.01})  # ensure that breaths are detected
+    """Test storing results when errors are expected."""
+    pi = PixelInflation(breath_detection_kwargs={"minimum_duration": 0.01})  # Ensure that breaths are detected
 
     sequence = request.getfixturevalue(sequence_fixture)
 
-    if expect_error:
-        # Expect a specific exception (either ValueError or RuntimeError)
-        with pytest.raises(expected_exception):
-            pi.find_pixel_inflations(mock_eit_data, mock_continuous_data, sequence, store=store_input)
-    else:
-        # Run pixel inflation detection and check the result
-        result = pi.find_pixel_inflations(mock_eit_data, mock_continuous_data, sequence, store=store_input)
+    # Expect a specific exception (either ValueError or RuntimeError)
+    with pytest.raises(expected_exception):
+        pi.find_pixel_inflations(mock_eit_data, mock_continuous_data, sequence, store=store_input)
 
-        # If store is True or None and sequence is not None, check that the result is stored in the sequence
-        if (store_input is True or store_input is None) and sequence is not None:
-            assert len(sequence.interval_data.data) == 1
-            assert sequence.interval_data.data[0] == result
-        elif sequence is not None:
-            assert len(sequence.interval_data.data) == 0
+
+@pytest.mark.parametrize(
+    ("store_input", "sequence_fixture"),
+    [
+        (True, "mock_sequence"),  # Result should be stored
+        (False, "mock_sequence"),  # No result should be stored
+        (False, "none_sequence"),  # No result should be stored, no sequence provided
+        (None, "mock_sequence"),  # Result should be stored
+        (None, "none_sequence"),  # No result stored, no sequence provided
+    ],
+)
+def test_store_result_success(
+    mock_eit_data: MockEITData,
+    mock_continuous_data: MockContinuousData,
+    request: pytest.FixtureRequest,
+    store_input: bool,
+    sequence_fixture: str,
+):
+    """Test storing results when no errors are expected."""
+    pi = PixelInflation(breath_detection_kwargs={"minimum_duration": 0.01})  # Ensure that breaths are detected
+
+    sequence = request.getfixturevalue(sequence_fixture)
+
+    # Run pixel inflation detection and check the result
+    result = pi.find_pixel_inflations(mock_eit_data, mock_continuous_data, sequence, store=store_input)
+
+    # If store is True or None and sequence is not None, check that the result is stored in the sequence
+    if (store_input is True or store_input is None) and sequence is not None:
+        assert len(sequence.interval_data.data) == 1
+        assert sequence.interval_data.data[0] == result
+    elif sequence is not None:
+        assert len(sequence.interval_data.data) == 0
 
 
 @pytest.mark.parametrize(
