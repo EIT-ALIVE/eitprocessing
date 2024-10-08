@@ -126,7 +126,11 @@ class TIV(ParameterCalculation):
                 continuous_data,
                 sequence,
             )
-            breath_data = pixel_inflations.values
+            # Check if pixel_inflations.values is empty
+            breath_data = (
+                np.empty((0, n_rows, n_cols)) if not pixel_inflations.values else np.stack(pixel_inflations.values)
+            )
+            ## TODO: replace with breath_data = pixel_inflations.values when IntervalData works with 3D array
         else:  # tiv_timing == "continuous"
             global_breaths = self._detect_breaths(
                 continuous_data,

@@ -154,7 +154,9 @@ class PixelInflation:
             unit=None,
             category="breath",
             intervals=intervals,
-            values=pixel_inflations,
+            values=list(
+                pixel_inflations,
+            ),  ## TODO: change back to pixel_inflations array when IntervalData works with 3D array
             parameters=self.breath_detection_kwargs,
             derived_from=[eit_data],
         )

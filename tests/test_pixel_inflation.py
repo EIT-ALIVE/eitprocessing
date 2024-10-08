@@ -277,10 +277,11 @@ def test_with_custom_mean_pixel_tiv(mock_eit_data: MockEITData, mock_continuous_
 
         result = pi.find_pixel_inflations(mock_eit_data, mock_continuous_data)
 
-        assert result.values.shape == (3, 2, 2)
+        test_result = np.stack(result.values)
+        assert test_result.shape == (3, 2, 2)
 
         for row, col in itertools.product(range(2), range(2)):
-            time_point = result.values[1, row, col].middle_time
+            time_point = test_result[1, row, col].middle_time
             index = np.where(mock_eit_data.time == time_point)[0]
             value_at_time = mock_eit_data.pixel_impedance[index[0], row, col]
             if mean == -1:
@@ -292,8 +293,9 @@ def test_with_custom_mean_pixel_tiv(mock_eit_data: MockEITData, mock_continuous_
 def test_with_zero_impedance(mock_zero_eit_data: MockEITData, mock_continuous_data: MockContinuousData):
     pi = PixelInflation(breath_detection_kwargs={"minimum_duration": 0.01})
     inflation_container = pi.find_pixel_inflations(mock_zero_eit_data, mock_continuous_data)
-    assert np.all(inflation_container.values[:, 1, 1] is None)
-    assert inflation_container.values.shape == (3, 2, 2)
+    test_result = np.stack(inflation_container.values)
+    assert np.all(np.vectorize(lambda x: x is None)(test_result[:, 1, 1]))
+    assert test_result.shape == (3, 2, 2)
 
 
 def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
@@ -308,10 +310,11 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
         eit_data = ssequence.eit_data["raw"]
         cd = ssequence.continuous_data["global_impedance_(raw)"]
         pixel_inflations = pi.find_pixel_inflations(eit_data, cd)
-        _, n_rows, n_cols = pixel_inflations.values.shape
+        test_result = np.stack(pixel_inflations.values)
+        _, n_rows, n_cols = test_result.shape
 
         for row, col in itertools.product(range(n_rows), range(n_cols)):
-            filtered_values = [val for val in pixel_inflations.values[:, row, col] if val is not None]
+            filtered_values = [val for val in test_result[:, row, col] if val is not None]
             if not len(filtered_values):
                 return
             start_indices, middle_indices, end_indices = (list(x) for x in zip(*filtered_values, strict=True))
