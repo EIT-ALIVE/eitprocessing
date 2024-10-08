@@ -23,7 +23,9 @@ class TIV(ParameterCalculation):
     breath_detection_kwargs: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        pass
+        if self.method != "extremes":
+            msg = f"Method {self.method} is not implemented. The method must be 'extremes'."
+            raise NotImplementedError(msg)
 
     @singledispatchmethod
     def compute_parameter(
@@ -56,13 +58,8 @@ class TIV(ParameterCalculation):
             A list with the computed TIV values.
 
         Raises:
-            NotImplementedError: If the method is not 'extremes'.
             ValueError: If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.
         """
-        if self.method != "extremes":
-            msg = f"Method {self.method} is not implemented. The method must be 'extremes'."
-            raise NotImplementedError(msg)
-
         if tiv_method not in {"inspiratory", "expiratory", "mean"}:
             msg = f"Invalid tiv_method: {tiv_method}. Must be one of 'inspiratory', 'expiratory', or 'mean'."
             raise ValueError(msg)
@@ -101,14 +98,9 @@ class TIV(ParameterCalculation):
             An np.ndarray with the computed TIV values.
 
         Raises:
-            NotImplementedError: If the method is not 'extremes'.
             ValueError: If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.
             ValueError: If tiv_timing is not one of 'continuous' or 'pixel'.
         """
-        if self.method != "extremes":
-            msg = f"Method {self.method} is not implemented. The method must be 'extremes'."
-            raise NotImplementedError(msg)
-
         if tiv_method not in ["inspiratory", "expiratory", "mean"]:
             msg = f"Invalid {tiv_method}. The tiv_method must be either 'inspiratory', 'expiratory' or 'mean'."
             raise ValueError(msg)
