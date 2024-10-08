@@ -138,26 +138,19 @@ def test_compute_parameter_type_error():
         tiv.compute_parameter("unsupported_type")
 
 
-def test_compute_continuous_parameter_not_implemented_method(mock_continuous_data: MockContinuousData):
-    """Test that compute_continuous_parameter raises NotImplementedError for unsupported methods."""
-    tiv = TIV(method="unsupported_method")
-    with pytest.raises(NotImplementedError, match="Method unsupported_method is not implemented."):
-        tiv.compute_continuous_parameter(mock_continuous_data)
+def test_tiv_initialization_with_invalid_method():
+    """Test that TIV raises NotImplementedError for unsupported methods during initialization."""
+    with pytest.raises(
+        NotImplementedError,
+        match="Method unsupported_method is not implemented. The method must be 'extremes'.",
+    ):
+        TIV(method="unsupported_method")
 
 
-def test_compute_pixel_parameter_not_implemented_method(
-    mock_eit_data: MockEITData,
-    mock_continuous_data: MockContinuousData,
-    mock_sequence: MockSequence,
-):
-    """Test that compute_pixel_parameter raises NotImplementedError for unsupported methods."""
-    tiv = TIV(method="unsupported_method")
-    with pytest.raises(NotImplementedError, match="Method unsupported_method is not implemented."):
-        tiv.compute_pixel_parameter(
-            eit_data=mock_eit_data,
-            continuous_data=mock_continuous_data,
-            sequence=mock_sequence,
-        )
+def test_tiv_initialization_with_valid_method():
+    """Test that TIV initializes successfully with a valid method."""
+    tiv = TIV(method="extremes")  # This should not raise an error
+    assert tiv.method == "extremes"
 
 
 @pytest.mark.parametrize(
