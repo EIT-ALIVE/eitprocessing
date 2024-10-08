@@ -23,6 +23,12 @@ draeger_file1 = data_directory / "Draeger_Test3.bin"
 timpel_file = data_directory / "Timpel_Test.txt"
 
 
+def create_result_array(value: float):
+    nan_row = [[np.nan] * 2] * 2
+    value_row = [[value] * 2] * 2
+    return np.array([nan_row, value_row, nan_row])
+
+
 class MockEITData(EITData):
     """Class to create Mock EITData for running tests."""
 
@@ -186,39 +192,9 @@ def test_compute_continuous_parameter_tiv_method(
     [
         ("invalid_method", ValueError, None),
         (5, ValueError, None),
-        (
-            "inspiratory",
-            None,
-            np.array(
-                [
-                    [[np.nan, np.nan], [np.nan, np.nan]],
-                    [[2, 2], [2, 2]],
-                    [[np.nan, np.nan], [np.nan, np.nan]],
-                ],
-            ),
-        ),
-        (
-            "expiratory",
-            None,
-            np.array(
-                [
-                    [[np.nan, np.nan], [np.nan, np.nan]],
-                    [[2.5, 2.5], [2.5, 2.5]],
-                    [[np.nan, np.nan], [np.nan, np.nan]],
-                ],
-            ),
-        ),
-        (
-            "mean",
-            None,
-            np.array(
-                [
-                    [[np.nan, np.nan], [np.nan, np.nan]],
-                    [[2.25, 2.25], [2.25, 2.25]],
-                    [[np.nan, np.nan], [np.nan, np.nan]],
-                ],
-            ),
-        ),
+        ("inspiratory", None, create_result_array(2)),
+        ("expiratory", None, create_result_array(2.5)),
+        ("mean", None, create_result_array(2.25)),
     ],
 )
 def test_compute_pixel_parameter_invalid_tiv_method(
