@@ -161,129 +161,146 @@ def test_compute_pixel_parameter_not_implemented_method(
 
 
 @pytest.mark.parametrize(
-    ("tiv_method", "expected_error", "expected_result"),
+    ("tiv_method", "expected_error"),
     [
-        ("invalid_method", ValueError, None),
-        (5, ValueError, None),
-        ("inspiratory", None, np.array([8, 8, 8])),
-        ("expiratory", None, np.array([8, 10, 8])),
-        ("mean", None, np.array([8, 9, 8])),
+        ("invalid_method", ValueError),
+        (5, ValueError),
     ],
 )
-def test_compute_continuous_parameter_tiv_method(
+def test_compute_continuous_parameter_tiv_method_errors(
     mock_continuous_data: MockContinuousData,
     tiv_method: str,
-    expected_error: ValueError | None,
-    expected_result: np.ndarray,
+    expected_error: ValueError,
 ):
-    """Test compute_continuous_parameter with various tiv_method inputs."""
+    """Test compute_continuous_parameter with invalid tiv_method inputs that raise errors."""
     tiv = TIV()
-    if expected_error:
-        with pytest.raises(expected_error):
-            tiv.compute_continuous_parameter(mock_continuous_data, tiv_method=tiv_method)
-    else:
-        result = tiv.compute_continuous_parameter(mock_continuous_data, tiv_method=tiv_method)
-        assert result.shape == (3,)
-        assert np.allclose(result, expected_result, atol=0.01)
+    with pytest.raises(expected_error):
+        tiv.compute_continuous_parameter(mock_continuous_data, tiv_method=tiv_method)
 
 
 @pytest.mark.parametrize(
-    ("tiv_method", "expected_error", "expected_result"),
+    ("tiv_method", "expected_result"),
     [
-        ("invalid_method", ValueError, None),
-        (5, ValueError, None),
-        ("inspiratory", None, create_result_array(2)),
-        ("expiratory", None, create_result_array(2.5)),
-        ("mean", None, create_result_array(2.25)),
+        ("inspiratory", np.array([8, 8, 8])),
+        ("expiratory", np.array([8, 10, 8])),
+        ("mean", np.array([8, 9, 8])),
     ],
 )
-def test_compute_pixel_parameter_invalid_tiv_method(
+def test_compute_continuous_parameter_tiv_method_success(
+    mock_continuous_data: MockContinuousData,
+    tiv_method: str,
+    expected_result: np.ndarray,
+):
+    """Test compute_continuous_parameter with valid tiv_method inputs that return expected results."""
+    tiv = TIV()
+    result = tiv.compute_continuous_parameter(mock_continuous_data, tiv_method=tiv_method)
+    assert result.shape == (3,)
+    assert np.allclose(result, expected_result, atol=0.01)
+
+
+@pytest.mark.parametrize(
+    ("tiv_method", "expected_error"),
+    [
+        ("invalid_method", ValueError),
+        (5, ValueError),
+    ],
+)
+def test_compute_pixel_parameter_invalid_tiv_method_errors(
     mock_eit_data: MockEITData,
     mock_continuous_data: MockContinuousData,
     mock_sequence: MockSequence,
     tiv_method: str,
-    expected_error: ValueError | None,
-    expected_result: np.ndarray,
+    expected_error: ValueError,
 ):
-    """Test compute_pixel_parameter with invalid tiv_method."""
+    """Test compute_pixel_parameter with invalid tiv_method inputs that raise errors."""
     tiv = TIV()
-    if expected_error:
-        with pytest.raises(expected_error):
-            tiv.compute_pixel_parameter(mock_eit_data, mock_continuous_data, mock_sequence, tiv_method=tiv_method)
-    else:
-        result = tiv.compute_pixel_parameter(
-            mock_eit_data,
-            mock_continuous_data,
-            mock_sequence,
-            tiv_method=tiv_method,
-        )
-        assert result.shape == (3, 2, 2)
-        assert np.allclose(
-            result[np.isfinite(result)],
-            expected_result[np.isfinite(expected_result)],
-            atol=0.01,
-        )  # isfinite because first and last breaths are expected to be np.nan
+    with pytest.raises(expected_error):
+        tiv.compute_pixel_parameter(mock_eit_data, mock_continuous_data, mock_sequence, tiv_method=tiv_method)
 
 
 @pytest.mark.parametrize(
-    ("tiv_timing", "expected_error", "expected_result"),
+    ("tiv_method", "expected_result"),
     [
-        ("invalid_timing", ValueError, None),
-        (
-            "continuous",
-            None,
-            np.array(
-                [
-                    [[2, 2], [2, 2]],
-                    [[2, 2], [2, 2]],
-                    [[2, 2], [2, 2]],
-                ],
-            ),
-        ),
-        (
-            "pixel",
-            None,
-            np.array(
-                [
-                    [[np.nan, np.nan], [np.nan, np.nan]],
-                    [[2, 2], [2, 2]],
-                    [[np.nan, np.nan], [np.nan, np.nan]],
-                ],
-            ),
-        ),
+        ("inspiratory", create_result_array(2)),
+        ("expiratory", create_result_array(2.5)),
+        ("mean", create_result_array(2.25)),
     ],
 )
-def test_compute_pixel_parameter_tiv_timing(
+def test_compute_pixel_parameter_valid_tiv_method(
+    mock_eit_data: MockEITData,
+    mock_continuous_data: MockContinuousData,
+    mock_sequence: MockSequence,
+    tiv_method: str,
+    expected_result: np.ndarray,
+):
+    """Test compute_pixel_parameter with valid tiv_method inputs that return expected results."""
+    tiv = TIV()
+    result = tiv.compute_pixel_parameter(
+        mock_eit_data,
+        mock_continuous_data,
+        mock_sequence,
+        tiv_method=tiv_method,
+    )
+    assert result.shape == (3, 2, 2)
+    assert np.allclose(
+        result[np.isfinite(result)],
+        expected_result[np.isfinite(expected_result)],
+        atol=0.01,
+    )  # isfinite because first and last breaths are expected to be np.nan
+
+
+@pytest.mark.parametrize(
+    ("tiv_timing", "expected_error"),
+    [
+        ("invalid_timing", ValueError),
+    ],
+)
+def test_compute_pixel_parameter_tiv_timing_errors(
     mock_eit_data: MockEITData,
     mock_continuous_data: MockContinuousData,
     mock_sequence: MockSequence,
     tiv_timing: str,
-    expected_error: ValueError | None,
-    expected_result: np.ndarray,
+    expected_error: ValueError,
 ):
-    """Test compute_pixel_parameter with various tiv_timing inputs."""
+    """Test compute_pixel_parameter with invalid tiv_timing inputs that raise errors."""
     tiv = TIV()
-    if expected_error and tiv_timing == "invalid_timing":
-        with pytest.raises(expected_error, match="tiv_timing must be either 'continuous' or 'pixel'"):
-            tiv.compute_pixel_parameter(
-                eit_data=mock_eit_data,
-                continuous_data=mock_continuous_data,
-                sequence=mock_sequence,
-                tiv_timing=tiv_timing,
-            )
-    else:
-        result = tiv.compute_pixel_parameter(
+    with pytest.raises(expected_error, match="tiv_timing must be either 'continuous' or 'pixel'"):
+        tiv.compute_pixel_parameter(
             eit_data=mock_eit_data,
             continuous_data=mock_continuous_data,
             sequence=mock_sequence,
             tiv_timing=tiv_timing,
         )
-        assert result.shape == (3, 2, 2)
-        assert np.allclose(
-            result[np.isfinite(result)],
-            expected_result[np.isfinite(expected_result)],
-            atol=0.01,
-        )
+
+
+@pytest.mark.parametrize(
+    ("tiv_timing", "expected_result"),
+    [
+        ("continuous", np.full((3, 2, 2), 2)),
+        ("pixel", create_result_array(2)),
+    ],
+)
+def test_compute_pixel_parameter_tiv_timing_success(
+    mock_eit_data: MockEITData,
+    mock_continuous_data: MockContinuousData,
+    mock_sequence: MockSequence,
+    tiv_timing: str,
+    expected_result: np.ndarray,
+):
+    """Test compute_pixel_parameter with valid tiv_timing inputs that return expected results."""
+    tiv = TIV()
+    result = tiv.compute_pixel_parameter(
+        eit_data=mock_eit_data,
+        continuous_data=mock_continuous_data,
+        sequence=mock_sequence,
+        tiv_timing=tiv_timing,
+    )
+    assert result.shape == (3, 2, 2)
+    assert np.allclose(
+        result[np.isfinite(result)],
+        expected_result[np.isfinite(expected_result)],
+        atol=0.01,
+    )
 
 
 def test_tiv_with_no_breaths_continuous(mock_continuous_data: MockContinuousData):
@@ -379,30 +396,44 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
 @pytest.mark.parametrize(
     ("bd_kwargs", "expected_error"),
     [
-        ({"amplitude_cutoff_fraction": 0.1, "minimum_duration": 0.5}, None),
-        ({"amplitude_cutoff_fraction": 0.2, "minimum_duration": 0.3}, None),
-        ({"amplitude_cutoff_fraction": 0.5, "minimum_duration": 0.2}, None),
         ({"amplitude_cutoff_fraction": 0.3, "minimum_duration": 5.0}, ValueError),  # too long duration
         ({"amplitude_cutoff_fraction": 2, "minimum_duration": 5.0}, ValueError),  # too high amplitude cutoff
+        ({"minimum_amplitude": 2, "minimum_duration": 5.0}, TypeError),  # unexpected keyword minimum_amplitude
     ],
 )
-def test_detect_pixel_inflations_with_varying_bd_kwargs(
+def test_detect_pixel_inflations_with_invalid_bd_kwargs(
     bd_kwargs: dict,
-    expected_error: ValueError | None,
+    expected_error: ValueError,
     mock_eit_data: MockEITData,
     mock_continuous_data: MockContinuousData,
     mock_sequence: MockSequence,
 ):
+    """Test detect_pixel_inflations with invalid bd_kwargs that raise errors."""
     tiv = TIV(breath_detection_kwargs=bd_kwargs)
 
-    if expected_error:
-        # Check that the expected error is raised
-        with pytest.raises(expected_error):
-            tiv._detect_pixel_inflations(mock_eit_data, mock_continuous_data, mock_sequence)
-    else:
-        # If no error is expected, call the method and assert the result
-        result = tiv._detect_pixel_inflations(mock_eit_data, mock_continuous_data, mock_sequence)
+    with pytest.raises(expected_error):
+        tiv._detect_pixel_inflations(mock_eit_data, mock_continuous_data, mock_sequence)
 
-        # Assert that the result is of the expected type and shape
-        assert isinstance(result, IntervalData)
-        assert result.values.shape == (3, 2, 2)  # Adjust this based on your expected output
+
+@pytest.mark.parametrize(
+    ("bd_kwargs"),
+    [
+        ({"amplitude_cutoff_fraction": 0.1, "minimum_duration": 0.5}),
+        ({"amplitude_cutoff_fraction": 0.2, "minimum_duration": 0.3}),
+        ({"amplitude_cutoff_fraction": 0.5, "minimum_duration": 0.2}),
+    ],
+)
+def test_detect_pixel_inflations_with_valid_bd_kwargs(
+    bd_kwargs: dict,
+    mock_eit_data: MockEITData,
+    mock_continuous_data: MockContinuousData,
+    mock_sequence: MockSequence,
+):
+    """Test detect_pixel_inflations with valid bd_kwargs that return expected results."""
+    tiv = TIV(breath_detection_kwargs=bd_kwargs)
+
+    result = tiv._detect_pixel_inflations(mock_eit_data, mock_continuous_data, mock_sequence)
+
+    # Assert that the result is of the expected type and shape
+    assert isinstance(result, IntervalData)
+    assert result.values.shape == (3, 2, 2)  # Adjust this based on your expected output
