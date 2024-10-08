@@ -11,7 +11,7 @@ from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.sequence import Sequence
-from eitprocessing.features.pixel_inflation import PixelInflation
+from eitprocessing.features.pixel_breath import PixelBreath
 
 environment = Path(
     os.environ.get(
@@ -157,16 +157,16 @@ def mock_compute_pixel_parameter(mean: int):
     return _mock
 
 
-def test__compute_inflations():
-    """Test _compute_inflations helper function."""
+def test__compute_breaths():
+    """Test _compute_breaths helper function."""
     time = np.array([0, 1, 2, 3, 4])
     start = [0, 2]
     middle = [1, 3]
     end = [2, 4]
-    pi = PixelInflation()
-    result = pi._construct_inflations(start, middle, end, time)
+    pi = PixelBreath()
+    result = pi._construct_breaths(start, middle, end, time)
 
-    assert len(result) == 4  # Two inflations plus two None
+    assert len(result) == 4  # Two breaths plus two None
     assert result[0] is None
     assert result[-1] is None
     assert isinstance(result[1], Breath)
@@ -186,8 +186,8 @@ def test__find_extreme_indices(mock_pixel_impedance: tuple):
         (-1, np.sqrt(2) / 2),  # cos_wave_4
     ]
 
-    # Create an instance of PixelInflation
-    pi = PixelInflation()
+    # Create an instance of PixelBreath
+    pi = PixelBreath()
 
     # Loop over each wave, defined by the (row, col) position in pixel_impedance
     for i, (row, col) in enumerate([(0, 0), (0, 1), (1, 0), (1, 1)]):
@@ -218,13 +218,13 @@ def test_store_result_with_errors(
     expected_exception: ValueError | RuntimeError,
 ):
     """Test storing results when errors are expected."""
-    pi = PixelInflation(breath_detection_kwargs={"minimum_duration": 0.01})  # Ensure that breaths are detected
+    pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})  # Ensure that breaths are detected
 
     sequence = request.getfixturevalue(sequence_fixture)
 
     # Expect a specific exception (either ValueError or RuntimeError)
     with pytest.raises(expected_exception):
-        pi.find_pixel_inflations(mock_eit_data, mock_continuous_data, sequence, store=store_input)
+        pi.find_pixel_breaths(mock_eit_data, mock_continuous_data, sequence, store=store_input)
 
 
 @pytest.mark.parametrize(
@@ -245,12 +245,12 @@ def test_store_result_success(
     sequence_fixture: str,
 ):
     """Test storing results when no errors are expected."""
-    pi = PixelInflation(breath_detection_kwargs={"minimum_duration": 0.01})  # Ensure that breaths are detected
+    pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})  # Ensure that breaths are detected
 
     sequence = request.getfixturevalue(sequence_fixture)
 
-    # Run pixel inflation detection and check the result
-    result = pi.find_pixel_inflations(mock_eit_data, mock_continuous_data, sequence, store=store_input)
+    # Run pixel breath detection and check the result
+    result = pi.find_pixel_breaths(mock_eit_data, mock_continuous_data, sequence, store=store_input)
 
     # If store is True or None and sequence is not None, check that the result is stored in the sequence
     if (store_input is True or store_input is None) and sequence is not None:
@@ -273,9 +273,9 @@ def test_with_custom_mean_pixel_tiv(mock_eit_data: MockEITData, mock_continuous_
         "eitprocessing.parameters.tidal_impedance_variation.TIV.compute_pixel_parameter",
         side_effect=mock_function,
     ):
-        pi = PixelInflation(breath_detection_kwargs={"minimum_duration": 0.01})
+        pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})
 
-        result = pi.find_pixel_inflations(mock_eit_data, mock_continuous_data)
+        result = pi.find_pixel_breaths(mock_eit_data, mock_continuous_data)
 
         test_result = np.stack(result.values)
         assert test_result.shape == (3, 2, 2)
@@ -291,9 +291,9 @@ def test_with_custom_mean_pixel_tiv(mock_eit_data: MockEITData, mock_continuous_
 
 
 def test_with_zero_impedance(mock_zero_eit_data: MockEITData, mock_continuous_data: MockContinuousData):
-    pi = PixelInflation(breath_detection_kwargs={"minimum_duration": 0.01})
-    inflation_container = pi.find_pixel_inflations(mock_zero_eit_data, mock_continuous_data)
-    test_result = np.stack(inflation_container.values)
+    pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})
+    breath_container = pi.find_pixel_breaths(mock_zero_eit_data, mock_continuous_data)
+    test_result = np.stack(breath_container.values)
     assert np.all(np.vectorize(lambda x: x is None)(test_result[:, 1, 1]))
     assert test_result.shape == (3, 2, 2)
 
@@ -306,11 +306,11 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
     timpel1 = copy.deepcopy(timpel1)
     for sequence in draeger1, timpel1:
         ssequence = sequence[0:500]
-        pi = PixelInflation()
+        pi = PixelBreath()
         eit_data = ssequence.eit_data["raw"]
         cd = ssequence.continuous_data["global_impedance_(raw)"]
-        pixel_inflations = pi.find_pixel_inflations(eit_data, cd)
-        test_result = np.stack(pixel_inflations.values)
+        pixel_breaths = pi.find_pixel_breaths(eit_data, cd)
+        test_result = np.stack(pixel_breaths.values)
         _, n_rows, n_cols = test_result.shape
 
         for row, col in itertools.product(range(n_rows), range(n_cols)):
@@ -318,7 +318,7 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
             if not len(filtered_values):
                 return
             start_indices, middle_indices, end_indices = (list(x) for x in zip(*filtered_values, strict=True))
-            # Test whether pixel inflations are sorted properly
+            # Test whether pixel breaths are sorted properly
             assert start_indices == sorted(start_indices)
             assert middle_indices == sorted(middle_indices)
             assert end_indices == sorted(end_indices)
@@ -329,11 +329,11 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
             assert list(middle_indices) == sorted(set(middle_indices))
             assert list(end_indices) == sorted(set(end_indices))
 
-            # Test whether the start of the next inflation is on/after the previous inflation
+            # Test whether the start of the next breath is on/after the previous breath
             assert all(
                 start_index >= end_index
                 for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
             )
-            for inflation in filtered_values:
+            for breath in filtered_values:
                 # Test whether the indices are in the proper order within a breath
-                assert inflation.start_time < inflation.middle_time < inflation.end_time
+                assert breath.start_time < breath.middle_time < breath.end_time

@@ -11,7 +11,7 @@ from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
-from eitprocessing.features.pixel_inflation import PixelInflation
+from eitprocessing.features.pixel_breath import PixelBreath
 from eitprocessing.parameters import ParameterCalculation
 
 
@@ -90,11 +90,11 @@ class TIV(ParameterCalculation):
         Args:
             sequence: The sequence containing the data.
             eit_data: The eit pixel level data to determine the TIV of.
-            continuous_data: The continuous data to determine the continuous data breaths or pixel level inflations.
+            continuous_data: The continuous data to determine the continuous data breaths or pixel level breaths.
             tiv_method: The label of which part of the breath the TIV should be determined on
                         (inspiratory, expiratory or mean). Defaults to 'inspiratory'.
             tiv_timing: The label of which timing should be used to compute the TIV, either based on breaths
-                        detected in continuous data ('continuous') or based on pixel inflations ('pixel').
+                        detected in continuous data ('continuous') or based on pixel breaths ('pixel').
                         Defaults to 'pixel'.
 
         Returns:
@@ -121,16 +121,14 @@ class TIV(ParameterCalculation):
         _, n_rows, n_cols = data.shape
 
         if tiv_timing == "pixel":
-            pixel_inflations = self._detect_pixel_inflations(
+            pixel_breaths = self._detect_pixel_breaths(
                 eit_data,
                 continuous_data,
                 sequence,
             )
-            # Check if pixel_inflations.values is empty
-            breath_data = (
-                np.empty((0, n_rows, n_cols)) if not pixel_inflations.values else np.stack(pixel_inflations.values)
-            )
-            ## TODO: replace with breath_data = pixel_inflations.values when IntervalData works with 3D array
+            # Check if pixel_breaths.values is empty
+            breath_data = np.empty((0, n_rows, n_cols)) if not pixel_breaths.values else np.stack(pixel_breaths.values)
+            ## TODO: replace with breath_data = pixel_breaths.values when IntervalData works with 3D array
         else:  # tiv_timing == "continuous"
             global_breaths = self._detect_breaths(
                 continuous_data,
@@ -159,15 +157,15 @@ class TIV(ParameterCalculation):
         breath_detection = BreathDetection(**bd_kwargs)
         return breath_detection.find_breaths(data)
 
-    def _detect_pixel_inflations(
+    def _detect_pixel_breaths(
         self,
         eit_data: EITData,
         continuous_data: ContinuousData,
         sequence: Sequence,
     ) -> IntervalData:
         bd_kwargs = self.breath_detection_kwargs.copy()
-        pi = PixelInflation(breath_detection_kwargs=bd_kwargs)
-        return pi.find_pixel_inflations(eit_data, continuous_data, result_label="pixel inflations", sequence=sequence)
+        pi = PixelBreath(breath_detection_kwargs=bd_kwargs)
+        return pi.find_pixel_breaths(eit_data, continuous_data, result_label="pixel breaths", sequence=sequence)
 
     def _calculate_tiv_values(
         self,
