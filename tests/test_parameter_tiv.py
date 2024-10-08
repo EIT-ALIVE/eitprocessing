@@ -433,7 +433,7 @@ def test_detect_pixel_inflations_with_valid_bd_kwargs(
     tiv = TIV(breath_detection_kwargs=bd_kwargs)
 
     result = tiv._detect_pixel_inflations(mock_eit_data, mock_continuous_data, mock_sequence)
-
+    test_result = np.stack(result.values)
     # Assert that the result is of the expected type and shape
     assert isinstance(result, IntervalData)
-    assert result.values.shape == (3, 2, 2)  # Adjust this based on your expected output
+    assert test_result.shape == (3, 2, 2)  # Adjust this based on your expected output
