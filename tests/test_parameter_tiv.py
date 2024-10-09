@@ -7,9 +7,11 @@ import numpy as np
 import pytest
 
 from eitprocessing.datahandling.continuousdata import ContinuousData
-from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.datacollection import DataCollection
+from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
+from eitprocessing.datahandling.sparsedata import SparseData
 from eitprocessing.parameters.tidal_impedance_variation import TIV
 
 environment = Path(
@@ -29,97 +31,103 @@ def create_result_array(value: float):
     return np.array([nan_row, value_row, nan_row])
 
 
-class MockEITData(EITData):
-    """Class to create Mock EITData for running tests."""
+def mock_pixel_impedance():
+    """Mock pixel_impedance.
 
-    def __init__(self):
-        """Mock pixel_impedance.
+    Each pixel is an identical sine wave with a baseline drop to create difference between
+    inspiratory and expiratory limb for one of the breaths.
+    """
+    duration = 10
+    fs = 1000
+    frequency = 0.25
+    amplitude = 1.0
+    baseline_drop = -0.5
+    # Calculate the period of the sine wave
+    period = 1 / frequency
 
-        Each pixel is an identical sine wave with a baseline drop to create difference between
-        inspiratory and expiratory limb for one of the breaths.
-        """
-        duration = 10
-        fs = 1000
-        frequency = 0.25
-        amplitude = 1.0
-        baseline_drop = -0.5
-        # Calculate the period of the sine wave
-        period = 1 / frequency
+    # Create time vector with extra breaths
+    extra_breaths_duration = 2 * period  # One period for the extra breath at start and end
+    total_duration = duration + extra_breaths_duration
+    t = np.linspace(0, total_duration, int(total_duration * fs), endpoint=False)
 
-        # Create time vector with extra breaths
-        extra_breaths_duration = 2 * period  # One period for the extra breath at start and end
-        total_duration = duration + extra_breaths_duration
-        t = np.linspace(0, total_duration, int(total_duration * fs), endpoint=False)
+    # Generate the sine wave
+    signal = amplitude * np.sin(2 * np.pi * frequency * t)
 
-        # Generate the sine wave
-        signal = amplitude * np.sin(2 * np.pi * frequency * t)
+    # Apply baseline drop halfway through the original duration
+    halfway_index = len(signal) // 2
+    signal[halfway_index:] += baseline_drop  # Shift the baseline down for the second half
 
-        # Apply baseline drop halfway through the original duration
-        halfway_index = len(signal) // 2
-        signal[halfway_index:] += baseline_drop  # Shift the baseline down for the second half
+    # Store the waves in a (time, 2, 2) array
+    pixel_impedance = np.empty((len(t), 2, 2))
+    pixel_impedance[:, 0, 0] = signal
+    pixel_impedance[:, 0, 1] = signal
+    pixel_impedance[:, 1, 0] = signal
+    pixel_impedance[:, 1, 1] = signal
 
-        # Store the waves in a (time, 2, 2) array
-        pixel_impedance = np.empty((len(t), 2, 2))
-        pixel_impedance[:, 0, 0] = signal
-        pixel_impedance[:, 0, 1] = signal
-        pixel_impedance[:, 1, 0] = signal
-        pixel_impedance[:, 1, 1] = signal
-
-        self.time = t
-        self.pixel_impedance = pixel_impedance
-        self.label = "raw"
+    return pixel_impedance
 
 
-class MockContinuousData(ContinuousData):
-    """Class to create Mock ContinuousData for running tests."""
-
-    def __init__(self, mock_eit_data: MockEITData):
-        pixel_impedance = mock_eit_data.pixel_impedance
-        self.time = mock_eit_data.time
-        self.values = np.nansum(
-            pixel_impedance,
-            axis=(1, 2),
-        )
-        self.label = "global_impedance(raw)"
-        self.sample_frequency = 1000
-
-
-class MockIntervalData:
-    """Class to create Mock IntervalData for running tests."""
-
-    def __init__(self):
-        self.data = []
-
-    def add(self, item: list):
-        """Function to add item to IntervalData."""
-        self.data.append(item)
-
-
-class MockSequence(Sequence):
-    """Class to create Mock Sequence for running tests."""
-
-    def __init__(self, mock_eit_data: MockEITData, mock_continuous_data: MockContinuousData):
-        self.eit_data = mock_eit_data
-        self.continuous_data = mock_continuous_data
-        self.interval_data = MockIntervalData()
+def mock_global_impedance():
+    pixel_impedance = mock_pixel_impedance()
+    return np.nansum(
+        pixel_impedance,
+        axis=(1, 2),
+    )
 
 
 @pytest.fixture()
-def mock_continuous_data(mock_eit_data: MockEITData):
-    """Fixture to provide an instance of MockContinuousData."""
-    return MockContinuousData(mock_eit_data)
+def mock_continuous_data():
+    """Fixture to provide an instance of ContinuousData."""
+    return ContinuousData(
+        label="global_impedance",
+        name="global_impedance",
+        unit="au",
+        category="relative impedance",
+        description="Global impedance created for testing TIV parameter",
+        parameters={},
+        derived_from="mock_eit_data",
+        time=np.linspace(0, 18, int(18 * 1000), endpoint=False),
+        values=mock_global_impedance(),
+        sample_frequency=1000,
+    )
 
 
 @pytest.fixture()
 def mock_eit_data():
-    """Fixture to provide an instance of MockEITData."""
-    return MockEITData()
+    """Fixture to provide an instance of EITData."""
+    return EITData(
+        path="",
+        nframes=2000,
+        time=np.linspace(0, 18, int(18 * 1000), endpoint=False),
+        sample_frequency=1000,
+        vendor=Vendor.DRAEGER,
+        label="mock_eit_data",
+        name="mock_eit_data",
+        pixel_impedance=mock_pixel_impedance(),
+    )
 
 
 @pytest.fixture()
-def mock_sequence(mock_eit_data: MockEITData, mock_continuous_data: MockEITData):
-    """Fixture to provide an instance of MockSequence."""
-    return MockSequence(mock_eit_data, mock_continuous_data)
+def mock_sequence(mock_eit_data: EITData, mock_continuous_data: ContinuousData):
+    """Fixture to provide an instance of Sequence."""
+    data_collection_eit = DataCollection(EITData)
+    data_collection_eit.add(mock_eit_data)
+
+    data_collection_continuous = DataCollection(ContinuousData)
+    data_collection_continuous.add(mock_continuous_data)
+
+    data_collection_sparse = DataCollection(SparseData)
+    data_collection_interval = DataCollection(IntervalData)
+
+    return Sequence(
+        label="mock_sequence",
+        name="mock_sequence",
+        description="Sequence created for parameter TIV testing",
+        eit_data=data_collection_eit,
+        continuous_data=data_collection_continuous,
+        sparse_data=data_collection_sparse,
+        interval_data=data_collection_interval,
+    )
 
 
 def test_tiv_initialization():
@@ -161,7 +169,7 @@ def test_tiv_initialization_with_valid_method():
     ],
 )
 def test_compute_continuous_parameter_tiv_method_errors(
-    mock_continuous_data: MockContinuousData,
+    mock_continuous_data: ContinuousData,
     tiv_method: str,
     expected_error: ValueError,
 ):
@@ -180,7 +188,7 @@ def test_compute_continuous_parameter_tiv_method_errors(
     ],
 )
 def test_compute_continuous_parameter_tiv_method_success(
-    mock_continuous_data: MockContinuousData,
+    mock_continuous_data: ContinuousData,
     tiv_method: str,
     expected_result: np.ndarray,
 ):
@@ -199,9 +207,9 @@ def test_compute_continuous_parameter_tiv_method_success(
     ],
 )
 def test_compute_pixel_parameter_invalid_tiv_method_errors(
-    mock_eit_data: MockEITData,
-    mock_continuous_data: MockContinuousData,
-    mock_sequence: MockSequence,
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
+    mock_sequence: Sequence,
     tiv_method: str,
     expected_error: ValueError,
 ):
@@ -220,9 +228,9 @@ def test_compute_pixel_parameter_invalid_tiv_method_errors(
     ],
 )
 def test_compute_pixel_parameter_valid_tiv_method(
-    mock_eit_data: MockEITData,
-    mock_continuous_data: MockContinuousData,
-    mock_sequence: MockSequence,
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
+    mock_sequence: Sequence,
     tiv_method: str,
     expected_result: np.ndarray,
 ):
@@ -249,9 +257,9 @@ def test_compute_pixel_parameter_valid_tiv_method(
     ],
 )
 def test_compute_pixel_parameter_tiv_timing_errors(
-    mock_eit_data: MockEITData,
-    mock_continuous_data: MockContinuousData,
-    mock_sequence: MockSequence,
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
+    mock_sequence: Sequence,
     tiv_timing: str,
     expected_error: ValueError,
 ):
@@ -274,9 +282,9 @@ def test_compute_pixel_parameter_tiv_timing_errors(
     ],
 )
 def test_compute_pixel_parameter_tiv_timing_success(
-    mock_eit_data: MockEITData,
-    mock_continuous_data: MockContinuousData,
-    mock_sequence: MockSequence,
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
+    mock_sequence: Sequence,
     tiv_timing: str,
     expected_result: np.ndarray,
 ):
@@ -296,7 +304,7 @@ def test_compute_pixel_parameter_tiv_timing_success(
     )
 
 
-def test_tiv_with_no_breaths_continuous(mock_continuous_data: MockContinuousData):
+def test_tiv_with_no_breaths_continuous(mock_continuous_data: ContinuousData):
     """Test compute_continuous_parameter when no breaths are detected."""
     tiv = TIV()
     with (
@@ -321,9 +329,9 @@ def test_tiv_with_no_breaths_continuous(mock_continuous_data: MockContinuousData
 
 
 def test_tiv_with_no_breaths_pixel(
-    mock_eit_data: MockEITData,
-    mock_continuous_data: MockContinuousData,
-    mock_sequence: MockSequence,
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
+    mock_sequence: Sequence,
 ):
     """Test compute_pixel_parameter when no pixel breaths are detected."""
     tiv = TIV()
@@ -397,9 +405,9 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
 def test_detect_pixel_breaths_with_invalid_bd_kwargs(
     bd_kwargs: dict,
     expected_error: ValueError,
-    mock_eit_data: MockEITData,
-    mock_continuous_data: MockContinuousData,
-    mock_sequence: MockSequence,
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
+    mock_sequence: Sequence,
 ):
     """Test detect_pixel_breaths with invalid bd_kwargs that raise errors."""
     tiv = TIV(breath_detection_kwargs=bd_kwargs)
@@ -418,9 +426,9 @@ def test_detect_pixel_breaths_with_invalid_bd_kwargs(
 )
 def test_detect_pixel_breaths_with_valid_bd_kwargs(
     bd_kwargs: dict,
-    mock_eit_data: MockEITData,
-    mock_continuous_data: MockContinuousData,
-    mock_sequence: MockSequence,
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
+    mock_sequence: Sequence,
 ):
     """Test detect_pixel_breaths with valid bd_kwargs that return expected results."""
     tiv = TIV(breath_detection_kwargs=bd_kwargs)
