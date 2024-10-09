@@ -1,0 +1,16 @@
+:py:mod:`eitprocessing.features`
+================================
+
+.. py:module:: eitprocessing.features
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   breath_detection/index.rst
+   moving_average/index.rst
+
+

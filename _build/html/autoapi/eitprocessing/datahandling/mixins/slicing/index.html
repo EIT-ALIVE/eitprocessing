@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>eitprocessing.datahandling.mixins.slicing &#8212; eitprocessing 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/nature.css?v=601dbdee" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">eitprocessing 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-eitprocessing.datahandling.mixins.slicing">
+<span id="eitprocessing-datahandling-mixins-slicing"></span><h1><a class="reference internal" href="#module-eitprocessing.datahandling.mixins.slicing" title="eitprocessing.datahandling.mixins.slicing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing</span></code></a><a class="headerlink" href="#module-eitprocessing.datahandling.mixins.slicing" title="Link to this heading">¶</a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex" title="eitprocessing.datahandling.mixins.slicing.SelectByIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByIndex</span></code></a></p></td>
+<td><p>Adds slicing functionality to subclass by implementing <cite>__getitem__</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></a></p></td>
+<td><p>Gives access to a TimeIndexer object that can be used to slice by time.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByTime</span></code></a></p></td>
+<td><p>Adds methods for slicing by time rather than index.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeIndexer</span></code></a></p></td>
+<td><p>Helper class for slicing an object using the time axis instead of indices.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByIndex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.mixins.slicing.</span></span><span class="sig-name descname"><span class="pre">SelectByIndex</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>Adds slicing functionality to subclass by implementing <cite>__getitem__</cite>.</p>
+<p>Subclasses must implement a <cite>_sliced_copy</cite> function that defines what should
+happen when the object is sliced. This class ensures that when calling a
+slice between square brackets (as e.g. done for lists) then return the
+expected sliced object.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByIndex.label">
+<span class="sig-name descname"><span class="pre">label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex.label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex.label" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByIndex.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.12)"><span class="pre">slice</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex.__getitem__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByIndex.select_by_index">
+<span class="sig-name descname"><span class="pre">select_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex.select_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex.select_by_index" title="Link to this definition">¶</a></dt>
+<dd><p>De facto implementation of the <cite>__getitem__</cite> function.</p>
+<p>This function can also be called directly to add a label to the sliced
+object. Otherwise a default label describing the slice and original
+object is attached.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByIndex.__len__">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex.__len__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByIndex._sliced_copy">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_sliced_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">newlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByIndex._sliced_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex._sliced_copy" title="Link to this definition">¶</a></dt>
+<dd><p>Slicing method that must be implemented by all subclasses.</p>
+<p>Must return a copy of self object with all attached data within selected
+indices.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.mixins.slicing.</span></span><span class="sig-name descname"><span class="pre">HasTimeIndexer</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#HasTimeIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="Link to this definition">¶</a></dt>
+<dd><p>Gives access to a TimeIndexer object that can be used to slice by time.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.t">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer"><span class="pre">TimeIndexer</span></a></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#HasTimeIndexer.t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.t" title="Link to this definition">¶</a></dt>
+<dd><p>Slicing an object using the time axis instead of indices.</p>
+<p>Example:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">sequence</span> <span class="pre">=</span> <span class="pre">load_eit_data(&lt;path&gt;,</span> <span class="pre">...)</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">=</span> <span class="pre">sequence.t[tp_start:tp_end]</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice2</span> <span class="pre">=</span> <span class="pre">sequence.select_by_time(tp_start,</span> <span class="pre">tp_end)</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">==</span> <span class="pre">time_slice2</span>
+<span class="pre">True</span>
+<span class="pre">`</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.select_by_time">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#HasTimeIndexer.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.select_by_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByTime">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.mixins.slicing.</span></span><span class="sig-name descname"><span class="pre">SelectByTime</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex" title="eitprocessing.datahandling.mixins.slicing.SelectByIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectByIndex</span></code></a>, <a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></a></p>
+<p>Adds methods for slicing by time rather than index.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.SelectByTime.select_by_time">
+<span class="sig-name descname"><span class="pre">select_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_inclusive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_inclusive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">typing_extensions.Self</span></span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#SelectByTime.select_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime.select_by_time" title="Link to this definition">¶</a></dt>
+<dd><p>Get a shortened copy of the object, starting from start_time and ending at end_time.</p>
+<p>Given a start and end time stamp (i.e. its value, not its index),
+return a slice of the original object, which must contain a time axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_time</strong> – first time point to include. Defaults to first frame of sequence.</p></li>
+<li><p><strong>end_time</strong> – last time point. Defaults to last frame of sequence.</p></li>
+<li><p><strong>(</strong><strong>default</strong> (<em>start_inclusive</em>) – <cite>True</cite>), end_inclusive (default <cite>False</cite>):
+these arguments control the behavior if the given time stamp
+does not match exactly with an existing time stamp of the input.
+if <cite>True</cite>: the given time stamp will be inside the sliced object.
+if <cite>False</cite>: the given time stamp will be outside the sliced object.</p></li>
+<li><p><strong>label</strong> – Description. Defaults to None, which will create a label based
+on the original object label and the frames by which it is sliced.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.12)"><strong>TypeError</strong></a> – if <cite>self</cite> does not contain a <cite>time</cite> attribute.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – if time stamps are not sorted.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A shortened copy of the object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.TimeIndexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.datahandling.mixins.slicing.</span></span><span class="sig-name descname"><span class="pre">TimeIndexer</span></span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#TimeIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer" title="Link to this definition">¶</a></dt>
+<dd><p>Helper class for slicing an object using the time axis instead of indices.</p>
+<p>Example:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">sequence</span> <span class="pre">=</span> <span class="pre">load_eit_data(&lt;path&gt;,</span> <span class="pre">...)</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">=</span> <span class="pre">sequence.t[tp_start:tp_end]</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice2</span> <span class="pre">=</span> <span class="pre">sequence.select_by_time(tp_start,</span> <span class="pre">tp_end)</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">time_slice1</span> <span class="pre">==</span> <span class="pre">time_slice2</span>
+<span class="pre">True</span>
+<span class="pre">`</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.TimeIndexer.obj">
+<span class="sig-name descname"><span class="pre">obj</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer" title="eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><span class="pre">HasTimeIndexer</span></a></em><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#TimeIndexer.obj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer.obj" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.datahandling.mixins.slicing.TimeIndexer.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.12)"><span class="pre">slice</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/eitprocessing/datahandling/mixins/slicing.html#TimeIndexer.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer.__getitem__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing</span></code></a><ul>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex"><code class="docutils literal notranslate"><span class="pre">SelectByIndex</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex.label"><code class="docutils literal notranslate"><span class="pre">SelectByIndex.label</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex.__getitem__"><code class="docutils literal notranslate"><span class="pre">SelectByIndex.__getitem__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex.select_by_index"><code class="docutils literal notranslate"><span class="pre">SelectByIndex.select_by_index()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex.__len__"><code class="docutils literal notranslate"><span class="pre">SelectByIndex.__len__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByIndex._sliced_copy"><code class="docutils literal notranslate"><span class="pre">SelectByIndex._sliced_copy()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.t"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer.t</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.HasTimeIndexer.select_by_time"><code class="docutils literal notranslate"><span class="pre">HasTimeIndexer.select_by_time()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime"><code class="docutils literal notranslate"><span class="pre">SelectByTime</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.SelectByTime.select_by_time"><code class="docutils literal notranslate"><span class="pre">SelectByTime.select_by_time()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer"><code class="docutils literal notranslate"><span class="pre">TimeIndexer</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer.obj"><code class="docutils literal notranslate"><span class="pre">TimeIndexer.obj</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.datahandling.mixins.slicing.TimeIndexer.__getitem__"><code class="docutils literal notranslate"><span class="pre">TimeIndexer.__getitem__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../../_sources/autoapi/eitprocessing/datahandling/mixins/slicing/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">eitprocessing 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.datahandling.mixins.slicing</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+    </div>
+  </body>
+</html>

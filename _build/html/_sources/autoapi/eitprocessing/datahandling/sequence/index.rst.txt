@@ -1,0 +1,113 @@
+:py:mod:`eitprocessing.datahandling.sequence`
+=============================================
+
+.. py:module:: eitprocessing.datahandling.sequence
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.sequence.Sequence
+
+
+
+
+.. py:class:: Sequence
+
+   Bases: :py:obj:`eitprocessing.datahandling.mixins.equality.Equivalence`, :py:obj:`eitprocessing.datahandling.mixins.slicing.SelectByTime`, :py:obj:`eitprocessing.datahandling.mixins.slicing.HasTimeIndexer`
+
+   Sequence of timepoints containing respiratory data.
+
+   A Sequence object is a representation of data points over time. These data can consist of any combination of EIT
+   frames (`EITData`), waveform data (`ContinuousData`) from different sources, or individual events (`SparseData`)
+   occurring at any given timepoint.
+   A Sequence can consist of an entire measurement, a section of a measurement, a single breath, or even a portion of a
+   breath. A Sequence can consist of multiple sets of each type of data from the same time-points or can be a single
+   measurement from just one source.
+
+   A Sequence can be split up into separate sections of a measurement or multiple (similar) Sequence objects can be
+   merged together to form a single Sequence.
+
+   :param label: Computer readable naming of the instance.
+   :param name: Human readable naming of the instance.
+   :param description: Human readable extended description of the data.
+   :param eit_data: Collection of one or more sets of EIT data frames.
+   :param continuous_data: Collection of one or more sets of continuous data points.
+   :param sparse_data: Collection of one or more sets of individual data points.
+
+   .. py:property:: time
+      :type: numpy.ndarray
+
+      Time axis from either EITData or ContinuousData.
+
+   .. py:attribute:: label
+      :type: str | None
+
+      
+
+   .. py:attribute:: name
+      :type: str | None
+
+      
+
+   .. py:attribute:: description
+      :type: str
+
+      
+
+   .. py:attribute:: eit_data
+      :type: eitprocessing.datahandling.datacollection.DataCollection
+
+      
+
+   .. py:attribute:: continuous_data
+      :type: eitprocessing.datahandling.datacollection.DataCollection
+
+      
+
+   .. py:attribute:: sparse_data
+      :type: eitprocessing.datahandling.datacollection.DataCollection
+
+      
+
+   .. py:attribute:: interval_data
+      :type: eitprocessing.datahandling.datacollection.DataCollection
+
+      
+
+   .. py:method:: __post_init__()
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: __add__(other: Sequence) -> Sequence
+
+
+   .. py:method:: concatenate(a: Sequence, b: Sequence, newlabel: str | None = None) -> Sequence
+      :classmethod:
+
+      Create a merge of two Sequence objects.
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = True, end_inclusive: bool = False, label: str | None = None, name: str | None = None, description: str = '') -> typing_extensions.Self
+
+      Return a sliced version of the Sequence.
+
+      See SelectByTime.select_by_time().
+
+
+
