@@ -13,8 +13,9 @@ from eitprocessing.datahandling.sparsedata import SparseData
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-V_classes = (EITData, ContinuousData, SparseData, IntervalData)
-V = TypeVar("V", *V_classes)
+
+V = TypeVar("V", EITData, ContinuousData, SparseData, IntervalData)
+V_classes = V.__constraints__
 
 
 class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
