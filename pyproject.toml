@@ -85,6 +85,9 @@ branch = true
 source = ["eitprocessing"]
 command_line = "-m pytest"
 
+[tool.coverage.report]
+exclude_lines = ["if TYPE_CHECKING:"]
+
 [tool.setuptools.packages.find]
 include = ["eitprocessing*", "eitprocessing.*"]
 exclude = ["tests*", "*tests.*", "*tests"]
