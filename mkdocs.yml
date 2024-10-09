@@ -121,3 +121,6 @@ plugins:
           show_source: false
           docstring_section_style: spacy
           line_length: 80
+
+extra_css:
+- css/material.css
