@@ -60,6 +60,7 @@ docs = [
     "mkdocs-exclude",
     "mike",
     "pymdown-extensions",
+    "black",
 ]
 notebooks = [
     "ipykernel >= 6.15.2",
