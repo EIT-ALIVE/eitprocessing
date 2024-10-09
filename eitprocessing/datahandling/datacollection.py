@@ -97,7 +97,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
 
     def get_data_derived_from(self, obj: V) -> dict[str, V]:
         """Return all data that was derived from a specific source."""
-        return {k: v for k, v in self.items() if obj in v.derived_from}
+        return {k: v for k, v in self.items() if any(obj is item for item in v.derived_from)}
 
     def get_derived_data(self) -> dict[str, V]:
         """Return all data that was derived from any source."""
