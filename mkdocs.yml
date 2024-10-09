@@ -48,7 +48,13 @@ nav:
 - Getting started:
   - Installation: installation.md
   - Basic example: basic_example.md
-- API Documentation: APIindex.md
+- API Documentation: 
+  - api/loading.md
+  - api/datacontainers.md
+  - api/filters.md
+  - api/features.md
+  - api/parameters.md
+  - api/categories.md
 - About:
   - Contributing: contributing_doc.md
   - Code of Conduct: code_of_conduct_doc.md
