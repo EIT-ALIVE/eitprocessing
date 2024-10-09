@@ -9,8 +9,11 @@ import pytest
 
 from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
-from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.datacollection import DataCollection
+from eitprocessing.datahandling.eitdata import EITData, Vendor
+from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
+from eitprocessing.datahandling.sparsedata import SparseData
 from eitprocessing.features.pixel_breath import PixelBreath
 
 environment = Path(
@@ -24,8 +27,115 @@ draeger_file1 = data_directory / "Draeger_Test3.bin"
 timpel_file = data_directory / "Timpel_Test.txt"
 
 
-@pytest.fixture()
+# @pytest.fixture()
 def mock_pixel_impedance():
+    """Mock pixel_impedance with phase shifted cosines for testing."""
+    # Create a time vector
+    time = np.linspace(0, 2 * np.pi, 400)
+
+    # Create 4 cosine waves with different frequencies or phases
+    cos_wave_1 = np.cos(4 * time)  # Standard cosine wave
+    cos_wave_2 = np.cos(4 * time + np.pi)  # Phase-shifted by pi
+    cos_wave_3 = np.cos(4 * time + 0.5 * np.pi)  # Phase-shifted by 0.5*pi
+    cos_wave_4 = np.cos(4 * time + 0.25 * np.pi)  # Phase-shifted by 0.25*pi
+
+    # Store the waves in a (time, 2, 2) array
+    pixel_impedance = np.empty((len(time), 2, 2))
+    pixel_impedance[:, 0, 0] = cos_wave_1
+    pixel_impedance[:, 0, 1] = cos_wave_2
+    pixel_impedance[:, 1, 0] = cos_wave_3
+    pixel_impedance[:, 1, 1] = cos_wave_4
+
+    return pixel_impedance
+
+
+def mock_pixel_impedance_one_zero() -> np.ndarray:
+    pixel_impedance = mock_pixel_impedance()
+    pixel_impedance[:, 1, 1] = np.abs(pixel_impedance[:, 1, 1] * 0)
+    return pixel_impedance
+
+
+def mock_global_impedance():
+    pixel_impedance = mock_pixel_impedance()
+    return np.nansum(
+        pixel_impedance,
+        axis=(1, 2),
+    )
+
+
+@pytest.fixture()
+def mock_continuous_data():
+    """Fixture to provide an instance of ContinuousData."""
+    return ContinuousData(
+        label="global_impedance",
+        name="global_impedance",
+        unit="au",
+        category="relative impedance",
+        description="Global impedance created for testing pixel breath feature",
+        parameters={},
+        derived_from="mock_eit_data",
+        time=np.linspace(0, 2 * np.pi, 400),
+        values=mock_global_impedance(),
+        sample_frequency=399 / 2 * np.pi,
+    )
+
+
+@pytest.fixture()
+def mock_eit_data():
+    """Fixture to provide an instance of EITData."""
+    return EITData(
+        path="",
+        nframes=400,
+        time=np.linspace(0, 2 * np.pi, 400),
+        sample_frequency=399 / 2 * np.pi,
+        vendor=Vendor.DRAEGER,
+        label="mock_eit_data",
+        name="mock_eit_data",
+        pixel_impedance=mock_pixel_impedance(),
+    )
+
+
+@pytest.fixture()
+def mock_sequence(mock_eit_data: EITData, mock_continuous_data: ContinuousData):
+    """Fixture to provide an instance of Sequence."""
+    data_collection_eit = DataCollection(EITData)
+    data_collection_eit.add(mock_eit_data)
+
+    data_collection_continuous = DataCollection(ContinuousData)
+    data_collection_continuous.add(mock_continuous_data)
+
+    data_collection_sparse = DataCollection(SparseData)
+    data_collection_interval = DataCollection(IntervalData)
+
+    return Sequence(
+        label="mock_sequence",
+        name="mock_sequence",
+        description="Sequence created for pixel breath feature testing",
+        eit_data=data_collection_eit,
+        continuous_data=data_collection_continuous,
+        sparse_data=data_collection_sparse,
+        interval_data=data_collection_interval,
+    )
+
+
+@pytest.fixture()
+def mock_zero_eit_data():
+    """Fixture to provide an instance of EITData with one element set to zero."""
+    return EITData(
+        path="",
+        nframes=400,
+        time=np.linspace(0, 2 * np.pi, 400),
+        sample_frequency=399 / 2 * np.pi,
+        vendor=Vendor.DRAEGER,
+        label="mock_eit_data",
+        name="mock_eit_data",
+        pixel_impedance=mock_pixel_impedance_one_zero(),
+    )
+
+
+@pytest.fixture()
+def mock_only_pixel_impedance():
+    """Mock pixel_impedance with phase shifted cosines for testing."""
     """Mock pixel_impedance with phase shifted cosines for testing."""
     # Create a time vector (e.g., 100 points from 0 to 2*pi)
     time = np.linspace(0, 2 * np.pi, 100)
@@ -44,96 +154,6 @@ def mock_pixel_impedance():
     pixel_impedance[:, 1, 1] = cos_wave_4
 
     return time, pixel_impedance
-
-
-class MockEITData(EITData):
-    """Class to create Mock EITData for running tests."""
-
-    def __init__(self):
-        """Mock pixel_impedance with phase shifted cosines for testing."""
-        # Create a time vector (e.g., 400 points from 0 to 2*pi)
-        time = np.linspace(0, 2 * np.pi, 400)
-
-        # Create 4 cosine waves with different frequencies or phases
-        cos_wave_1 = np.cos(4 * time)  # Standard cosine wave
-        cos_wave_2 = np.cos(4 * time + np.pi)  # Phase-shifted by pi
-        cos_wave_3 = np.cos(4 * time + 0.5 * np.pi)  # Phase-shifted by 0.5*pi
-        cos_wave_4 = np.cos(4 * time + 0.25 * np.pi)  # Phase-shifted by 0.25*pi
-
-        # Store the waves in a (time, 2, 2) array
-        pixel_impedance = np.empty((len(time), 2, 2))
-        pixel_impedance[:, 0, 0] = cos_wave_1
-        pixel_impedance[:, 0, 1] = cos_wave_2
-        pixel_impedance[:, 1, 0] = cos_wave_3
-        pixel_impedance[:, 1, 1] = cos_wave_4
-
-        self.time = time
-        self.pixel_impedance = pixel_impedance
-        self.label = "raw"
-
-    def _make_one_zero(self) -> np.ndarray:
-        self.pixel_impedance[:, 1, 1] = np.abs(self.pixel_impedance[:, 1, 1] * 0)
-        return self.pixel_impedance
-
-
-class MockContinuousData(ContinuousData):
-    """Class to create Mock ContinuousData for running tests."""
-
-    def __init__(self, mock_eit_data: MockEITData):
-        pixel_impedance = mock_eit_data.pixel_impedance
-        self.time = np.linspace(0, 2 * np.pi, 400)
-        self.values = np.nansum(
-            pixel_impedance,
-            axis=(1, 2),
-        )
-        self.label = "global_impedance(raw)"
-        self.sample_frequency = 399 / 2 * np.pi
-
-
-class MockIntervalData:
-    """Class to create Mock IntervalData for running tests."""
-
-    def __init__(self):
-        self.data = []
-
-    def add(self, item: list):
-        """Function to add item to IntervalData."""
-        self.data.append(item)
-
-
-class MockSequence(Sequence):
-    """Class to create Mock Sequence for running tests."""
-
-    def __init__(self, mock_eit_data: MockEITData, mock_continuous_data: MockContinuousData):
-        self.eit_data = mock_eit_data
-        self.continuous_data = mock_continuous_data
-        self.interval_data = MockIntervalData()
-
-
-@pytest.fixture()
-def mock_continuous_data(mock_eit_data: MockEITData):
-    """Fixture to provide an instance of MockContinuousData."""
-    return MockContinuousData(mock_eit_data)
-
-
-@pytest.fixture()
-def mock_eit_data():
-    """Fixture to provide an instance of MockEITData."""
-    return MockEITData()
-
-
-@pytest.fixture()
-def mock_zero_eit_data():
-    """Fixture to provide an instance of MockEITData with one element set to zero."""
-    mock_eit_data = MockEITData()  # Create an instance of MockEITData
-    mock_eit_data._make_one_zero()  # Set one specific element to zero
-    return mock_eit_data  # Return the modified instance
-
-
-@pytest.fixture()
-def mock_sequence(mock_eit_data: MockEITData, mock_continuous_data: MockContinuousData):
-    """Fixture to provide an instance of MockSequence."""
-    return MockSequence(mock_eit_data, mock_continuous_data)
 
 
 @pytest.fixture()
@@ -172,9 +192,9 @@ def test__compute_breaths():
     assert isinstance(result[1], Breath)
 
 
-def test__find_extreme_indices(mock_pixel_impedance: tuple):
+def test__find_extreme_indices(mock_only_pixel_impedance: tuple):
     """Test _find_extreme_indices helper function."""
-    _, pixel_impedance = mock_pixel_impedance
+    _, pixel_impedance = mock_only_pixel_impedance
     # Define the time indices where we want to find the extrema
     indices = np.array([0, 50])  # Indices between which to find extreme indices
 
@@ -210,8 +230,8 @@ def test__find_extreme_indices(mock_pixel_impedance: tuple):
     ],
 )
 def test_store_result_with_errors(
-    mock_eit_data: MockEITData,
-    mock_continuous_data: MockContinuousData,
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
     request: pytest.FixtureRequest,
     store_input: bool,
     sequence_fixture: str,
@@ -238,8 +258,8 @@ def test_store_result_with_errors(
     ],
 )
 def test_store_result_success(
-    mock_eit_data: MockEITData,
-    mock_continuous_data: MockContinuousData,
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
     request: pytest.FixtureRequest,
     store_input: bool,
     sequence_fixture: str,
@@ -255,7 +275,7 @@ def test_store_result_success(
     # If store is True or None and sequence is not None, check that the result is stored in the sequence
     if (store_input is True or store_input is None) and sequence is not None:
         assert len(sequence.interval_data.data) == 1
-        assert sequence.interval_data.data[0] == result
+        assert sequence.interval_data["pixel breaths"] == result
     elif sequence is not None:
         assert len(sequence.interval_data.data) == 0
 
@@ -267,7 +287,7 @@ def test_store_result_success(
         1,
     ],
 )
-def test_with_custom_mean_pixel_tiv(mock_eit_data: MockEITData, mock_continuous_data: MockContinuousData, mean: int):
+def test_with_custom_mean_pixel_tiv(mock_eit_data: EITData, mock_continuous_data: ContinuousData, mean: int):
     mock_function = mock_compute_pixel_parameter(mean)
     with patch(
         "eitprocessing.parameters.tidal_impedance_variation.TIV.compute_pixel_parameter",
@@ -290,7 +310,7 @@ def test_with_custom_mean_pixel_tiv(mock_eit_data: MockEITData, mock_continuous_
                 assert np.isclose(value_at_time, 1, atol=0.01)
 
 
-def test_with_zero_impedance(mock_zero_eit_data: MockEITData, mock_continuous_data: MockContinuousData):
+def test_with_zero_impedance(mock_zero_eit_data: EITData, mock_continuous_data: ContinuousData):
     pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})
     breath_container = pi.find_pixel_breaths(mock_zero_eit_data, mock_continuous_data)
     test_result = np.stack(breath_container.values)
