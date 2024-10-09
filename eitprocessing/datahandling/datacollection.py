@@ -82,6 +82,9 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
             msg = f"'{key}' does not match label '{item.label}'."
             raise KeyError(msg)
 
+        if not key:
+            key = item.label
+
         if not overwrite and key in self:
             # Generally it is not expected one would want to overwrite existing data with different/derived data. One
             # should probably change the label instead over overwriting existing data.
