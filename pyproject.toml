@@ -37,6 +37,7 @@ dependencies = [
     "strenum >= 0.4.10",
     "anytree >= 2.12.1 ",
     "typing_extensions",
+    "pyyaml",
 ]
 
 [project.optional-dependencies]
@@ -49,12 +50,18 @@ dev = [
     "pytest-cov",
     "pytest-runner",
     "coveralls",
-    "sphinx",
-    "sphinx_rtd_theme",
-    "sphinx-autoapi",
     "tox",
     "ruff < 0.6",
-    "myst_parser",
+]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings",
+    "mkdocstrings-python",
+    "mkdocs-exclude",
+    "mike",
+    "pymdown-extensions",
+    "black",
 ]
 notebooks = [
     "ipykernel >= 6.15.2",

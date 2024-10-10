@@ -42,10 +42,16 @@ class Sequence(Equivalence, SelectByTime):
     label: str | None = field(default=None, compare=False)
     name: str | None = field(default=None, compare=False, repr=False)
     description: str = field(default="", compare=False, repr=False)
-    eit_data: DataCollection = field(default_factory=lambda: DataCollection(EITData), repr=False)
-    continuous_data: DataCollection = field(default_factory=lambda: DataCollection(ContinuousData), repr=False)
-    sparse_data: DataCollection = field(default_factory=lambda: DataCollection(SparseData), repr=False)
-    interval_data: DataCollection = field(default_factory=lambda: DataCollection(IntervalData), repr=False)
+    eit_data: DataCollection[EITData] = field(default_factory=lambda: DataCollection(EITData), repr=False)
+    continuous_data: DataCollection[ContinuousData] = field(
+        default_factory=lambda: DataCollection(ContinuousData),
+        repr=False,
+    )
+    sparse_data: DataCollection[SparseData] = field(default_factory=lambda: DataCollection(SparseData), repr=False)
+    interval_data: DataCollection[IntervalData] = field(
+        default_factory=lambda: DataCollection(IntervalData),
+        repr=False,
+    )
 
     def __post_init__(self):
         if not self.label:
