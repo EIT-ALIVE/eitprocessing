@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.0253249f.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -1004,7 +1004,7 @@
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">minimum_duration</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">=</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">averaging_window_duration</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">averaging_window_function</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a></span><span class="p">[[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">],</span> <span class="n"><a class="autorefs autorefs-external" title="numpy.typing.ArrayLike" href="https://numpy.org/doc/stable/reference/typing.html#numpy.typing.ArrayLike">ArrayLike</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">blackman</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">averaging_window_function</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a></span><span class="p">[[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">],</span> <span class="n"><a class="autorefs autorefs-external" title="numpy.typing.ArrayLike" href="https://numpy.org/doc/stable/reference/typing.html#numpy.typing.ArrayLike">ArrayLike</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="numpy.blackman" href="https://numpy.org/doc/stable/reference/generated/numpy.blackman.html#numpy.blackman">blackman</a></span><span class="p">,</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">amplitude_cutoff_fraction</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">invalid_data_removal_window_length</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">invalid_data_removal_percentile</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
@@ -1042,7 +1042,9 @@ breaths = bd.find_breaths(continuous_data=global_impedance)</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>minimum_duration</code></td>
+            <td>
+                <code>minimum_duration</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>minimum expected duration of breaths, defaults to 2/3 of a second</p>
@@ -1060,7 +1062,9 @@ breaths = bd.find_breaths(continuous_data=global_impedance)</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>averaging_window_duration</code></td>
+            <td>
+                <code>averaging_window_duration</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>duration of window used for averaging the data, defaults to 15 seconds</p>
@@ -1078,7 +1082,9 @@ breaths = bd.find_breaths(continuous_data=global_impedance)</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>averaging_window_function</code></td>
+            <td>
+                <code>averaging_window_function</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>function used to create a window for averaging the data, defaults to np.blackman</p>
@@ -1096,7 +1102,9 @@ breaths = bd.find_breaths(continuous_data=global_impedance)</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>amplitude_cutoff_fraction</code></td>
+            <td>
+                <code>amplitude_cutoff_fraction</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>fraction of the median amplitude below which breaths are removed, defaults to 0.25</p>
@@ -1114,7 +1122,9 @@ breaths = bd.find_breaths(continuous_data=global_impedance)</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>invalid_data_removal_window_length</code></td>
+            <td>
+                <code>invalid_data_removal_window_length</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>window around invalid data in which breaths are removed, defaults to 0.5</p>
@@ -1132,7 +1142,9 @@ breaths = bd.find_breaths(continuous_data=global_impedance)</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>invalid_data_removal_percentile</code></td>
+            <td>
+                <code>invalid_data_removal_percentile</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>the nth percentile of values used to remove outliers, defaults to 5</p>
@@ -1150,7 +1162,9 @@ breaths = bd.find_breaths(continuous_data=global_impedance)</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>invalid_data_removal_multiplier</code></td>
+            <td>
+                <code>invalid_data_removal_multiplier</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>the multiplier used to remove outliers, defaults to 4</p>
@@ -1169,6 +1183,11 @@ breaths = bd.find_breaths(continuous_data=global_impedance)</p>
           </tr>
       </tbody>
     </table>
+
+
+
+
+
 
 
 
@@ -1225,7 +1244,9 @@ inspiration/start of expiration, and end of expiration.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>continuous_data</code></td>
+            <td>
+                <code>continuous_data</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>optional, a ContinuousData object that contains the data</p>
@@ -1239,7 +1260,9 @@ inspiration/start of expiration, and end of expiration.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>result_label</code></td>
+            <td>
+                <code>result_label</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>label of the returned IntervalData object, defaults to <code>'breaths'</code>.</p>
@@ -1257,7 +1280,9 @@ inspiration/start of expiration, and end of expiration.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>sequence</code></td>
+            <td>
+                <code>sequence</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>optional, Sequence that contains the object to detect breaths in, and/or to store the result in</p>
@@ -1275,7 +1300,9 @@ inspiration/start of expiration, and end of expiration.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>store</code></td>
+            <td>
+                <code>store</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>whether to store the result in the sequence, defaults to <code>True</code> if a Sequence if provided.</p>
@@ -1372,7 +1399,9 @@ boundaries of the data.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>window_size</code></td>
+            <td>
+                <code>window_size</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>the number of data points in the averaging window. Should be odd; is increased by 1 if even.</p>
@@ -1386,7 +1415,9 @@ boundaries of the data.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>window_function</code></td>
+            <td>
+                <code>window_function</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>window function, e.g. np.blackman.</p>
@@ -1404,7 +1435,9 @@ boundaries of the data.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>padding_type</code></td>
+            <td>
+                <code>padding_type</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>see <code>np.pad()</code>.</p>
@@ -1448,6 +1481,11 @@ boundaries of the data.</p>
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -1483,7 +1521,9 @@ boundaries of the data.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>data</code></td>
+            <td>
+                <code>data</code>
+            </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>input data as 1D array</p>
@@ -1561,7 +1601,7 @@ boundaries of the data.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["announce.dismiss", "content.action.view", "content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.indexes", "navigation.path", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.525ec568.min.js"></script>
+      <script src="../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
     
   </body>
