@@ -14,7 +14,7 @@ from eitprocessing.features.breath_detection import BreathDetection
 
 @dataclass
 class PixelBreath:
-    """Algorithm for detecting timing of pixel breath and deflation in pixel impedance data.
+    """Algorithm for detecting timing of pixel breaths in pixel impedance data.
 
     This algorithm detects the position of start of inspiration, end of inspiration and
     end of expiration in pixel impedance data. It uses BreathDetection to find the global start and end
@@ -118,7 +118,16 @@ class PixelBreath:
             tiv_timing="continuous",
         )
 
-        mean_tiv_pixel = np.nanmean(pixel_tiv_with_continuous_data_timing, axis=0)
+        # Create a mask to detect slices that are entirely NaN
+        all_nan_mask = np.isnan(pixel_tiv_with_continuous_data_timing).all(axis=0)
+
+        # Initialize the mean_tiv_pixel array with NaNs
+        mean_tiv_pixel = np.full((n_rows, n_cols), np.nan)
+
+        # Only compute nanmean for slices that are not entirely NaN
+        if not all_nan_mask.all():  # Check if there are any valid (non-all-NaN) slices
+            mean_tiv_pixel[~all_nan_mask] = np.nanmean(pixel_tiv_with_continuous_data_timing[:, ~all_nan_mask], axis=0)
+
         time = eit_data.time
         pixel_impedance = eit_data.pixel_impedance
 
@@ -133,20 +142,18 @@ class PixelBreath:
                 else:
                     start_func, middle_func = np.argmin, np.argmax
 
-                start = self._find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, start_func)
-                end = start[1:]
-                middle = self._find_extreme_indices(pixel_impedance, start, row, col, middle_func)
-
+                outsides = self._find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, start_func)
+                starts = outsides[:-1]
+                ends = outsides[1:]
+                middles = self._find_extreme_indices(pixel_impedance, outsides, row, col, middle_func)
                 # TODO discuss; this block of code is implemented to prevent noisy pixels from breaking the code.
                 # Quick solve is to make entire breath object None if any breath in a pixel does not have
                 # consecutive start, middle and end.
                 # However, this might cause problems elsewhere.
-
-                if (start[:-1] >= middle).any() or (middle >= end).any():
+                if (starts >= middles).any() or (middles >= ends).any():
                     pixel_breath = None
                 else:
-                    start = start[:-1]
-                    pixel_breath = self._construct_breaths(start, middle, end, time)
+                    pixel_breath = self._construct_breaths(starts, middles, ends, time)
                 pixel_breaths[:, row, col] = pixel_breath
 
         intervals = [(breath.start_time, breath.end_time) for breath in continuous_breaths.values]
