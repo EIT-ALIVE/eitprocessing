@@ -15,7 +15,7 @@ from eitprocessing.filters.butterworth_filters import (
 SpecifiedFilter: TypeAlias = type[LowPassFilter | HighPassFilter | BandPassFilter | BandStopFilter]
 
 
-@pytest.fixture()
+@pytest.fixture
 def filter_arguments():
     return {
         "filter_type": "lowpass",

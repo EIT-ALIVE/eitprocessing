@@ -6,7 +6,7 @@ import pytest
 from eitprocessing.datahandling.intervaldata import Interval, IntervalData
 
 
-@pytest.fixture()
+@pytest.fixture
 def intervaldata_novalues_partialtrue():
     """IntervalData object without values, and partial inclusion set to True by default.
 
@@ -23,7 +23,7 @@ def intervaldata_novalues_partialtrue():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def intervaldata_novalues_partialfalse():
     """IntervalData object without values, without partial inclusion.
 
@@ -40,7 +40,7 @@ def intervaldata_novalues_partialfalse():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def intervaldata_valueslist_partialfalse():
     """IntervalData object with values as list, no partial inclusion.
 
@@ -58,7 +58,7 @@ def intervaldata_valueslist_partialfalse():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def intervaldata_valuesarray_partialfalse():
     """IntervalData object with values as numpy array, no partial inclusion.
 

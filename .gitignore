@@ -38,3 +38,4 @@ venv3
 .helpers/dock_test_add/*
 
 /site/
+uv.lock
