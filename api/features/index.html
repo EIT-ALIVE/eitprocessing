@@ -660,6 +660,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#eitprocessing.features.pixel_breath.PixelBreath" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;PixelBreath
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" PixelBreath">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eitprocessing.features.pixel_breath.PixelBreath.find_pixel_breaths" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;find_pixel_breaths
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#eitprocessing.features.moving_average.MovingAverage" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MovingAverage
@@ -924,6 +948,30 @@
   <a href="#eitprocessing.features.breath_detection.BreathDetection.find_breaths" class="md-nav__link">
     <span class="md-ellipsis">
       <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;find_breaths
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#eitprocessing.features.pixel_breath.PixelBreath" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;PixelBreath
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" PixelBreath">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eitprocessing.features.pixel_breath.PixelBreath.find_pixel_breaths" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;find_pixel_breaths
     </span>
   </a>
   
@@ -1340,6 +1388,286 @@ inspiration/start of expiration, and end of expiration.</p>
             <td class="doc-returns-details">
               <div class="doc-md-description">
                 <p>An IntervalData object containing Breath objects.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="eitprocessing.features.pixel_breath.PixelBreath" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">eitprocessing.features.pixel_breath.PixelBreath</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#eitprocessing.features.pixel_breath.PixelBreath" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">PixelBreath</span><span class="p">(</span><span class="n">breath_detection_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span><span class="p">())</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+
+        <p>Algorithm for detecting timing of pixel breaths in pixel impedance data.</p>
+<p>This algorithm detects the position of start of inspiration, end of inspiration and
+end of expiration in pixel impedance data. It uses BreathDetection to find the global start and end
+of inspiration and expiration. These points are then used to find the start/end of pixel
+inspiration/expiration in pixel impedance data.</p>
+<p>Examples:</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>pi = PixelBreath()
+eit_data = sequence.eit_data['raw']
+continuous_data = sequence.continuous_data['global_impedance_(raw)']
+pixel_breaths = pi.find_pixel_breaths(eit_data, continuous_data, sequence)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+        <p>breath_detection_kwargs (dict): A dictionary of keyword arguments for breath detection.
+    The available keyword arguments are:
+    minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
+    averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
+    averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
+    amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed, defaults to 0.25
+    invalid_data_removal_window_length: window around invalid data in which breaths are removed, defaults to 0.5
+    invalid_data_removal_percentile: the nth percentile of values used to remove outliers, defaults to 5
+    invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="eitprocessing.features.pixel_breath.PixelBreath.find_pixel_breaths" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">find_pixel_breaths</span>
+
+
+<a href="#eitprocessing.features.pixel_breath.PixelBreath.find_pixel_breaths" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">find_pixel_breaths</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">eit_data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.eitdata.EITData" href="../datacontainers/#eitprocessing.datahandling.eitdata.EITData">EITData</a></span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">continuous_data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.continuousdata.ContinuousData" href="../datacontainers/#eitprocessing.datahandling.continuousdata.ContinuousData">ContinuousData</a></span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">sequence</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sequence.Sequence" href="../datacontainers/#eitprocessing.datahandling.sequence.Sequence">Sequence</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">store</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">result_label</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s2">&quot;pixel_breaths&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.intervaldata.IntervalData" href="../datacontainers/#eitprocessing.datahandling.intervaldata.IntervalData">IntervalData</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Find pixel breaths in the data.</p>
+<p>This method finds the pixel start/end of inspiration/expiration
+based on the start/end of inspiration/expiration as detected
+in the continuous data.</p>
+<p>If pixel impedance is in phase (within 180 degrees) with the continuous data,
+the start of breath of that pixel is defined as the local minimum between
+two end-inspiratory points in the continuous signal.
+The end of expiration of that pixel is defined as the local minimum between two
+consecutive end-inspiratory points in the continuous data.
+The end of inspiration of that pixel is defined as the local maximum between
+the start of inspiration and end of expiration of that pixel.</p>
+<p>If pixel impedance is out of phase with the continuous signal,
+the start of inspiration of that pixel is defined as the local maximum between
+two end-inspiration points in the continuous data.
+The end of expiration of that pixel is defined as the local maximum between two
+consecutive end-inspiratory points in the continuous data.
+The end of inspiration of that pixel is defined as the local minimum between
+the start of inspiration and end of expiration of that pixel.</p>
+<p>Pixel breaths are constructed as a valley-peak-valley combination,
+representing the start of inspiration, the end of inspiration/start of
+expiration, and end of expiration.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>eit_data</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>EITData to apply the algorithm to</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.eitdata.EITData" href="../datacontainers/#eitprocessing.datahandling.eitdata.EITData">EITData</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>continuous_data</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>ContinuousData to use for global breath detection</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.continuousdata.ContinuousData" href="../datacontainers/#eitprocessing.datahandling.continuousdata.ContinuousData">ContinuousData</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>result_label</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>label of the returned IntervalData object, defaults to <code>'pixel_breaths'</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;pixel_breaths&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sequence</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>optional, Sequence that contains the object to detect pixel breaths in,</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sequence.Sequence" href="../datacontainers/#eitprocessing.datahandling.sequence.Sequence">Sequence</a> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>store</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>whether to store the result in the sequence, defaults to <code>True</code> if a Sequence if provided.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.intervaldata.IntervalData" href="../datacontainers/#eitprocessing.datahandling.intervaldata.IntervalData">IntervalData</a></code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>An IntervalData object containing Breath objects.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If store is set to true but no sequence is provided.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If the provided sequence is not an instance of the Sequence dataclass.</p>
               </div>
             </td>
           </tr>

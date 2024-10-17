@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eitprocessing.datahandling.loading.binreader &#8212; eitprocessing 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=601dbdee" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../loading.html" accesskey="U">eitprocessing.datahandling.loading</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.loading.binreader</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for eitprocessing.datahandling.loading.binreader</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">mmap</span> <span class="kn">import</span> <span class="n">mmap</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
+
+<div class="viewcode-block" id="T">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.T">[docs]</a>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="N">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.N">[docs]</a>
+<span class="n">N</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">)</span></div>
+
+
+
+<span class="nd">@dataclass</span>
+<div class="viewcode-block" id="BinReader">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader">[docs]</a>
+<span class="k">class</span> <span class="nc">BinReader</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper class for reading binary files from disk.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_handle: a buffered reader handle, e.g. the result of the `open()` function.</span>
+<span class="sd">        endian: the endianness of the binary data. Either &#39;little&#39; or &#39;big&#39;, or None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BinReader.file_handle">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.file_handle">[docs]</a>
+    <span class="n">file_handle</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">BufferedReader</span> <span class="o">|</span> <span class="n">mmap</span></div>
+
+<div class="viewcode-block" id="BinReader.endian">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.endian">[docs]</a>
+    <span class="n">endian</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;little&quot;</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="BinReader.read_single">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.read_single">[docs]</a>
+    <span class="k">def</span> <span class="nf">read_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cast</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return a single unit of the given type code.</span>
+
+<span class="sd">        The type of data to be read should be provided as a single typ code. See</span>
+<span class="sd">        https://docs.python.org/3.10/library/struct.html#byte-order-size-and-alignment for a list of available type</span>
+<span class="sd">        codes.</span>
+
+<span class="sd">        A unit returns a single value, and can be one or more bytes of data. E.g. requesting a signed 32-bit integer</span>
+<span class="sd">        (&#39;q&#39;) will result in reading 8 bytes of data.</span>
+
+<span class="sd">        `cast` should be a type, e.g. `int` or `float` used to cast the value to the proper type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            type_code: singular type code.</span>
+<span class="sd">            cast: the associated type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">type_code</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="BinReader.read_list">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.read_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">read_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cast</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read multiple values of the same type and return as list.</span>
+
+<span class="sd">        See `read_single()`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            type_code: singular type code.</span>
+<span class="sd">            cast: the associated type.</span>
+<span class="sd">            length: number of values to be read.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}{</span><span class="n">type_code</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="BinReader.read_array">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.read_array">[docs]</a>
+    <span class="k">def</span> <span class="nf">read_array</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">type_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">cast</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">N</span><span class="p">],</span>
+        <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">N</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read multiple values of the same type and return as NumPy array.</span>
+
+<span class="sd">        See `read_list()`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}{</span><span class="n">type_code</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cast</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.read_string">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.read_string">[docs]</a>
+    <span class="k">def</span> <span class="nf">read_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return a string with a given length.</span>
+
+<span class="sd">        Reads `length` characters of type code &#39;s&#39; and returns as a string. When length is not provided, a single</span>
+<span class="sd">        character is returned.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            length: number of characters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">full_type_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2">s&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_full_type_code</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="BinReader.string">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.string">[docs]</a>
+    <span class="n">string</span> <span class="o">=</span> <span class="n">read_string</span></div>
+
+
+<div class="viewcode-block" id="BinReader._read_full_type_code">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader._read_full_type_code">[docs]</a>
+    <span class="k">def</span> <span class="nf">_read_full_type_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_type_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the data associated with the type code.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;little&quot;</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">]:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Endian type &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endian</span><span class="si">}</span><span class="s2">&#39; not recognized. Allowed values are &#39;little&#39; and &#39;big&#39;.&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;&lt;&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">==</span> <span class="s2">&quot;little&quot;</span> <span class="k">else</span> <span class="s2">&quot;&gt;&quot;</span>
+            <span class="n">full_type_code</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">full_type_code</span>
+
+        <span class="n">data_size</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">)</span>
+        <span class="n">packed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">data_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">full_type_code</span><span class="p">,</span> <span class="n">packed_data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.float32">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.float32">[docs]</a>
+    <span class="k">def</span> <span class="nf">float32</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return a single signed 32-bit floating point value.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.float64">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.float64">[docs]</a>
+    <span class="k">def</span> <span class="nf">float64</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return a single signed 64-bit floating point value.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.npfloat32">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.npfloat32">[docs]</a>
+    <span class="k">def</span> <span class="nf">npfloat32</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return an array of signed 32-bit floating point values.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.npfloat64">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.npfloat64">[docs]</a>
+    <span class="k">def</span> <span class="nf">npfloat64</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return an array of signed 64-bit floating point values.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.int32">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.int32">[docs]</a>
+    <span class="k">def</span> <span class="nf">int32</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return a single signed 32-bit integer value.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.npint32">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.npint32">[docs]</a>
+    <span class="k">def</span> <span class="nf">npint32</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return an array of signed 32-bit integer values.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.uint8">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.uint8">[docs]</a>
+    <span class="k">def</span> <span class="nf">uint8</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return a single unsigned 8-bit integer value.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.uint16">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.uint16">[docs]</a>
+    <span class="k">def</span> <span class="nf">uint16</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return a single unsigned 16-bit integer value.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.uint32">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.uint32">[docs]</a>
+    <span class="k">def</span> <span class="nf">uint32</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return a single unsigned 32-bit integer value.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BinReader.uint64">
+<a class="viewcode-back" href="../../../../autoapi/eitprocessing/datahandling/loading/binreader/index.html#eitprocessing.datahandling.loading.binreader.BinReader.uint64">[docs]</a>
+    <span class="k">def</span> <span class="nf">uint64</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and return a single unsigned 64-bit integer value.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_single</span><span class="p">(</span><span class="n">type_code</span><span class="o">=</span><span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="n">cast</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../loading.html" >eitprocessing.datahandling.loading</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">eitprocessing.datahandling.loading.binreader</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+    </div>
+  </body>
+</html>

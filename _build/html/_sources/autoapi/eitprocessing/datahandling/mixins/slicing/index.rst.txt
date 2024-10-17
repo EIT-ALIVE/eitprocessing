@@ -1,0 +1,139 @@
+:py:mod:`eitprocessing.datahandling.mixins.slicing`
+===================================================
+
+.. py:module:: eitprocessing.datahandling.mixins.slicing
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.mixins.slicing.SelectByIndex
+   eitprocessing.datahandling.mixins.slicing.HasTimeIndexer
+   eitprocessing.datahandling.mixins.slicing.SelectByTime
+   eitprocessing.datahandling.mixins.slicing.TimeIndexer
+
+
+
+
+.. py:class:: SelectByIndex
+
+   Bases: :py:obj:`abc.ABC`
+
+   Adds slicing functionality to subclass by implementing `__getitem__`.
+
+   Subclasses must implement a `_sliced_copy` function that defines what should
+   happen when the object is sliced. This class ensures that when calling a
+   slice between square brackets (as e.g. done for lists) then return the
+   expected sliced object.
+
+   .. py:attribute:: label
+      :type: str
+
+      
+
+   .. py:method:: __getitem__(key: slice | int)
+
+
+   .. py:method:: select_by_index(start: int | None = None, end: int | None = None, newlabel: str | None = None) -> typing_extensions.Self
+
+      De facto implementation of the `__getitem__` function.
+
+      This function can also be called directly to add a label to the sliced
+      object. Otherwise a default label describing the slice and original
+      object is attached.
+
+
+   .. py:method:: __len__()
+      :abstractmethod:
+
+
+   .. py:method:: _sliced_copy(start_index: int, end_index: int, newlabel: str) -> typing_extensions.Self
+      :abstractmethod:
+
+      Slicing method that must be implemented by all subclasses.
+
+      Must return a copy of self object with all attached data within selected
+      indices.
+
+
+
+.. py:class:: HasTimeIndexer
+
+   Gives access to a TimeIndexer object that can be used to slice by time.
+
+   .. py:property:: t
+      :type: TimeIndexer
+
+      Slicing an object using the time axis instead of indices.
+
+      Example:
+      ```
+      >>> sequence = load_eit_data(<path>, ...)
+      >>> time_slice1 = sequence.t[tp_start:tp_end]
+      >>> time_slice2 = sequence.select_by_time(tp_start, tp_end)
+      >>> time_slice1 == time_slice2
+      True
+      ```
+
+   .. py:method:: select_by_time(*args, **kwargs) -> typing_extensions.Self
+      :abstractmethod:
+
+
+
+.. py:class:: SelectByTime
+
+   Bases: :py:obj:`SelectByIndex`, :py:obj:`HasTimeIndexer`
+
+   Adds methods for slicing by time rather than index.
+
+   .. py:method:: select_by_time(start_time: float | None = None, end_time: float | None = None, start_inclusive: bool = False, end_inclusive: bool = False, label: str | None = None) -> typing_extensions.Self
+
+      Get a shortened copy of the object, starting from start_time and ending at end_time.
+
+      Given a start and end time stamp (i.e. its value, not its index),
+      return a slice of the original object, which must contain a time axis.
+
+      :param start_time: first time point to include. Defaults to first frame of sequence.
+      :param end_time: last time point. Defaults to last frame of sequence.
+      :param start_inclusive (default: `True`), end_inclusive (default `False`):
+                                       these arguments control the behavior if the given time stamp
+                                       does not match exactly with an existing time stamp of the input.
+                                       if `True`: the given time stamp will be inside the sliced object.
+                                       if `False`: the given time stamp will be outside the sliced object.
+      :param label: Description. Defaults to None, which will create a label based
+                    on the original object label and the frames by which it is sliced.
+
+      :raises TypeError: if `self` does not contain a `time` attribute.
+      :raises ValueError: if time stamps are not sorted.
+
+      :returns: A shortened copy of the object.
+
+
+
+.. py:class:: TimeIndexer
+
+   Helper class for slicing an object using the time axis instead of indices.
+
+   Example:
+   ```
+   >>> sequence = load_eit_data(<path>, ...)
+   >>> time_slice1 = sequence.t[tp_start:tp_end]
+   >>> time_slice2 = sequence.select_by_time(tp_start, tp_end)
+   >>> time_slice1 == time_slice2
+   True
+   ```
+
+   .. py:attribute:: obj
+      :type: HasTimeIndexer
+
+      
+
+   .. py:method:: __getitem__(key: slice | float)
+
+
+

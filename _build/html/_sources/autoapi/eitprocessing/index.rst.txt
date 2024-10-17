@@ -1,0 +1,18 @@
+:py:mod:`eitprocessing`
+=======================
+
+.. py:module:: eitprocessing
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   datahandling/index.rst
+   features/index.rst
+   filters/index.rst
+   plotting/index.rst
+
+

@@ -680,6 +680,48 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#eitprocessing.parameters.tidal_impedance_variation.TIV" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;TIV
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" TIV">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eitprocessing.parameters.tidal_impedance_variation.TIV.compute_parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;compute_parameter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eitprocessing.parameters.tidal_impedance_variation.TIV.compute_continuous_parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;compute_continuous_parameter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eitprocessing.parameters.tidal_impedance_variation.TIV.compute_pixel_parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;compute_pixel_parameter
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -910,6 +952,48 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#eitprocessing.parameters.tidal_impedance_variation.TIV" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;TIV
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" TIV">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eitprocessing.parameters.tidal_impedance_variation.TIV.compute_parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;compute_parameter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eitprocessing.parameters.tidal_impedance_variation.TIV.compute_continuous_parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;compute_continuous_parameter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eitprocessing.parameters.tidal_impedance_variation.TIV.compute_pixel_parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;compute_pixel_parameter
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1051,6 +1135,564 @@ eeli_values = EELI().compute_parameter(global_impedance)</p>
             <td class="doc-returns-details">
               <div class="doc-md-description">
                 <p>np.ndarray: the end-expiratory values of all breaths in the impedance data.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="eitprocessing.parameters.tidal_impedance_variation.TIV" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">eitprocessing.parameters.tidal_impedance_variation.TIV</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#eitprocessing.parameters.tidal_impedance_variation.TIV" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">TIV</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">method</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a></span><span class="p">[</span><span class="s2">&quot;extremes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;extremes&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">breath_detection_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span><span class="p">(),</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+
+        <p>Compute the tidal impedance variation (TIV) per breath.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="eitprocessing.parameters.tidal_impedance_variation.TIV.compute_parameter" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">compute_parameter</span>
+
+
+<a href="#eitprocessing.parameters.tidal_impedance_variation.TIV.compute_parameter" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">compute_parameter</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.continuousdata.ContinuousData" href="../datacontainers/#eitprocessing.datahandling.continuousdata.ContinuousData">ContinuousData</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.eitdata.EITData" href="../datacontainers/#eitprocessing.datahandling.eitdata.EITData">EITData</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="typing.NoReturn" href="https://docs.python.org/3/library/typing.html#typing.NoReturn">NoReturn</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Compute the tidal impedance variation per breath on either ContinuousData or EITData, depending on the input.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>either continuous_data or eit_data to compute TIV on.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.continuousdata.ContinuousData" href="../datacontainers/#eitprocessing.datahandling.continuousdata.ContinuousData">ContinuousData</a> | <a class="autorefs autorefs-internal" title="eitprocessing.datahandling.eitdata.EITData" href="../datacontainers/#eitprocessing.datahandling.eitdata.EITData">EITData</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="eitprocessing.parameters.tidal_impedance_variation.TIV.compute_continuous_parameter" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">compute_continuous_parameter</span>
+
+
+<a href="#eitprocessing.parameters.tidal_impedance_variation.TIV.compute_continuous_parameter" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">compute_continuous_parameter</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">continuous_data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.continuousdata.ContinuousData" href="../datacontainers/#eitprocessing.datahandling.continuousdata.ContinuousData">ContinuousData</a></span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">tiv_method</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a></span><span class="p">[</span><span class="s2">&quot;inspiratory&quot;</span><span class="p">,</span> <span class="s2">&quot;expiratory&quot;</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;inspiratory&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">sequence</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sequence.Sequence" href="../datacontainers/#eitprocessing.datahandling.sequence.Sequence">Sequence</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">store</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">result_label</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s2">&quot;continuous_tivs&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sparsedata.SparseData" href="../datacontainers/#eitprocessing.datahandling.sparsedata.SparseData">SparseData</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Compute the tidal impedance variation per breath.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>continuous_data</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The ContinuousData to compute the TIV on.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.continuousdata.ContinuousData" href="../datacontainers/#eitprocessing.datahandling.continuousdata.ContinuousData">ContinuousData</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tiv_method</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The label of which part of the breath the TIV
+should be determined on (inspiratory, expiratory, or mean).
+Defaults to 'inspiratory'.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;inspiratory&#39;, &#39;expiratory&#39;, &#39;mean&#39;]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;inspiratory&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sequence</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>optional, Sequence that contains the object to detect TIV on,</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sequence.Sequence" href="../datacontainers/#eitprocessing.datahandling.sequence.Sequence">Sequence</a> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>store</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>whether to store the result in the sequence, defaults to <code>True</code> if a Sequence if provided.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>result_label</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>label of the returned SparseData object, defaults to <code>'continuous_tivs'</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;continuous_tivs&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sparsedata.SparseData" href="../datacontainers/#eitprocessing.datahandling.sparsedata.SparseData">SparseData</a></code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>A list with the computed TIV values.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If store is set to true but no sequence is provided.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If the provided sequence is not an instance of the Sequence dataclass.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="eitprocessing.parameters.tidal_impedance_variation.TIV.compute_pixel_parameter" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">compute_pixel_parameter</span>
+
+
+<a href="#eitprocessing.parameters.tidal_impedance_variation.TIV.compute_pixel_parameter" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">compute_pixel_parameter</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">eit_data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.eitdata.EITData" href="../datacontainers/#eitprocessing.datahandling.eitdata.EITData">EITData</a></span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">continuous_data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.continuousdata.ContinuousData" href="../datacontainers/#eitprocessing.datahandling.continuousdata.ContinuousData">ContinuousData</a></span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">sequence</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sequence.Sequence" href="../datacontainers/#eitprocessing.datahandling.sequence.Sequence">Sequence</a></span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">tiv_method</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a></span><span class="p">[</span><span class="s2">&quot;inspiratory&quot;</span><span class="p">,</span> <span class="s2">&quot;expiratory&quot;</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;inspiratory&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">tiv_timing</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a></span><span class="p">[</span><span class="s2">&quot;pixel&quot;</span><span class="p">,</span> <span class="s2">&quot;continuous&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;pixel&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">store</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">result_label</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s2">&quot;pixel_tivs&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sparsedata.SparseData" href="../datacontainers/#eitprocessing.datahandling.sparsedata.SparseData">SparseData</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Compute the tidal impedance variation per breath on pixel level.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>sequence</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The sequence containing the data.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sequence.Sequence" href="../datacontainers/#eitprocessing.datahandling.sequence.Sequence">Sequence</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>eit_data</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The eit pixel level data to determine the TIV of.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.eitdata.EITData" href="../datacontainers/#eitprocessing.datahandling.eitdata.EITData">EITData</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>continuous_data</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The continuous data to determine the continuous data breaths or pixel level breaths.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.continuousdata.ContinuousData" href="../datacontainers/#eitprocessing.datahandling.continuousdata.ContinuousData">ContinuousData</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tiv_method</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The label of which part of the breath the TIV should be determined on
+        (inspiratory, expiratory or mean). Defaults to 'inspiratory'.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;inspiratory&#39;, &#39;expiratory&#39;, &#39;mean&#39;]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;inspiratory&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tiv_timing</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The label of which timing should be used to compute the TIV, either based on breaths
+        detected in continuous data ('continuous') or based on pixel breaths ('pixel').
+        Defaults to 'pixel'.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;pixel&#39;, &#39;continuous&#39;]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;pixel&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>result_label</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>label of the returned IntervalData object, defaults to <code>'pixel_tivs'</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;pixel_tivs&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>store</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>whether to store the result in the sequence, defaults to <code>True</code> if a Sequence if provided.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sparsedata.SparseData" href="../datacontainers/#eitprocessing.datahandling.sparsedata.SparseData">SparseData</a></code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>An np.ndarray with the computed TIV values.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If store is set to true but no sequence is provided.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If the provided sequence is not an instance of the Sequence dataclass.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If tiv_timing is not one of 'continuous' or 'pixel'.</p>
               </div>
             </td>
           </tr>
