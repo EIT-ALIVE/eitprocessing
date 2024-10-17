@@ -75,7 +75,7 @@ def mock_global_impedance():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_continuous_data():
     """Fixture to provide an instance of ContinuousData."""
     return ContinuousData(
@@ -92,7 +92,7 @@ def mock_continuous_data():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_eit_data():
     """Fixture to provide an instance of EITData."""
     return EITData(
@@ -107,7 +107,7 @@ def mock_eit_data():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_sequence(mock_eit_data: EITData, mock_continuous_data: ContinuousData):
     """Fixture to provide an instance of Sequence."""
     data_collection_eit = DataCollection(EITData)
@@ -130,12 +130,12 @@ def mock_sequence(mock_eit_data: EITData, mock_continuous_data: ContinuousData):
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def not_a_sequence():
     return []
 
 
-@pytest.fixture()
+@pytest.fixture
 def none_sequence():
     return None
 
