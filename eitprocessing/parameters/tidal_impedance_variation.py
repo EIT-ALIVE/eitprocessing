@@ -60,12 +60,14 @@ class TIV(ParameterCalculation):
             sequence: optional, Sequence that contains the object to detect TIV on,
             and/or to store the result in.
             store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
-            result_label: label of the returned SparseData object, defaults to `'tivs'`.
+            result_label: label of the returned SparseData object, defaults to `'continuous_tivs'`.
 
         Returns:
             A list with the computed TIV values.
 
         Raises:
+            RuntimeError: If store is set to true but no sequence is provided.
+            ValueError: If the provided sequence is not an instance of the Sequence dataclass.
             ValueError: If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.
         """
         if store is None and isinstance(sequence, Sequence):
@@ -137,6 +139,8 @@ class TIV(ParameterCalculation):
             An np.ndarray with the computed TIV values.
 
         Raises:
+            RuntimeError: If store is set to true but no sequence is provided.
+            ValueError: If the provided sequence is not an instance of the Sequence dataclass.
             ValueError: If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.
             ValueError: If tiv_timing is not one of 'continuous' or 'pixel'.
         """

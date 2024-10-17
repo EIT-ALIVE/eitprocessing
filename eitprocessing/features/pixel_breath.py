@@ -85,6 +85,10 @@ class PixelBreath:
 
         Returns:
             An IntervalData object containing Breath objects.
+
+        Raises:
+            RuntimeError: If store is set to true but no sequence is provided.
+            ValueError: If the provided sequence is not an instance of the Sequence dataclass.
         """
         if store is None and isinstance(sequence, Sequence):
             store = True
