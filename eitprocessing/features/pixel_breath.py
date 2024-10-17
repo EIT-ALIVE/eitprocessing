@@ -47,7 +47,7 @@ class PixelBreath:
         continuous_data: ContinuousData,
         sequence: Sequence | None = None,
         store: bool | None = None,
-        result_label: str = "pixel breaths",
+        result_label: str = "pixel_breaths",
     ) -> IntervalData:
         """Find pixel breaths in the data.
 
@@ -78,7 +78,7 @@ class PixelBreath:
         Args:
             eit_data: EITData to apply the algorithm to
             continuous_data: ContinuousData to use for global breath detection
-            result_label: label of the returned IntervalData object, defaults to `'pixel breaths'`.
+            result_label: label of the returned IntervalData object, defaults to `'pixel_breaths'`.
             sequence: optional, Sequence that contains the object to detect pixel breaths in,
             and/or to store the result in.
             store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
@@ -110,12 +110,17 @@ class PixelBreath:
 
         from eitprocessing.parameters.tidal_impedance_variation import TIV
 
-        pixel_tiv_with_continuous_data_timing = TIV().compute_pixel_parameter(
+        pixel_tivs = TIV().compute_pixel_parameter(
             eit_data,
             continuous_data,
             sequence,
             tiv_method="inspiratory",
             tiv_timing="continuous",
+            store=False,
+        )  # Set store to false as to not save these pixel tivs as SparseData.
+
+        pixel_tiv_with_continuous_data_timing = (
+            np.empty((0, n_rows, n_cols)) if not len(pixel_tivs.values) else np.stack(pixel_tivs.values)
         )
 
         # Create a mask to detect slices that are entirely NaN

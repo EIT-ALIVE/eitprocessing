@@ -130,6 +130,16 @@ def mock_sequence(mock_eit_data: EITData, mock_continuous_data: ContinuousData):
     )
 
 
+@pytest.fixture()
+def not_a_sequence():
+    return []
+
+
+@pytest.fixture()
+def none_sequence():
+    return None
+
+
 def test_tiv_initialization():
     """Test that TIV initializes correctly with default parameters."""
     tiv = TIV()
@@ -159,6 +169,98 @@ def test_tiv_initialization_with_valid_method():
     """Test that TIV initializes successfully with a valid method."""
     tiv = TIV(method="extremes")  # This should not raise an error
     assert tiv.method == "extremes"
+
+
+@pytest.mark.parametrize(
+    ("store_input", "sequence_fixture", "expected_exception"),
+    [
+        (True, "not_a_sequence", ValueError),  # Expect ValueError because a string is not a valid Sequence
+        (True, "none_sequence", RuntimeError),  # Expect RuntimeError because sequence is None and store=True
+    ],
+)
+def test_store_result_with_errors(
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
+    request: pytest.FixtureRequest,
+    store_input: bool,
+    sequence_fixture: str,
+    expected_exception: ValueError | RuntimeError,
+):
+    """Test storing results when errors are expected."""
+    tiv = TIV()  # Ensure that breaths are detected
+
+    # Retrieve the sequence from the fixture
+    test_sequence = request.getfixturevalue(sequence_fixture)
+
+    # Expect a specific exception (either ValueError or RuntimeError)
+    with pytest.raises(expected_exception):
+        tiv.compute_continuous_parameter(
+            mock_continuous_data,
+            tiv_method="inspiratory",
+            sequence=test_sequence,
+            store=store_input,
+        )
+    with pytest.raises(expected_exception):
+        tiv.compute_pixel_parameter(
+            eit_data=mock_eit_data,
+            continuous_data=mock_continuous_data,
+            sequence=test_sequence,
+            tiv_method="inspiratory",
+            tiv_timing="pixel",
+            store=store_input,
+            result_label="pixel_tivs",
+        )
+
+
+@pytest.mark.parametrize(
+    ("store_input", "sequence_fixture"),
+    [
+        (True, "mock_sequence"),  # Result should be stored
+        (False, "mock_sequence"),  # No result should be stored
+        (False, "none_sequence"),  # No result should be stored, no sequence provided
+        (None, "mock_sequence"),  # Result should be stored
+        (None, "none_sequence"),  # No result stored, no sequence provided
+    ],
+)
+def test_store_result_success(
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
+    request: pytest.FixtureRequest,
+    store_input: bool,
+    sequence_fixture: str,
+):
+    """Test storing results when no errors are expected."""
+    tiv = TIV()  # Ensure that breaths are detected
+
+    # Retrieve the sequence from the fixture
+    test_sequence = request.getfixturevalue(sequence_fixture)
+
+    # Run continuous and pixel tiv computation and check the result
+    continuous_result = tiv.compute_continuous_parameter(
+        mock_continuous_data,
+        tiv_method="inspiratory",
+        sequence=test_sequence,
+        store=store_input,
+        result_label="continuous_tivs",
+    )
+
+    pixel_result = tiv.compute_pixel_parameter(
+        eit_data=mock_eit_data,
+        continuous_data=mock_continuous_data,
+        sequence=test_sequence,
+        tiv_method="inspiratory",
+        tiv_timing="pixel",
+        store=store_input,
+        result_label="pixel_tivs",
+    )
+
+    # Check that the results are stored correctly based on store_input
+    if store_input in [True, None] and test_sequence is not None:
+        assert len(test_sequence.sparse_data.data) == 2
+        assert test_sequence.sparse_data["continuous_tivs"] == continuous_result
+        assert test_sequence.sparse_data["pixel_tivs"] == pixel_result
+    elif test_sequence is not None:
+        assert len(test_sequence.sparse_data.data) == 0
 
 
 @pytest.mark.parametrize(
@@ -195,6 +297,7 @@ def test_compute_continuous_parameter_tiv_method_success(
     """Test compute_continuous_parameter with valid tiv_method inputs that return expected results."""
     tiv = TIV()
     result = tiv.compute_continuous_parameter(mock_continuous_data, tiv_method=tiv_method)
+    result = np.stack(result.values)
     assert result.shape == (3,)
     assert np.allclose(result, expected_result, atol=0.01)
 
@@ -242,6 +345,7 @@ def test_compute_pixel_parameter_valid_tiv_method(
         mock_sequence,
         tiv_method=tiv_method,
     )
+    result = np.stack(result.values)
     assert result.shape == (3, 2, 2)
     assert np.allclose(
         result[np.isfinite(result)],
@@ -296,6 +400,7 @@ def test_compute_pixel_parameter_tiv_timing_success(
         sequence=mock_sequence,
         tiv_timing=tiv_timing,
     )
+    result = np.stack(result.values)
     assert result.shape == (3, 2, 2)
     assert np.allclose(
         result[np.isfinite(result)],
@@ -325,7 +430,7 @@ def test_tiv_with_no_breaths_continuous(mock_continuous_data: ContinuousData):
         patch.object(tiv, "_calculate_tiv_values", return_value=[]),
     ):
         result = tiv.compute_continuous_parameter(mock_continuous_data, tiv_method="inspiratory")
-        assert result == []
+        assert len(result.values) == 0
 
 
 def test_tiv_with_no_breaths_pixel(
@@ -359,6 +464,7 @@ def test_tiv_with_no_breaths_pixel(
             tiv_method="mean",
             tiv_timing="pixel",
         )
+        result = np.empty((0, 2, 2)) if not len(result.values) else np.stack(result.values)
         assert result.shape == (0, 2, 2)
 
 
@@ -384,14 +490,17 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
         result_continuous = tiv.compute_continuous_parameter(cd, tiv_method="inspiratory")
         result_pixel = tiv.compute_pixel_parameter(eit_data, cd, ssequence)
 
+        arr_result_continuous = np.stack(result_continuous.values)
+        arr_result_pixel = np.stack(result_pixel.values)
+
         assert result_continuous is not None
-        assert isinstance(result_continuous, np.ndarray)
-        assert result_continuous.ndim == 1
-        assert np.all(result_continuous > 0)  # values should be positive for continuous data
+        assert isinstance(result_continuous, SparseData)
+        assert arr_result_continuous.ndim == 1
+        assert np.all(arr_result_continuous > 0)  # values should be positive for continuous data
 
         assert result_pixel is not None
-        assert isinstance(result_continuous, np.ndarray)
-        assert result_pixel.ndim == 3
+        assert isinstance(result_pixel, SparseData)
+        assert arr_result_pixel.ndim == 3
 
 
 @pytest.mark.parametrize(
@@ -413,7 +522,7 @@ def test_detect_pixel_breaths_with_invalid_bd_kwargs(
     tiv = TIV(breath_detection_kwargs=bd_kwargs)
 
     with pytest.raises(expected_error):
-        tiv._detect_pixel_breaths(mock_eit_data, mock_continuous_data, mock_sequence)
+        tiv._detect_pixel_breaths(mock_eit_data, mock_continuous_data, mock_sequence, store=False)
 
 
 @pytest.mark.parametrize(
@@ -433,7 +542,7 @@ def test_detect_pixel_breaths_with_valid_bd_kwargs(
     """Test detect_pixel_breaths with valid bd_kwargs that return expected results."""
     tiv = TIV(breath_detection_kwargs=bd_kwargs)
 
-    result = tiv._detect_pixel_breaths(mock_eit_data, mock_continuous_data, mock_sequence)
+    result = tiv._detect_pixel_breaths(mock_eit_data, mock_continuous_data, mock_sequence, store=False)
     test_result = np.stack(result.values)
     # Assert that the result is of the expected type and shape
     assert isinstance(result, IntervalData)

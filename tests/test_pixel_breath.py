@@ -169,10 +169,40 @@ def none_sequence():
 def mock_compute_pixel_parameter(mean: int):
     def _mock(*_args, **_kwargs) -> np.ndarray:
         if mean > 0:
-            return np.full((2, 2, 2), 1)
+            return SparseData(
+                label="mock_sparse_data",
+                name="Tidal impedance variation",
+                unit=None,
+                category="impedance difference",
+                time=np.linspace(0, 100),
+                description="Mock tidal impedance variation",
+                parameters={},
+                derived_from=[],
+                values=np.full(100, 1),
+            )
         if mean < 0:
-            return np.full((2, 2, 2), -1)
-        return np.full((2, 2, 2), 0.0)
+            return SparseData(
+                label="mock_sparse_data",
+                name="Tidal impedance variation",
+                unit=None,
+                category="impedance difference",
+                time=np.linspace(0, 100),
+                description="Mock tidal impedance variation",
+                parameters={},
+                derived_from=[],
+                values=np.full(100, -1),
+            )
+        return SparseData(
+            label="mock_sparse_data",
+            name="Tidal impedance variation",
+            unit=None,
+            category="impedance difference",
+            time=np.linspace(0, 100),
+            description="Mock tidal impedance variation",
+            parameters={},
+            derived_from=[],
+            values=np.full(100, 0),
+        )
 
     return _mock
 
@@ -225,7 +255,7 @@ def test__find_extreme_indices(mock_only_pixel_impedance: tuple):
 @pytest.mark.parametrize(
     ("store_input", "sequence_fixture", "expected_exception"),
     [
-        (True, "not_a_sequence", ValueError),  # Expect ValueError because mock_eit_data is not a Sequence
+        (True, "not_a_sequence", ValueError),  # Expect ValueError because an empty list is not a Sequence
         (True, "none_sequence", RuntimeError),  # Expect RuntimeError because store=True but no Sequence is provided
     ],
 )
@@ -275,7 +305,7 @@ def test_store_result_success(
     # If store is True or None and sequence is not None, check that the result is stored in the sequence
     if (store_input is True or store_input is None) and sequence is not None:
         assert len(sequence.interval_data.data) == 1
-        assert sequence.interval_data["pixel breaths"] == result
+        assert sequence.interval_data["pixel_breaths"] == result
     elif sequence is not None:
         assert len(sequence.interval_data.data) == 0
 
@@ -287,7 +317,11 @@ def test_store_result_success(
         1,
     ],
 )
-def test_with_custom_mean_pixel_tiv(mock_eit_data: EITData, mock_continuous_data: ContinuousData, mean: int):
+def test_with_custom_mean_pixel_tiv(
+    mock_eit_data: EITData,
+    mock_continuous_data: ContinuousData,
+    mean: int,
+):
     mock_function = mock_compute_pixel_parameter(mean)
     with patch(
         "eitprocessing.parameters.tidal_impedance_variation.TIV.compute_pixel_parameter",
