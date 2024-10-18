@@ -46,6 +46,39 @@ jobs:
             pytest -v ;
             python${{ matrix.python-version }} -m build'
 
+  test_and_build:
+    if: github.event.pull_request.draft == false
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Connect to Container Registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ghcr.io
+          username: drcandacemakedamoore
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Tests in Container
+        run: |
+          docker volume create --name eitdata
+          docker run --rm -v eitdata:/eitprocessing ghcr.io/eit-alive/eittestdata:latest
+          docker run --rm \
+            -v eitdata:/eitprocessing \
+            -v ${{github.workspace}}:/ci \
+            -e EIT_PROCESSING_TEST_DATA=/eitprocessing \
+            python:${{ matrix.python-version }}-bookworm \
+            sh -c 'set -xe ;
+              cd /ci ;
+              python${{ matrix.python-version }} -m pip install ".[dev,publishing]" ;
+              pytest -v ;
+              python${{ matrix.python-version }} -m build'
+
+
   coveralls:
     if: github.event.pull_request.draft == false
     name: Coveralls build
