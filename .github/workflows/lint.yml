@@ -38,6 +38,7 @@ jobs:
           python3 --version
       - name: Check linting and formatting using ruff
         run: |
-          python3 -m pip install "ruff == 0.6.9"
+          python3 -m pip install pyproject-deplister
+          pyproject-deplister --extra dev --path pyproject.toml | grep ruff | sed 's/ //g' | xargs -I{} python3 -m pip install "{}"
           ruff check || (echo "Please ensure you have a matching version of ruff (`ruff -V`) installed locally." && (exit 1))
           ruff format --check || (echo "Please ensure you have a matching version of ruff (`ruff -V`) installed locally." && (exit 1))
