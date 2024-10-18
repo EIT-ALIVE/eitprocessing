@@ -31,7 +31,7 @@ jobs:
         uses: docker/login-action@v2.1.0
         with:
           registry: ghcr.io
-          username: drcandacemakedamoore
+          username: psomhorst
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Tests in Container
         run: >
@@ -61,7 +61,7 @@ jobs:
         uses: docker/login-action@v2.1.0
         with:
           registry: ghcr.io
-          username: drcandacemakedamoore
+          username: psomhorst
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Tests in Container
         run: |
@@ -94,7 +94,7 @@ jobs:
         uses: docker/login-action@v2.1.0
         with:
           registry: ghcr.io
-          username: drcandacemakedamoore
+          username: psomhorst
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Tests in Container
         run: >
