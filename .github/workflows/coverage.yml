@@ -1,30 +1,20 @@
-name: Build package
+name: Coverage
 
 on:
   push:
     branches:
       - main
       - develop
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths-ignore:
-      - "**.md"
-      - "**.rst"
-      - "**.ipynb"
-    branches:
-      - main
-      - develop
 
 jobs:
-  test_and_build:
-    if: github.event.pull_request.draft == false
+  coveralls:
+    name: Coveralls
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
-    name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
+        python-version: ["3.10"]
     steps:
       - uses: actions/checkout@v3
       - name: Connect to Container Registry
@@ -37,13 +27,19 @@ jobs:
         run: |
           docker volume create --name eitdata
           docker run --rm -v eitdata:/eitprocessing ghcr.io/eit-alive/eittestdata:latest
-          docker run --rm \
+          docker run \
+            --rm \
+            -v ${{ github.workspace }}:/ci \
             -v eitdata:/eitprocessing \
-            -v ${{github.workspace}}:/ci \
             -e EIT_PROCESSING_TEST_DATA=/eitprocessing \
+            -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+            -e COVERALLS_REPO_TOKEN=${{ secrets.COVERALLS_REPO_TOKEN }} \
+            -e COVERALLS_FLAG_NAME=python-${{ matrix.python-version }} \
             python:${{ matrix.python-version }}-bookworm \
             sh -c 'set -xe ;
               cd /ci ;
+              python${{ matrix.python-version }} -m pip install --upgrade pip setuptools ;
               python${{ matrix.python-version }} -m pip install ".[dev,publishing]" ;
-              pytest -v ;
-              python${{ matrix.python-version }} -m build'
+              pytest --cov --cov-report xml --cov-report term --cov-report html ;
+              git config --global --add safe.directory /ci ;
+              coveralls --service=github'
