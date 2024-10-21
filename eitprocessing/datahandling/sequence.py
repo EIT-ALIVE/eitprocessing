@@ -145,7 +145,7 @@ class Sequence(Equivalence, SelectByTime):
     ) -> Self:
         """Return a sliced version of the Sequence.
 
-        See SelectByTime.select_by_time().
+        See `SelectByTime.select_by_time()`.
         """
         if not label:
             label = f"copy_of_<{self.label}>"

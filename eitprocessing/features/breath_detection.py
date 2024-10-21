@@ -24,11 +24,18 @@ class BreathDetection:
     implemented as the minimum time between peaks and between valleys.
 
     Examples:
+    ```
     >>> bd = BreathDetection(minimum_duration=0.5)
-    >>> breaths = bd.find_breaths(sequency=seq, continuousdata_label="global_impedance_(raw)")
+    >>> breaths = bd.find_breaths(
+    ...     sequency=seq,
+    ...     continuousdata_label="global_impedance_(raw)"
+    ... )
+    ```
 
+    ```
     >>> global_impedance = seq.continuous_data["global_impedance_(raw)"]
     >>> breaths = bd.find_breaths(continuous_data=global_impedance)
+    ```
 
     Args:
         minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
