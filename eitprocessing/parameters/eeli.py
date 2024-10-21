@@ -26,8 +26,10 @@ class EELI(ParameterCalculation):
         """Compute the EELI for each breath in the impedance data.
 
         Example:
+        ```
         >>> global_impedance = sequence.continuous_data["global_impedance_(raw)"]
-        >>> eeli_values = EELI().compute_parameter(global_impedance)
+        >>> eeli_data = EELI().compute_parameter(global_impedance)
+        ```
 
         Args:
             continuous_data: a ContinuousData object containing impedance data.

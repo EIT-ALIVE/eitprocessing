@@ -47,8 +47,12 @@ def load_eit_data(
 
     Example:
     ```
-    sequence = load_data(["path/to/file1", "path/to/file2"], vendor="sentec", label="initial_measurement")
-    pixel_impedance = sequence.eit_data["raw"].pixel_impedance
+    >>> sequence = load_eit_data(
+    ...     ["path/to/file1", "path/to/file2"],
+    ...     vendor="sentec",
+    ...     label="initial_measurement"
+    ... )
+    >>> pixel_impedance = sequence.eit_data["raw"].pixel_impedance
     ```
     """
     from eitprocessing.datahandling.loading import draeger, sentec, timpel  # not in top level to avoid circular import

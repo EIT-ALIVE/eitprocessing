@@ -21,11 +21,13 @@ class PixelBreath:
     of inspiration and expiration. These points are then used to find the start/end of pixel
     inspiration/expiration in pixel impedance data.
 
-    Examples:
+    Example:
+    ```
     >>> pi = PixelBreath()
     >>> eit_data = sequence.eit_data['raw']
     >>> continuous_data = sequence.continuous_data['global_impedance_(raw)']
     >>> pixel_breaths = pi.find_pixel_breaths(eit_data, continuous_data, sequence)
+    ```
 
     Args:
     breath_detection_kwargs (dict): A dictionary of keyword arguments for breath detection.
