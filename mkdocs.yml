@@ -55,6 +55,7 @@ nav:
   - api/features.md
   - api/parameters.md
   - api/categories.md
+  - api/mixins.md
 - About:
   - Contributing: contributing_doc.md
   - Code of Conduct: code_of_conduct_doc.md
