@@ -27,16 +27,24 @@ class Category(Node):
     subsub(...)category, `category.has_subcategory("<name>")` can be used. The keyword `in` can be used as a shorthand.
 
     Example:
+    ```
     >>> "tea" in category  # is the same as:
+    True
     >>> category.has_subcategory("tea")
+    True
+    ```
 
-    To select a subcategory, category["<name>"] can be used. You can select multiple categories at once. This will
+    To select a subcategory, `category["<name>"]` can be used. You can select multiple categories at once. This will
     create a new tree with a temporary root, containing only the selected categories.
 
     Example:
+    ```
     >>> foobar = categories["foo", "bar"]
-    >>> print(foobar)  # Category('/temporary root')
-    >>> print(foobar.children)  # (Category('/temporary root/foo'), Category('/temporary root/bar'))
+    >>> print(foobar)
+    Category('/temporary root')
+    >>> print(foobar.children)
+    (Category('/temporary root/foo'), Category('/temporary root/bar'))
+    ```
 
     Categories can be hand-crafted, created from a dictionary or a YAML string. See [`anytree.DictionaryImporter`
     documentation](https://anytree.readthedocs.io/en/latest/importer/dictimporter.html) for more info on the dictionary
@@ -61,10 +69,15 @@ class Category(Node):
     algorithms.
 
     Example:
+    ```
     >>> categories = get_default_categories()
-    >>> print(categories)  # Category('/category')
-    >>> print("pressure" in categories)  # True
-    >>> categories["pressure"]  # Category('/category/physical measurements/pressure')
+    >>> print(categories)
+    Category('/category')
+    >>> print("pressure" in categories)
+    True
+    >>> categories["pressure"]
+    Category('/category/physical measurement/pressure')
+    ```
     """
 
     readonly = True
