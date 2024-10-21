@@ -96,7 +96,7 @@ watch:
 
 plugins:
 - mike:
-    alias_type: symlink
+    alias_type: nonexisting
     canonical_version: latest
 - search
 - exclude:
