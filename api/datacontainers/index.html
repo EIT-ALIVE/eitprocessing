@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
     
     
       
@@ -469,6 +469,8 @@
   
     
     
+      
+        
       
         
       
@@ -1154,6 +1156,27 @@
   
   <span class="md-ellipsis">
     Categories
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mixins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mixins
   </span>
   
 
@@ -2049,18 +2072,18 @@ merged together to form a single Sequence.</p>
   </span>
 
 <a href="#eitprocessing.datahandling.sequence.Sequence.t" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><span title="eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</span></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer" href="../mixins/#eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Slicing an object using the time axis instead of indices.</p>
 <p>Example:
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&gt;&gt;&gt; sequence = load_eit_data(&lt;path&gt;, ...)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>&gt;&gt;&gt; time_slice1 = sequence.t[tp_start:tp_end]
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>&gt;&gt;&gt; time_slice2 = sequence.select_by_time(tp_start, tp_end)
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>&gt;&gt;&gt; time_slice1 == time_slice2
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>True
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">sequence</span> <span class="o">=</span> <span class="n">load_eit_data</span><span class="p">(</span><span class="o">&lt;</span><span class="n">path</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">tp_start</span><span class="p">:</span><span class="n">tp_end</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice2</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">select_by_time</span><span class="p">(</span><span class="n">tp_start</span><span class="p">,</span> <span class="n">tp_end</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">==</span> <span class="n">time_slice2</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kc">True</span>
 </code></pre></div></p>
     </div>
 
@@ -2282,7 +2305,7 @@ returned.</p>
     <div class="doc doc-contents ">
 
         <p>Return a sliced version of the Sequence.</p>
-<p>See SelectByTime.select_by_time().</p>
+<p>See <code>SelectByTime.select_by_time()</code>.</p>
 
     </div>
 
@@ -2508,18 +2531,18 @@ disk.</p>
   </span>
 
 <a href="#eitprocessing.datahandling.eitdata.EITData.t" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><span title="eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</span></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer" href="../mixins/#eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Slicing an object using the time axis instead of indices.</p>
 <p>Example:
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&gt;&gt;&gt; sequence = load_eit_data(&lt;path&gt;, ...)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>&gt;&gt;&gt; time_slice1 = sequence.t[tp_start:tp_end]
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>&gt;&gt;&gt; time_slice2 = sequence.select_by_time(tp_start, tp_end)
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>&gt;&gt;&gt; time_slice1 == time_slice2
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>True
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">sequence</span> <span class="o">=</span> <span class="n">load_eit_data</span><span class="p">(</span><span class="o">&lt;</span><span class="n">path</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">tp_start</span><span class="p">:</span><span class="n">tp_end</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice2</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">select_by_time</span><span class="p">(</span><span class="n">tp_start</span><span class="p">,</span> <span class="n">tp_end</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">==</span> <span class="n">time_slice2</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kc">True</span>
 </code></pre></div></p>
     </div>
 
@@ -3150,18 +3173,18 @@ other sources of variation.</p>
   </span>
 
 <a href="#eitprocessing.datahandling.continuousdata.ContinuousData.t" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><span title="eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</span></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer" href="../mixins/#eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Slicing an object using the time axis instead of indices.</p>
 <p>Example:
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&gt;&gt;&gt; sequence = load_eit_data(&lt;path&gt;, ...)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>&gt;&gt;&gt; time_slice1 = sequence.t[tp_start:tp_end]
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>&gt;&gt;&gt; time_slice2 = sequence.select_by_time(tp_start, tp_end)
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>&gt;&gt;&gt; time_slice1 == time_slice2
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>True
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">sequence</span> <span class="o">=</span> <span class="n">load_eit_data</span><span class="p">(</span><span class="o">&lt;</span><span class="n">path</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">tp_start</span><span class="p">:</span><span class="n">tp_end</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice2</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">select_by_time</span><span class="p">(</span><span class="n">tp_start</span><span class="p">,</span> <span class="n">tp_end</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">==</span> <span class="n">time_slice2</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kc">True</span>
 </code></pre></div></p>
     </div>
 
@@ -3670,22 +3693,22 @@ returned.</p>
       </tbody>
     </table>
         <p>Example:
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>def convert_data(x, add=None, subtract=None, multiply=None, divide=None):
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    if add:
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        x += add
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    if subtract:
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        x -= subtract
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    if multiply:
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        x *= multiply
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    if divide:
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        x /= divide
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    return x
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span> <span class="nf">convert_data</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">add</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">subtract</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">multiply</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">divide</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="k">if</span> <span class="n">add</span><span class="p">:</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="n">x</span> <span class="o">+=</span> <span class="n">add</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="k">if</span> <span class="n">subtract</span><span class="p">:</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="n">x</span> <span class="o">-=</span> <span class="n">subtract</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="k">if</span> <span class="n">multiply</span><span class="p">:</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="n">x</span> <span class="o">*=</span> <span class="n">multiply</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="k">if</span> <span class="n">divide</span><span class="p">:</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="n">x</span> <span class="o">/=</span> <span class="n">divide</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">return</span> <span class="n">x</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>data = ContinuousData(
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    name=&quot;Lung volume (in mL)&quot;, label=&quot;volume_mL&quot;, unit=&quot;mL&quot;, category=&quot;volume&quot;, values=some_loaded_data
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>)
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>derived = data.derive(&quot;volume_L&quot;, convert_data, {&quot;divide&quot;: 1000}, name=&quot;Lung volume (in L)&quot;, unit=&quot;L&quot;)
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">data</span> <span class="o">=</span> <span class="n">ContinuousData</span><span class="p">(</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Lung volume (in mL)&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;volume_mL&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;mL&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s2">&quot;volume&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">some_loaded_data</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">)</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">derived</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">derive</span><span class="p">(</span><span class="s2">&quot;volume_L&quot;</span><span class="p">,</span> <span class="n">convert_data</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;divide&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Lung volume (in L)&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;L&quot;</span><span class="p">)</span>
 </code></pre></div></p>
 
     </div>
@@ -4049,18 +4072,18 @@ or detected time points (e.g. QRS complexes).</p>
   </span>
 
 <a href="#eitprocessing.datahandling.sparsedata.SparseData.t" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><span title="eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</span></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer" href="../mixins/#eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Slicing an object using the time axis instead of indices.</p>
 <p>Example:
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&gt;&gt;&gt; sequence = load_eit_data(&lt;path&gt;, ...)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>&gt;&gt;&gt; time_slice1 = sequence.t[tp_start:tp_end]
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>&gt;&gt;&gt; time_slice2 = sequence.select_by_time(tp_start, tp_end)
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>&gt;&gt;&gt; time_slice1 == time_slice2
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>True
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">sequence</span> <span class="o">=</span> <span class="n">load_eit_data</span><span class="p">(</span><span class="o">&lt;</span><span class="n">path</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">tp_start</span><span class="p">:</span><span class="n">tp_end</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice2</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">select_by_time</span><span class="p">(</span><span class="n">tp_start</span><span class="p">,</span> <span class="n">tp_end</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">==</span> <span class="n">time_slice2</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kc">True</span>
 </code></pre></div></p>
     </div>
 
@@ -4691,18 +4714,18 @@ breath hold) or detected occurences (e.g. a breath).</p>
   </span>
 
 <a href="#eitprocessing.datahandling.intervaldata.IntervalData.t" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><span title="eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</span></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer" href="../mixins/#eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Slicing an object using the time axis instead of indices.</p>
 <p>Example:
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&gt;&gt;&gt; sequence = load_eit_data(&lt;path&gt;, ...)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>&gt;&gt;&gt; time_slice1 = sequence.t[tp_start:tp_end]
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>&gt;&gt;&gt; time_slice2 = sequence.select_by_time(tp_start, tp_end)
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>&gt;&gt;&gt; time_slice1 == time_slice2
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>True
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">sequence</span> <span class="o">=</span> <span class="n">load_eit_data</span><span class="p">(</span><span class="o">&lt;</span><span class="n">path</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">tp_start</span><span class="p">:</span><span class="n">tp_end</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice2</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">select_by_time</span><span class="p">(</span><span class="n">tp_start</span><span class="p">,</span> <span class="n">tp_end</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">==</span> <span class="n">time_slice2</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kc">True</span>
 </code></pre></div></p>
     </div>
 
@@ -5091,18 +5114,18 @@ data_type of the collection. Furthermore, the key has to match the attribute 'la
   </span>
 
 <a href="#eitprocessing.datahandling.datacollection.DataCollection.t" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><span title="eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</span></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.mixins.slicing.TimeIndexer" href="../mixins/#eitprocessing.datahandling.mixins.slicing.TimeIndexer">TimeIndexer</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Slicing an object using the time axis instead of indices.</p>
 <p>Example:
-<div class="language-text highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&gt;&gt;&gt; sequence = load_eit_data(&lt;path&gt;, ...)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>&gt;&gt;&gt; time_slice1 = sequence.t[tp_start:tp_end]
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>&gt;&gt;&gt; time_slice2 = sequence.select_by_time(tp_start, tp_end)
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>&gt;&gt;&gt; time_slice1 == time_slice2
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>True
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">sequence</span> <span class="o">=</span> <span class="n">load_eit_data</span><span class="p">(</span><span class="o">&lt;</span><span class="n">path</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">tp_start</span><span class="p">:</span><span class="n">tp_end</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice2</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">select_by_time</span><span class="p">(</span><span class="n">tp_start</span><span class="p">,</span> <span class="n">tp_end</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">time_slice1</span> <span class="o">==</span> <span class="n">time_slice2</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kc">True</span>
 </code></pre></div></p>
     </div>
 

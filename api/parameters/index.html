@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
     
     
       
@@ -482,6 +482,8 @@
       
         
       
+        
+      
     
     
       
@@ -743,6 +745,27 @@
   
   <span class="md-ellipsis">
     Categories
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mixins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mixins
   </span>
   
 
@@ -1079,15 +1102,10 @@
     <div class="doc doc-contents ">
 
         <p>Compute the EELI for each breath in the impedance data.</p>
-<p>Example:</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>global_impedance = sequence.continuous_data["global_impedance_(raw)"]
-eeli_values = EELI().compute_parameter(global_impedance)</p>
-</blockquote>
-</blockquote>
-</blockquote>
+<p>Example:
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">global_impedance</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">continuous_data</span><span class="p">[</span><span class="s2">&quot;global_impedance_(raw)&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">eeli_data</span> <span class="o">=</span> <span class="n">EELI</span><span class="p">()</span><span class="o">.</span><span class="n">compute_parameter</span><span class="p">(</span><span class="n">global_impedance</span><span class="p">)</span>
+</code></pre></div></p>
 
 
 <table>

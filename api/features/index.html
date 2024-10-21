@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
     
     
       
@@ -482,6 +482,8 @@
       
         
       
+        
+      
     
     
       
@@ -749,6 +751,27 @@
   
   <span class="md-ellipsis">
     Categories
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mixins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mixins
   </span>
   
 
@@ -1068,17 +1091,16 @@
 maximum values) in data. BreathDetection has a default minimum duration of breaths to be detected. The minimum
 duration should be short enough to include the shortest expected breath in the data. The minimum duration is
 implemented as the minimum time between peaks and between valleys.</p>
-<p>Examples:</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>bd = BreathDetection(minimum_duration=0.5)
-breaths = bd.find_breaths(sequency=seq, continuousdata_label="global_impedance_(raw)")</p>
-<p>global_impedance = seq.continuous_data["global_impedance_(raw)"]
-breaths = bd.find_breaths(continuous_data=global_impedance)</p>
-</blockquote>
-</blockquote>
-</blockquote>
+<p>Examples:
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">bd</span> <span class="o">=</span> <span class="n">BreathDetection</span><span class="p">(</span><span class="n">minimum_duration</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">breaths</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">find_breaths</span><span class="p">(</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">...</span>     <span class="n">sequency</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">...</span>     <span class="n">continuousdata_label</span><span class="o">=</span><span class="s2">&quot;global_impedance_(raw)&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="o">...</span> <span class="p">)</span>
+</code></pre></div></p>
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">global_impedance</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">continuous_data</span><span class="p">[</span><span class="s2">&quot;global_impedance_(raw)&quot;</span><span class="p">]</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">breaths</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">find_breaths</span><span class="p">(</span><span class="n">continuous_data</span><span class="o">=</span><span class="n">global_impedance</span><span class="p">)</span>
+</code></pre></div>
 
 
 <table>
@@ -1430,17 +1452,12 @@ inspiration/start of expiration, and end of expiration.</p>
 end of expiration in pixel impedance data. It uses BreathDetection to find the global start and end
 of inspiration and expiration. These points are then used to find the start/end of pixel
 inspiration/expiration in pixel impedance data.</p>
-<p>Examples:</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>pi = PixelBreath()
-eit_data = sequence.eit_data['raw']
-continuous_data = sequence.continuous_data['global_impedance_(raw)']
-pixel_breaths = pi.find_pixel_breaths(eit_data, continuous_data, sequence)</p>
-</blockquote>
-</blockquote>
-</blockquote>
+<p>Example:
+<div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">pi</span> <span class="o">=</span> <span class="n">PixelBreath</span><span class="p">()</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">eit_data</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">eit_data</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">continuous_data</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">continuous_data</span><span class="p">[</span><span class="s1">&#39;global_impedance_(raw)&#39;</span><span class="p">]</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">pixel_breaths</span> <span class="o">=</span> <span class="n">pi</span><span class="o">.</span><span class="n">find_pixel_breaths</span><span class="p">(</span><span class="n">eit_data</span><span class="p">,</span> <span class="n">continuous_data</span><span class="p">,</span> <span class="n">sequence</span><span class="p">)</span>
+</code></pre></div></p>
         <p>breath_detection_kwargs (dict): A dictionary of keyword arguments for breath detection.
     The available keyword arguments are:
     minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
