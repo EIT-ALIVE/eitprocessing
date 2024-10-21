@@ -82,6 +82,7 @@ markdown_extensions:
 - pymdownx.highlight:
     anchor_linenums: true
     pygments_lang_class: true
+    default_lang: "py"
 - pymdownx.extra
 - pymdownx.tabbed:
     alternate_style: true
