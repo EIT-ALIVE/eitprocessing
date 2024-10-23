@@ -89,6 +89,9 @@ command_line = "-m pytest"
 include = ["eitprocessing*", "eitprocessing.*"]
 exclude = ["tests*", "*tests.*", "*tests"]
 
+[tool.setuptools.package-data]
+eitprocessing = ["config/*.yaml"]
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
