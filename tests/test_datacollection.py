@@ -97,7 +97,10 @@ def test_check_add(create_data_object: Callable[[str], ContinuousData]):
     with pytest.raises(KeyError):
         dc.add(data_object_1_b)
 
+    assert dc["label 1"] is not data_object_1_b
     dc.add(data_object_1_b, overwrite=True)
+    assert dc["label 1"] is data_object_1_b
+    assert len(dc) == 3
 
 
 def test_set_item(create_data_object: Callable[[str], ContinuousData]):
