@@ -63,7 +63,7 @@ class TIV(ParameterCalculation):
             result_label: label of the returned SparseData object, defaults to `'continuous_tivs'`.
 
         Returns:
-            A list with the computed TIV values.
+            A SparseData object with the computed TIV values.
 
         Raises:
             RuntimeError: If store is set to true but no sequence is provided.
@@ -136,7 +136,7 @@ class TIV(ParameterCalculation):
             store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
 
         Returns:
-            An np.ndarray with the computed TIV values.
+            A SparseData object with the computed TIV values.
 
         Raises:
             RuntimeError: If store is set to true but no sequence is provided.
