@@ -71,7 +71,18 @@ class EELI(ParameterCalculation):
         breaths = breath_detection.find_breaths(continuous_data)
 
         if not len(breaths):
-            return np.array([], dtype=float)
+            eeli_container = SparseData(
+                label=result_label,
+                name="End-expiratory lung impedance (EELI)",
+                unit=None,
+                category="impedance",
+                time=np.array([], dtype=float),
+                description="End-expiratory lung impedance (EELI) determined on continuous data",
+                parameters=self.breath_detection_kwargs,
+                derived_from=[continuous_data],
+                values=np.array([], dtype=float),
+            )
+            return eeli_container
 
         _, _, end_expiratory_times = zip(*breaths.values, strict=True)
         end_expiratory_indices = np.flatnonzero(np.isin(continuous_data.time, end_expiratory_times))
