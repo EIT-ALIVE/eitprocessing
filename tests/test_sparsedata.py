@@ -24,13 +24,15 @@ def sparsedata_novalues():
 def sparsedata_valueslist():
     """SparseData object with random values as list at random time points."""
     n = random.randint(50, 150)
+    time = np.array(sorted({random.randint(0, 1000) for _ in range(n)}))
+    values = [random.random() for _ in range(len(time))]
     return SparseData(
         label="sparsedata_valueslist",
         name="SparseData with values as list",
         unit=None,
         category="dummy",
-        time=np.array(sorted({random.randint(0, 1000) for _ in range(n)})),
-        values=[random.random() for _ in range(n)],
+        time=time,
+        values=values,
     )
 
 
@@ -38,13 +40,15 @@ def sparsedata_valueslist():
 def sparsedata_valuesarray():
     """SparseData object with random values as array at random time points."""
     n = random.randint(50, 150)
+    time = np.array(sorted({random.randint(0, 1000) for _ in range(n)}))
+    values = np.array([random.random() for _ in range(len(time))])
     return SparseData(
         label="sparsedata_valuesarray",
         name="SparseData with values as array",
         unit=None,
         category="dummy",
-        time=np.array(sorted({random.randint(0, 1000) for _ in range(n)})),
-        values=np.array([random.random() for _ in range(n)]),
+        time=time,
+        values=values,
     )
 
 
