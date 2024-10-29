@@ -159,14 +159,17 @@ def test_concatenate(create_data_object: Callable):
 
     data_object_1_a = create_data_object("label 1", time=time[:30], values=values[:30])
     data_object_1_b = create_data_object("label 1", time=time[30:], values=values[30:])
+    data_object_1_c = create_data_object("label 1", time=time[28:], values=values[28:])
     data_object_2 = create_data_object("label 2", time=time[30:], values=values[30:])
 
     dc_1_a = DataCollection(ContinuousData)
     dc_1_b = DataCollection(ContinuousData)
+    dc_1_c = DataCollection(ContinuousData)
     dc_2 = DataCollection(ContinuousData)
 
     dc_1_a.add(data_object_1_a)
     dc_1_b.add(data_object_1_b)
+    dc_1_c.add(data_object_1_c)
     dc_2.add(data_object_2)
 
     dc_1_concat = dc_1_a.concatenate(dc_1_b)
@@ -178,6 +181,9 @@ def test_concatenate(create_data_object: Callable):
 
     with pytest.raises(ValueError, match=r"(.*?) \(b\) starts before (.*?) \(a\) end"):
         dc_1_b.concatenate(dc_1_a)
+
+    with pytest.raises(ValueError, match=r"(.*?) \(b\) starts before (.*?) \(a\) end"):
+        dc_1_a.concatenate(dc_1_c)
 
 
 def test_select_by_time(create_data_object: Callable):
