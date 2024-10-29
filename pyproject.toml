@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eitprocessing"
-version = "1.4.1"
+version = "1.4.2"
 description = "Processing of lung image data from electrical impedance tomography."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -84,6 +84,9 @@ testpaths = ["tests"]
 branch = true
 source = ["eitprocessing"]
 command_line = "-m pytest"
+
+[tool.coverage.report]
+exclude_lines = ["if TYPE_CHECKING:"]
 
 [tool.setuptools.packages.find]
 include = ["eitprocessing*", "eitprocessing.*"]
@@ -171,7 +174,7 @@ isort.known-first-party = ["eitprocessing"]
 "docs/*" = ["ALL"]
 
 [tool.bumpversion]
-current_version = "1.4.1"
+current_version = "1.4.2"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"

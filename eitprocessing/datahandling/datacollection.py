@@ -13,8 +13,9 @@ from eitprocessing.datahandling.sparsedata import SparseData
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-V_classes = (EITData, ContinuousData, SparseData, IntervalData)
-V = TypeVar("V", *V_classes)
+
+V = TypeVar("V", EITData, ContinuousData, SparseData, IntervalData)
+V_classes = V.__constraints__
 
 
 class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
@@ -35,7 +36,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
     def __init__(self, data_type: type[V], *args, **kwargs):
         if not any(issubclass(data_type, cls) for cls in V_classes):
             msg = f"Type {data_type} not expected to be stored in a DataCollection."
-            raise ValueError(msg)
+            raise TypeError(msg)
         self.data_type = data_type
         super().__init__(*args, **kwargs)
 
@@ -81,6 +82,9 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
             msg = f"'{key}' does not match label '{item.label}'."
             raise KeyError(msg)
 
+        if not key:
+            key = item.label
+
         if not overwrite and key in self:
             # Generally it is not expected one would want to overwrite existing data with different/derived data. One
             # should probably change the label instead over overwriting existing data.
@@ -93,7 +97,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
 
     def get_data_derived_from(self, obj: V) -> dict[str, V]:
         """Return all data that was derived from a specific source."""
-        return {k: v for k, v in self.items() if obj in v.derived_from}
+        return {k: v for k, v in self.items() if any(obj is item for item in v.derived_from)}
 
     def get_derived_data(self) -> dict[str, V]:
         """Return all data that was derived from any source."""
