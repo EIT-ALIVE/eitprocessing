@@ -86,7 +86,7 @@ def load_from_single_path(
     time = time[first_frame:]
 
     pixel_impedance = data[:, :1024]
-    pixel_impedance = np.reshape(pixel_impedance, shape=(-1, 32, 32), order="C")
+    pixel_impedance = np.reshape(pixel_impedance, (-1, 32, 32), order="C")
 
     pixel_impedance = np.where(pixel_impedance == _NAN_VALUE, np.nan, pixel_impedance)
 
