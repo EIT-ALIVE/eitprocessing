@@ -97,7 +97,7 @@ include = ["eitprocessing*", "eitprocessing.*"]
 exclude = ["tests*", "*tests.*", "*tests"]
 
 [tool.setuptools.package-data]
-eitprocessing = ["config/*.yaml"]
+eitprocessing = ["config/*.yaml", "py.typed"]
 
 [tool.tox]
 legacy_tox_ini = """
