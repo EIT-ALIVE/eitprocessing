@@ -81,7 +81,7 @@ class EELI(ParameterCalculation):
             name="End-expiratory lung impedance (EELI)",
             unit=None,
             category="impedance",
-            time=continuous_data.time,
+            time=[breath.end_time for breath in breaths.values if breath is not None],
             description="End-expiratory lung impedance (EELI) determined on continuous data",
             parameters=self.breath_detection_kwargs,
             derived_from=[continuous_data],
