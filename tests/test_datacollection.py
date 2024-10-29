@@ -200,6 +200,8 @@ def test_select_by_time(create_data_object: Callable):
     dc.add(data_object_1, data_object_2)
 
     s1 = dc.select_by_time(20, 80)
+    # TODO Add test with start == end
+
     assert np.array_equal(s1["label 1"].time, time1[20:80])
     assert np.array_equal(s1["label 1"].values, values1[20:80])
     assert np.array_equal(s1["label 2"].time, time2[:30])
