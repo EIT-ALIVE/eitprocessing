@@ -59,6 +59,10 @@ class EITData(DataContainer, SelectByTime):
 
         self.name = self.name or self.label
 
+        if (lv := len(self.pixel_impedance)) != (lt := len(self.time)):
+            msg = f"The number of time points ({lt}) does not match the number of pixel impedance values ({lv})."
+            raise ValueError(msg)
+
     @property
     def framerate(self) -> float:
         """Deprecated alias to `sample_frequency`."""
