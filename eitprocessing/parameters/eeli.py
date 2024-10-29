@@ -5,6 +5,8 @@ import numpy as np
 
 from eitprocessing.categories import check_category
 from eitprocessing.datahandling.continuousdata import ContinuousData
+from eitprocessing.datahandling.sequence import Sequence
+from eitprocessing.datahandling.sparsedata import SparseData
 from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.parameters import ParameterCalculation
 
@@ -22,7 +24,13 @@ class EELI(ParameterCalculation):
             msg = f"Method {self.method} is not valid. Use any of {', '.join(_methods)}"
             raise ValueError(msg)
 
-    def compute_parameter(self, continuous_data: ContinuousData) -> np.ndarray:
+    def compute_parameter(
+        self,
+        continuous_data: ContinuousData,
+        sequence: Sequence | None = None,
+        store: bool | None = None,
+        result_label: str = "continuous_eelis",
+    ) -> SparseData:
         """Compute the EELI for each breath in the impedance data.
 
         Example:
@@ -33,10 +41,29 @@ class EELI(ParameterCalculation):
 
         Args:
             continuous_data: a ContinuousData object containing impedance data.
+            sequence: optional, Sequence to store the result in.
+            store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
+            result_label: label of the returned SparseData object, defaults to `'continuous_eelis'`.
 
         Returns:
-            np.ndarray: the end-expiratory values of all breaths in the impedance data.
+            A SparseData object with the end-expiratory values of all breaths in the impedance data.
+
+        Raises:
+            RuntimeError: If store is set to true but no sequence is provided.
+            ValueError: If the provided sequence is not an instance of the Sequence dataclass.
+            ValueError: If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.
         """
+        if store is None and isinstance(sequence, Sequence):
+            store = True
+
+        if store and sequence is None:
+            msg = "Can't store the result if no Sequence is provided."
+            raise RuntimeError(msg)
+
+        if store and not isinstance(sequence, Sequence):
+            msg = "To store the result a Sequence dataclass must be provided."
+            raise ValueError(msg)
+
         check_category(continuous_data, "impedance", raise_=True)
 
         bd_kwargs = self.breath_detection_kwargs.copy()
@@ -49,4 +76,18 @@ class EELI(ParameterCalculation):
         _, _, end_expiratory_times = zip(*breaths.values, strict=True)
         end_expiratory_indices = np.flatnonzero(np.isin(continuous_data.time, end_expiratory_times))
 
-        return continuous_data.values[end_expiratory_indices]
+        eeli_container = SparseData(
+            label=result_label,
+            name="End-expiratory lung impedance (EELI)",
+            unit=None,
+            category="impedance",
+            time=continuous_data.time,
+            description="End-expiratory lung impedance (EELI) determined on continuous data",
+            parameters=self.breath_detection_kwargs,
+            derived_from=[continuous_data],
+            values=continuous_data.values[end_expiratory_indices],
+        )
+        if store:
+            sequence.sparse_data.add(eeli_container)
+
+        return eeli_container
