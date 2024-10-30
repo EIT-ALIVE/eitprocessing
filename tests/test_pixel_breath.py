@@ -63,7 +63,7 @@ def mock_global_impedance():
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_continuous_data():
     """Fixture to provide an instance of ContinuousData."""
     return ContinuousData(
@@ -80,7 +80,7 @@ def mock_continuous_data():
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_eit_data():
     """Fixture to provide an instance of EITData."""
     return EITData(
@@ -95,7 +95,7 @@ def mock_eit_data():
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_sequence(mock_eit_data: EITData, mock_continuous_data: ContinuousData):
     """Fixture to provide an instance of Sequence."""
     data_collection_eit = DataCollection(EITData)
@@ -118,7 +118,7 @@ def mock_sequence(mock_eit_data: EITData, mock_continuous_data: ContinuousData):
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_zero_eit_data():
     """Fixture to provide an instance of EITData with one element set to zero."""
     return EITData(
@@ -133,7 +133,7 @@ def mock_zero_eit_data():
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_only_pixel_impedance():
     """Mock pixel_impedance with phase shifted cosines for testing."""
     """Mock pixel_impedance with phase shifted cosines for testing."""
@@ -156,12 +156,12 @@ def mock_only_pixel_impedance():
     return time, pixel_impedance
 
 
-@pytest.fixture
+@pytest.fixture()
 def not_a_sequence():
     return []
 
 
-@pytest.fixture
+@pytest.fixture()
 def none_sequence():
     return None
 
@@ -174,7 +174,7 @@ def mock_compute_pixel_parameter(mean: int):
                 name="Tidal impedance variation",
                 unit=None,
                 category="impedance difference",
-                time=np.linspace(0, 100),
+                time=np.linspace(0, 100, 100),
                 description="Mock tidal impedance variation",
                 parameters={},
                 derived_from=[],
@@ -186,7 +186,7 @@ def mock_compute_pixel_parameter(mean: int):
                 name="Tidal impedance variation",
                 unit=None,
                 category="impedance difference",
-                time=np.linspace(0, 100),
+                time=np.linspace(0, 100, 100),
                 description="Mock tidal impedance variation",
                 parameters={},
                 derived_from=[],
@@ -197,7 +197,7 @@ def mock_compute_pixel_parameter(mean: int):
             name="Tidal impedance variation",
             unit=None,
             category="impedance difference",
-            time=np.linspace(0, 100),
+            time=np.linspace(0, 100, 100),
             description="Mock tidal impedance variation",
             parameters={},
             derived_from=[],
