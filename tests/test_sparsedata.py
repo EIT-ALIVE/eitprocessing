@@ -7,7 +7,7 @@ import pytest
 from eitprocessing.datahandling.sparsedata import SparseData
 
 
-@pytest.fixture()
+@pytest.fixture
 def sparsedata_novalues():
     """SparseData object without values and random time points."""
     n = random.randint(50, 150)
@@ -20,7 +20,7 @@ def sparsedata_novalues():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def sparsedata_valueslist():
     """SparseData object with random values as list at random time points."""
     n = random.randint(50, 150)
@@ -36,7 +36,7 @@ def sparsedata_valueslist():
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def sparsedata_valuesarray():
     """SparseData object with random values as array at random time points."""
     n = random.randint(50, 150)
