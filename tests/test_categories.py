@@ -47,7 +47,7 @@ categories_dict = {
 }
 
 
-@pytest.fixture
+@pytest.fixture()
 def categories_from_dict() -> Category:
     return Category.from_dict(categories_dict)
 

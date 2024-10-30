@@ -12,7 +12,7 @@ from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sparsedata import SparseData
 
 
-@pytest.fixture
+@pytest.fixture()
 def create_data_object() -> Callable[[str, list | None], ContinuousData]:
     def internal(
         label: str,
