@@ -71,6 +71,12 @@ jobs:
               --generate-notes \
               --draft
 
+      - name: Validate CITATION.cff
+        id: validate_cff
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        uses: dieghernan/cff-validator@v3
+
   tidy_workspace:
     # only run if action above succeeds
     needs: github_release
