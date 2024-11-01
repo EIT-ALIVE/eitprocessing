@@ -172,15 +172,3 @@ isort.known-first-party = ["eitprocessing"]
     "SLF001",  # Private member accessed
 ]
 "docs/*" = ["ALL"]
-
-[tool.bumpversion]
-current_version = "1.4.3"
-
-[[tool.bumpversion.files]]
-filename = "pyproject.toml"
-
-[[tool.bumpversion.files]]
-filename = "CITATION.cff"
-
-[[tool.bumpversion.files]]
-filename = "eitprocessing/__init__.py"
