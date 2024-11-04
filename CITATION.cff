@@ -1,6 +1,6 @@
 # YAML 1.2
 ---
-cff-version: "1.4.3"
+cff-version: 1.2.0
 title: "eitprocessing"
 authors:
   - family-names: Bodor
@@ -29,20 +29,20 @@ authors:
 
   - family-names: Wisse-Smit
     given-names: Jantine
-    email: xxx@xxx.xx
+    email: j.j.smit@erasmusmc.nl
     affiliation: Erasmus MC
-    orcid: "https://orcid.org/0000-0000-0000-0000"
+    orcid: "https://orcid.org/0009-0006-6552-5459"
 
   - family-names: Francovich
     given-names: Juliette
-    email: xxx@xxx.xx
+    email: j.francovich@erasmusmc.nl
     affiliation: Erasmus MC
-    orcid: "https://orcid.org/0000-0000-0000-0000"
+    orcid: "https://orcid.org/0009-0004-0976-5082"
 
 date-released: 2023-03-23
 doi: 10.5281/zenodo.7869553
-version: "1.4.3"
-repository-code: "git@github.com:EIT-ALIVE/eitprocessing"
+version: "1.4.4"
+repository-code: "https://github.com/EIT-ALIVE/eitprocessing"
 keywords:
   - Mechanical lung ventilation
   - Electrical impedance tomography
