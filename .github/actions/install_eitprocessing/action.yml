@@ -38,7 +38,7 @@ runs:
         image: ghcr.io/eit-alive/eittestdata:latest
         destination: ${{ inputs.data-directory }}
         path: /eitprocessing/.
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       id: cache-python-env
       with:
         path: ${{ env.pythonLocation }}
