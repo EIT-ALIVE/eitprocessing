@@ -22,24 +22,13 @@ jobs:
       COVERALLS_FLAG_NAME: python-${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - uses: ./.github/actions/install_eitprocessing
         with:
+          dependencies: testing
+          extract-data: true
           python-version: ${{ matrix.python-version }}
-      - name: Connect to Container Registry
-        uses: docker/login-action@v2.1.0
-        with:
-          registry: ghcr.io
-          username: psomhorst
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract data from image
-        uses: shrink/actions-docker-extract@v3
-        with: 
-          image: ghcr.io/eit-alive/eittestdata:latest
-          destination: $EIT_PROCESSING_TEST_DATA
-          path: /eitprocessing/.
-      - name: Install eitprocessing
-        run: python3 -m pip install ".[testing]"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
       - name: Run coveralls
         run: |
           pytest --cov --cov-report xml --cov-report term --cov-report html 
