@@ -12,26 +12,24 @@ on:
       - develop
     
 jobs:
-  test-build-docs:
+  build-docs:
     if: github.event.pull_request.draft == false
-    name: Test documentation build
-    runs-on: ${{ matrix.os }}
+    name: Build documentation
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        os: ["ubuntu-latest"]
-        python-version: ["3.10"]
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with: 
-          python-version: ${{ matrix.python-version }}
-      - name: Upgrade pip and install dependencies
-        run: |
-          python3 -m pip install --upgrade pip setuptools
-          python3 -m pip install .[docs]
+          python-version: "3.10"
+      - name: Install eitprocessing with docs dependencies
+        run: python3 -m pip install .[docs]
       - name: Build documentation
         run: mkdocs build
+      - name: Deploy documentation 
+        if: ${{ github.event.action == 'push' && github.action_ref == 'main' }}
+        run: mkdocs gh-deploy
