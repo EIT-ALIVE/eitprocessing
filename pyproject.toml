@@ -17,23 +17,29 @@ keywords = [
 authors = [
     { name = "Dani Bodor", email = "d.bodor@esciencecenter.nl" },
     { name = "Peter Somhorst", email = "p.somhorst@erasmusmc.nl" },
+    { name = "Annemijn Jonkman", email= "a.jonkman@erasmusmc.nl"}, 
     { name = "Walter Baccinelli", email = "w.baccinelli@esciencecenter.nl" },
+    { name = "Jantine Wisse-Smit", email = "j.j.smit@erasmusmc.nl"},
+    { name = "Juliette Francovich", email = "j.francovich@erasmusmc.nl"}
 ]
 license = { text = "Apache-2.0 license" }
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "matplotlib >= 3.7.1",
     "numpy >= 1.24.2",
     "scipy >= 1.10.1",
-    "tqdm >= 4.65.0",
     "strenum >= 0.4.10",
     "anytree >= 2.12.1 ",
     "typing_extensions",
@@ -46,12 +52,14 @@ dev = [
     "pytest >= 7.4.0",
     "bump-my-version",
     "coverage",
-    "pycodestyle",
     "pytest-cov",
-    "pytest-runner",
     "coveralls",
-    "tox",
     "ruff == 0.6.9",
+]
+testing = [
+    "pytest >= 7.4.0",
+    "pytest-cov",
+    "coveralls",
 ]
 docs = [
     "mkdocs",
@@ -64,13 +72,12 @@ docs = [
     "black",
 ]
 notebooks = [
-    "ipykernel >= 6.15.2",
-    "ipython >= 8.4.0",
     "jupyter >= 1.0.0",
     "jupytext >= 1.14.5",
-    "notebook >= 6.4.12",
+    "tqdm >= 4.65.0",
+    "ipympl"
 ]
-publishing = ["build", "twine", "wheel"]
+publishing = ["build"]
 
 [project.urls]
 Documentation = "https://github.com/EIT-ALIVE/eitprocessing/blob/main/README.md"
@@ -93,7 +100,7 @@ include = ["eitprocessing*", "eitprocessing.*"]
 exclude = ["tests*", "*tests.*", "*tests"]
 
 [tool.setuptools.package-data]
-eitprocessing = ["config/*.yaml"]
+eitprocessing = ["config/*.yaml", "py.typed"]
 
 [tool.tox]
 legacy_tox_ini = """
