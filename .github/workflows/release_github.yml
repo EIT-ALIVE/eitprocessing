@@ -45,10 +45,12 @@ jobs:
           image: ghcr.io/eit-alive/eittestdata:latest
           destination: $EIT_PROCESSING_TEST_DATA
           path: /eitprocessing/.
-      - name: Install eitprocessing
-        run: python3 -m pip install ".[dev,publishing]"
+      - name: Install eitprocessing with testing dependecies
+        run: python3 -m pip install ".[testing]"
       - name: Run pytest
         run: pytest -v
+      - name: Install eitprocessing with dev dependencies
+        run: python3 -m pip install --upgrade ".[publishing]"
       - name: Build eitprocessing
         run: python3 -m build
   
