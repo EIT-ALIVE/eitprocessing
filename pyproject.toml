@@ -17,7 +17,10 @@ keywords = [
 authors = [
     { name = "Dani Bodor", email = "d.bodor@esciencecenter.nl" },
     { name = "Peter Somhorst", email = "p.somhorst@erasmusmc.nl" },
+    { name = "Annemijn Jonkman", email= "a.jonkman@erasmusmc.nl"}, 
     { name = "Walter Baccinelli", email = "w.baccinelli@esciencecenter.nl" },
+    { name = "Jantine Wisse-Smit", email = "j.j.smit@erasmusmc.nl"},
+    { name = "Juliette Francovich", email = "j.francovich@erasmusmc.nl"}
 ]
 license = { text = "Apache-2.0 license" }
 classifiers = [
