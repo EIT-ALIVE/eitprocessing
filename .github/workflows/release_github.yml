@@ -17,7 +17,44 @@ permissions:
   pull-requests: write
 
 jobs:
+  test_python_releases:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: 
+        os: ["ubunt-latest"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Connect to container registry
+        uses: docker/login-action@v2.1.0
+        with: 
+          registry: ghcr.io
+          username: psomhorst
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Connect to Container Registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ghcr.io
+          username: psomhorst
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract data from image
+        uses: shrink/actions-docker-extract@v3
+        with: 
+          image: ghcr.io/eit-alive/eittestdata:latest
+          destination: $EIT_PROCESSING_TEST_DATA
+          path: /eitprocessing/.
+      - name: Install eitprocessing
+        run: python3 -m pip install ".[dev,publishing]"
+      - name: Run pytest
+        run: pytest -v
+      - name: Build eitprocessing
+        run: python3 -m build
+  
+
   github_release:
+    needs: test_python_releases
     runs-on: "ubuntu-latest"
     defaults:
       run:
