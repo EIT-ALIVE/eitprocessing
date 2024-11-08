@@ -40,7 +40,6 @@ dependencies = [
     "matplotlib >= 3.7.1",
     "numpy >= 1.24.2",
     "scipy >= 1.10.1",
-    "tqdm >= 4.65.0",
     "strenum >= 0.4.10",
     "anytree >= 2.12.1 ",
     "typing_extensions",
@@ -53,11 +52,8 @@ dev = [
     "pytest >= 7.4.0",
     "bump-my-version",
     "coverage",
-    "pycodestyle",
     "pytest-cov",
-    "pytest-runner",
     "coveralls",
-    "tox",
     "ruff == 0.6.9",
 ]
 testing = [
@@ -76,13 +72,12 @@ docs = [
     "black",
 ]
 notebooks = [
-    "ipykernel >= 6.15.2",
-    "ipython >= 8.4.0",
     "jupyter >= 1.0.0",
     "jupytext >= 1.14.5",
-    "notebook >= 6.4.12",
+    "tqdm >= 4.65.0",
+    "ipympl"
 ]
-publishing = ["build", "twine", "wheel"]
+publishing = ["build"]
 
 [project.urls]
 Documentation = "https://github.com/EIT-ALIVE/eitprocessing/blob/main/README.md"
