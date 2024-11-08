@@ -49,5 +49,3 @@ jobs:
         run: python3 -m pip install ".[dev,publishing]"
       - name: Run pytest
         run: pytest -v
-      - name: Build eitprocessing
-        run: python3 -m build
