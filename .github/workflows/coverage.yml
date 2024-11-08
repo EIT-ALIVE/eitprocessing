@@ -39,7 +39,7 @@ jobs:
           destination: $EIT_PROCESSING_TEST_DATA
           path: /eitprocessing/.
       - name: Install eitprocessing
-        run: python3 -m pip install ".[dev,publishing]"
+        run: python3 -m pip install ".[testing]"
       - name: Run coveralls
         run: |
           pytest --cov --cov-report xml --cov-report term --cov-report html 
