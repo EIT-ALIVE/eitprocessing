@@ -15,9 +15,38 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  packages: read
 
 jobs:
+  test_python_releases:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: 
+        os: ["ubuntu-latest"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
+    env: 
+      EIT_PROCESSING_TEST_DATA: ${{ github.workspace }}/../eitprocessing_data/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/install_eitprocessing
+        with:
+          dependencies: testing
+          extract-data: true
+          python-version: ${{ matrix.python-version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
+      - name: Run pytest
+        run: pytest -v
+      - name: Install eitprocessing with dev dependencies
+        run: python3 -m pip install --upgrade ".[publishing]"
+      - name: Build eitprocessing
+        run: python3 -m build
+  
+
   github_release:
+    needs: test_python_releases
     runs-on: "ubuntu-latest"
     defaults:
       run:
@@ -46,7 +75,8 @@ jobs:
       - name: Merge changes into main
         run: |
           git switch main
-          git merge origin/${{ github.ref_name }} --no-ff --no-commit
+          git branch ${{ github.ref_name }} origin/${{ github.ref_name }} 
+          git merge ${{ github.ref_name }} --no-ff --no-commit
           git commit --no-edit
 
       - name: Bump version
