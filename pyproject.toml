@@ -60,6 +60,11 @@ dev = [
     "tox",
     "ruff == 0.6.9",
 ]
+testing = [
+    "pytest >= 7.4.0",
+    "pytest-cov",
+    "coveralls",
+]
 docs = [
     "mkdocs",
     "mkdocs-material",
