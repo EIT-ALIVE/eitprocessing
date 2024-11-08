@@ -83,7 +83,8 @@ jobs:
       - name: Merge changes into main
         run: |
           git switch main
-          git merge origin/${{ github.ref_name }} --no-ff --no-commit
+          git branch -u origin/${{ github.ref_name }} ${{ github.ref_name }}
+          git merge ${{ github.ref_name }} --no-ff --no-commit
           git commit --no-edit
 
       - name: Bump version
