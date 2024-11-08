@@ -46,6 +46,7 @@ class EITData(DataContainer, SelectByTime):
     sample_frequency: float = field(metadata={"check_equivalence": True}, repr=False)
     vendor: Vendor = field(metadata={"check_equivalence": True}, repr=False)
     label: str | None = field(default=None, compare=False, metadata={"check_equivalence": True})
+    description: str = field(default="", compare=False, repr=False)
     name: str | None = field(default=None, compare=False, repr=False)
     pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
 
