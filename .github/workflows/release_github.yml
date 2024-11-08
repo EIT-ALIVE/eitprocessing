@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: 
-        os: ["ubunt-latest"]
+        os: ["ubuntu-latest"]
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
     env: 
