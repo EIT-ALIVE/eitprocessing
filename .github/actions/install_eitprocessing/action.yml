@@ -8,7 +8,7 @@ inputs:
   dependencies:
     description: "The optional dependencies of eitprocessing to install"
     required: false
-  extract-data: 
+  extract-data:
     description: "Whether to extract testing data"
     required: false
     default: "false"
@@ -21,7 +21,7 @@ inputs:
     default: ${{ github.workspace }}/../eitprocessing_data/
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - uses: actions/setup-python@v5
       with:
@@ -47,7 +47,3 @@ runs:
       if: steps.cache-python-env.outputs.cache-hit != 'true'
       run: python3 -m pip install -e ".[${{ inputs.dependencies }}]"
       shell: bash
-
-  
-
-
