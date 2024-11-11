@@ -13,7 +13,6 @@ This repository is set up with Python versions:
 
 - 3.10
 
-
 ## Package management and dependencies
 
 You can use either pip or conda for installing dependencies and package management. This repository does not force you

@@ -3,22 +3,22 @@ site_description: ALIVE project
 strict: false
 
 theme:
-  name: 'material'
+  name: "material"
   palette:
-  - media: "(prefers-color-scheme: light)"
-    scheme: default
-    primary: darkblue
-    accent: pink
-    toggle:
-      icon: material/weather-sunny
-      name: "Switch to dark mode"
-  - media: "(prefers-color-scheme: dark)"
-    scheme: slate
-    primary: darkblue
-    accent: pink
-    toggle:
-      icon: material/weather-night
-      name: "Switch to light mode"
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: darkblue
+      accent: pink
+      toggle:
+        icon: material/weather-sunny
+        name: "Switch to dark mode"
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: darkblue
+      accent: pink
+      toggle:
+        icon: material/weather-night
+        name: "Switch to light mode"
   features:
     - announce.dismiss
     - content.action.view
@@ -31,12 +31,11 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
   icon:
-    logo: 'material/home'
+    logo: "material/home"
     next: fontawesome/solid/angle-right
     previous: fontawesome/solid/angle-left
     repo: fontawesome/brands/github-alt
     view: material/eye
-
 
 repo_url: https://github.com/EIT-ALIVE/eitprocessing
 repo_name: EIT-ALIVE/eitprocessing
@@ -44,23 +43,23 @@ edit_uri: edit/main/docs/
 
 # Page tree
 nav:
-- Home: index.md
-- Getting started:
-  - installation.md
-  - basic_example.md
-- API Documentation: 
-  - api/loading.md
-  - api/datacontainers.md
-  - api/filters.md
-  - api/features.md
-  - api/parameters.md
-  - api/categories.md
-  - api/mixins.md
-- About:
-  - Contributing: contributing_doc.md
-  - Code of Conduct: code_of_conduct_doc.md
-  - license_doc.md
-  - team.md
+  - Home: index.md
+  - Getting started:
+      - installation.md
+      - basic_example.md
+  - API Documentation:
+      - api/loading.md
+      - api/datacontainers.md
+      - api/filters.md
+      - api/features.md
+      - api/parameters.md
+      - api/categories.md
+      - api/mixins.md
+  - About:
+      - Contributing: contributing_doc.md
+      - Code of Conduct: code_of_conduct_doc.md
+      - license_doc.md
+      - team.md
 
 extra:
   version:
@@ -73,62 +72,62 @@ validation:
   unrecognized_links: warn
 
 markdown_extensions:
-- tables
-- toc:
-    permalink: true
-    title: Page contents
-- admonition
-- pymdownx.details
-- pymdownx.superfences
-- pymdownx.highlight:
-    anchor_linenums: true
-    pygments_lang_class: true
-    default_lang: "py"
-- pymdownx.extra
-- pymdownx.tabbed:
-    alternate_style: true
-- pymdownx.magiclink
-- pymdownx.snippets:
-      base_path: ["docs","."]
+  - tables
+  - toc:
+      permalink: true
+      title: Page contents
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+      default_lang: "py"
+  - pymdownx.extra
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.magiclink
+  - pymdownx.snippets:
+      base_path: ["docs", "."]
 
 watch:
-- docs
+  - docs
 
 plugins:
-- mike:
-    alias_type: symlink
-    canonical_version: latest
-- search
-- exclude:
-    glob:
-    - __pycache__/*
-- mkdocstrings:
-    handlers:
-      python:
-        paths: [src]
-        import:
-          - https://docs.python.org/3/objects.inv
-          - https://numpy.org/doc/stable/objects.inv
-          - https://docs.scipy.org/doc/scipy/objects.inv
-          - https://pandas.pydata.org/docs/objects.inv
-        options:
-          members_order: source
-          inherited_members: true
-          filters: ["!^_"]
-          merge_init_into_class: true
-          show_root_heading: true
-          show_root_full_path: true
-          show_signature_annotations: true
-          signature_crossrefs: true
-          separate_signature: true
-          show_symbol_type_heading: true
-          show_symbol_type_toc: true
-          show_submodules: true
-          heading_level: 2
-          show_bases: false
-          show_source: false
-          docstring_section_style: spacy
-          line_length: 80
+  - mike:
+      alias_type: symlink
+      canonical_version: latest
+  - search
+  - exclude:
+      glob:
+        - __pycache__/*
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          import:
+            - https://docs.python.org/3/objects.inv
+            - https://numpy.org/doc/stable/objects.inv
+            - https://docs.scipy.org/doc/scipy/objects.inv
+            - https://pandas.pydata.org/docs/objects.inv
+          options:
+            members_order: source
+            inherited_members: true
+            filters: ["!^_"]
+            merge_init_into_class: true
+            show_root_heading: true
+            show_root_full_path: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            separate_signature: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            show_submodules: true
+            heading_level: 2
+            show_bases: false
+            show_source: false
+            docstring_section_style: spacy
+            line_length: 80
 
 extra_css:
-- css/material.css
+  - css/material.css
