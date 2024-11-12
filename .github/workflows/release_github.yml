@@ -3,10 +3,11 @@ name: Draft GitHub Release
 on:
   workflow_dispatch:
     inputs:
-      version_level:
-        description: "Semantic version level increase."
+      version_level: 
+        description: Semantic version level increase
         required: true
         type: choice
+        default: patch
         options:
           - patch
           - minor
@@ -14,7 +15,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
   packages: read
 
 jobs:
@@ -43,61 +43,84 @@ jobs:
         run: python3 -m pip install --upgrade ".[publishing]"
       - name: Build eitprocessing
         run: python3 -m build
-  
 
-  github_release:
+  check_main:
     needs: test_python_releases
     runs-on: "ubuntu-latest"
-    defaults:
-      run:
-        shell: bash -l {0}
-
     steps:
       - name: Fail if main branch was selected
         if: ${{ github.ref_name == 'main' }}
         run: |
           echo "Cannot release from main branch, please select valid release branch."
           exit 1
-
-      - name: Checkout repository
+  
+  merge_pr:
+    if: ${{ github.ref_name != 'develop' }}
+    needs: check_main
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout the code
         uses: actions/checkout@v4
+
+      - name: Get PR number
+        run: pr_number=$(gh pr list --head ${{ github.ref_name }} --json number --jq '.[0].number')
+
+      - name: Set PR base to main and merge
+        run: |
+          gr pr edit $pr_number --base main
+          gr pr merge $pr_number --admin
+    
+  merge_develop:
+    if: ${{ github.ref_name == 'develop'}}
+    needs: check_main
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout the code
+        uses: actions/checkout@v4
+      - name: Merge main -> develop
+        uses: devmasx/merge-branch@master
         with:
-          token: ${{ secrets.GH_PAT }}
-          ref: main
-          fetch-depth: 0
-
-      - name: Configure git
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
-          git pull
-
-      - name: Merge changes into main
-        run: |
-          git switch main
-          git branch ${{ github.ref_name }} origin/${{ github.ref_name }} 
-          git merge ${{ github.ref_name }} --no-ff --no-commit
-          git commit --no-edit
-
-      - name: Bump version
+          type: now
+          from_branch: main
+          target_branch: develop
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+  
+  github_release:
+    needs: [merge_pr, merge_develop]
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        
+      - name: Bump version'
         id: bump
-        run: |
-          echo "-- install bump-my-version"
-          python3 -m pip install bump-my-version
-          echo "-- bump the version"
-          bump-my-version bump ${{ github.event.inputs.version_level }} --commit --tag
-          echo "-- push bumped version"
-          echo "RELEASE_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
-          git push --tags -f
-          git push
+        uses: callowayproject/bump-my-version@master
+        env:
+          BUMPVERSION_TAG: 'true'
+        with:
+          args: ${{ inputs.version_level }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Fail if bumping failes
+        if: steps.bump.outputs.bumped == 'false'
+        run: |
+          echo "Bumping failed."
+          exit 1
+
+      - name: Check new version number
+        if: steps.bump.outputs.bumped == 'true'
+        run: |
+          echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
+  
       - name: Create GitHub Release
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ steps.bump.outputs.RELEASE_TAG }} \
-              --title="Release ${{ steps.bump.outputs.RELEASE_TAG }}" \
+          gh release create v${{ steps.bump.outputs.current-version }} \
+              --title="Release v${{ steps.bump.outputs.current-version }}" \
               --generate-notes \
               --draft
 
@@ -110,48 +133,16 @@ jobs:
   tidy_workspace:
     # only run if action above succeeds
     needs: github_release
-    runs-on: "ubuntu-latest"
-    defaults:
-      run:
-        shell: bash -l {0}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Merge main -> develop
+        uses: devmasx/merge-branch@master
         with:
-          token: ${{ secrets.GH_PAT }}
-          fetch-depth: 0
-
-      - name: Configure git
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
-          git pull
-
-      - name: Close PR
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "-- searching for associated PR"
-          pr_number=$(gh pr list --head ${{ github.ref_name }} --json number --jq '.[0].number')
-          if [ -n "$pr_number" ]; then
-            echo "-- closing PR #$pr_number"
-            gh pr close $pr_number
-          else
-            echo "-- no open pull request found for branch $branch_name"
-          fi
-
-      - name: Merge updates into develop
-        run: |
-          git switch develop
-          git merge --no-ff origin/main
-          git push
-
-      - name: Delete release branch other than main or develop
-        run: |
-          if [[ ${{ github.ref_name }} != "main" && ${{ github.ref_name }} != "develop" ]]; then
-            echo "-- deleting branch '${{ github.ref_name }}'"
-            git push origin -d ${{ github.ref_name }}
-          else
-            echo "-- branch '${{ github.ref_name }}' will not be deleted from remote"
-          fi
+          type: now
+          from_branch: main
+          target_branch: develop
+          github_token: ${{ secrets.GITHUB_TOKEN }}
