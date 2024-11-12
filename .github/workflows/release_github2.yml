@@ -1,0 +1,148 @@
+name: Draft Github release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_level: 
+        description: Semantic version level increase
+        required: true
+        type: choice
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  test_python_releases:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: 
+        os: ["ubuntu-latest"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
+    env: 
+      EIT_PROCESSING_TEST_DATA: ${{ github.workspace }}/../eitprocessing_data/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/install_eitprocessing
+        with:
+          dependencies: testing
+          extract-data: true
+          python-version: ${{ matrix.python-version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
+      - name: Run pytest
+        run: pytest -v
+      - name: Install eitprocessing with dev dependencies
+        run: python3 -m pip install --upgrade ".[publishing]"
+      - name: Build eitprocessing
+        run: python3 -m build
+
+  check_main:
+    needs: test_python_releases
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Fail if main branch was selected
+        if: ${{ github.ref_name == 'main' }}
+        run: |
+          echo "Cannot release from main branch, please select valid release branch."
+          exit 1
+  
+  merge_pr:
+    if: ${{ github.ref_name != 'develop' }}
+    needs: check_main
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Get PR number
+        run: pr_number=$(gh pr list --head ${{ github.ref_name }} --json number --jq '.[0].number')
+
+      - name: Set PR base to main and merge
+        run: |
+          gr pr edit $pr_number --base main
+          gr pr merge $pr_number --admin
+    
+  merge_develop:
+    if: ${{ github.ref_name == 'develop'}}
+    needs: check_main
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout the code
+        uses: actions/checkout@v4
+      - name: Merge main -> develop
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: main
+          target_branch: develop
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+  
+  github_release:
+    needs: [merge_pr, merge_develop]
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        
+      - name: Bump version'
+        id: bump
+        uses: callowayproject/bump-my-version@master
+        env:
+          BUMPVERSION_TAG: 'true'
+        with:
+          args: ${{ inputs.version_level }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail if bumping failes
+        if: steps.bump.outputs.bumped == 'false'
+        run: |
+          echo "Bumping failed."
+          exit 1
+
+      - name: Check new version number
+        if: steps.bump.outputs.bumped == 'true'
+        run: |
+          echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
+  
+      - name: Create GitHub Release
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v${{ steps.bump.outputs.current-version }} \
+              --title="Release v${{ steps.bump.outputs.current-version }}" \
+              --generate-notes \
+              --draft
+
+      - name: Validate CITATION.cff
+        id: validate_cff
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        uses: dieghernan/cff-validator@v3
+
+  tidy_workspace:
+    # only run if action above succeeds
+    needs: github_release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Merge main -> develop
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: main
+          target_branch: develop
+          github_token: ${{ secrets.GITHUB_TOKEN }}
