@@ -2,23 +2,18 @@ name: Citation file
 
 on:
   push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches:
-      - main
-      - develop
+    paths:
+      - CITATION.cff
 
 jobs:
-  verify:
-    if: github.event.pull_request.draft == false
-    name: "cffconvert"
+  validate:
+    name: "validate"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        name: Check out a copy of the repository
+      - name: Check out a copy of the repository
+        uses: actions/checkout@v4
 
-      - uses: citation-file-format/cffconvert-github-action@main
-        name: Check whether the citation metadata from CITATION.cff is equivalent to that in .zenodo.json
+      - name: Check whether the citation metadata from CITATION.cff is valid
+        uses: citation-file-format/cffconvert-github-action@2.0.0
+        with:
+          args: "--validate"
