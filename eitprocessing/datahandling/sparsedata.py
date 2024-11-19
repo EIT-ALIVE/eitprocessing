@@ -18,7 +18,6 @@ class SparseData(DataContainer, SelectByTime):
     Sparse data is data for which the time points are not necessarily evenly spaced. Data can consist time-value pairs
     or only time points.
 
-
     Sparse data differs from interval data in that each data points is associated with a single time point rather than a
     time range.
 
