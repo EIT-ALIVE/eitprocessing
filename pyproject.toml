@@ -17,10 +17,10 @@ keywords = [
 authors = [
     { name = "Dani Bodor", email = "d.bodor@esciencecenter.nl" },
     { name = "Peter Somhorst", email = "p.somhorst@erasmusmc.nl" },
-    { name = "Annemijn Jonkman", email= "a.jonkman@erasmusmc.nl"}, 
+    { name = "Annemijn Jonkman", email = "a.jonkman@erasmusmc.nl" },
     { name = "Walter Baccinelli", email = "w.baccinelli@esciencecenter.nl" },
-    { name = "Jantine Wisse-Smit", email = "j.j.smit@erasmusmc.nl"},
-    { name = "Juliette Francovich", email = "j.francovich@erasmusmc.nl"}
+    { name = "Jantine Wisse-Smit", email = "j.j.smit@erasmusmc.nl" },
+    { name = "Juliette Francovich", email = "j.francovich@erasmusmc.nl" },
 ]
 license = { text = "Apache-2.0 license" }
 classifiers = [
@@ -56,11 +56,7 @@ dev = [
     "coveralls",
     "ruff == 0.6.9",
 ]
-testing = [
-    "pytest >= 7.4.0",
-    "pytest-cov",
-    "coveralls",
-]
+testing = ["pytest >= 7.4.0", "pytest-cov", "coveralls"]
 docs = [
     "mkdocs",
     "mkdocs-material",
@@ -75,7 +71,7 @@ notebooks = [
     "jupyter >= 1.0.0",
     "jupytext >= 1.14.5",
     "tqdm >= 4.65.0",
-    "ipympl"
+    "ipympl",
 ]
 publishing = ["build"]
 
