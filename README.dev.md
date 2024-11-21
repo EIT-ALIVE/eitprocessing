@@ -128,7 +128,7 @@ We use [prettier](https://prettier.io/) for formatting most other files. If you 
 
 ## Making a release
 
-### Automated release workflow:
+### Automated release workflow
 
 0. **IMP0RTANT:** [Create a PR](#creating-a-pr) for the release branch (usually `develop`) and make sure that all checks pass!
    - if everything goes well, this PR will automatically be closed after the draft release is created.
@@ -152,7 +152,7 @@ We use [prettier](https://prettier.io/) for formatting most other files. If you 
 8. Click green "Publish Release" button to convert the draft to a published release on GitHub.
    - This will automatically trigger [another GitHub workflow](https://github.com/EIT-ALIVE/eitprocessing/actions/workflows/release.yml) that will take care of publishing the package on PyPi.
 
-#### Updating the token:
+#### Updating the token
 
 NOTE: the current token (associated to @DaniBodor) allowing to bypass branch protection will expire on June 20th, 2025. To update the token do the following:
 
@@ -164,7 +164,7 @@ NOTE: the current token (associated to @DaniBodor) allowing to bypass branch pro
 5. Navigate to the [secrets settings](https://github.com/EIT-ALIVE/eitprocessing/settings/secrets/actions).
 6. Edit the `GH_PAT` key giving your access token as the new value.
 
-### Manually create a release:
+### Manually create a release
 
 0. Make sure you have all required developers tools installed `pip install -e .'[dev]'`.
 1. Create a `release` branch from `main` and merge the changes into this branch.

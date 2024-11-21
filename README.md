@@ -1,4 +1,17 @@
-# Badges <!-- omit in toc -->
+# EITprocessing <!-- omit in toc -->
+
+## Introduction
+
+[Electrical Impedance Tomography](https://en.wikipedia.org/wiki/Electrical_impedance_tomography) (EIT) is a noninvasive
+and radiation-free continuous imaging tool for monitoring respiratory mechanics. eitprocessing aims to provide a
+versatile, user-friendly, reproducible and reliable workflow for the processing and analysis of EIT data and related
+waveform data, like pressures and flow.
+
+`eitprocessing` includes tools to load data exported from EIT-devices from several manufacturers, including Dräger, SenTec
+and Timpel, as well as data from other sources. Several pre-processing tools and analysis tools are provided.
+
+<!-- TODO when available, add summarisation and reporting -->
+<!-- TODO extend with short list of available tools when applicable -->
 
 | Badges         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | :------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -10,43 +23,28 @@
 | Python Support | ![Python](https://img.shields.io/badge/python-3.10-blue.svg) ![Python](https://img.shields.io/badge/python-3.11-blue.svg) ![Python](https://img.shields.io/badge/python-3.12-blue.svg) ![Python](https://img.shields.io/badge/python-3.13-blue.svg)                                                                                                                                                                                                                                                                                                                                     |
 | Linting        | [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
-# Contents <!-- omit in toc -->
+## Contents <!-- omit in toc -->
 
 - [Introduction](#introduction)
 - [Installation](#installation)
   - [Install from PyPi](#install-from-pypi)
-    - [Developer install](#developer-install)
+  - [Developer install](#developer-install)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 - [Credits](#credits)
 
-# Introduction
-
-[Electrical Impedance Tomography](https://en.wikipedia.org/wiki/Electrical_impedance_tomography) (EIT) is a noninvasive
-and radiation-free continuous imaging tool for monitoring respiratory mechanics. eitprocessing aims to provide a
-versatile, user-friendly, reproducible and reliable workflow for the processing and analysis of EIT data and related
-waveform data, like pressures and flow.
-
-eitprocessing includes tools to load data exported from EIT-devices from several manufacturers, including Dräger, SenTec
-and Timpel, as well as data from other sources. Several pre-processing tools and analysis tools are provided.
-
-<!-- TODO when available, add summarisation and reporting -->
-<!-- TODO extend with short list of available tools when applicable -->
-
-[eit_dash](https://github.com/EIT-ALIVE/eit_dash) provides an accompanying GUI.
-
-# Installation
+## Installation
 
 It is advised to install eitprocessing in a dedicated virtual environment. See e.g. [Install packages in a virtual
 environment using pip and
 venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) or [Getting started
 with conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html).
 
-## Install from PyPi
+### Install from PyPi
 
 eitprocessing can be installed from PyPi as follows:
 
-```
+```bash
 pip install eitprocessing
 ```
 
@@ -54,21 +52,21 @@ pip install eitprocessing
 
 For full developer options (testing, etc):
 
-```
+```bash
 git clone git@github.com:EIT-ALIVE/eitprocessing.git
 cd eitprocessing
 pip install -e ".[dev]"
 ```
 
-# Documentation
+## Documentation
 
 Please see our [user documentation](https://eit-alive.github.io/eitprocessing/) for a detailed explanation of the package.
 
-# Contributing
+## Contributing
 
 We welcome any contributions or suggestions. If you want to contribute to the development of eitprocessing,
 have a look at the [contribution guidelines](CONTRIBUTING.md) and the [developer documentation](README.dev.md).
 
-# Credits
+## Credits
 
 This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter) and the [NLeSC/python-template](https://github.com/NLeSC/python-template).
