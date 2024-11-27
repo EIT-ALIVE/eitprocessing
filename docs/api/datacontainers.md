@@ -1,7 +1,7 @@
 # Data containers
 
 ::: eitprocessing.datahandling.sequence.Sequence
-    
+
 ::: eitprocessing.datahandling.eitdata.EITData
 
 ::: eitprocessing.datahandling.continuousdata.ContinuousData
