@@ -9,4 +9,3 @@
 ::: eitprocessing.filters.butterworth_filters.BandPassFilter
 
 ::: eitprocessing.filters.butterworth_filters.ButterworthFilter
-
