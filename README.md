@@ -33,7 +33,7 @@ and Timpel, as well as data from other sources. Several pre-processing tools and
 - [Contributing](#contributing)
 - [Credits](#credits)
 
-## Installation
+## Installation <!-- --8<-- [start:install] -->
 
 It is advised to install eitprocessing in a dedicated virtual environment. See e.g. [Install packages in a virtual
 environment using pip and
@@ -57,6 +57,8 @@ git clone git@github.com:EIT-ALIVE/eitprocessing.git
 cd eitprocessing
 pip install -e ".[dev]"
 ```
+
+<!-- --8<-- [end:install] -->
 
 ## Documentation
 
