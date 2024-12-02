@@ -78,17 +78,19 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
             raise TypeError(msg)
 
         if key and key != item.label:
-            # It is expected that an item in this collection has a key equal to the label of the value.
-            msg = f"'{key}' does not match label '{item.label}'."
+            msg = f"'{key}' does not match label '{item.label}'. Keys to Collection items must match their labels."
             raise KeyError(msg)
 
         if not key:
             key = item.label
 
         if not overwrite and key in self:
-            # Generally it is not expected one would want to overwrite existing data with different/derived data. One
-            # should probably change the label instead over overwriting existing data.
-            msg = f"Item with label {key} already exists. Use `overwrite=True` to overwrite."
+            # Generally it is not expected one would want to overwrite existing data with different/derived data.
+            # One should probably change the label instead over overwriting existing data.
+            # To force an overwrite, use __setitem__ and set `overwrite=True`.
+            msg = (
+                f"Item with label {key} already exists and cannot be overwritten. Please use a different label instead."
+            )
             raise KeyError(msg)
 
     def get_loaded_data(self) -> dict[str, V]:
