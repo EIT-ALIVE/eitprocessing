@@ -60,6 +60,10 @@ class ContinuousData(DataContainer, SelectByTime):
             )
             warnings.warn(msg, DeprecationWarning)
 
+        if (lv := len(self.values)) != (lt := len(self.time)):
+            msg = f"The number of time points ({lt}) does not match the number of values ({lv})."
+            raise ValueError(msg)
+
     def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
         try:
             old_value = getattr(self, attr)

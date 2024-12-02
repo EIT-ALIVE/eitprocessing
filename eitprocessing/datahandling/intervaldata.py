@@ -63,6 +63,10 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
     def __post_init__(self) -> None:
         self.intervals = [Interval._make(interval) for interval in self.intervals]
 
+        if self.has_values and (lv := len(self.values)) != (lt := len(self.intervals)):
+            msg = f"The number of time points ({lt}) does not match the number of values ({lv})."
+            raise ValueError(msg)
+
     def __len__(self) -> int:
         return len(self.intervals)
 
