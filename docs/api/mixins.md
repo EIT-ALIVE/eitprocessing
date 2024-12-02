@@ -9,4 +9,3 @@
         - t
 
 ::: eitprocessing.datahandling.mixins.slicing.TimeIndexer
-    

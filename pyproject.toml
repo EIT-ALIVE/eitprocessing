@@ -54,7 +54,7 @@ dev = [
     "coverage",
     "pytest-cov",
     "coveralls",
-    "ruff == 0.6.9",
+    "ruff == 0.7",
 ]
 testing = ["pytest >= 7.4.0", "pytest-cov", "coveralls"]
 docs = [
@@ -97,16 +97,6 @@ exclude = ["tests*", "*tests.*", "*tests"]
 
 [tool.setuptools.package-data]
 eitprocessing = ["config/*.yaml", "py.typed"]
-
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = py37,py38,py39,py310,py311
-skip_missing_interpreters = true
-[testenv]
-commands = pytest
-extras = dev
-"""
 
 [tool.ruff]
 output-format = "concise"
