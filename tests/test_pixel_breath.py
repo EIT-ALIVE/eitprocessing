@@ -168,40 +168,16 @@ def none_sequence():
 
 def mock_compute_pixel_parameter(mean: int):
     def _mock(*_args, **_kwargs) -> np.ndarray:
-        if mean > 0:
-            return SparseData(
-                label="mock_sparse_data",
-                name="Tidal impedance variation",
-                unit=None,
-                category="impedance difference",
-                time=np.linspace(0, 100),
-                description="Mock tidal impedance variation",
-                parameters={},
-                derived_from=[],
-                values=np.full(100, 1),
-            )
-        if mean < 0:
-            return SparseData(
-                label="mock_sparse_data",
-                name="Tidal impedance variation",
-                unit=None,
-                category="impedance difference",
-                time=np.linspace(0, 100),
-                description="Mock tidal impedance variation",
-                parameters={},
-                derived_from=[],
-                values=np.full(100, -1),
-            )
         return SparseData(
             label="mock_sparse_data",
             name="Tidal impedance variation",
             unit=None,
             category="impedance difference",
-            time=np.linspace(0, 100),
+            time=np.linspace(0, 100, 100),
             description="Mock tidal impedance variation",
             parameters={},
             derived_from=[],
-            values=np.full(100, 0),
+            values=np.full(100, np.sign(mean)),
         )
 
     return _mock

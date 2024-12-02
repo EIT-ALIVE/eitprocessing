@@ -52,6 +52,11 @@ class SparseData(DataContainer, SelectByTime):
     def __len__(self) -> int:
         return len(self.time)
 
+    def __post_init__(self):
+        if self.has_values and (lv := len(self.values)) != (lt := len(self.time)):
+            msg = f"The number of time points ({lt}) does not match the number of values ({lv})."
+            raise ValueError(msg)
+
     @property
     def has_values(self) -> bool:
         """True if the SparseData has values, False otherwise."""
