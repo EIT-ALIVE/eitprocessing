@@ -16,7 +16,7 @@ on:
 permissions:
   contents: write
   packages: read
-
+  
 jobs:
   test_python_releases:
     runs-on: ${{ matrix.os }}
@@ -28,6 +28,7 @@ jobs:
     name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
     env: 
       EIT_PROCESSING_TEST_DATA: ${{ github.workspace }}/../eitprocessing_data/
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/install_eitprocessing
