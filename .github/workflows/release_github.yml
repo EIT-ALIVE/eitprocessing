@@ -34,7 +34,7 @@ jobs:
           exit 1
 
   test_python_releases:
-    needs: [check_main, validate_citation]
+    needs: check_main
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
