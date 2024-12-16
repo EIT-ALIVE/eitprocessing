@@ -88,9 +88,14 @@ def load_from_single_path(
                 previous_marker,
             )
 
+    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 6)
+
     if not sample_frequency:
-        msg = "No sample frequency provided. "
-        raise ValueError(msg)
+        sample_frequency = estimated_sample_frequency
+
+    if sample_frequency != estimated_sample_frequency:
+        msg = "Provided sample frequency {} does not match the estimated sample frequency."
+        warnings.warn(msg, RuntimeWarning)
 
     # time wraps around the number of seconds in a day
     time = np.unwrap(time, period=24 * 60 * 60)
