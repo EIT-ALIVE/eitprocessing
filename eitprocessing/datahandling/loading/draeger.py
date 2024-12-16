@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
+NAN_VALUE_INDICATOR = -1e30
 
 
 def load_from_single_path(
@@ -196,7 +197,7 @@ def _convert_medibus_data(
     sparsedata_collection = DataCollection(SparseData)
 
     for field_info, data in zip(medibus_fields, medibus_data, strict=True):
-        data[data < -1e30] = np.nan
+        data[data < NAN_VALUE_INDICATOR] = np.nan
         if field_info.continuous:
             continuous_data = ContinuousData(
                 label=field_info.signal_name,
