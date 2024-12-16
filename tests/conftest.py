@@ -16,6 +16,7 @@ draeger_file1 = data_directory / "Draeger_Test3.bin"
 draeger_file2 = data_directory / "Draeger_Test.bin"
 draeger_file3 = data_directory / "Draeger_Test_event_on_first_frame.bin"
 draeger_wrapped_time_axis_file = data_directory / "Draeger_wrapped_time_axis.bin"
+draeger_file_pp = data_directory / "Draeger_PP_data.bin"
 timpel_file = data_directory / "Timpel_test.txt"
 dummy_file = data_directory / "not_a_file.dummy"
 
@@ -33,6 +34,11 @@ def draeger2():
 @pytest.fixture(scope="session")
 def draeger_both():
     return load_eit_data([draeger_file2, draeger_file1], vendor="draeger", sample_frequency=20, label="draeger_both")
+
+
+@pytest.fixture(scope="session")
+def draeger_pp():
+    return load_eit_data(draeger_file_pp, vendor="draeger", sample_frequency=20, label="draeger2")
 
 
 @pytest.fixture(scope="session")
