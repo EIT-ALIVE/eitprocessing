@@ -45,7 +45,20 @@ jobs:
     env: 
       EIT_PROCESSING_TEST_DATA: ${{ github.workspace }}/../eitprocessing_data/
     steps:
-      - run: echo "skipping!"
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/install_eitprocessing
+        with:
+          dependencies: testing
+          extract-data: true
+          python-version: ${{ matrix.python-version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
+      - name: Run pytest
+        run: pytest -v
+      - name: Install eitprocessing with dev dependencies
+        run: python3 -m pip install --upgrade ".[publishing]"
+      - name: Build eitprocessing
+        run: python3 -m build
     
 
   merge_pr:
