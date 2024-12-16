@@ -6,7 +6,7 @@ from tests.conftest import draeger_file1, timpel_file
 
 
 def test_default_label(draeger1: Sequence):
-    draeger_default = load_eit_data(draeger_file1, vendor="draeger")
+    draeger_default = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20)
     assert isinstance(draeger_default.label, str)
     assert draeger_default.label == f"Sequence_{id(draeger_default)}"
 
@@ -15,7 +15,7 @@ def test_default_label(draeger1: Sequence):
     assert timpel_default.label == f"Sequence_{id(timpel_default)}"
 
     # test that default label changes upon reloading identical data
-    draeger_reloaded = load_eit_data(draeger_file1, vendor="draeger")
+    draeger_reloaded = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20)
     assert draeger_default == draeger_reloaded
     assert draeger_default.label != draeger_reloaded.label
     assert draeger_default.label != draeger1.label
