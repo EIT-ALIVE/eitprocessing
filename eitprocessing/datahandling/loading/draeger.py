@@ -28,7 +28,7 @@ load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
 
 def load_from_single_path(
     path: Path,
-    sample_frequency: float,
+    sample_frequency: float | None = None,
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> dict[str, DataCollection]:
