@@ -37,7 +37,9 @@ def load_from_single_path(
     if file_size % _FRAME_SIZE_BYTES:
         msg = (
             f"File size {file_size} of file {path!s} not divisible by {_FRAME_SIZE_BYTES}.\n"
-            f"Make sure this is a valid and uncorrupted Dräger data file."
+            "Currently this package does not support loading files containing "
+            "esophageal pressure or other non-standard data. "
+            "Make sure this is a valid and uncorrupted Dräger data file."
         )
         raise OSError(msg)
     total_frames = file_size // _FRAME_SIZE_BYTES
