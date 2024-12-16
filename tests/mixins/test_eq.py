@@ -8,8 +8,8 @@ from tests.conftest import draeger_file1
 
 
 def test_eq():
-    data = load_eit_data(draeger_file1, vendor="draeger")
-    data2 = load_eit_data(draeger_file1, vendor="draeger")
+    data = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20)
+    data2 = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20)
 
     data.isequivalent(data2)
 
