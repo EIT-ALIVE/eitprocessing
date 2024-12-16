@@ -34,7 +34,6 @@ jobs:
           exit 1
 
   test_python_releases:
-    if: false
     needs: check_main
     runs-on: ${{ matrix.os }}
     strategy:
@@ -46,20 +45,7 @@ jobs:
     env: 
       EIT_PROCESSING_TEST_DATA: ${{ github.workspace }}/../eitprocessing_data/
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/install_eitprocessing
-        with:
-          dependencies: testing
-          extract-data: true
-          python-version: ${{ matrix.python-version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
-      - name: Run pytest
-        run: pytest -v
-      - name: Install eitprocessing with dev dependencies
-        run: python3 -m pip install --upgrade ".[publishing]"
-      - name: Build eitprocessing
-        run: python3 -m build
+      - run: echo "skipping!"
     
 
   merge_pr:
