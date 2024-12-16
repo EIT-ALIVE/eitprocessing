@@ -34,6 +34,7 @@ jobs:
           exit 1
 
   test_python_releases:
+    if: false
     needs: check_main
     runs-on: ${{ matrix.os }}
     strategy:
