@@ -68,6 +68,10 @@ def load_eit_data(
         Vendor.SENTEC: sentec.load_from_single_path,
     }[vendor]
 
+    if vendor == Vendor.DRAEGER and not sample_frequency:
+        msg = """Provide a sample frequency when loading Draeger data."""
+        raise NotImplementedError(msg)  # automatic sample frequency detection is to be implemented per #217
+
     first_frame = _check_first_frame(first_frame)
 
     paths = EITData.ensure_path_list(path)
