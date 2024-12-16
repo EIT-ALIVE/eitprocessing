@@ -196,6 +196,7 @@ def _convert_medibus_data(
     sparsedata_collection = DataCollection(SparseData)
 
     for field_info, data in zip(medibus_fields, medibus_data, strict=True):
+        data[data < -1e30] = np.nan
         if field_info.continuous:
             continuous_data = ContinuousData(
                 label=field_info.signal_name,
