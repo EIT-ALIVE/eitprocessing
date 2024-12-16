@@ -5,7 +5,7 @@ import copy
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 import numpy as np
 
@@ -172,8 +172,11 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
         )
 
 
+T = TypeVar("T", bound=HasTimeIndexer)
+
+
 @dataclass
-class TimeIndexer:
+class TimeIndexer(Generic[T]):
     """Helper class for slicing an object using the time axis instead of indices.
 
     Example:
@@ -186,9 +189,9 @@ class TimeIndexer:
     ```
     """
 
-    obj: HasTimeIndexer
+    obj: T
 
-    def __getitem__(self, key: slice | float):
+    def __getitem__(self, key: slice | float) -> T:
         if isinstance(key, slice):
             if key.step:
                 msg = "Can't slice by time using specific step sizes."
