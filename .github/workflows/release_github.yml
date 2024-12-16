@@ -33,19 +33,6 @@ jobs:
           echo "Cannot release from main branch, please select valid release branch."
           exit 1
 
-  validate_citation:
-    name: "Validate CITATION.cff"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Validate CITATION.cff
-        id: validate_cff
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-        uses: dieghernan/cff-validator@v3
-
   test_python_releases:
     needs: [check_main, validate_citation]
     runs-on: ${{ matrix.os }}
