@@ -38,7 +38,7 @@ def draeger_both():
 
 @pytest.fixture(scope="session")
 def draeger_pp():
-    return load_eit_data(draeger_file_pp, vendor="draeger", sample_frequency=20, label="draeger2")
+    return load_eit_data(draeger_file_pp, vendor="draeger", sample_frequency=50, label="draeger2")
 
 
 @pytest.fixture(scope="session")
