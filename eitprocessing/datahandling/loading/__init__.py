@@ -18,6 +18,10 @@ def load_eit_data(
 ) -> Sequence:
     """Load EIT data from path(s).
 
+    Current limitations:
+    - Dräger data is assumed to have a limited set of (Medibus) data. Newer additions that add data like pleural
+    pressure are not yet supported.
+
     Args:
         path: relative or absolute path(s) to data file.
         vendor: vendor indicating the device used.
@@ -63,6 +67,10 @@ def load_eit_data(
         Vendor.TIMPEL: timpel.load_from_single_path,
         Vendor.SENTEC: sentec.load_from_single_path,
     }[vendor]
+
+    if vendor == Vendor.DRAEGER and not sample_frequency:
+        msg = """Provide a sample frequency when loading Draeger data."""
+        raise NotImplementedError(msg)  # automatic sample frequency detection is to be implemented per #217
 
     first_frame = _check_first_frame(first_frame)
 
