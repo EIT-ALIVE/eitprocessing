@@ -45,7 +45,7 @@ runs:
         key: ${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}-[${{ inputs.dependencies }}]
     - name: Install eitprocessing with [${{ inputs.dependencies }}] dependencies
       if: steps.cache-python-env.outputs.cache-hit != 'true'
-      run: python3 -m pip install -e ".[${{ inputs.dependencies }}]"
+      run: python3 -m pip install ".[${{ inputs.dependencies }}]"
       shell: bash
 
   
