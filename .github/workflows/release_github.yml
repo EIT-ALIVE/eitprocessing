@@ -3,7 +3,7 @@ name: Draft GitHub Release
 on:
   workflow_dispatch:
     inputs:
-      version_level: 
+      version_level:
         description: Semantic version level increase
         required: true
         type: choice
@@ -38,15 +38,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix: 
+      matrix:
         os: ["ubuntu-latest"]
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
-    env: 
+    env:
       EIT_PROCESSING_TEST_DATA: ${{ github.workspace }}/../eitprocessing_data/
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/install_eitprocessing
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install eitprocessing
+        uses: ./.github/actions/install_eitprocessing
         with:
           dependencies: testing
           extract-data: true
@@ -55,11 +57,10 @@ jobs:
           data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
       - name: Run pytest
         run: pytest -v
-      - name: Install eitprocessing with dev dependencies
+      - name: Install additional dependencies for building
         run: python3 -m pip install --upgrade ".[publishing]"
       - name: Build eitprocessing
         run: python3 -m build
-    
 
   merge_pr:
     name: Merge the PR into main
@@ -69,38 +70,34 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout the code
+      - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set PR base to main and merge
         run: |
           gh pr edit ${{ github.ref_name }} --base main
           gh pr merge ${{ github.ref_name }} --merge --admin
-    
+
   merge_develop:
     name: Merge develop into main
     if: ${{ github.ref_name == 'develop'}}
     needs: test_python_releases
     runs-on: ubuntu-latest
-    steps: 
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-
       - name: Configure git
         run: |
           git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
           git config user.name "GitHub Actions"
           git config -l
-
       - name: Merge changes into main
         run: |
           git switch main
           git branch ${{ github.ref_name }} origin/${{ github.ref_name }} 
           git merge ${{ github.ref_name }} --no-ff --no-edit
-      
       - name: Push changes to GitHub
         uses: ad-m/github-push-action@master
         with:
@@ -111,11 +108,11 @@ jobs:
     name: Bump the version
     needs: [merge_pr, merge_develop]
     if: ${{ always() && (needs.merge_pr.result == 'success' || needs.merge_develop.result == 'success') }}
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
     outputs:
       new-version: ${{ steps.bump.outputs.current-version }}
     steps:
-      - name: Checkout the code
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: main
@@ -130,7 +127,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v5.1.1
         with:
-          python-version: '3.12'
+          python-version: "3.12"
       - name: Install bump-my-version
         shell: bash
         run: pip install "bump-my-version==0.28.1"
@@ -147,29 +144,26 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           force: true
-
       - name: Fail if bumping failes
         if: steps.bump.outputs.bumped == 'false'
         run: |
           echo "Bumping failed."
           exit 1
-
       - name: Check new version number
         if: steps.bump.outputs.bumped == 'true'
         run: |
           echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
-  
+
   github_release:
     name: Create a draft GitHub release
     needs: bump_version
     if: ${{ always() && needs.bump_version.result == 'success' }}
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
     steps:
-      - name: Checkout the code
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: main
-
       - name: Create GitHub Release
         id: create_release
         env:
@@ -185,26 +179,22 @@ jobs:
     needs: github_release
     if: ${{ always() && needs.github_release.result == 'success' }}
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: develop
           fetch-depth: 0
-
       - name: Configure git
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git pull
-
       - name: Merge main into develop
         run: |
           git branch main origin/main
           git merge main --no-ff --no-edit
           git push
-      
       - name: Remove PR branch
         if: ${{ github.ref_name != 'develop' }}
         uses: dawidd6/action-delete-branch@v3
