@@ -90,7 +90,7 @@ jobs:
           fetch-depth: 0
       - name: Configure git
         run: |
-          git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+          git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
           git config user.name "GitHub Actions"
           git config -l
       - name: Merge changes into main
