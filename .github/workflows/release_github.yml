@@ -123,7 +123,9 @@ jobs:
 
       - name: Install bump-my-version
         shell: bash
-        run: pip install "bump-my-version==0.28.1"
+        run: |
+          python3 -m pip install pyproject-deplister
+          pyproject-deplister --extra dev --path pyproject.toml | grep bump-my-version | sed 's/ //g' | xargs -I{} python3 -m pip install "{}"
 
       - name: Pass Inputs to Shell
         id: bump
