@@ -194,10 +194,10 @@ jobs:
               --generate-notes \
               --draft
 
-  tidy_workspace:
-    name: Tidy up the repository
+  remove_branch:
+    name: Remove PR branch
     needs: github_release
-    if: ${{ always() && needs.github_release.result == 'success' }}
+    if: ${{ github.ref_name != 'develop' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -207,7 +207,6 @@ jobs:
           fetch-depth: 0
 
       - name: Remove PR branch
-        if: ${{ github.ref_name != 'develop' }}
         uses: dawidd6/action-delete-branch@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
