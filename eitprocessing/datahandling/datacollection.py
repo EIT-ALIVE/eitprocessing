@@ -40,9 +40,9 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
         self.data_type = data_type
         super().__init__(*args, **kwargs)
 
-    def __setitem__(self, __key: str, __value: V, /) -> None:
-        self._check_item(__value, key=__key)
-        return super().__setitem__(__key, __value)
+    def __setitem__(self, key: str, value: V, /) -> None:
+        self._check_item(value, key=key)
+        return super().__setitem__(key, value)
 
     def add(self, *item: V, overwrite: bool = False) -> None:
         """Add one or multiple item(s) to the collection using the item label as the key."""

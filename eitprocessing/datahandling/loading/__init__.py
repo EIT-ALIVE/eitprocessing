@@ -18,6 +18,10 @@ def load_eit_data(
 ) -> Sequence:
     """Load EIT data from path(s).
 
+    Current limitations:
+    - Dräger data is assumed to have a limited set of (Medibus) data. Newer additions that add data like pleural
+    pressure are not yet supported.
+
     Args:
         path: relative or absolute path(s) to data file.
         vendor: vendor indicating the device used.
@@ -29,7 +33,7 @@ def load_eit_data(
             Defaults to the same value as label.
         description: long description of sequence for human interpretation.
         sample_frequency: sample frequency at which the data was recorded.
-            Default for Draeger: 20
+            No default for Draeger. Will be autodetected. Warns if autodetected differs from provided.
             Default for Timpel: 50
             Default for Sentec: 50.2
         first_frame: index of first frame to load.

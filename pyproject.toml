@@ -50,11 +50,11 @@ dependencies = [
 # development dependency groups
 dev = [
     "pytest >= 7.4.0",
-    "bump-my-version",
+    "bump-my-version==0.28.1",
     "coverage",
     "pytest-cov",
     "coveralls",
-    "ruff == 0.6.9",
+    "ruff == 0.8",
 ]
 testing = ["pytest >= 7.4.0", "pytest-cov", "coveralls"]
 docs = [
@@ -98,16 +98,6 @@ exclude = ["tests*", "*tests.*", "*tests"]
 [tool.setuptools.package-data]
 eitprocessing = ["config/*.yaml", "py.typed"]
 
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = py37,py38,py39,py310,py311
-skip_missing_interpreters = true
-[testenv]
-commands = pytest
-extras = dev
-"""
-
 [tool.ruff]
 output-format = "concise"
 line-length = 120
@@ -120,8 +110,6 @@ ignore = [
     "FBT",    # Using boolean arguments
     "ANN002", # Missing type annotation for `*args`
     "ANN003", # Missing type annotation for `**kwargs`
-    "ANN101", # Missing type annotation for `self` in method
-    "ANN102", # Missing type annotation for `cls` in classmethod
     "ANN204", # Missing return type annotation for special (dunder) method
     "S105",   # Possible hardcoded password
     "S311",   # insecure random generators
@@ -151,7 +139,7 @@ extend-safe-fixes = [
     "D415",   # First line should end with a period, question mark, or exclamation point
     "D300",   # Use triple double quotes `"""`
     "D200",   # One-line docstring should fit on one line
-    "TCH",    # Format type checking only imports
+    "TC",     # Format type checking only imports
     "ISC001", # Implicitly concatenated strings on a single line
     "EM",     # Exception message variables
     "RUF013", # Implicit Optional

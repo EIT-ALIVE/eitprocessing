@@ -22,17 +22,17 @@ dummy_file = data_directory / "not_a_file.dummy"
 
 @pytest.fixture(scope="session")
 def draeger1():
-    return load_eit_data(draeger_file1, vendor="draeger", label="draeger1")
+    return load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20, label="draeger1")
 
 
 @pytest.fixture(scope="session")
 def draeger2():
-    return load_eit_data(draeger_file2, vendor="draeger", label="draeger2")
+    return load_eit_data(draeger_file2, vendor="draeger", sample_frequency=20, label="draeger2")
 
 
 @pytest.fixture(scope="session")
 def draeger_both():
-    return load_eit_data([draeger_file2, draeger_file1], vendor="draeger", label="draeger_both")
+    return load_eit_data([draeger_file2, draeger_file1], vendor="draeger", sample_frequency=20, label="draeger_both")
 
 
 @pytest.fixture(scope="session")
