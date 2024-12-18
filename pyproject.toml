@@ -50,7 +50,7 @@ dependencies = [
 # development dependency groups
 dev = [
     "pytest >= 7.4.0",
-    "bump-my-version",
+    "bump-my-version==0.28.1",
     "coverage",
     "pytest-cov",
     "coveralls",

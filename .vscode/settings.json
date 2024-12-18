@@ -26,6 +26,7 @@
   "rewrap.wrappingColumn": 120,
   "rewrap.autoWrap.enabled": true,
   "editor.formatOnSave": true,
+  "files.trimTrailingWhitespace": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[ignore]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
