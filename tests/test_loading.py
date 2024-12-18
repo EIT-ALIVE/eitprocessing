@@ -41,6 +41,15 @@ def test_loading_draeger(
     # assert draeger_both != draeger_inverted
 
 
+def test_sample_frequency_draeger():
+    with_sf = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20)
+    without_sf = load_eit_data(draeger_file1, vendor="draeger")
+    assert with_sf.eit_data["raw"].sample_frequency == without_sf.eit_data["raw"].sample_frequency
+
+    with pytest.warns(RuntimeWarning):
+        _ = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=50)
+
+
 def test_loading_timpel(
     draeger1: Sequence,
     timpel1: Sequence,
@@ -68,10 +77,6 @@ def test_loading_illegal():
         _ = load_eit_data(draeger_file1, vendor="timpel")
     with pytest.raises(OSError):
         _ = load_eit_data(timpel_file, vendor="draeger", sample_frequency=20)
-
-    # no sample frequency provided
-    with pytest.raises(NotImplementedError):
-        _ = load_eit_data(timpel_file, vendor="draeger", sample_frequency=None)
 
 
 def test_load_partial(

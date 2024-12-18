@@ -28,7 +28,7 @@ load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
 
 def load_from_single_path(
     path: Path,
-    sample_frequency: float,
+    sample_frequency: float | None = None,
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> dict[str, DataCollection]:
@@ -88,9 +88,17 @@ def load_from_single_path(
                 previous_marker,
             )
 
+    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 4)
+
     if not sample_frequency:
-        msg = "No sample frequency provided. "
-        raise ValueError(msg)
+        sample_frequency = estimated_sample_frequency
+
+    if sample_frequency != estimated_sample_frequency:
+        msg = (
+            f"Provided sample frequency ({sample_frequency}) does not match "
+            f"the estimated sample frequency ({estimated_sample_frequency})."
+        )
+        warnings.warn(msg, RuntimeWarning)
 
     # time wraps around the number of seconds in a day
     time = np.unwrap(time, period=24 * 60 * 60)
