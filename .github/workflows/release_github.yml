@@ -103,6 +103,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
 
       - name: Configure git
         run: |
@@ -156,8 +157,9 @@ jobs:
       - name: Push changes to develop
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_PAT }}
           branch: develop
+          force_with_lease: true
 
       - name: Checkout main
         run: |
@@ -166,8 +168,9 @@ jobs:
       - name: Push changes to main
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_PAT }}
           branch: main
+          force_with_lease: true
 
   github_release:
     name: Create a draft GitHub release
