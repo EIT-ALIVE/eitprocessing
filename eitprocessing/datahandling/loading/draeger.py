@@ -93,7 +93,7 @@ def load_from_single_path(
     if not sample_frequency:
         sample_frequency = estimated_sample_frequency
 
-    if sample_frequency != estimated_sample_frequency:
+    elif sample_frequency != estimated_sample_frequency:
         msg = (
             f"Provided sample frequency ({sample_frequency}) does not match "
             f"the estimated sample frequency ({estimated_sample_frequency})."
