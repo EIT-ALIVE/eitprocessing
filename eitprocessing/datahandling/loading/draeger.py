@@ -88,7 +88,7 @@ def load_from_single_path(
                 previous_marker,
             )
 
-    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 6)
+    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 4)
 
     if not sample_frequency:
         sample_frequency = estimated_sample_frequency
