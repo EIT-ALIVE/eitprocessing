@@ -40,7 +40,7 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
         self.data_type = data_type
         super().__init__(*args, **kwargs)
 
-    def __setitem__(self, __key: str, __value: V) -> None:
+    def __setitem__(self, __key: str, __value: V, /) -> None:
         self._check_item(__value, key=__key)
         return super().__setitem__(__key, __value)
 
