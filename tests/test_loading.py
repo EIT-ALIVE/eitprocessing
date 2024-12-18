@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from eitprocessing.datahandling.eitdata import EITData, Vendor
@@ -129,3 +130,10 @@ def test_event_on_first_frame(draeger2: Sequence):
     draeger3_events = draeger3.sparse_data["events_(draeger)"]
     assert draeger3_events == draeger2.sparse_data["events_(draeger)"]
     assert draeger3_events.time[0] == draeger3.eit_data["raw"].time[0]
+
+
+@pytest.mark.parametrize("fixture_name", ["draeger1", "draeger2", "draeger_wrapped_time_axis"])
+def test_time_axis(fixture_name: str, request: pytest.FixtureRequest):
+    sequence = request.getfixturevalue(fixture_name)
+    time_diff = np.diff(sequence.time)
+    assert np.allclose(time_diff, time_diff.mean())
