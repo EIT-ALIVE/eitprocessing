@@ -90,6 +90,9 @@ def load_from_single_path(
     if not sample_frequency:
         sample_frequency = DRAEGER_SAMPLE_FREQUENCY
 
+    # time wraps around the number of seconds in a day
+    time = np.unwrap(time, period=24 * 60 * 60)
+
     eit_data = EITData(
         vendor=Vendor.DRAEGER,
         path=path,
