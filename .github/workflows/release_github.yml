@@ -12,7 +12,7 @@ on:
           - patch
           - minor
           - major
-          
+
 permissions:
   contents: write
   packages: read
@@ -29,7 +29,7 @@ env:
 jobs:
   checks:
     name: Check requirements
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
       - name: Fail if main branch was selected
         if: ${{ github.ref_name == 'main' }}
@@ -48,7 +48,7 @@ jobs:
       - name: Check if PR base is main
         if: ${{ github.ref_name != 'develop' }}
         run: gh pr view ${{ github.ref_name }} --json baseRefName -q 'if .baseRefName == "main" then "PR base is main" else error("PR base is not main") end'
-        
+
       - name: Check if PR is mergeable
         if: ${{ github.ref_name != 'develop' }}
         run: gh pr view ${{ github.ref_name }} --json mergeable -q 'if .mergeable == "MERGEABLE" then "PR is mergeable" else error("PR is not mergeable") end'
@@ -59,7 +59,7 @@ jobs:
         if: ${{ github.ref_name != 'develop' }}
         run: |
           gh pr checks ${{ github.ref_name }} --watch --fail-fast
-          gh pr checks ${{ github.ref_name }} --json state -q 'if . | length == 0 then "No checks found." elif map(.state == "SUCCESS") | all then "All checks passed" else error("Not all checks passed") end'            
+          gh pr checks ${{ github.ref_name }} --json state -q 'if . | length == 0 then "No checks found." elif map(.state == "SUCCESS") | all then "All checks passed" else error("Not all checks passed") end'
 
   test_python_releases:
     needs: checks
@@ -90,7 +90,7 @@ jobs:
       - name: Build eitprocessing
         run: python3 -m build
 
-  merge_and_bump: 
+  merge_and_bump:
     name: Merge the changes into main and bump the version
     needs: test_python_releases
     runs-on: ubuntu-latest
@@ -113,18 +113,18 @@ jobs:
       - name: Merge branch into main
         run: |
           git switch main
-          git branch -f ${{ github.ref_name }} origin/${{ github.ref_name }} 
+          git branch -f ${{ github.ref_name }} origin/${{ github.ref_name }}
           git merge ${{ github.ref_name }} --no-ff --no-edit
-    
+
       - name: Install Python
         uses: actions/setup-python@v5.1.1
         with:
-          python-version: '3.12'
-  
+          python-version: "3.12"
+
       - name: Install bump-my-version
         shell: bash
         run: pip install "bump-my-version==0.28.1"
-        
+
       - name: Pass Inputs to Shell
         id: bump
         shell: bash
@@ -148,7 +148,7 @@ jobs:
         run: |
           git checkout develop
           git merge main --no-ff --no-edit
-      
+
       - name: Push changes to GitHub
         uses: ad-m/github-push-action@master
         with:
@@ -164,11 +164,11 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
-  
+
   github_release:
     name: Create a draft GitHub release
     needs: merge_and_bump
-    runs-on: 'ubuntu-latest'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -195,7 +195,7 @@ jobs:
         with:
           ref: develop
           fetch-depth: 0
-      
+
       - name: Remove PR branch
         if: ${{ github.ref_name != 'develop' }}
         uses: dawidd6/action-delete-branch@v3
