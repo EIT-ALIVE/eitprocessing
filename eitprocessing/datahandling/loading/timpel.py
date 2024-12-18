@@ -31,7 +31,7 @@ load_timpel_data = partial(load_eit_data, vendor=Vendor.TIMPEL)
 
 def load_from_single_path(
     path: Path,
-    sample_frequency: float | None = 20,
+    sample_frequency: float | None = TIMPEL_SAMPLE_FREQUENCY,
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> dict[str, DataCollection]:
