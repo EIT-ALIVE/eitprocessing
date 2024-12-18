@@ -94,7 +94,10 @@ def load_from_single_path(
         sample_frequency = estimated_sample_frequency
 
     if sample_frequency != estimated_sample_frequency:
-        msg = "Provided sample frequency {} does not match the estimated sample frequency."
+        msg = (
+            f"Provided sample frequency ({sample_frequency}) does not match "
+            f"the estimated sample frequency ({estimated_sample_frequency})."
+        )
         warnings.warn(msg, RuntimeWarning)
 
     # time wraps around the number of seconds in a day
