@@ -151,7 +151,7 @@ jobs:
       - name: Merge main into develop
         run: |
           git checkout develop
-          git merge main --no-ff --no-edit
+          git merge main --no-ff --no-edit || { echo "Can't merge changes to develop. Manually merge PR and create GitHub release."; exit 1; }
 
       - name: Push changes to develop
         uses: ad-m/github-push-action@master
