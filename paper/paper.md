@@ -97,6 +97,7 @@ international community has been invited to use and contribute to the software.
 
 `eitprocessing` aims to simplify and standardize loading, pre-processing, analysis and reporting
 while working with different respiration-related datasets. 
+Notebooks showing these features are available in the repository.
 
 ### Loading
 
