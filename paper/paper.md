@@ -73,7 +73,7 @@ diagnostics may ameliorate the risk of death and long-term morbidity, and may su
 the burden on our healthcare system.
 
 The perspective that EIT will become an important standard monitoring technique is shared by
-international experts [@Frerichs2016;Wisse2024-sl]. Both @Frerichs2016 and @Wisse2024-sl emphasize
+international experts [@Frerichs2016;@Wisse2024-sl]. Both @Frerichs2016 and @Wisse2024-sl emphasize
 the importance of standardized techniques, terminology, and consensus regarding applications was
 extensively discussed. However, validated methods to implement EIT information in routine care are
 still lacking and synchronizing EIT data with other bedside respiratory monitoring modalities is
