@@ -2,6 +2,7 @@
 title: 'eitprocessing: a Python package for analysis of Electrial Impedance Tomography data'
 tags:
   - Python
+  - Electrical Impedance Tomography
 authors:
   - name: Peter Somhorst
     orcid: 0000-0003-3490-2080
@@ -29,7 +30,7 @@ affiliations:
    index: 1
  - name: Netherlands eScience Center, Amsterdam, The Netherlands 
    index: 2
-date: xxxxxxx
+date: 6 January 2025
 bibliography: paper.bib
 ---
 
