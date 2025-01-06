@@ -93,13 +93,59 @@ from related data sources. It includes commonly used methods for filtering and s
 authors continuously develop further algorithms for analysis for current and future projects. The
 international community has been invited to use and contribute to the software.
 
+## Key features
 
-## Key features 
-<!-- Dani -->
-<!-- TODO:  example with animal-data -->
-<!-- TODO:  update example in notebook updaten with newer features -->
-<!-- TODO:  example notebook Dani/Peter -->
+`eitprocessing` aims to simplify and standardize loading, pre-processing, analysis and reporting
+while working with different respiration-related datasets. 
+
+### Loading
+
+`eitprocessing` supports the loading of EIT data exported from the Dräger Pulmovista (`.bin`
+files), Timpel Enlight (`.csv` files) and Sentec LuMon (`.zri`) devices. Non-EIT data saved in the
+data files are also loaded.
 
 ### Data containers
+
+The main data container in `eitprocessing` is the sequence. A sequence represents a single
+continuous measurement of data in a single subject, and can contain multiple datasets. Sequences
+can be sliced --- by time or index --- and concatenated. Contained datasets are sliced and
+concatenated accordingly.
+
+`eitprocessing` currently supports four types of dataset. Continuous data has one-dimensional data
+points at predictable intervals with a fixed sample frequency. Examples are airway pressure
+measured by a mechanical ventilator or a global impedance signal. EIT data is also continuous, but
+contains three-dimensional data points, (generally) 32 rows by 32 columns by time. Sparse data has
+one-dimensional data points at unpredictable intervals and no set sample frequency. An example is
+the tidal volume measured by a mechanical ventilator, registered at the end of each breath.
+Interval data has one-dimensional data points that are valid for a time interval. An example is the
+position of a subject, e.g., supine for the first part of a measurement and prone for the second
+part.
+
+### Pre-processing
+
+`eitprocessing` currently has implementations for the following pre-processing steps:
+
+- high-pass, low-pass, band-pass of band-stop Butterworth filters;
+- a moving averager using convolution with a given window;
+- automatic detection of the start, middle (end-inspiration) and end of breaths on a
+  global/regional and pixel level.
+
+### Analysis
+
+`eitprocessing` currently has implementations for the following parameters:
+
+- end-expiratory lung impedance on a global/regional and pixel level;
+- tidal impedance variation on a global/regional and pixel level.
+
+## Future perspective
+
+Several features are in active development. Examples are:
+
+- more advanced filtering methods, using a combination of Butterworth filters, empirical mode
+  decomposition or wavelet transforms;
+- automatic detection of respiratory and heart rate from pixel impedance values.
+
+Moreover, we plan to extend `eitprocessing` with standardized workflows to summarize and report
+analysis results.
 
 ## References
