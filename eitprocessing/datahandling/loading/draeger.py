@@ -35,9 +35,14 @@ def load_from_single_path(
     """Load Dräger EIT data from path."""
     file_size = path.stat().st_size
 
+    frame_size: int
+    medibus_fields: list
+
+    # iterate over the supported file formats to find the frame size that matches the file size
     for _file_format_data in _bin_file_formats.values():
-        frame_size: int = _file_format_data["frame_size"]
+        frame_size = _file_format_data["frame_size"]
         if file_size % frame_size == 0:
+            # if the file size is an integer multiple of the frame size, assume this is the correct format
             medibus_fields = _file_format_data["medibus_fields"]
             break
     else:
