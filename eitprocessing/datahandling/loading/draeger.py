@@ -100,20 +100,10 @@ def load_from_single_path(
                 previous_marker,
             )
 
-    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 4)
-
-    if not sample_frequency:
-        sample_frequency = estimated_sample_frequency
-
-    elif sample_frequency != estimated_sample_frequency:
-        msg = (
-            f"Provided sample frequency ({sample_frequency}) does not match "
-            f"the estimated sample frequency ({estimated_sample_frequency})."
-        )
-        warnings.warn(msg, RuntimeWarning)
-
     # time wraps around the number of seconds in a day
     time = np.unwrap(time, period=24 * 60 * 60)
+
+    sample_frequency = _estimate_sample_frequency(time, sample_frequency)
 
     eit_data = EITData(
         vendor=Vendor.DRAEGER,
@@ -190,6 +180,23 @@ def load_from_single_path(
         "sparsedata_collection": sparsedata_collection,
         "intervaldata_collection": intervaldata_collection,
     }
+
+
+def _estimate_sample_frequency(time: np.ndarray, sample_frequency: float | None) -> float:
+    """Estimate the sample frequency from the time axis, and check with provided sample frequency."""
+    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 4)
+
+    if sample_frequency is None:
+        return estimated_sample_frequency
+
+    if sample_frequency != estimated_sample_frequency:
+        msg = (
+            f"Provided sample frequency ({sample_frequency}) does not match "
+            f"the estimated sample frequency ({estimated_sample_frequency})."
+        )
+        warnings.warn(msg, RuntimeWarning)
+
+    return sample_frequency
 
 
 def _convert_medibus_data(
