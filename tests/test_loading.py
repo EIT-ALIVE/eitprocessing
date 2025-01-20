@@ -19,6 +19,7 @@ def test_loading_draeger(
     draeger1: Sequence,
     draeger2: Sequence,
     draeger_both: Sequence,
+    draeger_pp: Sequence,
 ):
     assert isinstance(draeger1, Sequence)
     assert isinstance(draeger1.eit_data["raw"], EITData)
@@ -34,6 +35,10 @@ def test_loading_draeger(
     assert len(draeger_both.eit_data["raw"]) == len(draeger1.eit_data["raw"]) + len(
         draeger2.eit_data["raw"],
     )
+
+    #  draeger data with pressure pod data has 10 continuous medibus fields, 'normal' only 6
+    assert len(draeger_pp.continuous_data) == 10 + 1
+    assert len(draeger1.continuous_data) == 6 + 1
 
     # test below not possible due to requirement of axis 1 ending before axis b starts
     # draeger_inverted = load_eit_data([draeger_file1, draeger_file2], vendor="draeger", label="inverted")

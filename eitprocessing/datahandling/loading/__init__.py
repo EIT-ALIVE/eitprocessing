@@ -18,10 +18,6 @@ def load_eit_data(
 ) -> Sequence:
     """Load EIT data from path(s).
 
-    Current limitations:
-    - Dräger data is assumed to have a limited set of (Medibus) data. Newer additions that add data like pleural
-    pressure are not yet supported.
-
     Args:
         path: relative or absolute path(s) to data file.
         vendor: vendor indicating the device used.
