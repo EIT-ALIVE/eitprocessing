@@ -79,7 +79,7 @@ def load_from_single_path(
     time = np.zeros((n_frames,))
     events: list[tuple[float, Event]] = []
     phases: list[tuple[float, int]] = []
-    medibus_data = np.zeros((len(medibus_fields), n_frames))
+    medibus_data = np.zeros((len(medibus_fields), n_frames), dtype=np.float32)
 
     with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
         fh.seek(first_frame_to_load * frame_size)
