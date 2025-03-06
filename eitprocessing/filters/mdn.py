@@ -62,7 +62,7 @@ class MDNFilter(TimeDomainFilter):
     def apply_filter(self, input_data: np.ndarray, axis: int = -1) -> np.ndarray:
         """Filter data using multiple multiple digital notch filters."""
 
-        class FrequencyLimitReached(Exception):
+        class FrequencyLimitReached(Exception):  # noqa: N818
             """The highest frequency is reached."""
 
         def filter_(data: np.ndarray, harmonic: int) -> np.ndarray:

@@ -12,13 +12,13 @@ def test_mdn_working():
     heart_rate = 70 / MINUTE
     respiratory_rate = 12 / MINUTE
 
-    signal = np.random.normal(2.0, 1.0, n_samples)
+    signal = np.random.default_rng().normal(2.0, 1.0, n_samples)
 
     mdn_filter = MDNFilter(sample_frequency=SAMPLE_FREQUENCY, heart_rate=heart_rate, respiratory_rate=respiratory_rate)
     filtered_signal = mdn_filter.apply_filter(signal)
 
-    f, Pxx = sp.signal.welch(signal, fs=SAMPLE_FREQUENCY)
-    filtered_f, filtered_Pxx = sp.signal.welch(filtered_signal, fs=SAMPLE_FREQUENCY)
+    f, Pxx = sp.signal.welch(signal, fs=SAMPLE_FREQUENCY)  # noqa: N806
+    _, filtered_Pxx = sp.signal.welch(filtered_signal, fs=SAMPLE_FREQUENCY)  # noqa: N806
 
     current_frequency_center = heart_rate
     while current_frequency_center < mdn_filter.noise_frequency_limit:

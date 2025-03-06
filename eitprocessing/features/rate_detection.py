@@ -45,15 +45,11 @@ class RateDetection:
             raise NotImplementedError(msg)
 
         _, n_rows, n_cols = eit_data.pixel_impedance.shape
-        pixel_impedance_detrended = signal.detrend(
-            eit_data.pixel_impedance, type="constant", axis=0
-        )
+        pixel_impedance_detrended = signal.detrend(eit_data.pixel_impedance, type="constant", axis=0)
         summed_impedance = np.nansum(eit_data.pixel_impedance, axis=(1, 2))
         summed_impedance_detrended = signal.detrend(summed_impedance, type="constant")
 
-        len_segment = min(
-            len(pixel_impedance_detrended), self.welch_window * eit_data.sample_frequency
-        )
+        len_segment = min(len(pixel_impedance_detrended), self.welch_window * eit_data.sample_frequency)
         len_overlap = self.welch_overlap * eit_data.sample_frequency
         frequencies, total_power = signal.welch(
             summed_impedance_detrended,
@@ -63,8 +59,7 @@ class RateDetection:
         )
 
         indices_respiratory_rate = np.nonzero(
-            (frequencies >= self.min_respiratory_rate)
-            & (frequencies <= self.max_respiratory_rate),
+            (frequencies >= self.min_respiratory_rate) & (frequencies <= self.max_respiratory_rate),
         )
         indices_heart_rate = np.nonzero(
             (frequencies >= self.min_heart_rate) & (frequencies <= self.max_heart_rate),
@@ -112,8 +107,7 @@ class RateDetection:
         diff_total_summed_spectra = summed_power_spectra_normalized - total_power_normalized
 
         max_diff_index = np.argmax(
-            diff_total_summed_spectra[indices_heart_rate]
-            == np.max(diff_total_summed_spectra[indices_heart_rate]),
+            diff_total_summed_spectra[indices_heart_rate] == np.max(diff_total_summed_spectra[indices_heart_rate]),
         )
         estimated_heart_rate: float = frequencies[indices_heart_rate][max_diff_index]
 
