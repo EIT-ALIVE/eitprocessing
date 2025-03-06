@@ -44,7 +44,7 @@ class MDNFilter(TimeDomainFilter):
         if self.respiratory_rate > UPPER_RESPIRATORY_RATE_LIMIT:
             msg = (
                 f"The provided respiratory rate ({self.respiratory_rate:.1f}) "
-                "is higher than 2 Hz (120 BPM). "
+                f"is higher than {UPPER_RESPIRATORY_RATE_LIMIT} Hz (120 BPM). "
                 "Make sure this is correct, and to use the correct unit."
             )
             warnings.warn(msg)
@@ -52,7 +52,7 @@ class MDNFilter(TimeDomainFilter):
         if self.heart_rate > UPPER_HEART_RATE_LIMIT:
             msg = (
                 f"The provided heart rate ({self.heart_rate:.1f}) is higher "
-                "than 10 Hz (600 BPM). "
+                f"than {UPPER_HEART_RATE_LIMIT} Hz (600 BPM). "
                 "Make sure this is correct, and to use the correct unit."
             )
             warnings.warn(msg)
