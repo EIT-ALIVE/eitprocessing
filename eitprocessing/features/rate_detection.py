@@ -45,11 +45,15 @@ class RateDetection:
             raise NotImplementedError(msg)
 
         _, n_rows, n_cols = eit_data.pixel_impedance.shape
-        pixel_impedance_detrended = signal.detrend(eit_data.pixel_impedance, type="constant", axis=0)
+        pixel_impedance_detrended = signal.detrend(
+            eit_data.pixel_impedance, type="constant", axis=0
+        )
         summed_impedance = np.nansum(eit_data.pixel_impedance, axis=(1, 2))
         summed_impedance_detrended = signal.detrend(summed_impedance, type="constant")
 
-        len_segment = min(len(pixel_impedance_detrended), self.welch_window * eit_data.sample_frequency)
+        len_segment = min(
+            len(pixel_impedance_detrended), self.welch_window * eit_data.sample_frequency
+        )
         len_overlap = self.welch_overlap * eit_data.sample_frequency
         frequencies, total_power = signal.welch(
             summed_impedance_detrended,
@@ -59,7 +63,8 @@ class RateDetection:
         )
 
         indices_respiratory_rate = np.nonzero(
-            (frequencies >= self.min_respiratory_rate) & (frequencies <= self.max_respiratory_rate),
+            (frequencies >= self.min_respiratory_rate)
+            & (frequencies <= self.max_respiratory_rate),
         )
         indices_heart_rate = np.nonzero(
             (frequencies >= self.min_heart_rate) & (frequencies <= self.max_heart_rate),
@@ -72,10 +77,14 @@ class RateDetection:
 
         power_spectra = np.full((len(frequencies), n_rows, n_cols), np.nan)
 
+        included_pixels = (np.std(pixel_impedance_detrended, axis=0) > 0) & np.all(
+            (~np.isnan(pixel_impedance_detrended)), axis=0
+        )
+
         for row, column in itertools.product(range(n_rows), range(n_cols)):
             pixel_data = pixel_impedance_detrended[:, row, column]
 
-            if np.all(pixel_data == np.nan):
+            if not included_pixels[row, column]:
                 continue
 
             pixel_data_detrended = signal.detrend(pixel_data, type="constant")
@@ -88,7 +97,10 @@ class RateDetection:
             )
             power_spectra[:, row, column] = power
 
-        power_spectrum_normalizer = 1 / np.nansum(power_spectra, axis=0, keepdims=True)
+        power_spectrum_normalizer = np.full(power_spectra.shape, np.nan)
+        power_spectrum_normalizer[:, included_pixels] = 1 / np.nansum(
+            power_spectra[:, included_pixels], axis=0, keepdims=True
+        )
 
         normalized_power_spectra = power_spectra * power_spectrum_normalizer
         summed_power_spectra = np.nansum(normalized_power_spectra, axis=(1, 2))
@@ -100,7 +112,8 @@ class RateDetection:
         diff_total_summed_spectra = summed_power_spectra_normalized - total_power_normalized
 
         max_diff_index = np.argmax(
-            diff_total_summed_spectra[indices_heart_rate] == np.max(diff_total_summed_spectra[indices_heart_rate]),
+            diff_total_summed_spectra[indices_heart_rate]
+            == np.max(diff_total_summed_spectra[indices_heart_rate]),
         )
         estimated_heart_rate: float = frequencies[indices_heart_rate][max_diff_index]
 
