@@ -18,10 +18,12 @@ UPPER_HEART_RATE_LIMIT: float = 10
 class MDNFilter(TimeDomainFilter):
     """Multiple Digital Notch filter.
 
-    This filter is used to remove heart rate noise from data. It uses multiple
-    notch filters to remove the frequency surrounding the heart rate (± the
-    notch distance) and its harmonics, up to the Nyquist frequency. The filter
-    also applies a high pass filter above the noise frequency limit.
+    This filter is used to remove heart rate noise from data. A band stop filter removes heart rate
+    ± the notch distance. This is repeated for every harmonic of the heart rate below the noise
+    frequency limit. Lastly, a low pass filter removes noise above the noise frequency limit.
+
+    By default, the notch distance is set to 0.166... Hz (10 BPM), and the noise frequency limit is
+    set to 3.666... Hz (220 BPM).
 
     NB: the respiratory and heart rate should be in provided Hz, not BPM.
 
@@ -30,7 +32,7 @@ class MDNFilter(TimeDomainFilter):
       respiratory_rate: the respiratory rate of the subject in Hz
       heart_rate: the heart rate of the subject in Hz
       noise_frequency_limit: the highest frequency to filter in Hz
-      notch_distance: the distance from the heart rate to filter in Hz
+      notch_distance: the half width of the band stop filters frequency range
 
     """
 
