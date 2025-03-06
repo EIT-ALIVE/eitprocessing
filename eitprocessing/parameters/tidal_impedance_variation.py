@@ -63,7 +63,7 @@ class TIV(ParameterCalculation):
             result_label: label of the returned SparseData object, defaults to `'continuous_tivs'`.
 
         Returns:
-            A list with the computed TIV values.
+            A SparseData object with the computed TIV values.
 
         Raises:
             RuntimeError: If store is set to true but no sequence is provided.
@@ -99,7 +99,7 @@ class TIV(ParameterCalculation):
             name="Continuous tidal impedance variation",
             unit=None,
             category="impedance difference",
-            time=continuous_data.time,
+            time=[breath.middle_time for breath in breaths.values if breath is not None],
             description="Tidal impedance variation determined on continuous data",
             parameters=self.breath_detection_kwargs,
             derived_from=[continuous_data],
@@ -136,7 +136,7 @@ class TIV(ParameterCalculation):
             store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
 
         Returns:
-            An np.ndarray with the computed TIV values.
+            A SparseData object with the computed TIV values.
 
         Raises:
             RuntimeError: If store is set to true but no sequence is provided.
@@ -186,6 +186,7 @@ class TIV(ParameterCalculation):
 
         number_of_breaths = len(breath_data)
         all_pixels_tiv_values = np.full((number_of_breaths, n_rows, n_cols), None, dtype=object)
+        all_pixels_breath_timings = np.full((number_of_breaths, n_rows, n_cols), None, dtype=object)
 
         for row, col in itertools.product(range(n_rows), range(n_cols)):
             time_series = data[:, row, col]
@@ -197,6 +198,12 @@ class TIV(ParameterCalculation):
                 tiv_method,
                 tiv_timing,
             )
+            # Get the middle times of each breath where breath is not None
+            pixel_breath_timings = [breath.middle_time for breath in breaths if breath is not None]
+
+            # Store these in all_pixels_breath_timings, ensuring they match the expected shape
+            all_pixels_breath_timings[: len(pixel_breath_timings), row, col] = pixel_breath_timings
+
             all_pixels_tiv_values[:, row, col] = pixel_tiv_values
 
         tiv_container = SparseData(
@@ -204,12 +211,13 @@ class TIV(ParameterCalculation):
             name="Pixel tidal impedance variation",
             unit=None,
             category="impedance difference",
-            time=eit_data.time,
+            time=list(all_pixels_breath_timings),
             description="Tidal impedance variation determined on pixel impedance",
             parameters=self.breath_detection_kwargs,
             derived_from=[eit_data],
             values=list(all_pixels_tiv_values.astype(float)),
         )
+
         if store:
             sequence.sparse_data.add(tiv_container)
 

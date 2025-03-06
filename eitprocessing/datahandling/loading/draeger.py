@@ -22,26 +22,38 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-_FRAME_SIZE_BYTES = 4358
-DRAEGER_SAMPLE_FREQUENCY = 20
 load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
+NAN_VALUE_INDICATOR = -1e30
 
 
 def load_from_single_path(
     path: Path,
-    sample_frequency: float | None = 20,
+    sample_frequency: float | None = None,
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> dict[str, DataCollection]:
     """Load Dräger EIT data from path."""
     file_size = path.stat().st_size
-    if file_size % _FRAME_SIZE_BYTES:
+
+    frame_size: int
+    medibus_fields: list
+
+    # iterate over the supported file formats to find the frame size that matches the file size
+    for _file_format_data in _bin_file_formats.values():
+        frame_size = _file_format_data["frame_size"]
+        if file_size % frame_size == 0:
+            # if the file size is an integer multiple of the frame size, assume this is the correct format
+            medibus_fields = _file_format_data["medibus_fields"]
+            break
+    else:
         msg = (
-            f"File size {file_size} of file {path!s} not divisible by {_FRAME_SIZE_BYTES}.\n"
-            f"Make sure this is a valid and uncorrupted Dräger data file."
+            f"File size {file_size} of file {path!s} does not match the supported *.bin file formats.\n"
+            "Currently this package does not support loading files containing "
+            "esophageal pressure or other non-standard data. "
+            "Make sure this is a valid and uncorrupted Dräger data file."
         )
         raise OSError(msg)
-    total_frames = file_size // _FRAME_SIZE_BYTES
+    total_frames = file_size // frame_size
 
     if (f0 := first_frame) > (fn := total_frames):
         msg = f"Invalid input: `first_frame` ({f0}) is larger than the total number of frames in the file ({fn})."
@@ -67,10 +79,10 @@ def load_from_single_path(
     time = np.zeros((n_frames,))
     events: list[tuple[float, Event]] = []
     phases: list[tuple[float, int]] = []
-    medibus_data = np.zeros((52, n_frames))
+    medibus_data = np.zeros((len(medibus_fields), n_frames), dtype=np.float32)
 
     with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
-        fh.seek(first_frame_to_load * _FRAME_SIZE_BYTES)
+        fh.seek(first_frame_to_load * frame_size)
         reader = BinReader(fh)
         previous_marker = None
 
@@ -82,13 +94,16 @@ def load_from_single_path(
                 time,
                 pixel_impedance,
                 medibus_data,
+                len(medibus_fields),
                 events,
                 phases,
                 previous_marker,
             )
 
-    if not sample_frequency:
-        sample_frequency = DRAEGER_SAMPLE_FREQUENCY
+    # time wraps around the number of seconds in a day
+    time = np.unwrap(time, period=24 * 60 * 60)
+
+    sample_frequency = _estimate_sample_frequency(time, sample_frequency)
 
     eit_data = EITData(
         vendor=Vendor.DRAEGER,
@@ -104,7 +119,7 @@ def load_from_single_path(
     (
         continuousdata_collection,
         sparsedata_collection,
-    ) = _convert_medibus_data(medibus_data, time, sample_frequency)
+    ) = _convert_medibus_data(medibus_data, medibus_fields, time, sample_frequency)
     intervaldata_collection = DataCollection(IntervalData)
     # TODO: move some medibus data to sparse / interval
     # TODO: move phases and events to sparse / interval
@@ -167,15 +182,34 @@ def load_from_single_path(
     }
 
 
+def _estimate_sample_frequency(time: np.ndarray, sample_frequency: float | None) -> float:
+    """Estimate the sample frequency from the time axis, and check with provided sample frequency."""
+    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 4)
+
+    if sample_frequency is None:
+        return estimated_sample_frequency
+
+    if sample_frequency != estimated_sample_frequency:
+        msg = (
+            f"Provided sample frequency ({sample_frequency}) does not match "
+            f"the estimated sample frequency ({estimated_sample_frequency})."
+        )
+        warnings.warn(msg, RuntimeWarning)
+
+    return sample_frequency
+
+
 def _convert_medibus_data(
     medibus_data: NDArray,
+    medibus_fields: list,
     time: NDArray,
     sample_frequency: float,
 ) -> tuple[DataCollection, DataCollection]:
     continuousdata_collection = DataCollection(ContinuousData)
     sparsedata_collection = DataCollection(SparseData)
 
-    for field_info, data in zip(_medibus_fields, medibus_data, strict=True):
+    for field_info, data in zip(medibus_fields, medibus_data, strict=True):
+        data[data < NAN_VALUE_INDICATOR] = np.nan
         if field_info.continuous:
             continuous_data = ContinuousData(
                 label=field_info.signal_name,
@@ -203,6 +237,7 @@ def _read_frame(
     time: NDArray,
     pixel_impedance: NDArray,
     medibus_data: NDArray,
+    n_medibus_fields: int,
     events: list,
     phases: list,
     previous_marker: int | None,
@@ -223,7 +258,7 @@ def _read_frame(
     event_text = reader.string(length=30)
     timing_error = reader.int32()
 
-    frame_medibus_data = reader.npfloat32(length=52)
+    frame_medibus_data = reader.npfloat32(length=n_medibus_fields)
 
     if index < 0:
         # do not keep any loaded data, just return the event marker
@@ -253,61 +288,133 @@ class _MedibusField(NamedTuple):
     continuous: bool
 
 
-_medibus_fields = [
-    _MedibusField("airway pressure", "mbar", True),
-    _MedibusField("flow", "L/min", True),
-    _MedibusField("volume", "mL", True),
-    _MedibusField("CO2 (%)", "%", True),
-    _MedibusField("CO2 (kPa)", "kPa", True),
-    _MedibusField("CO2 (mmHg)", "mmHg", True),
-    _MedibusField("dynamic compliance", "mL/mbar", False),
-    _MedibusField("resistance", "mbar/L/s", False),
-    _MedibusField("r^2", "", False),
-    _MedibusField("spontaneous inspiratory time", "s", False),
-    _MedibusField("minimal pressure", "mbar", False),
-    _MedibusField("P0.1", "mbar", False),
-    _MedibusField("mean pressure", "mbar", False),
-    _MedibusField("plateau pressure", "mbar", False),
-    _MedibusField("PEEP", "mbar", False),
-    _MedibusField("intrinsic PEEP", "mbar", False),
-    _MedibusField("mandatory respiratory rate", "/min", False),
-    _MedibusField("mandatory minute volume", "L/min", False),
-    _MedibusField("peak inspiratory pressure", "mbar", False),
-    _MedibusField("mandatory tidal volume", "L", False),
-    _MedibusField("spontaneous tidal volume", "L", False),
-    _MedibusField("trapped volume", "mL", False),
-    _MedibusField("mandatory expiratory tidal volume", "mL", False),
-    _MedibusField("spontaneous expiratory tidal volume", "mL", False),
-    _MedibusField("mandatory inspiratory tidal volume", "mL", False),
-    _MedibusField("tidal volume", "mL", False),
-    _MedibusField("spontaneous inspiratory tidal volume", "mL", False),
-    _MedibusField("negative inspiratory force", "mbar", False),
-    _MedibusField("leak minute volume", "L/min", False),
-    _MedibusField("leak percentage", "%", False),
-    _MedibusField("spontaneous respiratory rate", "/min", False),
-    _MedibusField("percentage of spontaneous minute volume", "%", False),
-    _MedibusField("spontaneous minute volume", "L/min", False),
-    _MedibusField("minute volume", "L/min", False),
-    _MedibusField("airway temperature", "degrees C", False),
-    _MedibusField("rapid shallow breating index", "1/min/L", False),
-    _MedibusField("respiratory rate", "/min", False),
-    _MedibusField("inspiratory:expiratory ratio", "", False),
-    _MedibusField("CO2 flow", "mL/min", False),
-    _MedibusField("dead space volume", "mL", False),
-    _MedibusField("percentage dead space of expiratory tidal volume", "%", False),
-    _MedibusField("end-tidal CO2", "%", False),
-    _MedibusField("end-tidal CO2", "kPa", False),
-    _MedibusField("end-tidal CO2", "mmHg", False),
-    _MedibusField("fraction inspired O2", "%", False),
-    _MedibusField("spontaneous inspiratory:expiratory ratio", "", False),
-    _MedibusField("elastance", "mbar/L", False),
-    _MedibusField("time constant", "s", False),
-    _MedibusField(
-        "ratio between upper 20% pressure range and total dynamic compliance",
-        "",
-        False,
-    ),
-    _MedibusField("end-inspiratory pressure", "mbar", False),
-    _MedibusField("expiratory tidal volume", "mL", False),
-    _MedibusField("time at low pressure", "s", False),
-]
+_bin_file_formats = {
+    "original": {
+        "frame_size": 4358,
+        "medibus_fields": [
+            _MedibusField("airway pressure", "mbar", True),
+            _MedibusField("flow", "L/min", True),
+            _MedibusField("volume", "mL", True),
+            _MedibusField("CO2 (%)", "%", True),
+            _MedibusField("CO2 (kPa)", "kPa", True),
+            _MedibusField("CO2 (mmHg)", "mmHg", True),
+            _MedibusField("dynamic compliance", "mL/mbar", False),
+            _MedibusField("resistance", "mbar/L/s", False),
+            _MedibusField("r^2", "", False),
+            _MedibusField("spontaneous inspiratory time", "s", False),
+            _MedibusField("minimal pressure", "mbar", False),
+            _MedibusField("P0.1", "mbar", False),
+            _MedibusField("mean pressure", "mbar", False),
+            _MedibusField("plateau pressure", "mbar", False),
+            _MedibusField("PEEP", "mbar", False),
+            _MedibusField("intrinsic PEEP", "mbar", False),
+            _MedibusField("mandatory respiratory rate", "/min", False),
+            _MedibusField("mandatory minute volume", "L/min", False),
+            _MedibusField("peak inspiratory pressure", "mbar", False),
+            _MedibusField("mandatory tidal volume", "L", False),
+            _MedibusField("spontaneous tidal volume", "L", False),
+            _MedibusField("trapped volume", "mL", False),
+            _MedibusField("mandatory expiratory tidal volume", "mL", False),
+            _MedibusField("spontaneous expiratory tidal volume", "mL", False),
+            _MedibusField("mandatory inspiratory tidal volume", "mL", False),
+            _MedibusField("tidal volume", "mL", False),
+            _MedibusField("spontaneous inspiratory tidal volume", "mL", False),
+            _MedibusField("negative inspiratory force", "mbar", False),
+            _MedibusField("leak minute volume", "L/min", False),
+            _MedibusField("leak percentage", "%", False),
+            _MedibusField("spontaneous respiratory rate", "/min", False),
+            _MedibusField("percentage of spontaneous minute volume", "%", False),
+            _MedibusField("spontaneous minute volume", "L/min", False),
+            _MedibusField("minute volume", "L/min", False),
+            _MedibusField("airway temperature", "degrees C", False),
+            _MedibusField("rapid shallow breating index", "1/min/L", False),
+            _MedibusField("respiratory rate", "/min", False),
+            _MedibusField("inspiratory:expiratory ratio", "", False),
+            _MedibusField("CO2 flow", "mL/min", False),
+            _MedibusField("dead space volume", "mL", False),
+            _MedibusField("percentage dead space of expiratory tidal volume", "%", False),
+            _MedibusField("end-tidal CO2", "%", False),
+            _MedibusField("end-tidal CO2", "kPa", False),
+            _MedibusField("end-tidal CO2", "mmHg", False),
+            _MedibusField("fraction inspired O2", "%", False),
+            _MedibusField("spontaneous inspiratory:expiratory ratio", "", False),
+            _MedibusField("elastance", "mbar/L", False),
+            _MedibusField("time constant", "s", False),
+            _MedibusField(
+                "ratio between upper 20% pressure range and total dynamic compliance",
+                "",
+                False,
+            ),
+            _MedibusField("end-inspiratory pressure", "mbar", False),
+            _MedibusField("expiratory tidal volume", "mL", False),
+            _MedibusField("time at low pressure", "s", False),
+        ],
+    },
+    "pressure_pod": {
+        "frame_size": 4382,
+        "medibus_fields": [
+            _MedibusField("airway pressure", "mbar", True),
+            _MedibusField("flow", "L/min", True),
+            _MedibusField("volume", "mL", True),
+            _MedibusField("CO2 (%)", "%", True),
+            _MedibusField("CO2 (kPa)", "kPa", True),
+            _MedibusField("CO2 (mmHg)", "mmHg", True),
+            _MedibusField("dynamic compliance", "mL/mbar", False),
+            _MedibusField("resistance", "mbar/L/s", False),
+            _MedibusField("r^2", "", False),
+            _MedibusField("spontaneous inspiratory time", "s", False),
+            _MedibusField("minimal pressure", "mbar", False),
+            _MedibusField("P0.1", "mbar", False),
+            _MedibusField("mean pressure", "mbar", False),
+            _MedibusField("plateau pressure", "mbar", False),
+            _MedibusField("PEEP", "mbar", False),
+            _MedibusField("intrinsic PEEP", "mbar", False),
+            _MedibusField("mandatory respiratory rate", "/min", False),
+            _MedibusField("mandatory minute volume", "L/min", False),
+            _MedibusField("peak inspiratory pressure", "mbar", False),
+            _MedibusField("mandatory tidal volume", "L", False),
+            _MedibusField("spontaneous tidal volume", "L", False),
+            _MedibusField("trapped volume", "mL", False),
+            _MedibusField("mandatory expiratory tidal volume", "mL", False),
+            _MedibusField("spontaneous expiratory tidal volume", "mL", False),
+            _MedibusField("mandatory inspiratory tidal volume", "mL", False),
+            _MedibusField("tidal volume", "mL", False),
+            _MedibusField("spontaneous inspiratory tidal volume", "mL", False),
+            _MedibusField("negative inspiratory force", "mbar", False),
+            _MedibusField("leak minute volume", "L/min", False),
+            _MedibusField("leak percentage", "%", False),
+            _MedibusField("spontaneous respiratory rate", "/min", False),
+            _MedibusField("percentage of spontaneous minute volume", "%", False),
+            _MedibusField("spontaneous minute volume", "L/min", False),
+            _MedibusField("minute volume", "L/min", False),
+            _MedibusField("airway temperature", "degrees C", False),
+            _MedibusField("rapid shallow breating index", "1/min/L", False),
+            _MedibusField("respiratory rate", "/min", False),
+            _MedibusField("inspiratory:expiratory ratio", "", False),
+            _MedibusField("CO2 flow", "mL/min", False),
+            _MedibusField("dead space volume", "mL", False),
+            _MedibusField("percentage dead space of expiratory tidal volume", "%", False),
+            _MedibusField("end-tidal CO2", "%", False),
+            _MedibusField("end-tidal CO2", "kPa", False),
+            _MedibusField("end-tidal CO2", "mmHg", False),
+            _MedibusField("fraction inspired O2", "%", False),
+            _MedibusField("spontaneous inspiratory:expiratory ratio", "", False),
+            _MedibusField("elastance", "mbar/L", False),
+            _MedibusField("time constant", "s", False),
+            _MedibusField(
+                "ratio between upper 20% pressure range and total dynamic compliance",
+                "",
+                False,
+            ),
+            _MedibusField("end-inspiratory pressure", "mbar", False),
+            _MedibusField("expiratory tidal volume", "mL", False),
+            _MedibusField("high pressure", "mbar", False),
+            _MedibusField("low pressure", "mbar", False),
+            _MedibusField("time at low pressure", "s", False),
+            _MedibusField("airway pressure (pod)", "mbar", True),
+            _MedibusField("esophageal pressure (pod)", "mbar", True),
+            _MedibusField("transpulmonary pressure (pod)", "mbar", True),
+            _MedibusField("gastric pressure/auxiliary pressure (pod)", "mbar", True),
+        ],
+    },
+}

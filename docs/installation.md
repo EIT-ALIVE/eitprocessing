@@ -1,1 +1,1 @@
---8<-- "README.md:39:62"
+--8<-- "README.md:install"

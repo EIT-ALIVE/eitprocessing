@@ -1,0 +1,49 @@
+name: Install eitprocessing
+description: Install eitprocessing on the given Python version.
+inputs:
+  python-version:
+    description: "The Python version to use"
+    required: false
+    default: "3.10"
+  dependencies:
+    description: "The optional dependencies of eitprocessing to install"
+    required: false
+  extract-data:
+    description: "Whether to extract testing data"
+    required: false
+    default: "false"
+  token:
+    description: "GitHub TOKEN"
+    required: true
+  data-directory:
+    description: "Directory where to store eitprocessing data"
+    required: false
+    default: ${{ github.workspace }}/../eitprocessing_data/
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+    - uses: docker/login-action@v3
+      if: ${{ inputs.extract-data == 'true' }}
+      with:
+        registry: ghcr.io
+        username: psomhorst
+        password: ${{ inputs.token }}
+    - uses: shrink/actions-docker-extract@v3
+      if: ${{ inputs.extract-data == 'true' }}
+      with:
+        image: ghcr.io/eit-alive/eittestdata:latest
+        destination: ${{ inputs.data-directory }}
+        path: /eitprocessing/.
+    - uses: actions/cache@v4
+      id: cache-python-env
+      with:
+        path: ${{ env.pythonLocation }}
+        key: ${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}-[${{ inputs.dependencies }}]
+    - name: Install eitprocessing with [${{ inputs.dependencies }}] dependencies
+      if: steps.cache-python-env.outputs.cache-hit != 'true'
+      run: python3 -m pip install ".[${{ inputs.dependencies }}]"
+      shell: bash

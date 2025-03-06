@@ -1,4 +1,4 @@
-name: Linting
+name: Lint
 
 on:
   push:
@@ -26,18 +26,16 @@ jobs:
         os: ["ubuntu-latest"]
         python-version: ["3.10"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Python info
-        shell: bash -l {0}
+      - name: Install ruff
         run: |
-          which python3
-          python3 --version
-      - name: Check linting and formatting using ruff
-        run: |
-          python3 -m pip install "ruff == 0.6.9"
-          ruff check || (echo "Please ensure you have a matching version of ruff (`ruff -V`) installed locally." && (exit 1))
-          ruff format --check || (echo "Please ensure you have a matching version of ruff (`ruff -V`) installed locally." && (exit 1))
+          python3 -m pip install pyproject-deplister
+          pyproject-deplister --extra dev --path pyproject.toml | grep ruff | sed 's/ //g' | xargs -I{} python3 -m pip install "{}"
+      - name: Check linting using ruff
+        run: ruff check || (echo "Please ensure you have a matching version of ruff (`ruff -V`) installed locally." && (exit 1))
+      - name: Check formatting using ruff
+        run: ruff format --check || (echo "Please ensure you have a matching version of ruff (`ruff -V`) installed locally." && (exit 1))

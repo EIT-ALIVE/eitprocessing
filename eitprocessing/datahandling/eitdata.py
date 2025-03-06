@@ -46,6 +46,7 @@ class EITData(DataContainer, SelectByTime):
     sample_frequency: float = field(metadata={"check_equivalence": True}, repr=False)
     vendor: Vendor = field(metadata={"check_equivalence": True}, repr=False)
     label: str | None = field(default=None, compare=False, metadata={"check_equivalence": True})
+    description: str = field(default="", compare=False, repr=False)
     name: str | None = field(default=None, compare=False, repr=False)
     pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
 
@@ -58,6 +59,10 @@ class EITData(DataContainer, SelectByTime):
             self.path = self.path[0]
 
         self.name = self.name or self.label
+
+        if (lv := len(self.pixel_impedance)) != (lt := len(self.time)):
+            msg = f"The number of time points ({lt}) does not match the number of pixel impedance values ({lv})."
+            raise ValueError(msg)
 
     @property
     def framerate(self) -> float:

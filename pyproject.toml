@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eitprocessing"
-version = "1.4.3"
+version = "1.6.0"
 description = "Processing of lung image data from electrical impedance tomography."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,23 +17,29 @@ keywords = [
 authors = [
     { name = "Dani Bodor", email = "d.bodor@esciencecenter.nl" },
     { name = "Peter Somhorst", email = "p.somhorst@erasmusmc.nl" },
+    { name = "Annemijn Jonkman", email = "a.jonkman@erasmusmc.nl" },
     { name = "Walter Baccinelli", email = "w.baccinelli@esciencecenter.nl" },
+    { name = "Jantine Wisse-Smit", email = "j.j.smit@erasmusmc.nl" },
+    { name = "Juliette Francovich", email = "j.francovich@erasmusmc.nl" },
 ]
 license = { text = "Apache-2.0 license" }
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "matplotlib >= 3.7.1",
     "numpy >= 1.24.2",
     "scipy >= 1.10.1",
-    "tqdm >= 4.65.0",
     "strenum >= 0.4.10",
     "anytree >= 2.12.1 ",
     "typing_extensions",
@@ -44,15 +50,13 @@ dependencies = [
 # development dependency groups
 dev = [
     "pytest >= 7.4.0",
-    "bump-my-version",
+    "bump-my-version==0.28.1",
     "coverage",
-    "pycodestyle",
     "pytest-cov",
-    "pytest-runner",
     "coveralls",
-    "tox",
-    "ruff == 0.6.9",
+    "ruff == 0.9",
 ]
+testing = ["pytest >= 7.4.0", "pytest-cov", "coveralls"]
 docs = [
     "mkdocs",
     "mkdocs-material",
@@ -64,13 +68,12 @@ docs = [
     "black",
 ]
 notebooks = [
-    "ipykernel >= 6.15.2",
-    "ipython >= 8.4.0",
     "jupyter >= 1.0.0",
     "jupytext >= 1.14.5",
-    "notebook >= 6.4.12",
+    "tqdm >= 4.65.0",
+    "ipympl",
 ]
-publishing = ["build", "twine", "wheel"]
+publishing = ["build"]
 
 [project.urls]
 Documentation = "https://github.com/EIT-ALIVE/eitprocessing/blob/main/README.md"
@@ -93,21 +96,12 @@ include = ["eitprocessing*", "eitprocessing.*"]
 exclude = ["tests*", "*tests.*", "*tests"]
 
 [tool.setuptools.package-data]
-eitprocessing = ["config/*.yaml"]
-
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = py37,py38,py39,py310,py311
-skip_missing_interpreters = true
-[testenv]
-commands = pytest
-extras = dev
-"""
+eitprocessing = ["config/*.yaml", "py.typed"]
 
 [tool.ruff]
 output-format = "concise"
 line-length = 120
+extend-include = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -117,8 +111,6 @@ ignore = [
     "FBT",    # Using boolean arguments
     "ANN002", # Missing type annotation for `*args`
     "ANN003", # Missing type annotation for `**kwargs`
-    "ANN101", # Missing type annotation for `self` in method
-    "ANN102", # Missing type annotation for `cls` in classmethod
     "ANN204", # Missing return type annotation for special (dunder) method
     "S105",   # Possible hardcoded password
     "S311",   # insecure random generators
@@ -129,12 +121,12 @@ ignore = [
     "B028",   # No explicit `stacklevel` keyword argument found in warning
     # "SIM108", # Use ternary operator (not sure if we want to ignore this)
     # Unneeded docstrings
-    "D100", # Missing module docstring
-    "D104", # Missing public package docstring
-    "D105", # Missing docstring in magic method
-    "D107", # Missing docstring in `__init__`
+    "D100",   # Missing module docstring
+    "D104",   # Missing public package docstring
+    "D105",   # Missing docstring in magic method
+    "D107",   # Missing docstring in `__init__`
     "COM812", # missing trailing comma
-    "ISC001"  # single line implicit string concatenation
+    "ISC001", # single line implicit string concatenation
 ]
 
 # Set autofixing.
@@ -148,7 +140,7 @@ extend-safe-fixes = [
     "D415",   # First line should end with a period, question mark, or exclamation point
     "D300",   # Use triple double quotes `"""`
     "D200",   # One-line docstring should fit on one line
-    "TCH",    # Format type checking only imports
+    "TC",     # Format type checking only imports
     "ISC001", # Implicitly concatenated strings on a single line
     "EM",     # Exception message variables
     "RUF013", # Implicit Optional
@@ -162,8 +154,7 @@ flake8-tidy-imports.ban-relative-imports = "all" # Disallow all relative imports
 isort.known-first-party = ["eitprocessing"]
 
 [tool.ruff.lint.per-file-ignores]
-"*.ipynb" = ["ERA001", "T201", "T203"] # Commented out code, print() / pprint() statement
-"notebooks/**/*.py" = ["ERA001", "T201", "T203"] # Commented out code, print() / pprint() statement
+"*.ipynb" = ["ERA001", "T203", "T201"] # Commented out code
 "tests/*" = [
     "S101",    # Use of `assert` detected
     "ANN201",  # Missing return type
@@ -174,13 +165,19 @@ isort.known-first-party = ["eitprocessing"]
 "docs/*" = ["ALL"]
 
 [tool.bumpversion]
-current_version = "1.4.3"
+current_version = "1.6.0"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
 
 [[tool.bumpversion.files]]
 filename = "CITATION.cff"
+search = 'version: "{current_version}"'
+replace = 'version: "{new_version}"'
 
 [[tool.bumpversion.files]]
 filename = "eitprocessing/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
