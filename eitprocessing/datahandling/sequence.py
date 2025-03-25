@@ -287,3 +287,15 @@ class _DataAccess:
             msg = f"Key {label} does not match object label {obj.label}."
             raise KeyError(msg)
         return self.add(obj)
+
+    def __contains__(self, label: str):
+        for container in (
+            self._sequence.continuous_data,
+            self._sequence.interval_data,
+            self._sequence.sparse_data,
+            self._sequence.eit_data,
+        ):
+            if label in container:
+                return True
+
+        return False
