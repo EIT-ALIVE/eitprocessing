@@ -27,10 +27,9 @@ class Sequence(Equivalence, SelectByTime):
 
     A Sequence object is a representation of data points over time. These data can consist of any combination of EIT
     frames (`EITData`), waveform data (`ContinuousData`) from different sources, or individual events (`SparseData`)
-    occurring at any given timepoint.
-    A Sequence can consist of an entire measurement, a section of a measurement, a single breath, or even a portion of a
-    breath. A Sequence can consist of multiple sets of each type of data from the same time-points or can be a single
-    measurement from just one source.
+    occurring at any given timepoint. A Sequence can consist of an entire measurement, a section of a measurement, a
+    single breath, or even a portion of a breath. A Sequence can consist of multiple sets of each type of data from the
+    same time-points or can be a single measurement from just one source.
 
     A Sequence can be split up into separate sections of a measurement or multiple (similar) Sequence objects can be
     merged together to form a single Sequence.
