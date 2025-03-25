@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+import itertools
+from dataclasses import MISSING, dataclass, field
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
@@ -14,6 +15,10 @@ from eitprocessing.datahandling.sparsedata import SparseData
 if TYPE_CHECKING:
     import numpy as np
     from typing_extensions import Self
+
+    from eitprocessing.parameters import DataContainer
+
+T = TypeVar("T", bound=Any)
 
 
 @dataclass(eq=False)
@@ -167,3 +172,119 @@ class Sequence(Equivalence, SelectByTime):
                 for key in ("eit_data", "continuous_data", "sparse_data", "interval_data")
             },
         )
+
+    @property
+    def data(self) -> _DataAccess:
+        """Shortcut access to data stored in collections inside a sequence.
+
+        This allows all data objects stored in a collection inside a sequence can be accessed.
+        Instead of `sequence.continuous_data["global_impedance"]` you can use
+        `sequence.data["global_impedance"]`. This works for getting (`sequence.data["label"]` or
+        `sequence.data.get("label")`) and adding data (`sequence.data["label"] = obj` or
+        `sequence.data.add("label", obj)`).
+
+        This interface only works if the labels are unique among the data collections. An attempt
+        to add a data object with an exiting label will result in a KeyError.
+        """
+        return _DataAccess(self)
+
+
+@dataclass
+class _DataAccess:
+    _sequence: Sequence
+
+    def __post_init__(self):
+        for a, b in itertools.combinations(
+            (
+                self._sequence.continuous_data,
+                self._sequence.interval_data,
+                self._sequence.sparse_data,
+                self._sequence.eit_data,
+            ),
+            2,
+        ):
+            if duplicates := set(a) & set(b):
+                msg = (
+                    f"Duplicate labels ({', '.join(sorted(duplicates))}) found in {a} and {b}. "
+                    "You can't use this interface with duplicate labels."
+                )
+                raise KeyError(msg)
+
+    @overload
+    def get(self, label: str) -> DataContainer: ...
+
+    @overload
+    def get(self, label: str, default: T) -> DataContainer | T: ...
+
+    def get(self, label: str, default: object = MISSING) -> DataContainer | object:
+        """Get a DataContainer object by label.
+
+        Example:
+        ```
+        if filtered_data := sequence.data.get("filtered data", None):
+            print(filtered_data.values.mean())
+        else:
+            print("No filtered data was found.")
+
+        ```
+
+        Args:
+            label (str): label of the object to retrieve.
+            default (optional): a default value that is returned if the object is not found.
+                Defaults to MISSING.
+
+        Raises:
+            KeyError: if the object is not found, and no default was set.
+
+        Returns:
+            DataContainer: the requested DataContainer.
+        """
+        for collection in (
+            self._sequence.continuous_data,
+            self._sequence.interval_data,
+            self._sequence.sparse_data,
+            self._sequence.eit_data,
+        ):
+            if label in collection:
+                return collection[label]
+
+        if default is not MISSING:
+            return default
+
+        msg = f"No object with label {label} was found."
+        raise KeyError(msg)
+
+    def __getitem__(self, key: str) -> DataContainer:
+        return self.get(key)
+
+    def add(self, obj: DataContainer) -> None:
+        """Add a DataContainer object to the sequence.
+
+        Adds the object to the appropriate data collection. The label of the object must be unique
+        among all data collections, otherwise a KeyError is raised.
+
+        Args:
+            obj (DataContainer): the object to add to the Sequence.
+
+        Raises:
+            KeyError: if the label of the object already exists in any of the data collections.
+        """
+        if self.get(obj.label, None):
+            msg = f"An object with the label {obj.label} already exists in this sequence."
+            raise KeyError(msg)
+
+        match obj:
+            case ContinuousData():
+                self._sequence.continuous_data.add(obj)
+            case IntervalData():
+                self._sequence.interval_data.add(obj)
+            case SparseData():
+                self._sequence.sparse_data.add(obj)
+            case EITData():
+                self._sequence.eit_data.add(obj)
+
+    def __setitem__(self, label: str, obj: DataContainer):
+        if obj.label != label:
+            msg = f"Key {label} does not match object label {obj.label}."
+            raise KeyError(msg)
+        return self.add(obj)
