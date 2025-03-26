@@ -97,7 +97,20 @@ def test_add(create_continuous_data_object: Callable, create_interval_data_objec
         sequence.data["not foobar"] = continuous_data_object_2
 
 
-def test_duplicate_keys(create_continuous_data_object: Callable, create_interval_data_object: Callable):
+def test_add_multiple(create_continuous_data_object: Callable, create_interval_data_object: Callable):
+    sequence = Sequence()
+
+    continuous_data_object = create_continuous_data_object("foo")
+    interval_data_object = create_interval_data_object("bar")
+
+    sequence.data.add(continuous_data_object, interval_data_object)
+    assert "foo" in sequence.data
+    assert "bar" in sequence.data
+
+
+def test_duplicate_keys(
+    create_continuous_data_object: Callable, create_interval_data_object: Callable
+):
     sequence = Sequence()
 
     continuous_data_object = create_continuous_data_object("foo")

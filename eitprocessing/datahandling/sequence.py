@@ -252,7 +252,7 @@ class _DataAccess:
     def __getitem__(self, key: str) -> DataContainer:
         return self.get(key)
 
-    def add(self, obj: DataContainer) -> None:
+    def add(self, *obj: DataContainer) -> None:
         """Add a DataContainer object to the sequence.
 
         Adds the object to the appropriate data collection. The label of the object must be unique
@@ -264,19 +264,20 @@ class _DataAccess:
         Raises:
             KeyError: if the label of the object already exists in any of the data collections.
         """
-        if self.get(obj.label, None):
-            msg = f"An object with the label {obj.label} already exists in this sequence."
-            raise KeyError(msg)
+        for object_ in obj:
+            if self.get(object_.label, None):
+                msg = f"An object with the label {object_.label} already exists in this sequence."
+                raise KeyError(msg)
 
-        match obj:
-            case ContinuousData():
-                self._sequence.continuous_data.add(obj)
-            case IntervalData():
-                self._sequence.interval_data.add(obj)
-            case SparseData():
-                self._sequence.sparse_data.add(obj)
-            case EITData():
-                self._sequence.eit_data.add(obj)
+            match object_:
+                case ContinuousData():
+                    self._sequence.continuous_data.add(object_)
+                case IntervalData():
+                    self._sequence.interval_data.add(object_)
+                case SparseData():
+                    self._sequence.sparse_data.add(object_)
+                case EITData():
+                    self._sequence.eit_data.add(object_)
 
     def __setitem__(self, label: str, obj: DataContainer):
         if obj.label != label:
