@@ -13,6 +13,8 @@ from eitprocessing.datahandling.mixins.slicing import SelectByTime
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     import numpy as np
     from typing_extensions import Self
 
@@ -182,6 +184,14 @@ class Sequence(Equivalence, SelectByTime):
         `sequence.data.get("label")`) and adding data (`sequence.data["label"] = obj` or
         `sequence.data.add("label", obj)`).
 
+        Other dict-like behaviour is also supported:
+        - `label in sequence.data` to check whether an object with a label exists;
+        - `del sequence.data[label]` to remove an object from the sequence based on the label;
+        - `for label in sequence.data` to iterate over the labels;
+        - `sequence.data.items()` to retrieve a (list of label), object pairs, especially useful for iteration;
+        - `sequence.data.labels()` or `sequence.data.keys()` to get a list of data labels;
+        - `sequence.data.objects()` or `sequence.data.values()` to get a list of data objects.
+
         This interface only works if the labels are unique among the data collections. An attempt
         to add a data object with an exiting label will result in a KeyError.
         """
@@ -287,7 +297,31 @@ class _DataAccess:
 
     def __contains__(self, label: str) -> bool:
         return any(label in container for container in self._collections)
-            if label in container:
-                return True
 
-        return False
+    def __delitem__(self, label: str) -> None:
+        for container in self._collections:
+            if label in container:
+                del container[label]
+                return
+
+        msg = f"Object with label {label} was not found."
+        raise KeyError(msg)
+
+    def __iter__(self) -> Iterator[str]:
+        return itertools.chain(*[collection.keys() for collection in self._collections])
+
+    def items(self) -> list[tuple[str, DataContainer]]:
+        """Return all data items (`(label, object)` pairs)."""
+        return list(itertools.chain(*[collection.items() for collection in self._collections]))
+
+    def keys(self) -> list[str]:
+        """Return a list of all labels."""
+        return list(self.__iter__())
+
+    labels = keys
+
+    def values(self) -> list[DataContainer]:
+        """Return all data objects."""
+        return list(itertools.chain(*[collection.values() for collection in self._collections]))
+
+    objects = values
