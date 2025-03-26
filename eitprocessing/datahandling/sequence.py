@@ -193,21 +193,22 @@ class _DataAccess:
     _sequence: Sequence
 
     def __post_init__(self):
-        for a, b in itertools.combinations(
-            (
-                self._sequence.continuous_data,
-                self._sequence.interval_data,
-                self._sequence.sparse_data,
-                self._sequence.eit_data,
-            ),
-            2,
-        ):
+        for a, b in itertools.combinations(self._collections, 2):
             if duplicates := set(a) & set(b):
                 msg = (
                     f"Duplicate labels ({', '.join(sorted(duplicates))}) found in {a} and {b}. "
                     "You can't use this interface with duplicate labels."
                 )
                 raise KeyError(msg)
+
+    @property
+    def _collections(self) -> tuple[DataCollection, ...]:
+        return (
+            self._sequence.continuous_data,
+            self._sequence.interval_data,
+            self._sequence.sparse_data,
+            self._sequence.eit_data,
+        )
 
     @overload
     def get(self, label: str) -> DataContainer: ...
@@ -238,12 +239,7 @@ class _DataAccess:
         Returns:
             DataContainer: the requested DataContainer.
         """
-        for collection in (
-            self._sequence.continuous_data,
-            self._sequence.interval_data,
-            self._sequence.sparse_data,
-            self._sequence.eit_data,
-        ):
+        for collection in self._collections:
             if label in collection:
                 return collection[label]
 
@@ -288,13 +284,8 @@ class _DataAccess:
             raise KeyError(msg)
         return self.add(obj)
 
-    def __contains__(self, label: str):
-        for container in (
-            self._sequence.continuous_data,
-            self._sequence.interval_data,
-            self._sequence.sparse_data,
-            self._sequence.eit_data,
-        ):
+    def __contains__(self, label: str) -> bool:
+        return any(label in container for container in self._collections)
             if label in container:
                 return True
 

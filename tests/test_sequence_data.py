@@ -36,6 +36,12 @@ def test_init():
     sequence = Sequence()
 
     assert isinstance(sequence.data, _DataAccess)
+    assert sequence.data._collections == (
+        sequence.continuous_data,
+        sequence.interval_data,
+        sequence.sparse_data,
+        sequence.eit_data,
+    )
     assert hasattr(sequence.data, "get")
     assert hasattr(sequence.data, "add")
 
