@@ -108,9 +108,7 @@ def test_add_multiple(create_continuous_data_object: Callable, create_interval_d
     assert "bar" in sequence.data
 
 
-def test_duplicate_keys(
-    create_continuous_data_object: Callable, create_interval_data_object: Callable
-):
+def test_duplicate_keys(create_continuous_data_object: Callable, create_interval_data_object: Callable):
     sequence = Sequence()
 
     continuous_data_object = create_continuous_data_object("foo")
@@ -128,3 +126,50 @@ def test_duplicate_keys(
 
     with pytest.raises(KeyError):
         _ = sequence.data
+
+
+def test_delitem(create_continuous_data_object: Callable, create_interval_data_object: Callable):
+    sequence = Sequence()
+
+    continuous_data_object = create_continuous_data_object("foo")
+    interval_data_object = create_interval_data_object("bar")
+    sequence.data.add(continuous_data_object, interval_data_object)
+
+    assert "foo" in sequence.data
+    assert "bar" in sequence.data
+
+    del sequence.data["foo"]
+
+    assert "foo" not in sequence.data
+    assert continuous_data_object not in sequence.data.values()
+    assert "foo" not in sequence.continuous_data
+
+
+def test_lists_iter(create_continuous_data_object: Callable, create_interval_data_object: Callable):
+    sequence = Sequence()
+
+    continuous_data_object = create_continuous_data_object("foo")
+    interval_data_object = create_interval_data_object("bar")
+    sequence.data.add(continuous_data_object, interval_data_object)
+
+    assert set(sequence.data.keys()) == {"foo", "bar"}
+    assert set(sequence.data.labels()) == {"foo", "bar"}
+
+    # order is important! Ideally these would be converted to sets, but that is not possible due to missing hash
+    # functions
+    assert sequence.data.values() == [continuous_data_object, interval_data_object]
+    assert sequence.data.objects() == [continuous_data_object, interval_data_object]
+
+    iterator = iter(sequence.data)
+    a = next(iterator)
+    b = next(iterator)
+    assert a in ["foo", "bar"]
+    assert b in ["foo", "bar"]
+
+    with pytest.raises(StopIteration):
+        next(iterator)
+
+    assert dict(sequence.data.items()) == {
+        "foo": continuous_data_object,
+        "bar": interval_data_object,
+    }
