@@ -291,7 +291,7 @@ class _DataAccess:
 
     def __setitem__(self, label: str, obj: DataContainer):
         if obj.label != label:
-            msg = f"Key {label} does not match object label {obj.label}."
+            msg = f"Label {label} does not match object label {obj.label}."
             raise KeyError(msg)
         return self.add(obj)
 
