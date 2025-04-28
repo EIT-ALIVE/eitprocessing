@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import contextlib
 import itertools
+import sys
 from dataclasses import MISSING, dataclass, field
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
@@ -208,10 +208,11 @@ class _DataAccess:
             if duplicates := set(a) & set(b):
                 msg = f"Duplicate labels ({', '.join(sorted(duplicates))}) found in {a} and {b}."
                 exc = KeyError(msg)
-                with contextlib.suppress(AttributeError):
+                if sys.version_info >= (3, 11):
                     exc.add_note(
                         "You can't use the `data` interface with duplicate labels. "
-                        "Use the explicit data collections (`eit_data`, `continuous_data`, `sparse_data`, `interval_data`) instead."
+                        "Use the explicit data collections (`eit_data`, `continuous_data`, `sparse_data`, "
+                        "`interval_data`) instead."
                     )
                 raise exc
 
@@ -282,10 +283,11 @@ class _DataAccess:
             if self.get(object_.label, None):
                 msg = f"An object with the label {object_.label} already exists in this sequence."
                 exc = KeyError(msg)
-                with contextlib.suppress(AttributeError):
+                if sys.version_info >= (3, 11):
                     exc.add_note(
                         "You can't add an object with the same label through the `data` interface. "
-                        "Use the explicit data collections (`eit_data`, `continuous_data`, `sparse_data`, `interval_data`) instead."
+                        "Use the explicit data collections (`eit_data`, `continuous_data`, `sparse_data`, "
+                        "`interval_data`) instead."
                     )
                 raise exc
 
