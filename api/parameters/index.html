@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.43">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
     
     
       
@@ -906,7 +906,7 @@
         
   
   <span class="md-ellipsis">
-    Our team
+    Our Team
   </span>
   
 
@@ -1096,7 +1096,12 @@
 
 
 <a href="#eitprocessing.parameters.eeli.EELI.compute_parameter" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">compute_parameter</span><span class="p">(</span><span class="n">continuous_data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.continuousdata.ContinuousData" href="../datacontainers/#eitprocessing.datahandling.continuousdata.ContinuousData">ContinuousData</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">compute_parameter</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">continuous_data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.continuousdata.ContinuousData" href="../datacontainers/#eitprocessing.datahandling.continuousdata.ContinuousData">ContinuousData</a></span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">sequence</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sequence.Sequence" href="../datacontainers/#eitprocessing.datahandling.sequence.Sequence">Sequence</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">store</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">result_label</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s2">&quot;continuous_eelis&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sparsedata.SparseData" href="../datacontainers/#eitprocessing.datahandling.sparsedata.SparseData">SparseData</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1132,6 +1137,66 @@
               </p>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sequence</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>optional, Sequence to store the result in.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sequence.Sequence" href="../datacontainers/#eitprocessing.datahandling.sequence.Sequence">Sequence</a> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>store</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>whether to store the result in the sequence, defaults to <code>True</code> if a Sequence if provided.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>result_label</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>label of the returned SparseData object, defaults to <code>'continuous_eelis'</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;continuous_eelis&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -1147,12 +1212,60 @@
           <tr class="doc-section-item">
             <td>
                 <span class="doc-returns-annotation">
-                    <code><a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></code>
+                    <code><a class="autorefs autorefs-internal" title="eitprocessing.datahandling.sparsedata.SparseData" href="../datacontainers/#eitprocessing.datahandling.sparsedata.SparseData">SparseData</a></code>
                 </span>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p>np.ndarray: the end-expiratory values of all breaths in the impedance data.</p>
+                <p>A SparseData object with the end-expiratory values of all breaths in the impedance data.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If store is set to true but no sequence is provided.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If the provided sequence is not an instance of the Sequence dataclass.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If tiv_method is not one of 'inspiratory', 'expiratory', or 'mean'.</p>
               </div>
             </td>
           </tr>
@@ -1408,7 +1521,7 @@ Defaults to 'inspiratory'.</p>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p>A list with the computed TIV values.</p>
+                <p>A SparseData object with the computed TIV values.</p>
               </div>
             </td>
           </tr>
@@ -1650,7 +1763,7 @@ Defaults to 'inspiratory'.</p>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p>An np.ndarray with the computed TIV values.</p>
+                <p>A SparseData object with the computed TIV values.</p>
               </div>
             </td>
           </tr>

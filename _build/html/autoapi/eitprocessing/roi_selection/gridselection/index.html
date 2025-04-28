@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>eitprocessing.roi_selection.gridselection &#8212; eitprocessing 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=601dbdee" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=eafc0fe6" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.roi_selection.gridselection</span></code></a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-eitprocessing.roi_selection.gridselection">
+<span id="eitprocessing-roi-selection-gridselection"></span><h1><a class="reference internal" href="#module-eitprocessing.roi_selection.gridselection" title="eitprocessing.roi_selection.gridselection"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.roi_selection.gridselection</span></code></a><a class="headerlink" href="#module-eitprocessing.roi_selection.gridselection" title="Link to this heading">¶</a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection" title="eitprocessing.roi_selection.gridselection.GridSelection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridSelection</span></code></a></p></td>
+<td><p>Create regions of interest by division into a grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.VentralAndDorsal" title="eitprocessing.roi_selection.gridselection.VentralAndDorsal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VentralAndDorsal</span></code></a></p></td>
+<td><p>Split data into a ventral and dorsal region of interest.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.RightAndLeft" title="eitprocessing.roi_selection.gridselection.RightAndLeft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RightAndLeft</span></code></a></p></td>
+<td><p>Split data into a right and left region of interest.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.FourLayers" title="eitprocessing.roi_selection.gridselection.FourLayers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FourLayers</span></code></a></p></td>
+<td><p>Split data vertically into four layer regions of interest.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.Quadrants" title="eitprocessing.roi_selection.gridselection.Quadrants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quadrants</span></code></a></p></td>
+<td><p>Split data into four quadrant regions of interest.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">GridSelection</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../index.html#eitprocessing.roi_selection.ROISelection" title="eitprocessing.roi_selection.ROISelection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eitprocessing.roi_selection.ROISelection</span></code></a></p>
+<p>Create regions of interest by division into a grid.</p>
+<p>GridSelection allows for the creation a list of 2D arrays that can be used to divide a two- or
+higher-dimensional array into several regions structured in a grid. An instance of
+GridSelection contains information about how to subdivide an input matrix. Calling
+<cite>find_grid(data)</cite>, where data is a 2D array, results in a list of arrays with the same
+dimension as <cite>data</cite>, each representing a single region. Each resulting 2D array contains the
+value 0 for pixels that do not belong to the region, and the value 1 or any number between 0
+and 1 for pixels that (partly) belong to the region.</p>
+<p>Rows and columns at the edges of <cite>data</cite> that only contain NaN (not a number) values are
+ignored. E.g. a (32, 32) array where the first and last two rows and first and last two columns
+only contain NaN are split as if it is a (28, 28) array. The resulting arrays have the shape
+(32, 32) with the same cells as the input data containing NaN values.</p>
+<p>If the number of rows or columns can not split evenly, a row or column can be split among two
+regions. This behaviour is controlled by <cite>split_rows</cite> and <cite>split_columns</cite>.</p>
+<p>If <cite>split_rows</cite> is <cite>False</cite> (default), rows will not be split between two groups. A warning will
+be shown stating regions don’t contain equal numbers of rows. The regions towards the top will
+be larger. E.g., when a (5, 2) array is split in two vertical regions, the first region will
+contain the first three rows, and the second region the last two rows.</p>
+<p>If <cite>split_rows</cite> is <cite>True</cite>, e.g. a (5, 2) array that is split in two vertical regions, the first
+region will contain the first two rows and half of each pixel of the third row. The second
+region contains half of each pixel in the third row, and the last two rows.</p>
+<p><cite>split_columns</cite> has the same effect on columns as <cite>split_rows</cite> has on rows.</p>
+<p>Regions are ordered according to C indexing order. The <cite>matrix_layout()</cite> method provides a map
+showing how the regions are ordered.</p>
+<p>Common grids are pre-defined:
+- VentralAndDorsal: vertically divided into ventral and dorsal;
+- RightAndLeft: horizontally divided into anatomical right and left; NB: anatomical right is
+the left side of the matrix;
+- FourLayers: vertically divided into ventral, mid-ventral, mid-dorsal and dorsal;
+- Quadrants: vertically and horizontally divided into four quadrants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v_split</strong> – The number of vertical regions. Must be 1 or larger.</p></li>
+<li><p><strong>h_split</strong> – The number of horizontal regions. Must be 1 or larger.</p></li>
+<li><p><strong>split_rows</strong> – Allows rows to be split over two regions.</p></li>
+<li><p><strong>split_columns</strong> – Allows columns to be split over two regions.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pixel_map</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">3</span><span class="p">],</span>
+<span class="go">                       [ 4,  5,  6],</span>
+<span class="go">                       [ 7,  8,  9],</span>
+<span class="go">                       [10, 11, 12],</span>
+<span class="go">                       [13, 14, 15],</span>
+<span class="go">                       [16, 17, 18]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gs</span> <span class="o">=</span> <span class="n">GridSelection</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">split_pixels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">find_grid</span><span class="p">(</span><span class="n">pixel_map</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">pixel_map</span>
+<span class="go">array([[1, 2, 3],</span>
+<span class="go">       [4, 5, 6],</span>
+<span class="go">       [0, 0, 0],</span>
+<span class="go">       [0, 0, 0],</span>
+<span class="go">       [0, 0, 0],</span>
+<span class="go">       [0, 0, 0]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gs</span><span class="o">.</span><span class="n">matrix_layout</span><span class="p">()</span>
+<span class="go">array([[0],</span>
+<span class="go">       [1],</span>
+<span class="go">       [2]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gs2</span> <span class="o">=</span> <span class="n">GridSelection</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">split_pixels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices2</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">find_grid</span><span class="p">(</span><span class="n">pixel_map</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gs2</span><span class="o">.</span><span class="n">matrix_layout</span><span class="p">()</span>
+<span class="go">array([[0, 1],</span>
+<span class="go">       [2, 3]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrices2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">array([[0. , 0. , 0. ],</span>
+<span class="go">       [0. , 0. , 0. ],</span>
+<span class="go">       [0. , 0. , 0. ],</span>
+<span class="go">       [1. , 0.5, 0. ],</span>
+<span class="go">       [1. , 0.5, 0. ],</span>
+<span class="go">       [1. , 0.5, 0. ]])</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection.v_split">
+<span class="sig-name descname"><span class="pre">v_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection.v_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection.v_split" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection.h_split">
+<span class="sig-name descname"><span class="pre">h_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection.h_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection.h_split" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection.split_rows">
+<span class="sig-name descname"><span class="pre">split_rows</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection.split_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection.split_rows" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection.split_columns">
+<span class="sig-name descname"><span class="pre">split_columns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection.split_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection.split_columns" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection.ignore_nan_rows">
+<span class="sig-name descname"><span class="pre">ignore_nan_rows</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection.ignore_nan_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection.ignore_nan_rows" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection.ignore_nan_columns">
+<span class="sig-name descname"><span class="pre">ignore_nan_columns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection.ignore_nan_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection.ignore_nan_columns" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection.__post_init__">
+<span class="sig-name descname"><span class="pre">__post_init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection.__post_init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection.__post_init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection.find_grid">
+<span class="sig-name descname"><span class="pre">find_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection.find_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection.find_grid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection._create_grouping_vector_no_split_pixels">
+<span class="sig-name descname"><span class="pre">_create_grouping_vector_no_split_pixels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.typing.NDArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection._create_grouping_vector_no_split_pixels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection._create_grouping_vector_no_split_pixels" title="Link to this definition">¶</a></dt>
+<dd><p>Create a grouping vector to split vector into <cite>n</cite> groups not allowing split elements.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection._create_grouping_vector_split_pixels">
+<span class="sig-name descname"><span class="pre">_create_grouping_vector_split_pixels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.typing.NDArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection._create_grouping_vector_split_pixels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection._create_grouping_vector_split_pixels" title="Link to this definition">¶</a></dt>
+<dd><p>Create a grouping vector to split vector into <cite>n</cite> groups allowing split elements.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.GridSelection.matrix_layout">
+<span class="sig-name descname"><span class="pre">matrix_layout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.typing.NDArray</span></span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#GridSelection.matrix_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.GridSelection.matrix_layout" title="Link to this definition">¶</a></dt>
+<dd><p>Returns an array showing the layout of the matrices returned by <cite>find_grid</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.InvalidDivision">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">InvalidDivision</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#InvalidDivision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.InvalidDivision" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Raised when the data can’t be divided into regions.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.InvalidHorizontalDivision">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">InvalidHorizontalDivision</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#InvalidHorizontalDivision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.InvalidHorizontalDivision" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.InvalidDivision" title="eitprocessing.roi_selection.gridselection.InvalidDivision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidDivision</span></code></a></p>
+<p>Raised when the data can’t be divided into horizontal regions.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.InvalidVerticalDivision">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">InvalidVerticalDivision</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#InvalidVerticalDivision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.InvalidVerticalDivision" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.InvalidDivision" title="eitprocessing.roi_selection.gridselection.InvalidDivision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidDivision</span></code></a></p>
+<p>Raised when the data can’t be divided into vertical regions.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.DivisionWarning">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">DivisionWarning</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#DivisionWarning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.DivisionWarning" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Warning" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+<p>Base class for warning categories.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.UnevenDivision">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">UnevenDivision</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#UnevenDivision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.UnevenDivision" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.DivisionWarning" title="eitprocessing.roi_selection.gridselection.DivisionWarning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DivisionWarning</span></code></a></p>
+<p>Warning for when a grid selection results in groups of uneven size.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.UnevenHorizontalDivision">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">UnevenHorizontalDivision</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#UnevenHorizontalDivision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.UnevenHorizontalDivision" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.UnevenDivision" title="eitprocessing.roi_selection.gridselection.UnevenDivision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnevenDivision</span></code></a></p>
+<p>Warning for when a grid selection results in horizontal groups of uneven size.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.UnevenVerticalDivision">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">UnevenVerticalDivision</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#UnevenVerticalDivision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.UnevenVerticalDivision" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.UnevenDivision" title="eitprocessing.roi_selection.gridselection.UnevenDivision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnevenDivision</span></code></a></p>
+<p>Warning for when a grid selection results in vertical groups of uneven size.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.MoreGroupsThanVectors">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">MoreGroupsThanVectors</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#MoreGroupsThanVectors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.MoreGroupsThanVectors" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.DivisionWarning" title="eitprocessing.roi_selection.gridselection.DivisionWarning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DivisionWarning</span></code></a></p>
+<p>Warning for when the groups outnumber the available vectors.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.MoreVerticalGroupsThanRows">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">MoreVerticalGroupsThanRows</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#MoreVerticalGroupsThanRows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.MoreVerticalGroupsThanRows" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.MoreGroupsThanVectors" title="eitprocessing.roi_selection.gridselection.MoreGroupsThanVectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoreGroupsThanVectors</span></code></a></p>
+<p>Warning for when the vertical groups outnumber the available rows.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.MoreHorizontalGroupsThanColumns">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">MoreHorizontalGroupsThanColumns</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#MoreHorizontalGroupsThanColumns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.MoreHorizontalGroupsThanColumns" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.MoreGroupsThanVectors" title="eitprocessing.roi_selection.gridselection.MoreGroupsThanVectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoreGroupsThanVectors</span></code></a></p>
+<p>Warning for when the horizontal groups outnumber the available rows.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.VentralAndDorsal">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">VentralAndDorsal</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#VentralAndDorsal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.VentralAndDorsal" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection" title="eitprocessing.roi_selection.gridselection.GridSelection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridSelection</span></code></a></p>
+<p>Split data into a ventral and dorsal region of interest.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.VentralAndDorsal.v_split">
+<span class="sig-name descname"><span class="pre">v_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#VentralAndDorsal.v_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.VentralAndDorsal.v_split" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.VentralAndDorsal.h_split">
+<span class="sig-name descname"><span class="pre">h_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#VentralAndDorsal.h_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.VentralAndDorsal.h_split" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.VentralAndDorsal.split_rows">
+<span class="sig-name descname"><span class="pre">split_rows</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#VentralAndDorsal.split_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.VentralAndDorsal.split_rows" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.RightAndLeft">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">RightAndLeft</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#RightAndLeft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.RightAndLeft" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection" title="eitprocessing.roi_selection.gridselection.GridSelection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridSelection</span></code></a></p>
+<p>Split data into a right and left region of interest.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.RightAndLeft.v_split">
+<span class="sig-name descname"><span class="pre">v_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#RightAndLeft.v_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.RightAndLeft.v_split" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.RightAndLeft.h_split">
+<span class="sig-name descname"><span class="pre">h_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#RightAndLeft.h_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.RightAndLeft.h_split" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.RightAndLeft.split_columns">
+<span class="sig-name descname"><span class="pre">split_columns</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#RightAndLeft.split_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.RightAndLeft.split_columns" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.FourLayers">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">FourLayers</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#FourLayers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.FourLayers" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection" title="eitprocessing.roi_selection.gridselection.GridSelection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridSelection</span></code></a></p>
+<p>Split data vertically into four layer regions of interest.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.FourLayers.v_split">
+<span class="sig-name descname"><span class="pre">v_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#FourLayers.v_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.FourLayers.v_split" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.FourLayers.h_split">
+<span class="sig-name descname"><span class="pre">h_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#FourLayers.h_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.FourLayers.h_split" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.FourLayers.split_rows">
+<span class="sig-name descname"><span class="pre">split_rows</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#FourLayers.split_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.FourLayers.split_rows" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.Quadrants">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eitprocessing.roi_selection.gridselection.</span></span><span class="sig-name descname"><span class="pre">Quadrants</span></span><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#Quadrants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.Quadrants" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection" title="eitprocessing.roi_selection.gridselection.GridSelection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridSelection</span></code></a></p>
+<p>Split data into four quadrant regions of interest.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.Quadrants.v_split">
+<span class="sig-name descname"><span class="pre">v_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#Quadrants.v_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.Quadrants.v_split" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.Quadrants.h_split">
+<span class="sig-name descname"><span class="pre">h_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">]</span></span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#Quadrants.h_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.Quadrants.h_split" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.Quadrants.split_columns">
+<span class="sig-name descname"><span class="pre">split_columns</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#Quadrants.split_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.Quadrants.split_columns" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eitprocessing.roi_selection.gridselection.Quadrants.split_rows">
+<span class="sig-name descname"><span class="pre">split_rows</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../../_modules/eitprocessing/roi_selection/gridselection.html#Quadrants.split_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eitprocessing.roi_selection.gridselection.Quadrants.split_rows" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.roi_selection.gridselection</span></code></a><ul>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection"><code class="docutils literal notranslate"><span class="pre">GridSelection</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection.v_split"><code class="docutils literal notranslate"><span class="pre">GridSelection.v_split</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection.h_split"><code class="docutils literal notranslate"><span class="pre">GridSelection.h_split</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection.split_rows"><code class="docutils literal notranslate"><span class="pre">GridSelection.split_rows</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection.split_columns"><code class="docutils literal notranslate"><span class="pre">GridSelection.split_columns</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection.ignore_nan_rows"><code class="docutils literal notranslate"><span class="pre">GridSelection.ignore_nan_rows</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection.ignore_nan_columns"><code class="docutils literal notranslate"><span class="pre">GridSelection.ignore_nan_columns</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection.__post_init__"><code class="docutils literal notranslate"><span class="pre">GridSelection.__post_init__()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection.find_grid"><code class="docutils literal notranslate"><span class="pre">GridSelection.find_grid()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection._create_grouping_vector_no_split_pixels"><code class="docutils literal notranslate"><span class="pre">GridSelection._create_grouping_vector_no_split_pixels()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection._create_grouping_vector_split_pixels"><code class="docutils literal notranslate"><span class="pre">GridSelection._create_grouping_vector_split_pixels()</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.GridSelection.matrix_layout"><code class="docutils literal notranslate"><span class="pre">GridSelection.matrix_layout()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.InvalidDivision"><code class="docutils literal notranslate"><span class="pre">InvalidDivision</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.InvalidHorizontalDivision"><code class="docutils literal notranslate"><span class="pre">InvalidHorizontalDivision</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.InvalidVerticalDivision"><code class="docutils literal notranslate"><span class="pre">InvalidVerticalDivision</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.DivisionWarning"><code class="docutils literal notranslate"><span class="pre">DivisionWarning</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.UnevenDivision"><code class="docutils literal notranslate"><span class="pre">UnevenDivision</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.UnevenHorizontalDivision"><code class="docutils literal notranslate"><span class="pre">UnevenHorizontalDivision</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.UnevenVerticalDivision"><code class="docutils literal notranslate"><span class="pre">UnevenVerticalDivision</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.MoreGroupsThanVectors"><code class="docutils literal notranslate"><span class="pre">MoreGroupsThanVectors</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.MoreVerticalGroupsThanRows"><code class="docutils literal notranslate"><span class="pre">MoreVerticalGroupsThanRows</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.MoreHorizontalGroupsThanColumns"><code class="docutils literal notranslate"><span class="pre">MoreHorizontalGroupsThanColumns</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.VentralAndDorsal"><code class="docutils literal notranslate"><span class="pre">VentralAndDorsal</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.VentralAndDorsal.v_split"><code class="docutils literal notranslate"><span class="pre">VentralAndDorsal.v_split</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.VentralAndDorsal.h_split"><code class="docutils literal notranslate"><span class="pre">VentralAndDorsal.h_split</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.VentralAndDorsal.split_rows"><code class="docutils literal notranslate"><span class="pre">VentralAndDorsal.split_rows</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.RightAndLeft"><code class="docutils literal notranslate"><span class="pre">RightAndLeft</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.RightAndLeft.v_split"><code class="docutils literal notranslate"><span class="pre">RightAndLeft.v_split</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.RightAndLeft.h_split"><code class="docutils literal notranslate"><span class="pre">RightAndLeft.h_split</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.RightAndLeft.split_columns"><code class="docutils literal notranslate"><span class="pre">RightAndLeft.split_columns</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.FourLayers"><code class="docutils literal notranslate"><span class="pre">FourLayers</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.FourLayers.v_split"><code class="docutils literal notranslate"><span class="pre">FourLayers.v_split</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.FourLayers.h_split"><code class="docutils literal notranslate"><span class="pre">FourLayers.h_split</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.FourLayers.split_rows"><code class="docutils literal notranslate"><span class="pre">FourLayers.split_rows</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.Quadrants"><code class="docutils literal notranslate"><span class="pre">Quadrants</span></code></a><ul>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.Quadrants.v_split"><code class="docutils literal notranslate"><span class="pre">Quadrants.v_split</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.Quadrants.h_split"><code class="docutils literal notranslate"><span class="pre">Quadrants.h_split</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.Quadrants.split_columns"><code class="docutils literal notranslate"><span class="pre">Quadrants.split_columns</span></code></a></li>
+<li><a class="reference internal" href="#eitprocessing.roi_selection.gridselection.Quadrants.split_rows"><code class="docutils literal notranslate"><span class="pre">Quadrants.split_rows</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/autoapi/eitprocessing/roi_selection/gridselection/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">eitprocessing 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">eitprocessing.roi_selection.gridselection</span></code></a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Netherlands eScience Center, Erasmus MC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+    </div>
+  </body>
+</html>

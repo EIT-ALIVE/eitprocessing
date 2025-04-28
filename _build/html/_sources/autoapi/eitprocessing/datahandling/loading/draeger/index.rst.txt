@@ -1,0 +1,96 @@
+:py:mod:`eitprocessing.datahandling.loading.draeger`
+====================================================
+
+.. py:module:: eitprocessing.datahandling.loading.draeger
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.loading.draeger._MedibusField
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.loading.draeger.load_from_single_path
+   eitprocessing.datahandling.loading.draeger._convert_medibus_data
+   eitprocessing.datahandling.loading.draeger._read_frame
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.loading.draeger._FRAME_SIZE_BYTES
+   eitprocessing.datahandling.loading.draeger.DRAEGER_FRAMERATE
+   eitprocessing.datahandling.loading.draeger.load_draeger_data
+   eitprocessing.datahandling.loading.draeger._medibus_fields
+
+
+.. py:data:: _FRAME_SIZE_BYTES
+   :value: 4358
+
+   
+
+.. py:data:: DRAEGER_FRAMERATE
+   :value: 20
+
+   
+
+.. py:data:: load_draeger_data
+
+   
+
+.. py:function:: load_from_single_path(path: pathlib.Path, framerate: float | None = 20, first_frame: int = 0, max_frames: int | None = None) -> dict[str, eitprocessing.datahandling.datacollection.DataCollection]
+
+   Load Dräger EIT data from path.
+
+
+.. py:function:: _convert_medibus_data(medibus_data: numpy.typing.NDArray, time: numpy.typing.NDArray) -> tuple[eitprocessing.datahandling.datacollection.DataCollection, eitprocessing.datahandling.datacollection.DataCollection]
+
+
+.. py:function:: _read_frame(reader: eitprocessing.datahandling.loading.binreader.BinReader, index: int, time: numpy.typing.NDArray, pixel_impedance: numpy.typing.NDArray, medibus_data: numpy.typing.NDArray, events: list, phases: list, previous_marker: int | None) -> int
+
+   Read frame by frame data from DRAEGER files.
+
+   This method adds the loaded data to the provided arrays `time` and
+   `pixel_impedance` and the provided lists `events` and `phases` when the
+   index is non-negative. When the index is negative, no data is saved. In
+   any case, the event marker is returned.
+
+
+.. py:class:: _MedibusField
+
+   Bases: :py:obj:`NamedTuple`
+
+   .. py:attribute:: signal_name
+      :type: str
+
+      
+
+   .. py:attribute:: unit
+      :type: str
+
+      
+
+   .. py:attribute:: continuous
+      :type: bool
+
+      
+
+
+.. py:data:: _medibus_fields
+
+   
+

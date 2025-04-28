@@ -1,0 +1,41 @@
+:py:mod:`eitprocessing.datahandling.breath`
+===========================================
+
+.. py:module:: eitprocessing.datahandling.breath
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   eitprocessing.datahandling.breath.Breath
+
+
+
+
+.. py:class:: Breath
+
+   Bases: :py:obj:`NamedTuple`
+
+   Represents a breath with a start, middle and end index.
+
+   .. py:attribute:: start_time
+      :type: float
+
+      
+
+   .. py:attribute:: middle_time
+      :type: float
+
+      
+
+   .. py:attribute:: end_time
+      :type: float
+
+      
+
+
