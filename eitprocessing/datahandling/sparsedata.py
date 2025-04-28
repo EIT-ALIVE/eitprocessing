@@ -86,7 +86,7 @@ class SparseData(DataContainer, SelectByTime):
     def __add__(self: Self, other: Self) -> Self:
         return self.concatenate(other)
 
-    def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be moved to mixin in future
+    def concatenate(self, other: Self, newlabel: str | None = None) -> Self:  # noqa: D102, will be moved to mixin in future
         self.isequivalent(other, raise_=True)
 
         # TODO: make proper copy functions

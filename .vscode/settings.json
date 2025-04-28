@@ -36,5 +36,6 @@
   },
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
-  }
+  },
+  "ruff.lineLength": 120
 }
