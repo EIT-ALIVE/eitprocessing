@@ -178,17 +178,17 @@ class Sequence(Equivalence, SelectByTime):
     def data(self) -> _DataAccess:
         """Shortcut access to data stored in collections inside a sequence.
 
-        This allows all data objects stored in a collection inside a sequence can be accessed.
+        This allows all data objects stored in a collection inside a sequence to be accessed.
         Instead of `sequence.continuous_data["global_impedance"]` you can use
         `sequence.data["global_impedance"]`. This works for getting (`sequence.data["label"]` or
         `sequence.data.get("label")`) and adding data (`sequence.data["label"] = obj` or
-        `sequence.data.add("label", obj)`).
+        `sequence.data.add(obj)`).
 
         Other dict-like behaviour is also supported:
         - `label in sequence.data` to check whether an object with a label exists;
         - `del sequence.data[label]` to remove an object from the sequence based on the label;
         - `for label in sequence.data` to iterate over the labels;
-        - `sequence.data.items()` to retrieve a (list of label), object pairs, especially useful for iteration;
+        - `sequence.data.items()` to retrieve a list of (label, object) pairs, especially useful for iteration;
         - `sequence.data.labels()` or `sequence.data.keys()` to get a list of data labels;
         - `sequence.data.objects()` or `sequence.data.values()` to get a list of data objects.
 
