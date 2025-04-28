@@ -156,7 +156,7 @@ def load_from_single_path(
             time=np.array([t for t, d in phases if d == 1]),
         ),
     )
-    if len(events):
+    if events:
         time_, events_ = zip(*events, strict=True)
         time = np.array(time_)
         events = list(events_)
