@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import itertools
 from dataclasses import MISSING, dataclass, field
 from typing import TYPE_CHECKING, Any, TypeVar, overload
@@ -205,11 +206,14 @@ class _DataAccess:
     def __post_init__(self):
         for a, b in itertools.combinations(self._collections, 2):
             if duplicates := set(a) & set(b):
-                msg = (
-                    f"Duplicate labels ({', '.join(sorted(duplicates))}) found in {a} and {b}. "
-                    "You can't use this interface with duplicate labels."
-                )
-                raise KeyError(msg)
+                msg = f"Duplicate labels ({', '.join(sorted(duplicates))}) found in {a} and {b}."
+                exc = KeyError(msg)
+                with contextlib.suppress(AttributeError):
+                    exc.add_note(
+                        "You can't use the `data` interface with duplicate labels. "
+                        "Use the explicit data collections (`eit_data`, `continuous_data`, `sparse_data`, `interval_data`) instead."
+                    )
+                raise exc
 
     @property
     def _collections(self) -> tuple[DataCollection, ...]:
@@ -277,7 +281,13 @@ class _DataAccess:
         for object_ in obj:
             if self.get(object_.label, None):
                 msg = f"An object with the label {object_.label} already exists in this sequence."
-                raise KeyError(msg)
+                exc = KeyError(msg)
+                with contextlib.suppress(AttributeError):
+                    exc.add_note(
+                        "You can't add an object with the same label through the `data` interface. "
+                        "Use the explicit data collections (`eit_data`, `continuous_data`, `sparse_data`, `interval_data`) instead."
+                    )
+                raise exc
 
             match object_:
                 case ContinuousData():
