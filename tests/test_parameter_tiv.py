@@ -86,7 +86,7 @@ def mock_continuous_data():
         description="Global impedance created for testing TIV parameter",
         parameters={},
         derived_from="mock_eit_data",
-        time=np.linspace(0, 18, int(18 * 1000), endpoint=False),
+        time=np.linspace(0, 18, (18 * 1000), endpoint=False),
         values=mock_global_impedance(),
         sample_frequency=1000,
     )
@@ -98,7 +98,7 @@ def mock_eit_data():
     return EITData(
         path="",
         nframes=2000,
-        time=np.linspace(0, 18, int(18 * 1000), endpoint=False),
+        time=np.linspace(0, 18, (18 * 1000), endpoint=False),
         sample_frequency=1000,
         vendor=Vendor.DRAEGER,
         label="mock_eit_data",

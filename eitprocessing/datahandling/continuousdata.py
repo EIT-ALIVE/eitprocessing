@@ -107,10 +107,10 @@ class ContinuousData(DataContainer, SelectByTime):
         obj.unlock()
         return obj
 
-    def __add__(self: T, other: T) -> T:
+    def __add__(self: Self, other: Self) -> Self:
         return self.concatenate(other)
 
-    def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be removed soon
+    def concatenate(self: Self, other: Self, newlabel: str | None = None) -> Self:  # noqa: D102, will be removed soon
         # TODO: compare both concatenate methods and check what is needed from both and merge into one
         # Check that data can be concatenated
         self.isequivalent(other, raise_=True)
@@ -187,7 +187,7 @@ class ContinuousData(DataContainer, SelectByTime):
             >>> data.values = [1, 2, 3] # will result in an AttributeError
             >>> data.values[0] = 1      # will result in a RuntimeError
         """
-        if not len(attr):
+        if not attr:
             # default values are not allowed when using *attr, so set a default here if none is supplied
             attr = ("values",)
         for attr_ in attr:
@@ -214,7 +214,7 @@ class ContinuousData(DataContainer, SelectByTime):
             >>> print(data.values)
             1
         """
-        if not len(attr):
+        if not attr:
             # default values are not allowed when using *attr, so set a default here if none is supplied
             attr = ("values",)
         for attr_ in attr:

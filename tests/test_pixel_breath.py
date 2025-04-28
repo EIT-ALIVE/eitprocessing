@@ -345,7 +345,7 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
 
         for row, col in itertools.product(range(n_rows), range(n_cols)):
             filtered_values = [val for val in test_result[:, row, col] if val is not None]
-            if not len(filtered_values):
+            if not filtered_values:
                 return
             start_indices, middle_indices, end_indices = (list(x) for x in zip(*filtered_values, strict=True))
             # Test whether pixel breaths are sorted properly
