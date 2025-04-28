@@ -186,6 +186,7 @@ class Sequence(Equivalence, SelectByTime):
         `sequence.data.add(obj)`).
 
         Other dict-like behaviour is also supported:
+
         - `label in sequence.data` to check whether an object with a label exists;
         - `del sequence.data[label]` to remove an object from the sequence based on the label;
         - `for label in sequence.data` to iterate over the labels;
