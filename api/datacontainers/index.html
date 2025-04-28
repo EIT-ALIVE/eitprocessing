@@ -2225,13 +2225,15 @@ Instead of <code>sequence.continuous_data["global_impedance"]</code> you can use
 <code>sequence.data["global_impedance"]</code>. This works for getting (<code>sequence.data["label"]</code> or
 <code>sequence.data.get("label")</code>) and adding data (<code>sequence.data["label"] = obj</code> or
 <code>sequence.data.add(obj)</code>).</p>
-<p>Other dict-like behaviour is also supported:
-- <code>label in sequence.data</code> to check whether an object with a label exists;
-- <code>del sequence.data[label]</code> to remove an object from the sequence based on the label;
-- <code>for label in sequence.data</code> to iterate over the labels;
-- <code>sequence.data.items()</code> to retrieve a list of (label, object) pairs, especially useful for iteration;
-- <code>sequence.data.labels()</code> or <code>sequence.data.keys()</code> to get a list of data labels;
-- <code>sequence.data.objects()</code> or <code>sequence.data.values()</code> to get a list of data objects.</p>
+<p>Other dict-like behaviour is also supported:</p>
+<ul>
+<li><code>label in sequence.data</code> to check whether an object with a label exists;</li>
+<li><code>del sequence.data[label]</code> to remove an object from the sequence based on the label;</li>
+<li><code>for label in sequence.data</code> to iterate over the labels;</li>
+<li><code>sequence.data.items()</code> to retrieve a list of (label, object) pairs, especially useful for iteration;</li>
+<li><code>sequence.data.labels()</code> or <code>sequence.data.keys()</code> to get a list of data labels;</li>
+<li><code>sequence.data.objects()</code> or <code>sequence.data.values()</code> to get a list of data objects.</li>
+</ul>
 <p>This interface only works if the labels are unique among the data collections. An attempt
 to add a data object with an exiting label will result in a KeyError.</p>
     </div>
