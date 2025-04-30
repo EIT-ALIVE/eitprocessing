@@ -50,6 +50,7 @@ class PixelBreath:
         sequence: Sequence | None = None,
         store: bool | None = None,
         result_label: str = "pixel_breaths",
+        allow_negative_amplitude: bool = False,
     ) -> IntervalData:
         """Find pixel breaths in the data.
 
@@ -151,7 +152,7 @@ class PixelBreath:
                 # pixel has no amplitude
                 continue
 
-            if mean_tiv < 0:
+            if allow_negative_amplitude and mean_tiv < 0:
                 start_func, middle_func = np.argmax, np.argmin
             else:
                 start_func, middle_func = np.argmin, np.argmax
