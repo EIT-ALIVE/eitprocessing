@@ -147,25 +147,28 @@ class PixelBreath:
         for row, col in itertools.product(range(n_rows), range(n_cols)):
             mean_tiv = mean_tiv_pixel[row, col]
 
-            if np.any(pixel_impedance[:, row, col] > 0):
-                if mean_tiv < 0:
-                    start_func, middle_func = np.argmax, np.argmin
-                else:
-                    start_func, middle_func = np.argmin, np.argmax
+            if np.std(pixel_impedance[:, row, col]) == 0:
+                # pixel has no amplitude
+                continue
 
-                outsides = self._find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, start_func)
-                starts = outsides[:-1]
-                ends = outsides[1:]
-                middles = self._find_extreme_indices(pixel_impedance, outsides, row, col, middle_func)
-                # TODO discuss; this block of code is implemented to prevent noisy pixels from breaking the code.
-                # Quick solve is to make entire breath object None if any breath in a pixel does not have
-                # consecutive start, middle and end.
-                # However, this might cause problems elsewhere.
-                if (starts >= middles).any() or (middles >= ends).any():
-                    pixel_breath = None
-                else:
-                    pixel_breath = self._construct_breaths(starts, middles, ends, time)
-                pixel_breaths[:, row, col] = pixel_breath
+            if mean_tiv < 0:
+                start_func, middle_func = np.argmax, np.argmin
+            else:
+                start_func, middle_func = np.argmin, np.argmax
+
+            outsides = self._find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, start_func)
+            starts = outsides[:-1]
+            ends = outsides[1:]
+            middles = self._find_extreme_indices(pixel_impedance, outsides, row, col, middle_func)
+            # TODO discuss; this block of code is implemented to prevent noisy pixels from breaking the code.
+            # Quick solve is to make entire breath object None if any breath in a pixel does not have
+            # consecutive start, middle and end.
+            # However, this might cause problems elsewhere.
+            if (starts >= middles).any() or (middles >= ends).any():
+                pixel_breath = None
+            else:
+                pixel_breath = self._construct_breaths(starts, middles, ends, time)
+            pixel_breaths[:, row, col] = pixel_breath
 
         intervals = [(breath.start_time, breath.end_time) for breath in continuous_breaths.values]
 
