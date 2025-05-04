@@ -7,7 +7,6 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 
-from build.lib.eitprocessing.datahandling import breath
 from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
