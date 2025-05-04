@@ -1,6 +1,7 @@
 import itertools
 import sys
-from dataclasses import dataclass, field
+import warnings
+from dataclasses import InitVar, dataclass, field
 from functools import singledispatchmethod
 from typing import Final, Literal, NoReturn
 
@@ -17,6 +18,7 @@ from eitprocessing.features.pixel_breath import PixelBreath
 from eitprocessing.parameters import ParameterCalculation
 
 _SENTINAL_PIXEL_BREATH: Final = PixelBreath()
+_SENTINAL_BREATH_DETECTION: Final = BreathDetection()
 
 
 def _return_sentinal_pixel_breath() -> PixelBreath:
@@ -24,20 +26,41 @@ def _return_sentinal_pixel_breath() -> PixelBreath:
     return _SENTINAL_PIXEL_BREATH
 
 
+def _return_sentinal_breath_detection() -> BreathDetection:
+    # Returns a sential of a BreathDetection, which only exists to signal that the default value for breath_detection
+    # was used.
+    return _SENTINAL_BREATH_DETECTION
+
+
 @dataclass
 class TIV(ParameterCalculation):
     """Compute the tidal impedance variation (TIV) per breath."""
 
     method: Literal["extremes"] = "extremes"
-    breath_detection: BreathDetection = field(default_factory=BreathDetection)
+    breath_detection: BreathDetection = field(default_factory=_return_sentinal_breath_detection)
+    breath_detection_kwargs: InitVar[dict | None] = None
 
     # The default is a sentinal that will be replaced in __post_init__
     pixel_breath: PixelBreath = field(default_factory=_return_sentinal_pixel_breath)
 
-    def __post_init__(self) -> None:
+    def __post_init__(self, breath_detection_kwargs: dict | None) -> None:
         if self.method != "extremes":
             msg = f"Method {self.method} is not implemented. The method must be 'extremes'."
             raise NotImplementedError(msg)
+
+        if breath_detection_kwargs is not None:
+            if self.breath_detection is not _SENTINAL_BREATH_DETECTION:
+                msg = (
+                    "`breath_detection_kwargs` is deprecated, and can't be used at the same time as `breath_detection`."
+                )
+                raise TypeError(msg)
+
+            self.breath_detection = BreathDetection(**breath_detection_kwargs)
+            warnings.warn(
+                "`breath_detection_kwargs` is deprecated and will be removed soon. "
+                "Replace with `breath_detection=BreathDetection(**breath_detection_kwargs)`.",
+                DeprecationWarning,
+            )
 
         if self.pixel_breath is _SENTINAL_PIXEL_BREATH:
             # If no value was provided at initialization, PixelBreath should use the same BreathDetection object as TIV.
