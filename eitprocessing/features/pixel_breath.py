@@ -42,6 +42,7 @@ class PixelBreath:
     """
 
     breath_detection_kwargs: dict = field(default_factory=dict)
+    allow_negative_amplitude: bool = False
 
     def find_pixel_breaths(
         self,
@@ -50,7 +51,6 @@ class PixelBreath:
         sequence: Sequence | None = None,
         store: bool | None = None,
         result_label: str = "pixel_breaths",
-        allow_negative_amplitude: bool = False,
     ) -> IntervalData:
         """Find pixel breaths in the data.
 
@@ -152,7 +152,7 @@ class PixelBreath:
                 # pixel has no amplitude
                 continue
 
-            if allow_negative_amplitude and mean_tiv < 0:
+            if self.allow_negative_amplitude and mean_tiv < 0:
                 start_func, middle_func = np.argmax, np.argmin
             else:
                 start_func, middle_func = np.argmin, np.argmax
