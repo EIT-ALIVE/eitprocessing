@@ -1,4 +1,5 @@
 import itertools
+import sys
 from dataclasses import dataclass, field
 from functools import singledispatchmethod
 from typing import Final, Literal, NoReturn
@@ -284,6 +285,13 @@ class TIV(ParameterCalculation):
             mean_outer_values = data[[start_indices, end_indices]].mean(axis=0)
             end_inspiratory_values = data[middle_indices]
             tiv_values = end_inspiratory_values - mean_outer_values
+        else:
+            msg = f"`tiv_method` ({tiv_method}) not valid."
+            exc = ValueError(msg)
+            if sys.version_info >= (3, 11):
+                exc.add_note("Valid value for `tiv_method` are 'inspiratory', 'expiratory' and 'mean'.")
+            raise exc
+
         if tiv_timing == "pixel":
             tiv_values = [None, *tiv_values, None]
 
