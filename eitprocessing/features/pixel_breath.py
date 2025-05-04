@@ -180,7 +180,7 @@ class PixelBreath:
 
         return pixel_breaths_container
 
-    def _construct_breaths(self, start: list, middle: list, end: list, time: np.ndarray) -> list:
+    def _construct_breaths(self, start: list[int], middle: list[int], end: list[int], time: np.ndarray) -> list:
         breaths = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start, middle, end, strict=True)]
         # First and last breath are not detected by definition (need two breaths to find one breath)
         return [None, *breaths, None]
