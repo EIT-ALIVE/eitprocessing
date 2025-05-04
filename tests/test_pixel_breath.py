@@ -7,6 +7,7 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 
+from build.lib.eitprocessing.datahandling import breath
 from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
@@ -182,6 +183,17 @@ def mock_compute_pixel_parameter(mean: int):
         )
 
     return _mock
+
+
+def test_depricated():
+    with pytest.warns(DeprecationWarning):
+        _ = PixelBreath(breath_detection_kwargs={})
+
+    with pytest.raises(TypeError):
+        _ = PixelBreath(breath_detection=BreathDetection(), breath_detection_kwargs={})
+
+    bd_kwargs = {"minimum_duration": 10, "averaging_window_duration": 100.0}
+    assert PixelBreath(breath_detection_kwargs=bd_kwargs).breath_detection == BreathDetection(**bd_kwargs)
 
 
 def test__compute_breaths():

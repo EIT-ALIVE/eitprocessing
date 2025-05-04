@@ -1,15 +1,27 @@
 import itertools
+import warnings
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import InitVar, dataclass, field
+from typing import Final
 
 import numpy as np
 
+from eitprocessing.datahandling import breath
 from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
+from eitprocessing.features import breath_detection
 from eitprocessing.features.breath_detection import BreathDetection
+
+_SENTINAL_BREATH_DETECTION: Final = BreathDetection()
+
+
+def _return_sentinal_breath_detection() -> BreathDetection:
+    # Returns a sential of a BreathDetection, which only exists to signal that the default value for breath_detection
+    # was used.
+    return _SENTINAL_BREATH_DETECTION
 
 
 @dataclass
@@ -34,8 +46,24 @@ class PixelBreath:
         allow_negative_amplitude (bool): whether to asume out-of-phase pixels have negative amplitude instead.
     """
 
-    breath_detection: BreathDetection = field(default_factory=BreathDetection)
+    breath_detection: BreathDetection = field(default_factory=_return_sentinal_breath_detection)
+    breath_detection_kwargs: InitVar[dict | None] = None
     allow_negative_amplitude: bool = True
+
+    def __post_init__(self, breath_detection_kwargs: dict | None):
+        if breath_detection_kwargs is not None:
+            if self.breath_detection is not _SENTINAL_BREATH_DETECTION:
+                msg = (
+                    "`breath_detection_kwargs` is deprecated, and can't be used at the same time as `breath_detection`."
+                )
+                raise TypeError(msg)
+
+            self.breath_detection = BreathDetection(**breath_detection_kwargs)
+            warnings.warn(
+                "`breath_detection_kwargs` is deprecated and will be removed soon. "
+                "Replace with `breath_detection=BreathDetection(**breath_detection_kwargs)`.",
+                DeprecationWarning,
+            )
 
     def find_pixel_breaths(
         self,
