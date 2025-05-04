@@ -1,7 +1,7 @@
 import itertools
 from dataclasses import dataclass, field
 from functools import singledispatchmethod
-from typing import Literal, NoReturn
+from typing import Final, Literal, NoReturn
 
 import numpy as np
 
@@ -15,18 +15,34 @@ from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.features.pixel_breath import PixelBreath
 from eitprocessing.parameters import ParameterCalculation
 
+_SENTINAL_PIXEL_BREATH: Final = PixelBreath()
+
+
+def _return_sentinal_pixel_breath() -> PixelBreath:
+    # Returns a sential of a PixelBreath, which only exists to signal that the default value for pixel_breath was used.
+    return _SENTINAL_PIXEL_BREATH
+
 
 @dataclass
 class TIV(ParameterCalculation):
     """Compute the tidal impedance variation (TIV) per breath."""
 
     method: Literal["extremes"] = "extremes"
-    breath_detection_kwargs: dict = field(default_factory=dict)
+    breath_detection: BreathDetection = field(default_factory=BreathDetection)
+
+    # The default is a sentinal that will be replaced in __post_init__
+    pixel_breath: PixelBreath = field(default_factory=_return_sentinal_pixel_breath)
 
     def __post_init__(self) -> None:
         if self.method != "extremes":
             msg = f"Method {self.method} is not implemented. The method must be 'extremes'."
             raise NotImplementedError(msg)
+
+        if self.pixel_breath is _SENTINAL_PIXEL_BREATH:
+            # If no value was provided at initialization, PixelBreath should use the same BreathDetection object as TIV.
+            # However, a default factory cannot be used because it can't access self.breath_detection. The sentinal
+            # object is replaced here (only if pixel_breath was not provided) with the correct BreathDetection object.
+            self.pixel_breath = PixelBreath(breath_detection=self.breath_detection)
 
     @singledispatchmethod
     def compute_parameter(
@@ -101,7 +117,6 @@ class TIV(ParameterCalculation):
             category="impedance difference",
             time=[breath.middle_time for breath in breaths.values if breath is not None],
             description="Tidal impedance variation determined on continuous data",
-            parameters=self.breath_detection_kwargs,
             derived_from=[continuous_data],
             values=tiv_values,
         )
@@ -213,7 +228,6 @@ class TIV(ParameterCalculation):
             category="impedance difference",
             time=list(all_pixels_breath_timings),
             description="Tidal impedance variation determined on pixel impedance",
-            parameters=self.breath_detection_kwargs,
             derived_from=[eit_data],
             values=list(all_pixels_tiv_values.astype(float)),
         )
@@ -224,9 +238,7 @@ class TIV(ParameterCalculation):
         return tiv_container
 
     def _detect_breaths(self, data: ContinuousData) -> IntervalData:
-        bd_kwargs = self.breath_detection_kwargs.copy()
-        breath_detection = BreathDetection(**bd_kwargs)
-        return breath_detection.find_breaths(data)
+        return self.breath_detection.find_breaths(data)
 
     def _detect_pixel_breaths(
         self,
@@ -235,9 +247,7 @@ class TIV(ParameterCalculation):
         sequence: Sequence,
         store: bool,
     ) -> IntervalData:
-        bd_kwargs = self.breath_detection_kwargs.copy()
-        pi = PixelBreath(breath_detection_kwargs=bd_kwargs)
-        return pi.find_pixel_breaths(
+        return self.pixel_breath.find_pixel_breaths(
             eit_data,
             continuous_data,
             result_label="pixel breaths",
