@@ -6,13 +6,11 @@ from typing import Final
 
 import numpy as np
 
-from eitprocessing.datahandling import breath
 from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
-from eitprocessing.features import breath_detection
 from eitprocessing.features.breath_detection import BreathDetection
 
 _SENTINAL_BREATH_DETECTION: Final = BreathDetection()
