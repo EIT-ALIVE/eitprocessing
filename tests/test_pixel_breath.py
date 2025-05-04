@@ -15,6 +15,7 @@ from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
 from eitprocessing.features.pixel_breath import PixelBreath
+from tests.test_breath_detection import BreathDetection
 
 environment = Path(
     os.environ.get(
@@ -241,10 +242,10 @@ def test_store_result_with_errors(
     request: pytest.FixtureRequest,
     store_input: bool,
     sequence_fixture: str,
-    expected_exception: ValueError | RuntimeError,
+    expected_exception: type[ValueError | RuntimeError],
 ):
     """Test storing results when errors are expected."""
-    pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})  # Ensure that breaths are detected
+    pi = PixelBreath(breath_detection=BreathDetection(minimum_duration=0.01))  # Ensure that breaths are detected
 
     sequence = request.getfixturevalue(sequence_fixture)
 
@@ -271,7 +272,7 @@ def test_store_result_success(
     sequence_fixture: str,
 ):
     """Test storing results when no errors are expected."""
-    pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})  # Ensure that breaths are detected
+    pi = PixelBreath(breath_detection=BreathDetection(minimum_duration=0.01))  # Ensure that breaths are detected
 
     sequence = request.getfixturevalue(sequence_fixture)
 
@@ -303,7 +304,7 @@ def test_with_custom_mean_pixel_tiv(
         "eitprocessing.parameters.tidal_impedance_variation.TIV.compute_pixel_parameter",
         side_effect=mock_function,
     ):
-        pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})
+        pi = PixelBreath(breath_detection=BreathDetection(minimum_duration=0.01))
 
         result = pi.find_pixel_breaths(mock_eit_data, mock_continuous_data)
 
@@ -321,7 +322,7 @@ def test_with_custom_mean_pixel_tiv(
 
 
 def test_with_zero_impedance(mock_zero_eit_data: EITData, mock_continuous_data: ContinuousData):
-    pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})
+    pi = PixelBreath(breath_detection=BreathDetection(minimum_duration=0.01))
     breath_container = pi.find_pixel_breaths(mock_zero_eit_data, mock_continuous_data)
     test_result = np.stack(breath_container.values)
     assert np.all(np.vectorize(lambda x: x is None)(test_result[:, 1, 1]))
