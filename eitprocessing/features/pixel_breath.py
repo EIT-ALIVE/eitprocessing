@@ -42,7 +42,7 @@ class PixelBreath:
     """
 
     breath_detection_kwargs: dict = field(default_factory=dict)
-    allow_negative_amplitude: bool = False
+    allow_negative_amplitude: bool = True
 
     def find_pixel_breaths(
         self,
