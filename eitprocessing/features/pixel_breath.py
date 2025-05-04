@@ -31,6 +31,7 @@ class PixelBreath:
 
     Args:
         breath_detection (BreathDetection): BreathDetection object to use for detecing breaths.
+        allow_negative_amplitude (bool): whether to asume out-of-phase pixels have negative amplitude instead.
     """
 
     breath_detection: BreathDetection = field(default_factory=BreathDetection)
