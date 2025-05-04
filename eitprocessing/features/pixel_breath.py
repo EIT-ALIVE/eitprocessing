@@ -30,18 +30,10 @@ class PixelBreath:
     ```
 
     Args:
-    breath_detection_kwargs (dict): A dictionary of keyword arguments for breath detection.
-        The available keyword arguments are:
-        minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
-        averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
-        averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
-        amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed, defaults to 0.25
-        invalid_data_removal_window_length: window around invalid data in which breaths are removed, defaults to 0.5
-        invalid_data_removal_percentile: the nth percentile of values used to remove outliers, defaults to 5
-        invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4
+        breath_detection (BreathDetection): BreathDetection object to use for detecing breaths.
     """
 
-    breath_detection_kwargs: dict = field(default_factory=dict)
+    breath_detection: BreathDetection = field(default_factory=BreathDetection)
     allow_negative_amplitude: bool = True
 
     def find_pixel_breaths(
@@ -104,9 +96,7 @@ class PixelBreath:
             msg = "To store the result a Sequence dataclass must be provided."
             raise ValueError(msg)
 
-        bd_kwargs = self.breath_detection_kwargs.copy()
-        breath_detection = BreathDetection(**bd_kwargs)
-        continuous_breaths = breath_detection.find_breaths(continuous_data)
+        continuous_breaths = self.breath_detection.find_breaths(continuous_data)
 
         indices_breath_middles = np.searchsorted(
             eit_data.time,
@@ -182,7 +172,6 @@ class PixelBreath:
             values=list(
                 pixel_breaths,
             ),  ## TODO: change back to pixel_breaths array when IntervalData works with 3D array
-            parameters=self.breath_detection_kwargs,
             derived_from=[eit_data],
         )
         if store:
