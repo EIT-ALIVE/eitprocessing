@@ -1,5 +1,6 @@
-from dataclasses import dataclass, field
-from typing import Literal, get_args
+import warnings
+from dataclasses import InitVar, dataclass, field
+from typing import Final, Literal, get_args
 
 import numpy as np
 
@@ -10,15 +11,38 @@ from eitprocessing.datahandling.sparsedata import SparseData
 from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.parameters import ParameterCalculation
 
+_SENTINAL_BREATH_DETECTION: Final = BreathDetection()
+
+
+def _return_sentinal_breath_detection() -> BreathDetection:
+    # Returns a sential of a BreathDetection, which only exists to signal that the default value for breath_detection
+    # was used.
+    return _SENTINAL_BREATH_DETECTION
+
 
 @dataclass
 class EELI(ParameterCalculation):
     """Compute the end-expiratory lung impedance (EELI) per breath."""
 
+    breath_detection: BreathDetection = field(default_factory=_return_sentinal_breath_detection)
     method: Literal["breath_detection"] = "breath_detection"
-    breath_detection_kwargs: dict = field(default_factory=dict)
+    breath_detection_kwargs: InitVar[dict | None] = None
 
-    def __post_init__(self):
+    def __post_init__(self, breath_detection_kwargs: dict | None):
+        if breath_detection_kwargs is not None:
+            if self.breath_detection is not _SENTINAL_BREATH_DETECTION:
+                msg = (
+                    "`breath_detection_kwargs` is deprecated, and can't be used at the same time as `breath_detection`."
+                )
+                raise TypeError(msg)
+
+            self.breath_detection = BreathDetection(**breath_detection_kwargs)
+            warnings.warn(
+                "`breath_detection_kwargs` is deprecated and will be removed soon. "
+                "Replace with `breath_detection=BreathDetection(**breath_detection_kwargs)`.",
+                DeprecationWarning,
+            )
+
         _methods = get_args(EELI.__dataclass_fields__["method"].type)
         if self.method not in _methods:
             msg = f"Method {self.method} is not valid. Use any of {', '.join(_methods)}"
@@ -66,9 +90,7 @@ class EELI(ParameterCalculation):
 
         check_category(continuous_data, "impedance", raise_=True)
 
-        bd_kwargs = self.breath_detection_kwargs.copy()
-        breath_detection = BreathDetection(**bd_kwargs)
-        breaths = breath_detection.find_breaths(continuous_data)
+        breaths = self.breath_detection.find_breaths(continuous_data)
 
         if not len(breaths):
             time = np.array([], dtype=float)
