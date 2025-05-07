@@ -93,6 +93,16 @@ def test_eeli_values(repeat_n: int):  # noqa: ARG001
     assert np.array_equal(eeli_values, valley_values[1:])
 
 
+def test_bd_init():
+    assert EELI(breath_detection_kwargs={"minimum_duration": 0}) == EELI(
+        breath_detection=BreathDetection(minimum_duration=0)
+    )
+    with pytest.warns(DeprecationWarning):
+        EELI(breath_detection_kwargs={"minimum_duration": 0})
+    with pytest.raises(TypeError):
+        EELI(breath_detection_kwargs={"minimum_duration": 0}, breath_detection=BreathDetection(minimum_duration=0))
+
+
 def test_with_data(draeger1: Sequence, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
