@@ -5,6 +5,7 @@ from dataclasses import InitVar, dataclass, field
 from typing import Final
 
 import numpy as np
+from scipy import signal
 
 from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
@@ -14,6 +15,7 @@ from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
 
 _SENTINAL_BREATH_DETECTION: Final = BreathDetection()
+MAX_XCORR_LAG = 0.75
 
 
 def _return_sentinal_breath_detection() -> BreathDetection:
@@ -47,6 +49,7 @@ class PixelBreath:
     breath_detection: BreathDetection = field(default_factory=_return_sentinal_breath_detection)
     breath_detection_kwargs: InitVar[dict | None] = None
     allow_negative_amplitude: bool = True
+    correct_for_phase_shift: bool = True
 
     def __post_init__(self, breath_detection_kwargs: dict | None):
         if breath_detection_kwargs is not None:
@@ -63,7 +66,7 @@ class PixelBreath:
                 DeprecationWarning,
             )
 
-    def find_pixel_breaths(
+    def find_pixel_breaths(  # noqa: C901, PLR0912, PLR0915
         self,
         eit_data: EITData,
         continuous_data: ContinuousData,
@@ -162,6 +165,8 @@ class PixelBreath:
 
         pixel_breaths = np.full((len(continuous_breaths), n_rows, n_cols), None)
 
+        lags = signal.correlation_lags(len(continuous_data), len(continuous_data), mode="same")
+
         for row, col in itertools.product(range(n_rows), range(n_cols)):
             mean_tiv = mean_tiv_pixel[row, col]
 
@@ -171,10 +176,34 @@ class PixelBreath:
 
             if self.allow_negative_amplitude and mean_tiv < 0:
                 start_func, middle_func = np.argmax, np.argmin
+                lagged_indices_breath_middles = indices_breath_middles
             else:
                 start_func, middle_func = np.argmin, np.argmax
 
-            outsides = self._find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, start_func)
+                cd = continuous_data.values
+                cd -= np.nanmean(cd)
+                pi = pixel_impedance[:, row, col]
+                pi -= np.nanmean(pixel_impedance[:, row, col])
+
+                if self.correct_for_phase_shift:
+                    # search for maximum cross correlation within MAX_XCORR_LAG times the average
+                    # duration of a breath
+                    xcorr = signal.correlate(cd, pi, mode="same")
+                    max_lag = MAX_XCORR_LAG * np.mean(np.diff(indices_breath_middles))
+                    lag_range = (lags > -max_lag) & (lags < max_lag)
+                    # TODO: if this does not work, implement robust peak detection
+                    lag = lags[lag_range][np.argmax(xcorr[lag_range])]
+                    # positive lag: pixel inflates later than summed
+
+                    # shift search area
+                    lagged_indices_breath_middles = indices_breath_middles - lag
+                    lagged_indices_breath_middles = lagged_indices_breath_middles[
+                        (lagged_indices_breath_middles >= 0) & (lagged_indices_breath_middles < len(cd))
+                    ]
+                else:
+                    lagged_indices_breath_middles = indices_breath_middles
+
+            outsides = self._find_extreme_indices(pixel_impedance, lagged_indices_breath_middles, row, col, start_func)
             starts = outsides[:-1]
             ends = outsides[1:]
             middles = self._find_extreme_indices(pixel_impedance, outsides, row, col, middle_func)
@@ -242,5 +271,5 @@ class PixelBreath:
             are located for each time segment.
         """
         return np.array(
-            [function(pixel_impedance[times[i] : times[i + 1], row, col]) + times[i] for i in range(len(times) - 1)],
+            [function(pixel_impedance[t1:t2, row, col]) + t1 for t1, t2 in itertools.pairwise(times)],
         )
