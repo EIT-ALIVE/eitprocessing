@@ -180,9 +180,9 @@ class PixelBreath:
             else:
                 start_func, middle_func = np.argmin, np.argmax
 
-                cd = continuous_data.values
+                cd = np.copy(continuous_data.values)
                 cd -= np.nanmean(cd)
-                pi = pixel_impedance[:, row, col]
+                pi = np.copy(pixel_impedance[:, row, col])
                 pi -= np.nanmean(pixel_impedance[:, row, col])
 
                 if self.correct_for_phase_shift:
