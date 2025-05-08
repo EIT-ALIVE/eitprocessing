@@ -14,14 +14,14 @@ from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
 
-_SENTINAL_BREATH_DETECTION: Final = BreathDetection()
+_SENTINEL_BREATH_DETECTION: Final = BreathDetection()
 MAX_XCORR_LAG = 0.75
 
 
-def _return_sentinal_breath_detection() -> BreathDetection:
+def _return_sentinel_breath_detection() -> BreathDetection:
     # Returns a sential of a BreathDetection, which only exists to signal that the default value for breath_detection
     # was used.
-    return _SENTINAL_BREATH_DETECTION
+    return _SENTINEL_BREATH_DETECTION
 
 
 @dataclass
@@ -42,18 +42,18 @@ class PixelBreath:
     ```
 
     Args:
-        breath_detection (BreathDetection): BreathDetection object to use for detecing breaths.
         allow_negative_amplitude (bool): whether to asume out-of-phase pixels have negative amplitude instead.
+        breath_detection (BreathDetection): BreathDetection object to use for detecting breaths.
     """
 
-    breath_detection: BreathDetection = field(default_factory=_return_sentinal_breath_detection)
+    breath_detection: BreathDetection = field(default_factory=_return_sentinel_breath_detection)
     breath_detection_kwargs: InitVar[dict | None] = None
     allow_negative_amplitude: bool = True
     correct_for_phase_shift: bool = True
 
     def __post_init__(self, breath_detection_kwargs: dict | None):
         if breath_detection_kwargs is not None:
-            if self.breath_detection is not _SENTINAL_BREATH_DETECTION:
+            if self.breath_detection is not _SENTINEL_BREATH_DETECTION:
                 msg = (
                     "`breath_detection_kwargs` is deprecated, and can't be used at the same time as `breath_detection`."
                 )
