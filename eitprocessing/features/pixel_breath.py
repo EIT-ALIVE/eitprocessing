@@ -24,7 +24,7 @@ def _return_sentinel_breath_detection() -> BreathDetection:
     return _SENTINEL_BREATH_DETECTION
 
 
-@dataclass
+@dataclass(kw_only=True)
 class PixelBreath:
     """Algorithm for detecting timing of pixel breaths in pixel impedance data.
 
