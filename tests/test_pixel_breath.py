@@ -168,7 +168,7 @@ def none_sequence():
 
 
 def mock_compute_pixel_parameter(mean: int):
-    def _mock(*_args, **_kwargs) -> np.ndarray:
+    def _mock(*_args, **_kwargs) -> SparseData:
         return SparseData(
             label="mock_sparse_data",
             name="Tidal impedance variation",
@@ -347,12 +347,13 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
     draeger1 = copy.deepcopy(draeger1)
     timpel1 = copy.deepcopy(timpel1)
     for sequence in draeger1, timpel1:
-        ssequence = sequence[0:500]
+        ssequence = sequence
         pi = PixelBreath()
         eit_data = ssequence.eit_data["raw"]
         cd = ssequence.continuous_data["global_impedance_(raw)"]
         pixel_breaths = pi.find_pixel_breaths(eit_data, cd)
         test_result = np.stack(pixel_breaths.values)
+        assert not np.all(test_result == None)
         _, n_rows, n_cols = test_result.shape
 
         for row, col in itertools.product(range(n_rows), range(n_cols)):
