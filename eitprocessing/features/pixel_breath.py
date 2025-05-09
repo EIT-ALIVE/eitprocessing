@@ -1,8 +1,11 @@
 import itertools
+import warnings
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import InitVar, dataclass, field
+from typing import Final, Literal
 
 import numpy as np
+from scipy import signal
 
 from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
@@ -11,8 +14,17 @@ from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
 
+_SENTINEL_BREATH_DETECTION: Final = BreathDetection()
+MAX_XCORR_LAG = 0.75
 
-@dataclass
+
+def _return_sentinel_breath_detection() -> BreathDetection:
+    # Returns a sential of a BreathDetection, which only exists to signal that the default value for breath_detection
+    # was used.
+    return _SENTINEL_BREATH_DETECTION
+
+
+@dataclass(kw_only=True)
 class PixelBreath:
     """Algorithm for detecting timing of pixel breaths in pixel impedance data.
 
@@ -20,6 +32,16 @@ class PixelBreath:
     end of expiration in pixel impedance data. It uses BreathDetection to find the global start and end
     of inspiration and expiration. These points are then used to find the start/end of pixel
     inspiration/expiration in pixel impedance data.
+
+    Some pixel breaths may be phase shifted (inflation starts and ends later compared to others, e.g., due to pendelluft
+    or late airway opening). Other pixel breaths may have a negative amplitude (impedance decreases during inspiration,
+    e.g., due to pleural effusion or reconstruction artifacts). It is not always possible to determine whether a pixel
+    is out of phase or has a negative amplitude. PixelBreath has three different phase correction modes. In 'negative
+    amplitude' mode (default), pixels that have a decrease in amplitude between the start and end of globally defined
+    inspiration, will have a negative amplitude and smaller phase shift. In 'phase shift' mode, all pixel breaths will
+    have positive amplitudes, but can have large phase shifts. In 'none'/`None` mode, all pixels are assumed to be
+    within rouglhy -90 to 90 degrees of phase. Note that the 'none' mode can lead to unexpected results, such as
+    ultra-short (down to 2 frames) or very long breaths.
 
     Example:
     ```
@@ -30,20 +52,30 @@ class PixelBreath:
     ```
 
     Args:
-    breath_detection_kwargs (dict): A dictionary of keyword arguments for breath detection.
-        The available keyword arguments are:
-        minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
-        averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
-        averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
-        amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed, defaults to 0.25
-        invalid_data_removal_window_length: window around invalid data in which breaths are removed, defaults to 0.5
-        invalid_data_removal_percentile: the nth percentile of values used to remove outliers, defaults to 5
-        invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4
+        breath_detection (BreathDetection): BreathDetection object to use for detecting breaths.
+        phase_correction_mode: How to resolve pixels that are out-of-phase. Defaults to "negative amplitude".
     """
 
-    breath_detection_kwargs: dict = field(default_factory=dict)
+    breath_detection: BreathDetection = field(default_factory=_return_sentinel_breath_detection)
+    breath_detection_kwargs: InitVar[dict | None] = None
+    phase_correction_mode: Literal["negative amplitude", "phase shift", "none"] | None = "negative amplitude"
 
-    def find_pixel_breaths(
+    def __post_init__(self, breath_detection_kwargs: dict | None):
+        if breath_detection_kwargs is not None:
+            if self.breath_detection is not _SENTINEL_BREATH_DETECTION:
+                msg = (
+                    "`breath_detection_kwargs` is deprecated, and can't be used at the same time as `breath_detection`."
+                )
+                raise TypeError(msg)
+
+            self.breath_detection = BreathDetection(**breath_detection_kwargs)
+            warnings.warn(
+                "`breath_detection_kwargs` is deprecated and will be removed soon. "
+                "Replace with `breath_detection=BreathDetection(**breath_detection_kwargs)`.",
+                DeprecationWarning,
+            )
+
+    def find_pixel_breaths(  # noqa: C901, PLR0912, PLR0915
         self,
         eit_data: EITData,
         continuous_data: ContinuousData,
@@ -53,36 +85,29 @@ class PixelBreath:
     ) -> IntervalData:
         """Find pixel breaths in the data.
 
-        This method finds the pixel start/end of inspiration/expiration
-        based on the start/end of inspiration/expiration as detected
-        in the continuous data.
+        This method finds the pixel start/end of inspiration/expiration based on the start/end of inspiration/expiration
+        as detected in the continuous data.
 
-        If pixel impedance is in phase (within 180 degrees) with the continuous data,
-        the start of breath of that pixel is defined as the local minimum between
-        two end-inspiratory points in the continuous signal.
-        The end of expiration of that pixel is defined as the local minimum between two
-        consecutive end-inspiratory points in the continuous data.
-        The end of inspiration of that pixel is defined as the local maximum between
-        the start of inspiration and end of expiration of that pixel.
+        For most pixels, the start of a breath (start inspiration) is the valley between the middles (start of
+        expiration) of the globally defined breaths on either side. The end of a pixel breath is the start of the next
+        pixel breath. The middle of the pixel breath is the peak between the start and end of the pixel breath.
 
-        If pixel impedance is out of phase with the continuous signal,
-        the start of inspiration of that pixel is defined as the local maximum between
-        two end-inspiration points in the continuous data.
-        The end of expiration of that pixel is defined as the local maximum between two
-        consecutive end-inspiratory points in the continuous data.
-        The end of inspiration of that pixel is defined as the local minimum between
-        the start of inspiration and end of expiration of that pixel.
+        If the pixel is out of phase or has negative amplitude, the definition of the breath depends on the phase
+        correction mode. In 'negative amplitude' mode, the start of a breath is the peak between the middles of the
+        globally defined breaths on either side, while the middle of the pixel breath is the valley of the start and end
+        of the pixel breath. In 'phase shift' mode, first the phase shift between the pixel impedance and global
+        impedance is determined as the highest crosscorrelation between the signals near a phase shift of 0. The start
+        of breath is the valley between the phase shifted middles of the globally defined breaths on either side.
 
-        Pixel breaths are constructed as a valley-peak-valley combination,
-        representing the start of inspiration, the end of inspiration/start of
-        expiration, and end of expiration.
+        Pixel breaths are constructed as a valley-peak-valley combination, representing the start of inspiration, the
+        end of inspiration/start of expiration, and end of expiration.
 
         Args:
-            eit_data: EITData to apply the algorithm to
-            continuous_data: ContinuousData to use for global breath detection
+            eit_data: EITData to apply the algorithm to.
+            continuous_data: ContinuousData to use for global breath detection.
             result_label: label of the returned IntervalData object, defaults to `'pixel_breaths'`.
-            sequence: optional, Sequence that contains the object to detect pixel breaths in,
-            and/or to store the result in.
+            sequence: optional, Sequence that contains the object to detect pixel breaths in, and/or to store the result
+            in.
             store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
 
         Returns:
@@ -103,9 +128,7 @@ class PixelBreath:
             msg = "To store the result a Sequence dataclass must be provided."
             raise ValueError(msg)
 
-        bd_kwargs = self.breath_detection_kwargs.copy()
-        breath_detection = BreathDetection(**bd_kwargs)
-        continuous_breaths = breath_detection.find_breaths(continuous_data)
+        continuous_breaths = self.breath_detection.find_breaths(continuous_data)
 
         indices_breath_middles = np.searchsorted(
             eit_data.time,
@@ -144,28 +167,72 @@ class PixelBreath:
 
         pixel_breaths = np.full((len(continuous_breaths), n_rows, n_cols), None)
 
+        lags = signal.correlation_lags(len(continuous_data), len(continuous_data), mode="same")
+
+        match self.phase_correction_mode:
+            case "negative amplitude":
+                allow_negative_amplitude = True
+                correct_for_phase_shift = None
+            case "phase shift":
+                allow_negative_amplitude = False
+                correct_for_phase_shift = True
+            case "none" | None:
+                allow_negative_amplitude = False
+                correct_for_phase_shift = False
+            case _:
+                msg = f"Unknown phase correction mode ({self.phase_correction_mode})."
+                raise ValueError(msg)
+
         for row, col in itertools.product(range(n_rows), range(n_cols)):
             mean_tiv = mean_tiv_pixel[row, col]
 
-            if np.any(pixel_impedance[:, row, col] > 0):
-                if mean_tiv < 0:
-                    start_func, middle_func = np.argmax, np.argmin
-                else:
-                    start_func, middle_func = np.argmin, np.argmax
+            if np.std(pixel_impedance[:, row, col]) == 0:
+                # pixel has no amplitude
+                continue
 
-                outsides = self._find_extreme_indices(pixel_impedance, indices_breath_middles, row, col, start_func)
-                starts = outsides[:-1]
-                ends = outsides[1:]
-                middles = self._find_extreme_indices(pixel_impedance, outsides, row, col, middle_func)
-                # TODO discuss; this block of code is implemented to prevent noisy pixels from breaking the code.
-                # Quick solve is to make entire breath object None if any breath in a pixel does not have
-                # consecutive start, middle and end.
-                # However, this might cause problems elsewhere.
-                if (starts >= middles).any() or (middles >= ends).any():
-                    pixel_breath = None
+            if allow_negative_amplitude and mean_tiv < 0:
+                start_func, middle_func = np.argmax, np.argmin
+                lagged_indices_breath_middles = indices_breath_middles
+            else:
+                start_func, middle_func = np.argmin, np.argmax
+
+                cd = np.copy(continuous_data.values)
+                cd -= np.nanmean(cd)
+                pi = np.copy(pixel_impedance[:, row, col])
+                pi -= np.nanmean(pixel_impedance[:, row, col])
+
+                if correct_for_phase_shift:
+                    # search for maximum cross correlation within MAX_XCORR_LAG times the average
+                    # duration of a breath
+                    xcorr = signal.correlate(cd, pi, mode="same")
+                    max_lag = MAX_XCORR_LAG * np.mean(np.diff(indices_breath_middles))
+                    lag_range = (lags > -max_lag) & (lags < max_lag)
+                    # TODO: if this does not work, implement robust peak detection
+
+                    # positive lag: pixel inflates later than summed
+                    lag = lags[lag_range][np.argmax(xcorr[lag_range])]
+
+                    # shift search area
+                    lagged_indices_breath_middles = indices_breath_middles - lag
+                    lagged_indices_breath_middles = lagged_indices_breath_middles[
+                        (lagged_indices_breath_middles >= 0) & (lagged_indices_breath_middles < len(cd))
+                    ]
                 else:
-                    pixel_breath = self._construct_breaths(starts, middles, ends, time)
-                pixel_breaths[:, row, col] = pixel_breath
+                    lagged_indices_breath_middles = indices_breath_middles
+
+            outsides = self._find_extreme_indices(pixel_impedance, lagged_indices_breath_middles, row, col, start_func)
+            starts = outsides[:-1]
+            ends = outsides[1:]
+            middles = self._find_extreme_indices(pixel_impedance, outsides, row, col, middle_func)
+            # TODO discuss; this block of code is implemented to prevent noisy pixels from breaking the code.
+            # Quick solve is to make entire breath object None if any breath in a pixel does not have
+            # consecutive start, middle and end.
+            # However, this might cause problems elsewhere.
+            if (starts >= middles).any() or (middles >= ends).any():
+                pixel_breath = None
+            else:
+                pixel_breath = self._construct_breaths(starts, middles, ends, time)
+            pixel_breaths[:, row, col] = pixel_breath
 
         intervals = [(breath.start_time, breath.end_time) for breath in continuous_breaths.values]
 
@@ -178,7 +245,6 @@ class PixelBreath:
             values=list(
                 pixel_breaths,
             ),  ## TODO: change back to pixel_breaths array when IntervalData works with 3D array
-            parameters=self.breath_detection_kwargs,
             derived_from=[eit_data],
         )
         if store:
@@ -186,7 +252,7 @@ class PixelBreath:
 
         return pixel_breaths_container
 
-    def _construct_breaths(self, start: list, middle: list, end: list, time: np.ndarray) -> list:
+    def _construct_breaths(self, start: list[int], middle: list[int], end: list[int], time: np.ndarray) -> list:
         breaths = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start, middle, end, strict=True)]
         # First and last breath are not detected by definition (need two breaths to find one breath)
         return [None, *breaths, None]
@@ -222,5 +288,5 @@ class PixelBreath:
             are located for each time segment.
         """
         return np.array(
-            [function(pixel_impedance[times[i] : times[i + 1], row, col]) + times[i] for i in range(len(times) - 1)],
+            [function(pixel_impedance[t1:t2, row, col]) + t1 for t1, t2 in itertools.pairwise(times)],
         )

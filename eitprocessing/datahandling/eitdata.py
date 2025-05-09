@@ -86,10 +86,10 @@ class EITData(DataContainer, SelectByTime):
             return [Path(p) for p in path]
         return [Path(path)]
 
-    def __add__(self: T, other: T) -> T:
+    def __add__(self: Self, other: Self) -> Self:
         return self.concatenate(other)
 
-    def concatenate(self: T, other: T, newlabel: str | None = None) -> T:  # noqa: D102, will be moved to mixin in future
+    def concatenate(self: Self, other: Self, newlabel: str | None = None) -> Self:  # noqa: D102, will be moved to mixin in future
         # Check that data can be concatenated
         self.isequivalent(other, raise_=True)
         if np.min(other.time) <= np.max(self.time):

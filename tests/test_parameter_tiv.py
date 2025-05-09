@@ -13,6 +13,7 @@ from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
 from eitprocessing.parameters.tidal_impedance_variation import TIV
+from tests.test_breath_detection import BreathDetection
 
 environment = Path(
     os.environ.get(
@@ -86,7 +87,7 @@ def mock_continuous_data():
         description="Global impedance created for testing TIV parameter",
         parameters={},
         derived_from="mock_eit_data",
-        time=np.linspace(0, 18, int(18 * 1000), endpoint=False),
+        time=np.linspace(0, 18, (18 * 1000), endpoint=False),
         values=mock_global_impedance(),
         sample_frequency=1000,
     )
@@ -98,7 +99,7 @@ def mock_eit_data():
     return EITData(
         path="",
         nframes=2000,
-        time=np.linspace(0, 18, int(18 * 1000), endpoint=False),
+        time=np.linspace(0, 18, (18 * 1000), endpoint=False),
         sample_frequency=1000,
         vendor=Vendor.DRAEGER,
         label="mock_eit_data",
@@ -144,7 +145,18 @@ def test_tiv_initialization():
     """Test that TIV initializes correctly with default parameters."""
     tiv = TIV()
     assert tiv.method == "extremes"
-    assert tiv.breath_detection_kwargs == {}
+    assert tiv.breath_detection == BreathDetection()
+
+
+def test_depricated():
+    with pytest.warns(DeprecationWarning):
+        _ = TIV(breath_detection_kwargs={})
+
+    with pytest.raises(TypeError):
+        _ = TIV(breath_detection=BreathDetection(), breath_detection_kwargs={})
+
+    bd_kwargs = {"minimum_duration": 10, "averaging_window_duration": 100.0}
+    assert TIV(breath_detection_kwargs=bd_kwargs).breath_detection == BreathDetection(**bd_kwargs)
 
 
 def test_compute_parameter_type_error():
@@ -508,21 +520,35 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
     [
         ({"amplitude_cutoff_fraction": 0.3, "minimum_duration": 5.0}, ValueError),  # too long duration
         ({"amplitude_cutoff_fraction": 2, "minimum_duration": 5.0}, ValueError),  # too high amplitude cutoff
-        ({"minimum_amplitude": 2, "minimum_duration": 5.0}, TypeError),  # unexpected keyword minimum_amplitude
     ],
 )
 def test_detect_pixel_breaths_with_invalid_bd_kwargs(
     bd_kwargs: dict,
-    expected_error: ValueError,
+    expected_error: type[Exception],
     mock_eit_data: EITData,
     mock_continuous_data: ContinuousData,
     mock_sequence: Sequence,
 ):
     """Test detect_pixel_breaths with invalid bd_kwargs that raise errors."""
-    tiv = TIV(breath_detection_kwargs=bd_kwargs)
+    tiv = TIV(breath_detection=BreathDetection(**bd_kwargs))
 
     with pytest.raises(expected_error):
         tiv._detect_pixel_breaths(mock_eit_data, mock_continuous_data, mock_sequence, store=False)
+
+
+@pytest.mark.parametrize(
+    ("bd_kwargs", "expected_error"),
+    [
+        ({"minimum_amplitude": 2, "minimum_duration": 5.0}, TypeError),  # unexpected keyword minimum_amplitude
+    ],
+)
+def test_detect_pixel_breaths_with_invalid_bd_kwargs_(
+    bd_kwargs: dict,
+    expected_error: type[Exception],
+):
+    """Test detect_pixel_breaths with invalid bd_kwargs that raise errors."""
+    with pytest.raises(expected_error):
+        _ = TIV(breath_detection=BreathDetection(**bd_kwargs))
 
 
 @pytest.mark.parametrize(
@@ -540,7 +566,7 @@ def test_detect_pixel_breaths_with_valid_bd_kwargs(
     mock_sequence: Sequence,
 ):
     """Test detect_pixel_breaths with valid bd_kwargs that return expected results."""
-    tiv = TIV(breath_detection_kwargs=bd_kwargs)
+    tiv = TIV(breath_detection=BreathDetection(**bd_kwargs))
 
     result = tiv._detect_pixel_breaths(mock_eit_data, mock_continuous_data, mock_sequence, store=False)
     test_result = np.stack(result.values)

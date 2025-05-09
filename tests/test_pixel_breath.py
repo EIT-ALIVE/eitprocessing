@@ -15,6 +15,7 @@ from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
 from eitprocessing.features.pixel_breath import PixelBreath
+from tests.test_breath_detection import BreathDetection
 
 environment = Path(
     os.environ.get(
@@ -167,7 +168,7 @@ def none_sequence():
 
 
 def mock_compute_pixel_parameter(mean: int):
-    def _mock(*_args, **_kwargs) -> np.ndarray:
+    def _mock(*_args, **_kwargs) -> SparseData:
         return SparseData(
             label="mock_sparse_data",
             name="Tidal impedance variation",
@@ -181,6 +182,17 @@ def mock_compute_pixel_parameter(mean: int):
         )
 
     return _mock
+
+
+def test_depricated():
+    with pytest.warns(DeprecationWarning):
+        _ = PixelBreath(breath_detection_kwargs={})
+
+    with pytest.raises(TypeError):
+        _ = PixelBreath(breath_detection=BreathDetection(), breath_detection_kwargs={})
+
+    bd_kwargs = {"minimum_duration": 10, "averaging_window_duration": 100.0}
+    assert PixelBreath(breath_detection_kwargs=bd_kwargs).breath_detection == BreathDetection(**bd_kwargs)
 
 
 def test__compute_breaths():
@@ -241,10 +253,10 @@ def test_store_result_with_errors(
     request: pytest.FixtureRequest,
     store_input: bool,
     sequence_fixture: str,
-    expected_exception: ValueError | RuntimeError,
+    expected_exception: type[ValueError | RuntimeError],
 ):
     """Test storing results when errors are expected."""
-    pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})  # Ensure that breaths are detected
+    pi = PixelBreath(breath_detection=BreathDetection(minimum_duration=0.01))  # Ensure that breaths are detected
 
     sequence = request.getfixturevalue(sequence_fixture)
 
@@ -271,7 +283,7 @@ def test_store_result_success(
     sequence_fixture: str,
 ):
     """Test storing results when no errors are expected."""
-    pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})  # Ensure that breaths are detected
+    pi = PixelBreath(breath_detection=BreathDetection(minimum_duration=0.01))  # Ensure that breaths are detected
 
     sequence = request.getfixturevalue(sequence_fixture)
 
@@ -303,7 +315,7 @@ def test_with_custom_mean_pixel_tiv(
         "eitprocessing.parameters.tidal_impedance_variation.TIV.compute_pixel_parameter",
         side_effect=mock_function,
     ):
-        pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})
+        pi = PixelBreath(breath_detection=BreathDetection(minimum_duration=0.01))
 
         result = pi.find_pixel_breaths(mock_eit_data, mock_continuous_data)
 
@@ -321,7 +333,7 @@ def test_with_custom_mean_pixel_tiv(
 
 
 def test_with_zero_impedance(mock_zero_eit_data: EITData, mock_continuous_data: ContinuousData):
-    pi = PixelBreath(breath_detection_kwargs={"minimum_duration": 0.01})
+    pi = PixelBreath(breath_detection=BreathDetection(minimum_duration=0.01))
     breath_container = pi.find_pixel_breaths(mock_zero_eit_data, mock_continuous_data)
     test_result = np.stack(breath_container.values)
     assert np.all(np.vectorize(lambda x: x is None)(test_result[:, 1, 1]))
@@ -335,17 +347,18 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
     draeger1 = copy.deepcopy(draeger1)
     timpel1 = copy.deepcopy(timpel1)
     for sequence in draeger1, timpel1:
-        ssequence = sequence[0:500]
+        ssequence = sequence
         pi = PixelBreath()
         eit_data = ssequence.eit_data["raw"]
         cd = ssequence.continuous_data["global_impedance_(raw)"]
         pixel_breaths = pi.find_pixel_breaths(eit_data, cd)
         test_result = np.stack(pixel_breaths.values)
+        assert not np.all(test_result == None)
         _, n_rows, n_cols = test_result.shape
 
         for row, col in itertools.product(range(n_rows), range(n_cols)):
             filtered_values = [val for val in test_result[:, row, col] if val is not None]
-            if not len(filtered_values):
+            if not filtered_values:
                 return
             start_indices, middle_indices, end_indices = (list(x) for x in zip(*filtered_values, strict=True))
             # Test whether pixel breaths are sorted properly
@@ -367,3 +380,44 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
             for breath in filtered_values:
                 # Test whether the indices are in the proper order within a breath
                 assert breath.start_time < breath.middle_time < breath.end_time
+
+
+def test_phase_modes(draeger1: Sequence, pytestconfig: pytest.Config):
+    if pytestconfig.getoption("--cov"):
+        pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
+
+    ssequence = draeger1
+    eit_data = ssequence.eit_data["raw"]
+
+    # reduce the pixel set to middly 'well-behaved' pixels with positive TIV
+    eit_data.pixel_impedance = eit_data.pixel_impedance[:, 10:23, 10:23]
+
+    # flip a single pixel, so the differences between algorithms becomes predictable
+    eit_data.pixel_impedance[:, 6, 6] = -eit_data.pixel_impedance[:, 6, 6]
+
+    cd = ssequence.continuous_data["global_impedance_(raw)"]
+
+    # replace the 'global' data with the sum of the middly pixels
+    cd.values = np.sum(eit_data.pixel_impedance, axis=(1, 2))
+
+    pb_negative_amplitude = PixelBreath(phase_correction_mode="negative amplitude").find_pixel_breaths(eit_data, cd)
+    pb_phase_shift = PixelBreath(phase_correction_mode="phase shift").find_pixel_breaths(eit_data, cd)
+
+    # results are not compared, other than for length; just make sure it runs
+    pb_none = PixelBreath(phase_correction_mode="none").find_pixel_breaths(eit_data, cd)
+
+    assert len(pb_negative_amplitude) == len(pb_phase_shift) == len(pb_none)
+
+    # all breaths, except for the first and last,  should have been detected
+    assert not np.any(np.array(pb_negative_amplitude.values)[1:-1] == None)
+    assert not np.any(np.array(pb_phase_shift.values)[1:-1] == None)
+
+    same_pixel_timing = np.array(pb_negative_amplitude.values) == np.array(pb_phase_shift.values)
+    assert not np.all(same_pixel_timing)
+    assert not np.any(same_pixel_timing[1:-1, 6, 6])  # the single flipped pixel
+    assert np.all(same_pixel_timing[1:-1, :6, :])  # all pixels in the rows above match
+    assert np.all(same_pixel_timing[1:-1, 7:, :])  # all pixels in the rows below match
+    assert np.all(same_pixel_timing[1:-1, :, :6])  # all pixels in the columns to the left match
+    assert np.all(same_pixel_timing[1:-1, :, 7:])  # all pixels in the columns to the right match
+    assert np.all(same_pixel_timing[0, :, :])  # all first values match, because they are all None
+    assert np.all(same_pixel_timing[-1, :, :])  # all last values match, because they are all None

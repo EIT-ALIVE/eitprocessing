@@ -62,7 +62,7 @@ class SelectByIndex(ABC):
         return self._sliced_copy(start_index=start, end_index=end, newlabel=newlabel)
 
     @abstractmethod
-    def __len__(self): ...
+    def __len__(self) -> int: ...
 
     @abstractmethod
     def _sliced_copy(
