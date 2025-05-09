@@ -2,7 +2,7 @@ import itertools
 import warnings
 from collections.abc import Callable
 from dataclasses import InitVar, dataclass, field
-from typing import Final
+from typing import Final, Literal
 
 import numpy as np
 from scipy import signal
@@ -42,14 +42,13 @@ class PixelBreath:
     ```
 
     Args:
-        allow_negative_amplitude (bool): whether to asume out-of-phase pixels have negative amplitude instead.
         breath_detection (BreathDetection): BreathDetection object to use for detecting breaths.
+        phase_correction_mode: How to resolve pixels that are out-of-phase. Defaults to "negative amplitude".
     """
 
     breath_detection: BreathDetection = field(default_factory=_return_sentinel_breath_detection)
     breath_detection_kwargs: InitVar[dict | None] = None
-    allow_negative_amplitude: bool = True
-    correct_for_phase_shift: bool = True
+    phase_correction_mode: Literal["negative amplitude", "phase shift", "none"] | None = "negative amplitude"
 
     def __post_init__(self, breath_detection_kwargs: dict | None):
         if breath_detection_kwargs is not None:
@@ -167,6 +166,20 @@ class PixelBreath:
 
         lags = signal.correlation_lags(len(continuous_data), len(continuous_data), mode="same")
 
+        match self.phase_correction_mode:
+            case "negative amplitude":
+                allow_negative_amplitude = True
+                correct_for_phase_shift = None
+            case "phase shift":
+                allow_negative_amplitude = False
+                correct_for_phase_shift = True
+            case "none" | None:
+                allow_negative_amplitude = False
+                correct_for_phase_shift = False
+            case _:
+                msg = f"Unknown phase correction mode ({self.phase_correction_mode})."
+                raise ValueError(msg)
+
         for row, col in itertools.product(range(n_rows), range(n_cols)):
             mean_tiv = mean_tiv_pixel[row, col]
 
@@ -174,7 +187,7 @@ class PixelBreath:
                 # pixel has no amplitude
                 continue
 
-            if self.allow_negative_amplitude and mean_tiv < 0:
+            if allow_negative_amplitude and mean_tiv < 0:
                 start_func, middle_func = np.argmax, np.argmin
                 lagged_indices_breath_middles = indices_breath_middles
             else:
@@ -185,7 +198,7 @@ class PixelBreath:
                 pi = np.copy(pixel_impedance[:, row, col])
                 pi -= np.nanmean(pixel_impedance[:, row, col])
 
-                if self.correct_for_phase_shift:
+                if correct_for_phase_shift:
                     # search for maximum cross correlation within MAX_XCORR_LAG times the average
                     # duration of a breath
                     xcorr = signal.correlate(cd, pi, mode="same")
