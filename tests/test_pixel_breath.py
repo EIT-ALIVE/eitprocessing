@@ -353,7 +353,7 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
         cd = ssequence.continuous_data["global_impedance_(raw)"]
         pixel_breaths = pi.find_pixel_breaths(eit_data, cd)
         test_result = np.stack(pixel_breaths.values)
-        assert not np.all(test_result == None)
+        assert not np.all(test_result == None)  # noqa: E711
         _, n_rows, n_cols = test_result.shape
 
         for row, col in itertools.product(range(n_rows), range(n_cols)):
@@ -409,8 +409,8 @@ def test_phase_modes(draeger1: Sequence, pytestconfig: pytest.Config):
     assert len(pb_negative_amplitude) == len(pb_phase_shift) == len(pb_none)
 
     # all breaths, except for the first and last,  should have been detected
-    assert not np.any(np.array(pb_negative_amplitude.values)[1:-1] == None)
-    assert not np.any(np.array(pb_phase_shift.values)[1:-1] == None)
+    assert not np.any(np.array(pb_negative_amplitude.values)[1:-1] == None)  # noqa: E711
+    assert not np.any(np.array(pb_phase_shift.values)[1:-1] == None)  # noqa: E711
 
     same_pixel_timing = np.array(pb_negative_amplitude.values) == np.array(pb_phase_shift.values)
     assert not np.all(same_pixel_timing)
