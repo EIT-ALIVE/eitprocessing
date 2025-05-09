@@ -33,6 +33,16 @@ class PixelBreath:
     of inspiration and expiration. These points are then used to find the start/end of pixel
     inspiration/expiration in pixel impedance data.
 
+    Some pixel breaths may be phase shifted (inflation starts and ends later compared to others, e.g., due to pendelluft
+    or late airway opening). Other pixel breaths may have a negative amplitude (impedance decreases during inspiration,
+    e.g., due to pleural effusion or reconstruction artifacts). It is not always possible to determine whether a pixel
+    is out of phase or has a negative amplitude. PixelBreath has three different phase correction modes. In 'negative
+    amplitude' mode (default), pixels that have a decrease in amplitude between the start and end of globally defined
+    inspiration, will have a negative amplitude and smaller phase shift. In 'phase shift' mode, all pixel breaths will
+    have positive amplitudes, but can have large phase shifts. In 'none'/`None` mode, all pixels are assumed to be
+    within rouglhy -90 to 90 degrees of phase. Note that the 'none' mode can lead to unexpected results, such as
+    ultra-short (down to 2 frames) or very long breaths.
+
     Example:
     ```
     >>> pi = PixelBreath()
@@ -75,36 +85,29 @@ class PixelBreath:
     ) -> IntervalData:
         """Find pixel breaths in the data.
 
-        This method finds the pixel start/end of inspiration/expiration
-        based on the start/end of inspiration/expiration as detected
-        in the continuous data.
+        This method finds the pixel start/end of inspiration/expiration based on the start/end of inspiration/expiration
+        as detected in the continuous data.
 
-        If pixel impedance is in phase (within 180 degrees) with the continuous data,
-        the start of breath of that pixel is defined as the local minimum between
-        two end-inspiratory points in the continuous signal.
-        The end of expiration of that pixel is defined as the local minimum between two
-        consecutive end-inspiratory points in the continuous data.
-        The end of inspiration of that pixel is defined as the local maximum between
-        the start of inspiration and end of expiration of that pixel.
+        For most pixels, the start of a breath (start inspiration) is the valley between the middles (start of
+        expiration) of the globally defined breaths on either side. The end of a pixel breath is the start of the next
+        pixel breath. The middle of the pixel breath is the peak between the start and end of the pixel breath.
 
-        If pixel impedance is out of phase with the continuous signal,
-        the start of inspiration of that pixel is defined as the local maximum between
-        two end-inspiration points in the continuous data.
-        The end of expiration of that pixel is defined as the local maximum between two
-        consecutive end-inspiratory points in the continuous data.
-        The end of inspiration of that pixel is defined as the local minimum between
-        the start of inspiration and end of expiration of that pixel.
+        If the pixel is out of phase or has negative amplitude, the definition of the breath depends on the phase
+        correction mode. In 'negative amplitude' mode, the start of a breath is the peak between the middles of the
+        globally defined breaths on either side, while the middle of the pixel breath is the valley of the start and end
+        of the pixel breath. In 'phase shift' mode, first the phase shift between the pixel impedance and global
+        impedance is determined as the highest crosscorrelation between the signals near a phase shift of 0. The start
+        of breath is the valley between the phase shifted middles of the globally defined breaths on either side.
 
-        Pixel breaths are constructed as a valley-peak-valley combination,
-        representing the start of inspiration, the end of inspiration/start of
-        expiration, and end of expiration.
+        Pixel breaths are constructed as a valley-peak-valley combination, representing the start of inspiration, the
+        end of inspiration/start of expiration, and end of expiration.
 
         Args:
-            eit_data: EITData to apply the algorithm to
-            continuous_data: ContinuousData to use for global breath detection
+            eit_data: EITData to apply the algorithm to.
+            continuous_data: ContinuousData to use for global breath detection.
             result_label: label of the returned IntervalData object, defaults to `'pixel_breaths'`.
-            sequence: optional, Sequence that contains the object to detect pixel breaths in,
-            and/or to store the result in.
+            sequence: optional, Sequence that contains the object to detect pixel breaths in, and/or to store the result
+            in.
             store: whether to store the result in the sequence, defaults to `True` if a Sequence if provided.
 
         Returns:
@@ -205,8 +208,9 @@ class PixelBreath:
                     max_lag = MAX_XCORR_LAG * np.mean(np.diff(indices_breath_middles))
                     lag_range = (lags > -max_lag) & (lags < max_lag)
                     # TODO: if this does not work, implement robust peak detection
-                    lag = lags[lag_range][np.argmax(xcorr[lag_range])]
+
                     # positive lag: pixel inflates later than summed
+                    lag = lags[lag_range][np.argmax(xcorr[lag_range])]
 
                     # shift search area
                     lagged_indices_breath_middles = indices_breath_middles - lag
