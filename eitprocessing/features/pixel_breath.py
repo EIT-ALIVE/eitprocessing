@@ -199,7 +199,8 @@ class PixelBreath:
                 cd = np.copy(continuous_data.values)
                 cd -= np.nanmean(cd)
                 pi = np.copy(pixel_impedance[:, row, col])
-                pi -= np.nanmean(pixel_impedance[:, row, col])
+                if not np.all(np.isnan(pi)):
+                    pi -= np.nanmean(pixel_impedance[:, row, col])
 
                 if correct_for_phase_shift:
                     # search for maximum cross correlation within MAX_XCORR_LAG times the average
