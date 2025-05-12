@@ -17,19 +17,19 @@ from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.features.pixel_breath import PixelBreath
 from eitprocessing.parameters import ParameterCalculation
 
-_SENTINAL_PIXEL_BREATH: Final = PixelBreath()
-_SENTINAL_BREATH_DETECTION: Final = BreathDetection()
+_SENTINEL_PIXEL_BREATH: Final = PixelBreath()
+_SENTINEL_BREATH_DETECTION: Final = BreathDetection()
 
 
-def _return_sentinal_pixel_breath() -> PixelBreath:
+def _sentinel_pixel_breath() -> PixelBreath:
     # Returns a sential of a PixelBreath, which only exists to signal that the default value for pixel_breath was used.
-    return _SENTINAL_PIXEL_BREATH
+    return _SENTINEL_PIXEL_BREATH
 
 
-def _return_sentinal_breath_detection() -> BreathDetection:
+def _sentinel_breath_detection() -> BreathDetection:
     # Returns a sential of a BreathDetection, which only exists to signal that the default value for breath_detection
     # was used.
-    return _SENTINAL_BREATH_DETECTION
+    return _SENTINEL_BREATH_DETECTION
 
 
 @dataclass
@@ -37,11 +37,11 @@ class TIV(ParameterCalculation):
     """Compute the tidal impedance variation (TIV) per breath."""
 
     method: Literal["extremes"] = "extremes"
-    breath_detection: BreathDetection = field(default_factory=_return_sentinal_breath_detection)
+    breath_detection: BreathDetection = field(default_factory=_sentinel_breath_detection)
     breath_detection_kwargs: InitVar[dict | None] = None
 
     # The default is a sentinal that will be replaced in __post_init__
-    pixel_breath: PixelBreath = field(default_factory=_return_sentinal_pixel_breath)
+    pixel_breath: PixelBreath = field(default_factory=_sentinel_pixel_breath)
 
     def __post_init__(self, breath_detection_kwargs: dict | None) -> None:
         if self.method != "extremes":
@@ -49,7 +49,7 @@ class TIV(ParameterCalculation):
             raise NotImplementedError(msg)
 
         if breath_detection_kwargs is not None:
-            if self.breath_detection is not _SENTINAL_BREATH_DETECTION:
+            if self.breath_detection is not _SENTINEL_BREATH_DETECTION:
                 msg = (
                     "`breath_detection_kwargs` is deprecated, and can't be used at the same time as `breath_detection`."
                 )
@@ -62,7 +62,7 @@ class TIV(ParameterCalculation):
                 DeprecationWarning,
             )
 
-        if self.pixel_breath is _SENTINAL_PIXEL_BREATH:
+        if self.pixel_breath is _SENTINEL_PIXEL_BREATH:
             # If no value was provided at initialization, PixelBreath should use the same BreathDetection object as TIV.
             # However, a default factory cannot be used because it can't access self.breath_detection. The sentinal
             # object is replaced here (only if pixel_breath was not provided) with the correct BreathDetection object.

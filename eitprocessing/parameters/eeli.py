@@ -11,26 +11,26 @@ from eitprocessing.datahandling.sparsedata import SparseData
 from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.parameters import ParameterCalculation
 
-_SENTINAL_BREATH_DETECTION: Final = BreathDetection()
+_SENTINEL_BREATH_DETECTION: Final = BreathDetection()
 
 
-def _return_sentinal_breath_detection() -> BreathDetection:
+def _sentinel_breath_detection() -> BreathDetection:
     # Returns a sential of a BreathDetection, which only exists to signal that the default value for breath_detection
     # was used.
-    return _SENTINAL_BREATH_DETECTION
+    return _SENTINEL_BREATH_DETECTION
 
 
 @dataclass
 class EELI(ParameterCalculation):
     """Compute the end-expiratory lung impedance (EELI) per breath."""
 
-    breath_detection: BreathDetection = field(default_factory=_return_sentinal_breath_detection)
+    breath_detection: BreathDetection = field(default_factory=_sentinel_breath_detection)
     method: Literal["breath_detection"] = "breath_detection"
     breath_detection_kwargs: InitVar[dict | None] = None
 
     def __post_init__(self, breath_detection_kwargs: dict | None):
         if breath_detection_kwargs is not None:
-            if self.breath_detection is not _SENTINAL_BREATH_DETECTION:
+            if self.breath_detection is not _SENTINEL_BREATH_DETECTION:
                 msg = (
                     "`breath_detection_kwargs` is deprecated, and can't be used at the same time as `breath_detection`."
                 )
