@@ -491,16 +491,13 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
 
     # Iterate over both sequences (draeger1 and timpel1)
     for sequence in draeger1, timpel1:
-        # Select a subset of the sequence for testing (first 500 samples)
-        ssequence = sequence[0:500]
-
         # Initialize the TIV object
         tiv = TIV()
-        eit_data = ssequence.eit_data["raw"]
-        cd = ssequence.continuous_data["global_impedance_(raw)"]
+        eit_data = sequence.eit_data["raw"]
+        cd = sequence.continuous_data["global_impedance_(raw)"]
 
         result_continuous = tiv.compute_continuous_parameter(cd, tiv_method="inspiratory")
-        result_pixel = tiv.compute_pixel_parameter(eit_data, cd, ssequence)
+        result_pixel = tiv.compute_pixel_parameter(eit_data, cd, sequence)
 
         arr_result_continuous = np.stack(result_continuous.values)
         arr_result_pixel = np.stack(result_pixel.values)
