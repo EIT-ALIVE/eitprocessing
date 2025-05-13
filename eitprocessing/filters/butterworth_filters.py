@@ -1,3 +1,4 @@
+import sys
 from dataclasses import InitVar, dataclass
 from typing import Literal
 
@@ -142,6 +143,15 @@ class ButterworthFilter(TimeDomainFilter):
         Returns:
             The filtered output with the same shape as the input data.
         """
+        if np.any(np.isnan(input_data)):
+            msg = "Input data contains NaN-values."
+            exc = ValueError(msg)
+            if sys.version_info >= (3, 11):
+                exc.add_note(
+                    "Butterworth filters can't handle data containing NaN-values. "
+                    "You can fill in gaps using `np.nan_to_num(...)` or interpolation."
+                )
+            raise exc
         sos = signal.butter(
             N=self.order,
             Wn=self.cutoff_frequency,
