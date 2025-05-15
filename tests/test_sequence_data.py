@@ -17,6 +17,7 @@ def create_continuous_data_object():
         category="other",
         time=np.array([]),
         values=np.array([]),
+        sample_frequency=20,
     )
 
 

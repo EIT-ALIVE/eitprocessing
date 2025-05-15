@@ -86,11 +86,23 @@ def test_eeli_values(repeat_n: int):  # noqa: ARG001
         values=data,
         sample_frequency=sample_frequency,
     )
-    eeli = EELI(breath_detection_kwargs={"minimum_duration": 0})
+    with pytest.warns(DeprecationWarning):
+        eeli = EELI(breath_detection_kwargs={"minimum_duration": 0})
     eeli_values = eeli.compute_parameter(cd).values
 
     assert len(eeli_values) == expected_n_breaths
     assert np.array_equal(eeli_values, valley_values[1:])
+
+
+def test_bd_init():
+    with pytest.warns(DeprecationWarning):
+        assert EELI(breath_detection_kwargs={"minimum_duration": 0}) == EELI(
+            breath_detection=BreathDetection(minimum_duration=0)
+        )
+    with pytest.warns(DeprecationWarning):
+        EELI(breath_detection_kwargs={"minimum_duration": 0})
+    with pytest.raises(TypeError):
+        EELI(breath_detection_kwargs={"minimum_duration": 0}, breath_detection=BreathDetection(minimum_duration=0))
 
 
 def test_with_data(draeger1: Sequence, pytestconfig: pytest.Config):

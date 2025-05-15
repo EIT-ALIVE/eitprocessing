@@ -13,6 +13,7 @@ from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
 from eitprocessing.parameters.tidal_impedance_variation import TIV
+from tests.test_breath_detection import BreathDetection
 
 environment = Path(
     os.environ.get(
@@ -144,7 +145,20 @@ def test_tiv_initialization():
     """Test that TIV initializes correctly with default parameters."""
     tiv = TIV()
     assert tiv.method == "extremes"
-    assert tiv.breath_detection_kwargs == {}
+    assert tiv.breath_detection == BreathDetection()
+
+
+def test_deprecated():
+    with pytest.warns(DeprecationWarning):
+        _ = TIV(breath_detection_kwargs={})
+
+    with pytest.raises(TypeError):
+        _ = TIV(breath_detection=BreathDetection(), breath_detection_kwargs={})
+
+    bd_kwargs = {"minimum_duration": 10, "averaging_window_duration": 100.0}
+
+    with pytest.warns(DeprecationWarning):
+        assert TIV(breath_detection_kwargs=bd_kwargs).breath_detection == BreathDetection(**bd_kwargs)
 
 
 def test_compute_parameter_type_error():
@@ -479,16 +493,13 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
 
     # Iterate over both sequences (draeger1 and timpel1)
     for sequence in draeger1, timpel1:
-        # Select a subset of the sequence for testing (first 500 samples)
-        ssequence = sequence[0:500]
-
         # Initialize the TIV object
         tiv = TIV()
-        eit_data = ssequence.eit_data["raw"]
-        cd = ssequence.continuous_data["global_impedance_(raw)"]
+        eit_data = sequence.eit_data["raw"]
+        cd = sequence.continuous_data["global_impedance_(raw)"]
 
         result_continuous = tiv.compute_continuous_parameter(cd, tiv_method="inspiratory")
-        result_pixel = tiv.compute_pixel_parameter(eit_data, cd, ssequence)
+        result_pixel = tiv.compute_pixel_parameter(eit_data, cd, sequence)
 
         arr_result_continuous = np.stack(result_continuous.values)
         arr_result_pixel = np.stack(result_pixel.values)
@@ -508,21 +519,35 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
     [
         ({"amplitude_cutoff_fraction": 0.3, "minimum_duration": 5.0}, ValueError),  # too long duration
         ({"amplitude_cutoff_fraction": 2, "minimum_duration": 5.0}, ValueError),  # too high amplitude cutoff
-        ({"minimum_amplitude": 2, "minimum_duration": 5.0}, TypeError),  # unexpected keyword minimum_amplitude
     ],
 )
 def test_detect_pixel_breaths_with_invalid_bd_kwargs(
     bd_kwargs: dict,
-    expected_error: ValueError,
+    expected_error: type[Exception],
     mock_eit_data: EITData,
     mock_continuous_data: ContinuousData,
     mock_sequence: Sequence,
 ):
     """Test detect_pixel_breaths with invalid bd_kwargs that raise errors."""
-    tiv = TIV(breath_detection_kwargs=bd_kwargs)
+    tiv = TIV(breath_detection=BreathDetection(**bd_kwargs))
 
     with pytest.raises(expected_error):
         tiv._detect_pixel_breaths(mock_eit_data, mock_continuous_data, mock_sequence, store=False)
+
+
+@pytest.mark.parametrize(
+    ("bd_kwargs", "expected_error"),
+    [
+        ({"minimum_amplitude": 2, "minimum_duration": 5.0}, TypeError),  # unexpected keyword minimum_amplitude
+    ],
+)
+def test_detect_pixel_breaths_with_invalid_bd_kwargs_(
+    bd_kwargs: dict,
+    expected_error: type[Exception],
+):
+    """Test detect_pixel_breaths with invalid bd_kwargs that raise errors."""
+    with pytest.raises(expected_error):
+        _ = TIV(breath_detection=BreathDetection(**bd_kwargs))
 
 
 @pytest.mark.parametrize(
@@ -540,7 +565,7 @@ def test_detect_pixel_breaths_with_valid_bd_kwargs(
     mock_sequence: Sequence,
 ):
     """Test detect_pixel_breaths with valid bd_kwargs that return expected results."""
-    tiv = TIV(breath_detection_kwargs=bd_kwargs)
+    tiv = TIV(breath_detection=BreathDetection(**bd_kwargs))
 
     result = tiv._detect_pixel_breaths(mock_eit_data, mock_continuous_data, mock_sequence, store=False)
     test_result = np.stack(result.values)
