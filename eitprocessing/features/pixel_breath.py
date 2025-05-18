@@ -16,6 +16,7 @@ from eitprocessing.features.breath_detection import BreathDetection
 
 _SENTINEL_BREATH_DETECTION: Final = BreathDetection()
 MAX_XCORR_LAG = 0.75
+ALLOW_FRACTION_BREATHS_SKIPPED = 0.25
 
 
 def _return_sentinel_breath_detection() -> BreathDetection:
@@ -165,7 +166,7 @@ class PixelBreath:
         time = eit_data.time
         pixel_impedance = eit_data.pixel_impedance
 
-        pixel_breaths = np.full((len(continuous_breaths), n_rows, n_cols), None)
+        pixel_breaths = np.full((len(continuous_breaths), n_rows, n_cols), None, dtype=object)
 
         lags = signal.correlation_lags(len(continuous_data), len(continuous_data), mode="same")
 
@@ -225,15 +226,19 @@ class PixelBreath:
             starts = outsides[:-1]
             ends = outsides[1:]
             middles = self._find_extreme_indices(pixel_impedance, outsides, row, col, middle_func)
-            # TODO discuss; this block of code is implemented to prevent noisy pixels from breaking the code.
-            # Quick solve is to make entire breath object None if any breath in a pixel does not have
-            # consecutive start, middle and end.
-            # However, this might cause problems elsewhere.
+
             if (starts >= middles).any() or (middles >= ends).any():
-                pixel_breath = None
+                skip = np.concat((np.flatnonzero(starts >= middles), np.flatnonzero(middles >= ends)), axis=0)
+                if len(skip) > len(outsides) * ALLOW_FRACTION_BREATHS_SKIPPED:
+                    warnings.warn(
+                        f"Skipping pixel ({row}, {col}) because too many "
+                        f"({len(skip) / len(outsides)}) breaths were skipped."
+                    )
+                    continue
             else:
-                pixel_breath = self._construct_breaths(starts, middles, ends, time)
-            pixel_breaths[:, row, col] = pixel_breath
+                skip = np.array([])
+
+            pixel_breaths[:, row, col] = self._construct_breaths(starts, middles, ends, time, skip=skip)
 
         intervals = [(breath.start_time, breath.end_time) for breath in continuous_breaths.values]
 
@@ -253,8 +258,13 @@ class PixelBreath:
 
         return pixel_breaths_container
 
-    def _construct_breaths(self, start: list[int], middle: list[int], end: list[int], time: np.ndarray) -> list:
-        breaths = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start, middle, end, strict=True)]
+    def _construct_breaths(
+        self, start: list[int], middle: list[int], end: list[int], time: np.ndarray, skip: np.ndarray
+    ) -> list:
+        breaths = [
+            Breath(time[s], time[m], time[e]) if i not in skip else None
+            for i, (s, m, e) in enumerate(zip(start, middle, end, strict=True))
+        ]
         # First and last breath are not detected by definition (need two breaths to find one breath)
         return [None, *breaths, None]
 
