@@ -216,27 +216,28 @@ class PixelBreath:
 
                     # shift search area
                     lagged_indices_breath_middles = indices_breath_middles - lag
-                    lagged_indices_breath_middles = lagged_indices_breath_middles[
-                        (lagged_indices_breath_middles >= 0) & (lagged_indices_breath_middles < len(cd))
-                    ]
                 else:
                     lagged_indices_breath_middles = indices_breath_middles
 
+            skip = np.concatenate(
+                (
+                    np.flatnonzero(lagged_indices_breath_middles < 0),
+                    np.flatnonzero(lagged_indices_breath_middles >= len(continuous_data)),
+                )
+            )
+            lagged_indices_breath_middles = lagged_indices_breath_middles.clip(min=0, max=len(continuous_data) - 1)
             outsides = self._find_extreme_indices(pixel_impedance, lagged_indices_breath_middles, row, col, start_func)
             starts = outsides[:-1]
             ends = outsides[1:]
             middles = self._find_extreme_indices(pixel_impedance, outsides, row, col, middle_func)
 
-            if (starts >= middles).any() or (middles >= ends).any():
-                skip = np.concat((np.flatnonzero(starts >= middles), np.flatnonzero(middles >= ends)), axis=0)
-                if len(skip) > len(outsides) * ALLOW_FRACTION_BREATHS_SKIPPED:
-                    warnings.warn(
-                        f"Skipping pixel ({row}, {col}) because too many "
-                        f"({len(skip) / len(outsides)}) breaths were skipped."
-                    )
-                    continue
-            else:
-                skip = np.array([])
+            skip = np.concatenate((skip, np.flatnonzero(starts >= middles), np.flatnonzero(middles >= ends)))
+
+            if len(skip) > len(outsides) * ALLOW_FRACTION_BREATHS_SKIPPED:
+                warnings.warn(
+                    f"Skipping pixel ({row}, {col}) because more than half ({len(skip) / len(outsides)}) of breaths skipped."
+                )
+                continue
 
             pixel_breaths[:, row, col] = self._construct_breaths(starts, middles, ends, time, skip=skip)
 
