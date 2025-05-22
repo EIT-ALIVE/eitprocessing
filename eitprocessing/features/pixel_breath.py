@@ -222,7 +222,7 @@ class PixelBreath:
                     # if there are multiple candidates, take the one with the highest cross correlation
                     if len(candidates) == 1:
                         lag = candidates[0]
-                    elif len(candidates) == 2:
+                    elif len(candidates) == 2:  # noqa: PLR2004
                         # take the lag with the highest cross correlation
                         lag = candidates[np.argmax(xcorr[np.searchsorted(lags, candidates)])]
                     else:
@@ -250,7 +250,8 @@ class PixelBreath:
 
             if len(skip) > len(outsides) * ALLOW_FRACTION_BREATHS_SKIPPED:
                 warnings.warn(
-                    f"Skipping pixel ({row}, {col}) because more than half ({len(skip) / len(outsides)}) of breaths skipped."
+                    f"Skipping pixel ({row}, {col}) because more than half ({len(skip) / len(outsides)}) "
+                    "of breaths skipped."
                 )
                 continue
 
@@ -275,10 +276,11 @@ class PixelBreath:
         return pixel_breaths_container
 
     def _construct_breaths(
-        self, start: list[int], middle: list[int], end: list[int], time: np.ndarray, skip: np.ndarray
+        self, start: list[int], middle: list[int], end: list[int], time: np.ndarray, skip: np.ndarray | None = None
     ) -> list:
+        skip_ = skip if skip is not None else np.array([], dtype=int)
         breaths = [
-            Breath(time[s], time[m], time[e]) if i not in skip else None
+            Breath(time[s], time[m], time[e]) if i not in skip_ else None
             for i, (s, m, e) in enumerate(zip(start, middle, end, strict=True))
         ]
         # First and last breath are not detected by definition (need two breaths to find one breath)

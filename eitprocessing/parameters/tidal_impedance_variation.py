@@ -285,7 +285,7 @@ class TIV(ParameterCalculation):
         time: np.ndarray,
         breaths: list[Breath],
         tiv_method: str,
-        tiv_timing: str,
+        tiv_timing: str,  # noqa: ARG002 # remove when restructuring
     ) -> list:
         # Filter out None breaths
         breaths = np.array(breaths)
