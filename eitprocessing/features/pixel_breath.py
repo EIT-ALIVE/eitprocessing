@@ -15,7 +15,7 @@ from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
 
 _SENTINEL_BREATH_DETECTION: Final = BreathDetection()
-MAX_XCORR_LAG = 0.75
+MAX_XCORR_LAG = 1
 ALLOW_FRACTION_BREATHS_SKIPPED = 0.25
 
 
