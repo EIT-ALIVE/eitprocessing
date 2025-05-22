@@ -204,15 +204,30 @@ class PixelBreath:
                     pi = signal.detrend(pi, type="linear")
 
                 if correct_for_phase_shift:
-                    # search for maximum cross correlation within MAX_XCORR_LAG times the average
-                    # duration of a breath
+                    # search for closest or maximum cross correlation within MAX_XCORR_LAG times the average duration of
+                    # a breath
                     xcorr = signal.correlate(cd, pi, mode="same")
                     max_lag = MAX_XCORR_LAG * np.mean(np.diff(indices_breath_middles))
-                    lag_range = (lags > -max_lag) & (lags < max_lag)
-                    # TODO: if this does not work, implement robust peak detection
+                    lag_range = (lags >= -max_lag) & (lags <= max_lag)
 
-                    # positive lag: pixel inflates later than summed
-                    lag = lags[lag_range][np.argmax(xcorr[lag_range])]
+                    # find the peaks in the cross correlation
+                    peaks, _ = signal.find_peaks(xcorr[lag_range], height=0, prominence=xcorr.std())
+
+                    # find the closest peak to zero lag
+                    peak_lags = lags[lag_range][peaks]
+                    peak_distances = np.abs(peak_lags)
+                    min_peak_distance = np.min(peak_distances)
+                    candidates = peak_lags[peak_distances == min_peak_distance]
+
+                    # if there are multiple candidates, take the one with the highest cross correlation
+                    if len(candidates) == 1:
+                        lag = candidates[0]
+                    elif len(candidates) == 2:
+                        # take the lag with the highest cross correlation
+                        lag = candidates[np.argmax(xcorr[np.searchsorted(lags, candidates)])]
+                    else:
+                        msg = "Too many peaks found in cross correlation."
+                        raise RuntimeError(msg)
 
                     # shift search area
                     lagged_indices_breath_middles = indices_breath_middles - lag
