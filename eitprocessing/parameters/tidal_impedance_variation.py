@@ -285,18 +285,20 @@ class TIV(ParameterCalculation):
         time: np.ndarray,
         breaths: list[Breath],
         tiv_method: str,
-        tiv_timing: str,
+        tiv_timing: str,  # noqa: ARG002 # remove when restructuring
     ) -> list:
         # Filter out None breaths
-        valid_breaths = [breath for breath in breaths if breath is not None]
+        breaths = np.array(breaths)
+        valid_breath_indices = np.flatnonzero([breath is not None for breath in breaths])
+        valid_breaths = breaths[valid_breath_indices]
 
         # If there are no valid breaths, return a list of None with the same length as the number of breaths
-        if not valid_breaths:
-            return [None] * len(breaths)
+        if not len(valid_breaths):
+            return np.full(len(breaths), np.nan)
 
-        start_indices = np.searchsorted(time, [breath.start_time for breath in breaths if breath is not None])
-        middle_indices = np.searchsorted(time, [breath.middle_time for breath in breaths if breath is not None])
-        end_indices = np.searchsorted(time, [breath.end_time for breath in breaths if breath is not None])
+        start_indices = np.searchsorted(time, [breath.start_time for breath in valid_breaths])
+        middle_indices = np.searchsorted(time, [breath.middle_time for breath in valid_breaths])
+        end_indices = np.searchsorted(time, [breath.end_time for breath in valid_breaths])
 
         if tiv_method == "inspiratory":
             tiv_values = np.squeeze(np.diff(data[[start_indices, middle_indices]], axis=0), axis=0)
@@ -315,7 +317,7 @@ class TIV(ParameterCalculation):
                 exc.add_note("Valid value for `tiv_method` are 'inspiratory', 'expiratory' and 'mean'.")
             raise exc
 
-        if tiv_timing == "pixel":
-            tiv_values = [None, *tiv_values, None]
+        tiv_values_ = np.full(len(breaths), np.nan)
+        tiv_values_[valid_breath_indices] = tiv_values
 
-        return tiv_values
+        return tiv_values_
