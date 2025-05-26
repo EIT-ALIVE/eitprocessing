@@ -34,6 +34,10 @@ class PixelBreath:
     of inspiration and expiration. These points are then used to find the start/end of pixel
     inspiration/expiration in pixel impedance data.
 
+    Since this algorithm uses the previous and next global breath to determine the start and end of a pixel breath, the
+    first and last global breaths can not be used to determine pixel breaths. They are always set to `None` in the
+    return list. Breaths that could not properly be detected are set to `None` as well.
+
     Some pixel breaths may be phase shifted (inflation starts and ends later compared to others, e.g., due to pendelluft
     or late airway opening). Other pixel breaths may have a negative amplitude (impedance decreases during inspiration,
     e.g., due to pleural effusion or reconstruction artifacts). It is not always possible to determine whether a pixel
