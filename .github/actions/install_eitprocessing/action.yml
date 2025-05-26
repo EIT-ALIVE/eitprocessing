@@ -38,12 +38,6 @@ runs:
         image: ghcr.io/eit-alive/eittestdata:latest
         destination: ${{ inputs.data-directory }}
         path: /eitprocessing/.
-    - uses: actions/cache@v4
-      id: cache-python-env
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}-[${{ inputs.dependencies }}]
     - name: Install eitprocessing with [${{ inputs.dependencies }}] dependencies
-      if: steps.cache-python-env.outputs.cache-hit != 'true'
       run: python3 -m pip install ".[${{ inputs.dependencies }}]"
       shell: bash
