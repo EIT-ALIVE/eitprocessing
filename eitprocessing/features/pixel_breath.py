@@ -15,7 +15,8 @@ from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
 
 _SENTINEL_BREATH_DETECTION: Final = BreathDetection()
-MAX_XCORR_LAG = 0.75
+MAX_XCORR_LAG = 1
+ALLOW_FRACTION_BREATHS_SKIPPED = 0.25
 
 
 def _return_sentinel_breath_detection() -> BreathDetection:
@@ -32,6 +33,10 @@ class PixelBreath:
     end of expiration in pixel impedance data. It uses BreathDetection to find the global start and end
     of inspiration and expiration. These points are then used to find the start/end of pixel
     inspiration/expiration in pixel impedance data.
+
+    Since this algorithm uses the previous and next global breath to determine the start and end of a pixel breath, the
+    first and last global breaths can not be used to determine pixel breaths. They are always set to `None` in the
+    return list. Breaths that could not properly be detected are set to `None` as well.
 
     Some pixel breaths may be phase shifted (inflation starts and ends later compared to others, e.g., due to pendelluft
     or late airway opening). Other pixel breaths may have a negative amplitude (impedance decreases during inspiration,
@@ -165,7 +170,7 @@ class PixelBreath:
         time = eit_data.time
         pixel_impedance = eit_data.pixel_impedance
 
-        pixel_breaths = np.full((len(continuous_breaths), n_rows, n_cols), None)
+        pixel_breaths = np.full((len(continuous_breaths), n_rows, n_cols), None, dtype=object)
 
         lags = signal.correlation_lags(len(continuous_data), len(continuous_data), mode="same")
 
@@ -197,43 +202,64 @@ class PixelBreath:
                 start_func, middle_func = np.argmin, np.argmax
 
                 cd = np.copy(continuous_data.values)
-                cd -= np.nanmean(cd)
+                cd = signal.detrend(cd, type="linear")
                 pi = np.copy(pixel_impedance[:, row, col])
                 if not np.all(np.isnan(pi)):
-                    pi -= np.nanmean(pixel_impedance[:, row, col])
+                    pi = signal.detrend(pi, type="linear")
 
                 if correct_for_phase_shift:
-                    # search for maximum cross correlation within MAX_XCORR_LAG times the average
-                    # duration of a breath
+                    # search for closest or maximum cross correlation within MAX_XCORR_LAG times the average duration of
+                    # a breath
                     xcorr = signal.correlate(cd, pi, mode="same")
                     max_lag = MAX_XCORR_LAG * np.mean(np.diff(indices_breath_middles))
-                    lag_range = (lags > -max_lag) & (lags < max_lag)
-                    # TODO: if this does not work, implement robust peak detection
+                    lag_range = (lags >= -max_lag) & (lags <= max_lag)
 
-                    # positive lag: pixel inflates later than summed
-                    lag = lags[lag_range][np.argmax(xcorr[lag_range])]
+                    # find the peaks in the cross correlation
+                    peaks, _ = signal.find_peaks(xcorr[lag_range], height=0, prominence=xcorr.std())
+
+                    # find the closest peak to zero lag
+                    peak_lags = lags[lag_range][peaks]
+                    peak_distances = np.abs(peak_lags)
+                    min_peak_distance = np.min(peak_distances)
+                    candidates = peak_lags[peak_distances == min_peak_distance]
+
+                    # if there are multiple candidates, take the one with the highest cross correlation
+                    if len(candidates) == 1:
+                        lag = candidates[0]
+                    elif len(candidates) == 2:  # noqa: PLR2004
+                        # take the lag with the highest cross correlation
+                        lag = candidates[np.argmax(xcorr[np.searchsorted(lags, candidates)])]
+                    else:
+                        msg = "Too many peaks found in cross correlation."
+                        raise RuntimeError(msg)
 
                     # shift search area
                     lagged_indices_breath_middles = indices_breath_middles - lag
-                    lagged_indices_breath_middles = lagged_indices_breath_middles[
-                        (lagged_indices_breath_middles >= 0) & (lagged_indices_breath_middles < len(cd))
-                    ]
                 else:
                     lagged_indices_breath_middles = indices_breath_middles
 
+            skip = np.concatenate(
+                (
+                    np.flatnonzero(lagged_indices_breath_middles < 0),
+                    np.flatnonzero(lagged_indices_breath_middles >= len(continuous_data)),
+                )
+            )
+            lagged_indices_breath_middles = lagged_indices_breath_middles.clip(min=0, max=len(continuous_data) - 1)
             outsides = self._find_extreme_indices(pixel_impedance, lagged_indices_breath_middles, row, col, start_func)
             starts = outsides[:-1]
             ends = outsides[1:]
             middles = self._find_extreme_indices(pixel_impedance, outsides, row, col, middle_func)
-            # TODO discuss; this block of code is implemented to prevent noisy pixels from breaking the code.
-            # Quick solve is to make entire breath object None if any breath in a pixel does not have
-            # consecutive start, middle and end.
-            # However, this might cause problems elsewhere.
-            if (starts >= middles).any() or (middles >= ends).any():
-                pixel_breath = None
-            else:
-                pixel_breath = self._construct_breaths(starts, middles, ends, time)
-            pixel_breaths[:, row, col] = pixel_breath
+
+            skip = np.concatenate((skip, np.flatnonzero(starts >= middles), np.flatnonzero(middles >= ends)))
+
+            if len(skip) > len(outsides) * ALLOW_FRACTION_BREATHS_SKIPPED:
+                warnings.warn(
+                    f"Skipping pixel ({row}, {col}) because more than half ({len(skip) / len(outsides)}) "
+                    "of breaths skipped."
+                )
+                continue
+
+            pixel_breaths[:, row, col] = self._construct_breaths(starts, middles, ends, time, skip=skip)
 
         intervals = [(breath.start_time, breath.end_time) for breath in continuous_breaths.values]
 
@@ -253,8 +279,14 @@ class PixelBreath:
 
         return pixel_breaths_container
 
-    def _construct_breaths(self, start: list[int], middle: list[int], end: list[int], time: np.ndarray) -> list:
-        breaths = [Breath(time[s], time[m], time[e]) for s, m, e in zip(start, middle, end, strict=True)]
+    def _construct_breaths(
+        self, start: list[int], middle: list[int], end: list[int], time: np.ndarray, skip: np.ndarray | None = None
+    ) -> list:
+        skip_ = skip if skip is not None else np.array([], dtype=int)
+        breaths = [
+            Breath(time[s], time[m], time[e]) if i not in skip_ else None
+            for i, (s, m, e) in enumerate(zip(start, middle, end, strict=True))
+        ]
         # First and last breath are not detected by definition (need two breaths to find one breath)
         return [None, *breaths, None]
 
