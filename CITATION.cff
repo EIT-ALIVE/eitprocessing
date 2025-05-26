@@ -39,7 +39,7 @@ authors:
 
 date-released: 2023-03-23
 doi: 10.5281/zenodo.7869553
-version: "1.7.1"
+version: "1.7.2"
 repository-code: "https://github.com/EIT-ALIVE/eitprocessing"
 keywords:
   - Mechanical lung ventilation
