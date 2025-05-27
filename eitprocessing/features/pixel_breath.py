@@ -252,9 +252,9 @@ class PixelBreath:
 
             skip = np.concatenate((skip, np.flatnonzero(starts >= middles), np.flatnonzero(middles >= ends)))
 
-            if len(skip) > len(outsides) * ALLOW_FRACTION_BREATHS_SKIPPED:
+            if len(starts) > len(skip) > len(starts) * ALLOW_FRACTION_BREATHS_SKIPPED:
                 warnings.warn(
-                    f"Skipping pixel ({row}, {col}) because more than half ({len(skip) / len(outsides)}) "
+                    f"Skipping pixel ({row}, {col}) because more than half ({len(skip) / len(starts):.0%}) "
                     "of breaths skipped."
                 )
                 continue
