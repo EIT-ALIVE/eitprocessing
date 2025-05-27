@@ -1441,7 +1441,14 @@ inspiration/start of expiration, and end of expiration.</p>
   </span>
 
 <a href="#eitprocessing.features.pixel_breath.PixelBreath" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">PixelBreath</span><span class="p">(</span><span class="n">breath_detection_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span><span class="p">())</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">PixelBreath</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">breath_detection</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="eitprocessing.features.breath_detection.BreathDetection" href="#eitprocessing.features.breath_detection.BreathDetection">BreathDetection</a></span> <span class="o">=</span> <span class="n"><span title="eitprocessing.features.pixel_breath._return_sentinel_breath_detection">_return_sentinel_breath_detection</span></span><span class="p">(),</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">breath_detection_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="dataclasses.InitVar" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.InitVar">InitVar</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">phase_correction_mode</span><span class="p">:</span> <span class="p">(</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="n"><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a></span><span class="p">[</span><span class="s2">&quot;negative amplitude&quot;</span><span class="p">,</span> <span class="s2">&quot;phase shift&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="p">)</span> <span class="o">=</span> <span class="s2">&quot;negative amplitude&quot;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -1452,21 +1459,76 @@ inspiration/start of expiration, and end of expiration.</p>
 end of expiration in pixel impedance data. It uses BreathDetection to find the global start and end
 of inspiration and expiration. These points are then used to find the start/end of pixel
 inspiration/expiration in pixel impedance data.</p>
+<p>Since this algorithm uses the previous and next global breath to determine the start and end of a pixel breath, the
+first and last global breaths can not be used to determine pixel breaths. They are always set to <code>None</code> in the
+return list. Breaths that could not properly be detected are set to <code>None</code> as well.</p>
+<p>Some pixel breaths may be phase shifted (inflation starts and ends later compared to others, e.g., due to pendelluft
+or late airway opening). Other pixel breaths may have a negative amplitude (impedance decreases during inspiration,
+e.g., due to pleural effusion or reconstruction artifacts). It is not always possible to determine whether a pixel
+is out of phase or has a negative amplitude. PixelBreath has three different phase correction modes. In 'negative
+amplitude' mode (default), pixels that have a decrease in amplitude between the start and end of globally defined
+inspiration, will have a negative amplitude and smaller phase shift. In 'phase shift' mode, all pixel breaths will
+have positive amplitudes, but can have large phase shifts. In 'none'/<code>None</code> mode, all pixels are assumed to be
+within rouglhy -90 to 90 degrees of phase. Note that the 'none' mode can lead to unexpected results, such as
+ultra-short (down to 2 frames) or very long breaths.</p>
 <p>Example:
 <div class="language-py highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">pi</span> <span class="o">=</span> <span class="n">PixelBreath</span><span class="p">()</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">eit_data</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">eit_data</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">continuous_data</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">continuous_data</span><span class="p">[</span><span class="s1">&#39;global_impedance_(raw)&#39;</span><span class="p">]</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">pixel_breaths</span> <span class="o">=</span> <span class="n">pi</span><span class="o">.</span><span class="n">find_pixel_breaths</span><span class="p">(</span><span class="n">eit_data</span><span class="p">,</span> <span class="n">continuous_data</span><span class="p">,</span> <span class="n">sequence</span><span class="p">)</span>
 </code></pre></div></p>
-        <p>breath_detection_kwargs (dict): A dictionary of keyword arguments for breath detection.
-    The available keyword arguments are:
-    minimum_duration: minimum expected duration of breaths, defaults to 2/3 of a second
-    averaging_window_duration: duration of window used for averaging the data, defaults to 15 seconds
-    averaging_window_function: function used to create a window for averaging the data, defaults to np.blackman
-    amplitude_cutoff_fraction: fraction of the median amplitude below which breaths are removed, defaults to 0.25
-    invalid_data_removal_window_length: window around invalid data in which breaths are removed, defaults to 0.5
-    invalid_data_removal_percentile: the nth percentile of values used to remove outliers, defaults to 5
-    invalid_data_removal_multiplier: the multiplier used to remove outliers, defaults to 4</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>breath_detection</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>BreathDetection object to use for detecting breaths.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="eitprocessing.features.breath_detection.BreathDetection" href="#eitprocessing.features.breath_detection.BreathDetection">BreathDetection</a></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code><span title="eitprocessing.features.pixel_breath._return_sentinel_breath_detection">_return_sentinel_breath_detection</span>()</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>phase_correction_mode</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>How to resolve pixels that are out-of-phase. Defaults to "negative amplitude".</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;negative amplitude&#39;, &#39;phase shift&#39;, &#39;none&#39;] | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;negative amplitude&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 
@@ -1506,26 +1568,19 @@ inspiration/expiration in pixel impedance data.</p>
     <div class="doc doc-contents ">
 
         <p>Find pixel breaths in the data.</p>
-<p>This method finds the pixel start/end of inspiration/expiration
-based on the start/end of inspiration/expiration as detected
-in the continuous data.</p>
-<p>If pixel impedance is in phase (within 180 degrees) with the continuous data,
-the start of breath of that pixel is defined as the local minimum between
-two end-inspiratory points in the continuous signal.
-The end of expiration of that pixel is defined as the local minimum between two
-consecutive end-inspiratory points in the continuous data.
-The end of inspiration of that pixel is defined as the local maximum between
-the start of inspiration and end of expiration of that pixel.</p>
-<p>If pixel impedance is out of phase with the continuous signal,
-the start of inspiration of that pixel is defined as the local maximum between
-two end-inspiration points in the continuous data.
-The end of expiration of that pixel is defined as the local maximum between two
-consecutive end-inspiratory points in the continuous data.
-The end of inspiration of that pixel is defined as the local minimum between
-the start of inspiration and end of expiration of that pixel.</p>
-<p>Pixel breaths are constructed as a valley-peak-valley combination,
-representing the start of inspiration, the end of inspiration/start of
-expiration, and end of expiration.</p>
+<p>This method finds the pixel start/end of inspiration/expiration based on the start/end of inspiration/expiration
+as detected in the continuous data.</p>
+<p>For most pixels, the start of a breath (start inspiration) is the valley between the middles (start of
+expiration) of the globally defined breaths on either side. The end of a pixel breath is the start of the next
+pixel breath. The middle of the pixel breath is the peak between the start and end of the pixel breath.</p>
+<p>If the pixel is out of phase or has negative amplitude, the definition of the breath depends on the phase
+correction mode. In 'negative amplitude' mode, the start of a breath is the peak between the middles of the
+globally defined breaths on either side, while the middle of the pixel breath is the valley of the start and end
+of the pixel breath. In 'phase shift' mode, first the phase shift between the pixel impedance and global
+impedance is determined as the highest crosscorrelation between the signals near a phase shift of 0. The start
+of breath is the valley between the phase shifted middles of the globally defined breaths on either side.</p>
+<p>Pixel breaths are constructed as a valley-peak-valley combination, representing the start of inspiration, the
+end of inspiration/start of expiration, and end of expiration.</p>
 
 
 <table>
@@ -1542,7 +1597,7 @@ expiration, and end of expiration.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>EITData to apply the algorithm to</p>
+                <p>EITData to apply the algorithm to.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -1558,7 +1613,7 @@ expiration, and end of expiration.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>ContinuousData to use for global breath detection</p>
+                <p>ContinuousData to use for global breath detection.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -1594,7 +1649,7 @@ expiration, and end of expiration.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>optional, Sequence that contains the object to detect pixel breaths in,</p>
+                <p>optional, Sequence that contains the object to detect pixel breaths in, and/or to store the result</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
