@@ -286,3 +286,14 @@ def test_butterworth_functionality():
             signal_,
             axis,
         )
+
+
+def test_nan_values(filter_arguments: dict):
+    filter_ = ButterworthFilter(**filter_arguments)
+    data = np.random.default_rng().random(1000)
+
+    _ = filter_.apply_filter(data)
+
+    data[100] = np.nan
+    with pytest.raises(ValueError):
+        _ = filter_.apply_filter(data)
