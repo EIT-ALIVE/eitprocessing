@@ -1,4 +1,7 @@
+import dataclasses
+from collections.abc import Callable
 from dataclasses import KW_ONLY, dataclass, field
+from typing import Self
 
 import matplotlib as mpl
 import numpy as np
@@ -8,6 +11,7 @@ from matplotlib.axes import Axes
 from matplotlib.colors import CenteredNorm, Colormap, LinearSegmentedColormap, Normalize
 from matplotlib.image import AxesImage
 from matplotlib.ticker import PercentFormatter
+from numpy import typing as npt
 
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
 
@@ -43,6 +47,46 @@ class PixelMap:
         values = np.asarray(self.values, dtype=float)
         values.flags.writeable = False  # Make the values array immutable
         object.__setattr__(self, "values", values)
+
+    def threshold(
+        self,
+        threshold: npt.ArrayLike,
+        *,
+        comparator: Callable = np.greater_equal,
+        absolute: bool = False,
+        keep_sign: bool = False,
+        fill_value: float = np.nan,
+        **return_attrs: dict | None,
+    ) -> Self:
+        """Threshold the pixel map values.
+
+        This method applies a threshold to the pixel map values, setting values that do not meet the threshold condition
+        to a specified fill value. The comparison is done using the provided comparator function (default is `>=`).
+
+        If `absolute` is True, the threshold is applied to the absolute values of the pixel map. If `keep_sign` is True,
+        the sign of the original pixel values is retained when filling with the `fill_value`. Otherwise, the fill value
+        is applied uniformly.
+
+        The `threshold` method returns a new instance of `PixelMap` with the modified values. Other attributes of the
+        returned object can be set using keyword arguments.
+
+        Args:
+            threshold (float): The threshold value.
+            comparator (Callable): A function that compares pixel values against the threshold.
+            absolute (bool): If True, apply the threshold to the absolute values of the pixel map.
+            keep_sign (bool): If True, retain the sign of the original values when filling.
+            fill_value (float): The value to set for pixels that do not meet the threshold condition.
+            **return_attrs (dict | None): Additional attributes to pass to the new PixelMap instance.
+
+        Returns:
+            Self: A new PixelMap instance with the thresholded values.
+        """
+        compare_values = np.abs(self.values) if absolute else self.values
+        sign = np.sign(self.values) if keep_sign else 1.0
+        new_values = np.where(comparator(compare_values, threshold), self.values, fill_value * sign)
+
+        return_attrs = return_attrs or {}
+        return dataclasses.replace(self, values=new_values, **return_attrs)
 
     def imshow(
         self,
