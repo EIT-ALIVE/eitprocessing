@@ -50,7 +50,7 @@ class PixelMap:
         absolute: bool = False,
         colorbar_kwargs: dict | None = None,
         facecolor: ColorType | None = None,
-        hide_axes: bool = False,
+        hide_axes: bool = True,
         **kwargs,
     ) -> AxesImage:
         """Display the pixel map using `imshow`.
