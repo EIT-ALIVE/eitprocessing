@@ -10,6 +10,12 @@
 
 ::: eitprocessing.datahandling.intervaldata.IntervalData
 
+::: eitprocessing.datahandling.pixelmap.PixelMap
+
+::: eitprocessing.datahandling.pixelmap.TIVMap
+
+::: eitprocessing.datahandling.pixelmap.ODCLMap
+
 ::: eitprocessing.datahandling.datacollection.DataCollection
 
 ::: eitprocessing.datahandling.breath.Breath
