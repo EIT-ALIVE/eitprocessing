@@ -103,7 +103,7 @@ class PixelMap:
 
         values = self.values
         if normalize:
-            values /= np.nanmax(self.values, initial=1)
+            values = values / np.nanmax(self.values, initial=1)
 
         cm = ax.imshow(values, **kwargs)
 
