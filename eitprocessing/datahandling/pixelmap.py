@@ -7,7 +7,9 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.colors import CenteredNorm, Colormap, LinearSegmentedColormap, Normalize
 from matplotlib.image import AxesImage
-from matplotlib.ticker import PercentFormatter, ScalarFormatter
+from matplotlib.ticker import PercentFormatter
+
+from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
 
 ColorType = str | tuple[float, float, float] | tuple[float, float, float, float] | float | Colormap
 
@@ -222,19 +224,3 @@ class ODCLMap(PixelMap):
         kwargs.setdefault("percentage", True)
         kwargs.setdefault("absolute", True)
         return super().imshow(*args, **kwargs)
-
-
-class AbsolutePercentFormatter(PercentFormatter):
-    """Format numbers as absolute percentages."""
-
-    def __call__(self, x: float, pos: int | None = None) -> str:
-        """Format the tick as an absolute percentage."""
-        return super().__call__(abs(x), pos)
-
-
-class AbsoluteScalarFormatter(ScalarFormatter):
-    """Format numbers as absolute values."""
-
-    def __call__(self, x: float, pos: int | None = None) -> str:
-        """Format the tick as an absolute value."""
-        return super().__call__(abs(x), pos)
