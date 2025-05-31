@@ -1,6 +1,5 @@
-import dataclasses
 from collections.abc import Callable
-from dataclasses import KW_ONLY, dataclass, field
+from dataclasses import KW_ONLY, asdict, dataclass, field, replace
 from typing import Self
 
 import matplotlib as mpl
@@ -86,7 +85,7 @@ class PixelMap:
         new_values = np.where(comparator(compare_values, threshold), self.values, fill_value * sign)
 
         return_attrs = return_attrs or {}
-        return dataclasses.replace(self, values=new_values, **return_attrs)
+        return replace(self, values=new_values, **return_attrs)
 
     def imshow(
         self,
