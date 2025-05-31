@@ -268,3 +268,19 @@ class ODCLMap(PixelMap):
         kwargs.setdefault("percentage", True)
         kwargs.setdefault("absolute", True)
         return super().imshow(*args, **kwargs)
+
+
+@dataclass(frozen=True)
+class DifferenceMap(PixelMap):
+    """Pixel map representing the difference between two pixel maps.
+
+    Attributes:
+        values (np.ndarray): 2D array of difference values.
+        label (str | None): Label for the difference map.
+        cmap (str | Colormap | None): Colormap for the difference map.
+        norm (str | Normalize | None): Normalization for the difference map.
+        facecolor (ColorType): The background color of the axes, shown for NaN or masked values.
+    """
+
+    cmap: str | Colormap = "vanimo"
+    norm: str | Normalize = field(default_factory=lambda: CenteredNorm(vcenter=0))
