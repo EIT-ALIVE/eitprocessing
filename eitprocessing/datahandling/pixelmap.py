@@ -32,8 +32,12 @@ class PixelMap:
     Attributes:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
-        cmap (str | Colormap | None): Colormap for the pixel map.
-        norm (str | Normalize | None): Normalization for the pixel map.
+        cmap (str | Colormap | None):
+            Colormap for the pixel map. Can be a string (name of a colormap) or a Colormap object. Defaults to
+            "viridis".
+        norm (str | Normalize | None):
+            Normalization for the pixel map. Can be a string (name of a normalization) or a Normalize object. Defaults
+            to "linear" (which is equivalent to `Normalize()`).
         facecolor (ColorType): Face color, i.e., the background color for NaN values.
     """
 
@@ -123,6 +127,7 @@ class PixelMap:
         styling such as facecolor).
 
         Additional keyword arguments are passed directly to `imshow`, allowing for full control over image rendering.
+        Notably, you can pass an existing matplotlib Axes object using the `ax` keyword argument.
 
         Args:
             colorbar (bool): Whether to display a colorbar.
@@ -133,7 +138,11 @@ class PixelMap:
             facecolor (ColorType | None):
                 Background color for the axes. If None, uses the facecolor of the PixelMap.
             hide_axes (bool): Whether to hide the axes ticks and labels.
+            ax (matplotlib.axes.Axes, optional): Axes to plot on. If not provided, uses the current axes.
             **kwargs: Additional keyword arguments passed to `matplotlib.pyplot.imshow`.
+
+        Returns:
+            AxesImage: The image object created by imshow.
         """
         ax = kwargs.pop("ax", plt.gca())
 
@@ -236,13 +245,15 @@ class TIVMap(PixelMap):
     """Pixel map representing the tidal impedance variation or amplitude.
 
     Attributes:
-        values (np.ndarray): 2D array of TIV/amplitude values.
-        label (str | None): Label for the TIV map.
+        values (np.ndarray): 2D array of pixel values.
+        label (str | None): Label for the pixel map.
         cmap (str | Colormap | None):
-            Colormap for plotting the TIV map. Defaults to blue transitioning to white, with negative values represented
-            in purple.
-        norm (str | Normalize | None): Normalization for the TIV map.
-        facecolor (ColorType): The background color of the axes, shown for NaN or masked values.
+            Colormap for the pixel map. Can be a string (name of a colormap) or a Colormap object. Defaults to
+            "viridis".
+        norm (str | Normalize | None):
+            Normalization for the pixel map. Can be a string (name of a normalization) or a Normalize object. Defaults
+            to "linear" (which is equivalent to `Normalize()`).
+        facecolor (ColorType): Face color, i.e., the background color for NaN values.
     """
 
     cmap: str | Colormap = field(default_factory=lambda: _tiv_colormap)
@@ -273,12 +284,15 @@ class ODCLMap(PixelMap):
     to 100%).
 
     Attributes:
-        values (np.ndarray): 2D array of ODCL values.
-        label (str | None): Label for the ODCL map.
+        values (np.ndarray): 2D array of pixel values.
+        label (str | None): Label for the pixel map.
         cmap (str | Colormap | None):
-            Colormap for plotting the TIV map. Defaults to white transitioning to black transitioning to orange.
-        norm (str | Normalize | None): Normalization for the ODCL map.
-        facecolor (ColorType): The background color of the axes, shown for NaN or masked values.
+            Colormap for the pixel map. Can be a string (name of a colormap) or a Colormap object. Defaults to a custom
+            colormap ranging from white (collapse) to black (maximum compliance) and dark orange (overdistention).
+        norm (str | Normalize | None):
+            Normalization for the pixel map. Can be a string (name of a normalization) or a Normalize object. Defaults
+            to `CenteredNorm(vcenter=0, halfrange=1)` (values range from -1 to 1 with 0 at the center).
+        facecolor (ColorType): Face color, i.e., the background color for NaN values.
     """
 
     cmap: str | Colormap = field(default_factory=lambda: _odcl_colormap)
@@ -305,12 +319,19 @@ class ODCLMap(PixelMap):
 class DifferenceMap(PixelMap):
     """Pixel map representing the difference between two pixel maps.
 
+    The normalization is centered around zero, with positive values indicating an increase and negative values
+    indicating a decrease in the pixel values compared to a reference map. If the values are all expected to be
+    positive, converting to a normal `PixelMap` instead.
+
     Attributes:
-        values (np.ndarray): 2D array of difference values.
-        label (str | None): Label for the difference map.
-        cmap (str | Colormap | None): Colormap for the difference map.
-        norm (str | Normalize | None): Normalization for the difference map.
-        facecolor (ColorType): The background color of the axes, shown for NaN or masked values.
+        values (np.ndarray): 2D array of pixel values.
+        label (str | None): Label for the pixel map.
+        cmap (str | Colormap | None):
+            Colormap for the pixel map. Can be a string (name of a colormap) or a Colormap object. Defaults to "vanimo".
+        norm (str | Normalize | None):
+            Normalization for the pixel map. Can be a string (name of a normalization) or a Normalize object. Defaults
+            to `CenteredNorm(vcenter=0)` (normalizes data symmetrically around zero).
+        facecolor (ColorType): Face color, i.e., the background color for NaN values.
     """
 
     cmap: str | Colormap = "vanimo"
