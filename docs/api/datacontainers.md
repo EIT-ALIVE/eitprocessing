@@ -16,6 +16,8 @@
 
 ::: eitprocessing.datahandling.pixelmap.ODCLMap
 
+::: eitprocessing.datahandling.pixelmap.DifferenceMap
+
 ::: eitprocessing.datahandling.datacollection.DataCollection
 
 ::: eitprocessing.datahandling.breath.Breath
