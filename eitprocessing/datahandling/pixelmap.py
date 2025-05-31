@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from dataclasses import KW_ONLY, asdict, dataclass, field, replace
-from typing import Self
+from typing import Self, TypeVar
 
 import matplotlib as mpl
 import numpy as np
@@ -15,6 +15,8 @@ from numpy import typing as npt
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
 
 ColorType = str | tuple[float, float, float] | tuple[float, float, float, float] | float | Colormap
+
+T = TypeVar("T", bound="PixelMap")
 
 
 @dataclass(frozen=True)
@@ -191,6 +193,36 @@ class PixelMap:
             colorbar_kwargs.setdefault("extend", extend)
 
         return plt.colorbar(cm, ax=ax, **colorbar_kwargs or {})
+
+    def convert_to(self, target_type: type[T], *, keep_attrs: bool = False, **kwargs: dict) -> T:
+        """Convert the pixel map to (a different subclass of) PixelMap.
+
+        This method allows for converting the pixel map to a `PixelMap` or different subclass of `PixelMap`. The `label`
+        attribute is copied by default, but a new label can be provided. Other attributes are not copied by default, but
+        can be retained by setting `keep_attrs` to True. Additional keyword arguments can be passed to the new instance.
+
+        Args:
+            target_type (type[T]): The target subclass to convert to.
+            keep_attrs (bool): If True, retains the attributes of the original pixel map in the new instance.
+            **kwargs (dict): Additional keyword arguments to pass to the new instance.
+
+        Returns:
+            T: A new instance of the target type with the same values and attributes.
+        """
+        if not issubclass(target_type, PixelMap):
+            msg = "`target_type` must be (a subclass of) PixelMap."
+            raise TypeError(msg)
+
+        data = asdict(self)
+
+        if not keep_attrs:
+            data.pop("cmap", None)
+            data.pop("norm", None)
+            data.pop("facecolor", None)
+
+        data.update(kwargs)
+
+        return target_type(**data)
 
 
 _tiv_colormap = mpl.colormaps["Blues"].reversed()
