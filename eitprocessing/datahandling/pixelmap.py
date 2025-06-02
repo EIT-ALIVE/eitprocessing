@@ -19,6 +19,14 @@ ColorType = str | tuple[float, float, float] | tuple[float, float, float, float]
 T = TypeVar("T", bound="PixelMap")
 
 
+def _get_zero_norm() -> Normalize:
+    return Normalize(vmin=0)
+
+
+def _get_centered_norm() -> CenteredNorm:
+    return CenteredNorm(vcenter=0)
+
+
 @dataclass(frozen=True)
 class PixelMap:
     """Map representing a single value for each pixel.
@@ -234,24 +242,6 @@ class PixelMap:
         return target_type(**data)
 
 
-def _get_tiv_colormap() -> Colormap:
-    _tiv_colormap = mpl.colormaps["Blues"].reversed()
-    _tiv_colormap.set_under("purple")
-    return _tiv_colormap
-
-
-def _get_odcl_colormap() -> LinearSegmentedColormap:
-    return LinearSegmentedColormap.from_list("ODCL", ["white", "black", "darkorange"])
-
-
-def _get_odcl_norm() -> CenteredNorm:
-    return CenteredNorm(vcenter=0, halfrange=1)
-
-
-def _get_difference_norm() -> CenteredNorm:
-    return CenteredNorm(vcenter=0)
-
-
 @dataclass(frozen=True)
 class TIVMap(PixelMap):
     """Pixel map representing the tidal impedance variation or amplitude.
@@ -261,31 +251,21 @@ class TIVMap(PixelMap):
         label (str | None): Label for the pixel map.
         cmap (str | Colormap | None):
             Colormap for the pixel map. Can be a string (name of a colormap) or a Colormap object. Defaults to
-            "viridis".
+            "Blues" reversed.
         norm (str | Normalize | None):
             Normalization for the pixel map. Can be a string (name of a normalization) or a Normalize object. Defaults
             to "linear" (which is equivalent to `Normalize()`).
         facecolor (ColorType): Face color, i.e., the background color for NaN values.
     """
 
-    cmap: str | Colormap = field(default_factory=_get_tiv_colormap)
+    @staticmethod
+    def _get_cmap() -> Colormap:
+        _tiv_colormap = mpl.colormaps["Blues"].reversed()
+        _tiv_colormap.set_under("purple")
+        return _tiv_colormap
 
-    def imshow(self, *args, **kwargs) -> AxesImage:
-        """Display the TIV map using `imshow`.
-
-        This method is a wrapper around `PixelMap.imshow` with default colormap and settings for TIV maps.
-
-        The default colormap transitions from dark blue (low TIV) to white (high TIV) and is purple for negative values.
-        `vmin` is set to 0.
-
-        Returns:
-            AxesImage: The image object created by `imshow`.
-        """
-        kwargs.setdefault("vmin", 0)
-        kwargs.setdefault("normalize", False)
-        kwargs.setdefault("percentage", False)
-        kwargs.setdefault("absolute", False)
-        return super().imshow(*args, **kwargs)
+    cmap: str | Colormap = field(default_factory=_get_cmap)
+    norm: str | Normalize = field(default_factory=_get_zero_norm)
 
 
 @dataclass(frozen=True)
@@ -307,8 +287,16 @@ class ODCLMap(PixelMap):
         facecolor (ColorType): Face color, i.e., the background color for NaN values.
     """
 
-    cmap: str | Colormap = field(default_factory=_get_odcl_colormap)
-    norm: str | Normalize = field(default_factory=_get_odcl_norm)
+    @staticmethod
+    def _get_cmap() -> LinearSegmentedColormap:
+        return LinearSegmentedColormap.from_list("ODCL", ["white", "black", "darkorange"])
+
+    @staticmethod
+    def _get_norm() -> CenteredNorm:
+        return CenteredNorm(vcenter=0, halfrange=1)
+
+    cmap: str | Colormap = field(default_factory=_get_cmap)
+    norm: str | Normalize = field(default_factory=_get_norm)
 
     def imshow(self, *args, **kwargs) -> AxesImage:
         """Display the ODCL map using `imshow`.
@@ -347,4 +335,4 @@ class DifferenceMap(PixelMap):
     """
 
     cmap: str | Colormap = "vanimo"
-    norm: str | Normalize = field(default_factory=_get_difference_norm)
+    norm: str | Normalize = field(default_factory=_get_centered_norm)
