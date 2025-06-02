@@ -340,3 +340,39 @@ class DifferenceMap(PixelMap):
 
     cmap: str | Colormap = "vanimo"
     norm: str | Normalize = field(default_factory=_get_centered_norm)
+
+
+@dataclass(frozen=True)
+class PerfusionMap(PixelMap):
+    """Pixel map representing perfusion values in EIT analysis.
+
+    Values represent normalized perfusion, where higher values indicate better perfusion. The values are expected
+    to be non-negative, with 0 representing no perfusion and higher values representing more perfusion.
+
+    Attributes:
+        values (np.ndarray): 2D array of pixel values.
+        label (str | None): Label for the pixel map.
+        cmap (str | Colormap | None):
+            Colormap for the pixel map. Can be a string (name of a colormap) or a Colormap object. Defaults to
+            black (no perfusion) ranging to red (high perfusion).
+        norm (str | Normalize | None):
+            Normalization for the pixel map. Can be a string (name of a normalization) or a Normalize object. Defaults
+            to `Normalize(vmin=0)` (values are expected to be non-negative).
+        facecolor (ColorType): Face color, i.e., the background color for NaN values.
+    """
+
+    @staticmethod
+    def _get_cmap() -> Colormap:
+        return LinearSegmentedColormap.from_list("Perfusion", ["black", "red"])
+
+    cmap: str | Colormap = field(default_factory=_get_cmap)
+    norm: str | Normalize = field(default_factory=_get_zero_norm)
+
+
+@dataclass(frozen=True)
+class PendelluftMap(PixelMap):
+    @staticmethod
+    def _get_cmap() -> Colormap:
+        return LinearSegmentedColormap.from_list("Perfusion", ["black", "green"])
+
+    cmap: str | Colormap = field(default_factory=_get_cmap)
