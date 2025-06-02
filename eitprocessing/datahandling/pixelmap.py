@@ -159,7 +159,9 @@ class PixelMap:
         norm = kwargs.setdefault("norm", self.norm)
 
         if isinstance(norm, Normalize):
-            kwargs["norm"] = norm = deepcopy(norm)
+            if norm is self.norm:
+                # prevent sharing norm between plots if not explicitly set when calling imshow
+                kwargs["norm"] = norm = deepcopy(norm)
             vmin = kwargs.pop("vmin", None)
             vmax = kwargs.pop("vmax", None)
             if vmin is not None:
