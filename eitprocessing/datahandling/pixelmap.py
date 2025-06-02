@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import KW_ONLY, asdict, dataclass, field, replace
 from typing import Self, TypeVar
 
@@ -158,6 +159,7 @@ class PixelMap:
         norm = kwargs.setdefault("norm", self.norm)
 
         if isinstance(norm, Normalize):
+            kwargs["norm"] = norm = deepcopy(norm)
             vmin = kwargs.pop("vmin", None)
             vmax = kwargs.pop("vmax", None)
             if vmin is not None:
