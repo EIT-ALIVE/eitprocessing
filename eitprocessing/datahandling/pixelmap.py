@@ -104,7 +104,7 @@ class PlotParameters:
 
             object.__setattr__(self, key, merged)
 
-    def replace(self, **changes):
+    def update(self, **changes):
         if "colorbar_kwargs" in changes:
             changes["colorbar_kwargs"] = self.colorbar_kwargs | changes["colorbar_kwargs"]
 
@@ -332,7 +332,7 @@ class PixelMap:
 
         return target_type(**data)
 
-    def replace(self, **changes) -> Self:
+    def update(self, **changes) -> Self:
         """Return a copy of the of the PixelMap instance replacing attributes.
 
         Similar to dataclass.replace(), but with special handling of `plot_parameters`. When `plot_parameters` is
@@ -346,7 +346,7 @@ class PixelMap:
         """
         plot_parameters = cast("PlotParameters", self.plot_parameters)
         if "plot_parameters" in changes and isinstance(changes["plot_parameters"], dict):
-            changes["plot_parameters"] = plot_parameters.replace(**changes["plot_parameters"])
+            changes["plot_parameters"] = plot_parameters.update(**changes["plot_parameters"])
 
         return replace(self, **changes)
 
