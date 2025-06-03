@@ -133,6 +133,10 @@ class PixelMap:
 
     def __post_init__(self):
         values = np.asarray(self.values, dtype=float)
+        if values.ndim != 2:
+            msg = f"`values` should have 2 dimensions, not {values.ndim}."
+            raise ValueError(msg)
+
         values.flags.writeable = False  # Make the values array immutable
         object.__setattr__(self, "values", values)
 
