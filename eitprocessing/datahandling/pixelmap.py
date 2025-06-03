@@ -97,6 +97,7 @@ class PlotParameters:
         for key in ("colorbar_kwargs", "extra_kwargs"):
             default_factory = self.__dataclass_fields__[key].default_factory
             default_value = default_factory() if default_factory is not MISSING else None
+
             # tell type checker that this is definitely a frozendict
             default_value = cast("frozendict", default_value)
 
@@ -104,7 +105,18 @@ class PlotParameters:
 
             object.__setattr__(self, key, merged)
 
-    def update(self, **changes):
+    def update(self, **changes) -> Self:
+        """Return a copy of the of the PlotParameters instance replacing attributes.
+
+        Similar to dataclass.replace(), but with special handling of `colorbar_kwargs`. `colorbar_kwargs` is updated
+        with the provided dictionary, rather than replaced.
+
+        Args:
+            **changes: New values for attributes to replace.
+
+        Returns:
+            Self: A new instance with the replaced attributes.
+        """
         if "colorbar_kwargs" in changes:
             changes["colorbar_kwargs"] = self.colorbar_kwargs | changes["colorbar_kwargs"]
 
