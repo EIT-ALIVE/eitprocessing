@@ -111,7 +111,7 @@ class PlotParameters:
         return replace(self, **changes)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class PixelMap:
     """Map representing a single value for each pixel.
 
@@ -120,29 +120,38 @@ class PixelMap:
     Attributes:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters | dict):
+        plot_parameters (PlotParameters):
             Plotting parameters controlling colormap, normalization, colorbar, and other display options. Accepts both a
-            PlotParameters instance or a dict. Subclasses provide their own defaults.
+            PlotParameters instance or a dict, which is converted to PlotParameters during initialization.  Subclasses
+            provide their own defaults.
     """
 
-    values: npt.ArrayLike
+    values: np.ndarray
     _: KW_ONLY
     label: str | None = None
+    plot_parameters: PlotParameters = field(default_factory=PlotParameters)
 
-    plot_parameters: PlotParameters | dict = field(default_factory=PlotParameters)
-
-    def __post_init__(self):
-        values = np.asarray(self.values, dtype=float)
-        if values.ndim != 2:
+    def __init__(
+        self, values: npt.ArrayLike, *, label: str | None = None, plot_parameters: PlotParameters | dict | None = None
+    ):
+        values = np.asarray(values, dtype=float)
+        if values.ndim != 2:  # noqa: PLR2004, ignore hardcoded value
             msg = f"`values` should have 2 dimensions, not {values.ndim}."
             raise ValueError(msg)
 
         values.flags.writeable = False  # Make the values array immutable
         object.__setattr__(self, "values", values)
 
-        if isinstance(self.plot_parameters, dict):
+        object.__setattr__(self, "label", label)
+
+        if plot_parameters is None:
+            plot_parameters = {}
+        if isinstance(plot_parameters, dict):
+            # subclasses define their own version, so grab that if it exists
             plot_parameters_class = getattr(self.__class__, "PlotParameters", PlotParameters)
-            object.__setattr__(self, "plot_parameters", plot_parameters_class(**self.plot_parameters))
+            plot_parameters = plot_parameters_class(**plot_parameters)
+
+        object.__setattr__(self, "plot_parameters", plot_parameters)
 
     def threshold(
         self,
@@ -235,7 +244,7 @@ class PixelMap:
         Returns:
             AxesImage: The image object created by imshow.
         """
-        plot_parameters = cast("PlotParameters", self.plot_parameters)
+        plot_parameters = self.plot_parameters
         normalize = plot_parameters.normalize if normalize is None else normalize
         colorbar = plot_parameters.colorbar if colorbar is None else colorbar
         percentage = plot_parameters.percentage if percentage is None else percentage
@@ -282,7 +291,7 @@ class PixelMap:
     ) -> colorbar.Colorbar:
         """Create a colorbar for the pixel map."""
         colorbar_kwargs = dict(colorbar_kwargs or {})
-        plot_parameters = cast("PlotParameters", self.plot_parameters)
+        plot_parameters = self.plot_parameters
 
         if "format" not in colorbar_kwargs:
             if absolute and percentage:
@@ -348,21 +357,21 @@ class PixelMap:
         Returns:
             Self: A new instance with the replaced attributes.
         """
-        plot_parameters = cast("PlotParameters", self.plot_parameters)
+        plot_parameters = self.plot_parameters
         if "plot_parameters" in changes and isinstance(changes["plot_parameters"], dict):
             changes["plot_parameters"] = plot_parameters.update(**changes["plot_parameters"])
 
         return replace(self, **changes)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class TIVMap(PixelMap):
     """Pixel map representing the tidal impedance variation or amplitude.
 
     Attributes:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters | dict):
+        plot_parameters (PlotParameters):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
@@ -371,6 +380,7 @@ class TIVMap(PixelMap):
         """Configuration parameters for plotting TIV maps.
 
         The default configuration uses:
+
         - The 'Blues' colormap reversed (dark blue is no ventilation, lighter blue/white is more/most ventilation)
         - A zero-based normalization starting at 0 for no TIV
         - Default colorbar label "TIV (a.u.)"
@@ -386,10 +396,10 @@ class TIVMap(PixelMap):
         norm: str | Normalize = field(default_factory=_get_zero_norm)
         colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="TIV (a.u.)"))
 
-    plot_parameters: PlotParameters | dict = field(default_factory=PlotParameters)
+    plot_parameters: PlotParameters = field(default_factory=PlotParameters)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class ODCLMap(PixelMap):
     """Pixel map representing normalized overdistention and collapse.
 
@@ -399,7 +409,7 @@ class ODCLMap(PixelMap):
     Attributes:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters | dict):
+        plot_parameters (PlotParameters):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
@@ -408,6 +418,7 @@ class ODCLMap(PixelMap):
         """Configuration parameters for plotting ODCL maps.
 
         The default configuration uses:
+
         - A diverging colormap from white (collapse) through black to dark orange (overdistention)
         - Centered normalization around 0
         - Absolute percentage value formatting for the colorbar
@@ -422,10 +433,10 @@ class ODCLMap(PixelMap):
         absolute: bool = True
         colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Collapse/Overdistention (%)"))
 
-    plot_parameters: PlotParameters | dict = field(default_factory=PlotParameters)
+    plot_parameters: PlotParameters = field(default_factory=PlotParameters)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class DifferenceMap(PixelMap):
     """Pixel map representing the difference between two pixel maps.
 
@@ -436,7 +447,7 @@ class DifferenceMap(PixelMap):
     Attributes:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters | dict):
+        plot_parameters (PlotParameters):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
@@ -445,6 +456,7 @@ class DifferenceMap(PixelMap):
         """Configuration parameters for plotting difference maps.
 
         The default configuration uses:
+
         - The 'vanimo' colormap
         - Centered normalization around 0
         - Default colorbar label "Difference"
@@ -457,7 +469,7 @@ class DifferenceMap(PixelMap):
     plot_parameters: PlotParameters = field(default_factory=PlotParameters)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class PerfusionMap(PixelMap):
     """Pixel map representing perfusion values.
 
@@ -467,7 +479,7 @@ class PerfusionMap(PixelMap):
     Attributes:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters | dict):
+        plot_parameters (PlotParameters):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
@@ -476,6 +488,7 @@ class PerfusionMap(PixelMap):
         """Configuration parameters for plotting perfusion maps.
 
         The default configuration uses:
+
         - A gradient colormap black (no perfusion) to red (most perfusion)
         - A zero-based normalization starting at 0 for no perfusion
         - Default colorbar label "Perfusion"
@@ -487,10 +500,10 @@ class PerfusionMap(PixelMap):
         norm: str | Normalize = field(default_factory=_get_zero_norm)
         colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Perfusion"))
 
-    plot_parameters: PlotParameters | dict = field(default_factory=PlotParameters)
+    plot_parameters: PlotParameters = field(default_factory=PlotParameters)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class PendelluftMap(PixelMap):
     """Pixel map representing pendelluft values.
 
@@ -500,7 +513,7 @@ class PendelluftMap(PixelMap):
     Attributes:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters | dict):
+        plot_parameters (PlotParameters):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
@@ -509,6 +522,7 @@ class PendelluftMap(PixelMap):
         """Configuration parameters for plotting pendelluft maps.
 
         The default configuration uses:
+
         - A gradient colormap black (no pendelluft) to forestgreen (most pendelluft)
         - A zero-based normalization starting at 0 for no perfusion
         - Default colorbar label "Pendelluft"
@@ -520,10 +534,10 @@ class PendelluftMap(PixelMap):
         norm: Normalize = field(default_factory=_get_zero_norm)
         colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Pendelluft"))
 
-    plot_parameters: PlotParameters | dict = field(default_factory=PlotParameters)
+    plot_parameters: PlotParameters = field(default_factory=PlotParameters)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class SignedPendelluftMap(PixelMap):
     """Pixel map representing pendelluft values as signed values.
 
@@ -534,7 +548,7 @@ class SignedPendelluftMap(PixelMap):
     Attributes:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters | dict):
+        plot_parameters (PlotParameters):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
@@ -543,6 +557,7 @@ class SignedPendelluftMap(PixelMap):
         """Configuration parameters for plotting signed pendelluft maps.
 
         The default configuration uses:
+
         - A diverging colormap from deeppink (early inflation) through black to forestgreen (late inflation)
         - Centered normalization around 0 to properly show the difference between early and late inflation
         - Absolute value formatting for the colorbar
@@ -556,4 +571,4 @@ class SignedPendelluftMap(PixelMap):
         absolute: bool = True
         norm: Normalize = field(default_factory=_get_centered_norm)
 
-    plot_parameters: PlotParameters | dict = field(default_factory=PlotParameters)
+    plot_parameters: PlotParameters = field(default_factory=PlotParameters)
