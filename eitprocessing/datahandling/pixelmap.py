@@ -125,7 +125,7 @@ class PixelMap:
             PlotParameters instance or a dict. Subclasses provide their own defaults.
     """
 
-    values: np.ndarray
+    values: npt.ArrayLike
     _: KW_ONLY
     label: str | None = None
 
