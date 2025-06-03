@@ -44,6 +44,7 @@ dependencies = [
     "anytree >= 2.12.1 ",
     "typing_extensions",
     "pyyaml",
+    "frozendict>=2.4.6",
 ]
 
 [project.optional-dependencies]
