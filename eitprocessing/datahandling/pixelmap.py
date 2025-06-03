@@ -1,3 +1,30 @@
+"""Handling and visualizing pixel-based data maps in EIT analysis.
+
+This module provides classes for working with pixel-based data representations of EIT data. The main class hierarchy
+consists of:
+
+- PixelMap: Base class for representing 2D pixel data with visualization and manipulation capabilities.
+- TIVMap: Specialized map for Tidal Impedance Variation (TIV) data.
+- ODCLMap: Specialized map for Overdistention and Collapse (ODCL) analysis.
+- DifferenceMap: Specialized map for visualizing differences between pixel maps.
+- PerfusionMap: Specialized map for perfusion analysis.
+- PendelluftMap: Specialized map for positive-only pendelluft values (severity, no direction).
+- SignedPendelluftMap: Specialized map for signed pendelluft values (severity and direction/phase).
+
+Each map type provides appropriate default colormaps and normalizations suitable for
+their specific use case, along with methods for visualization and data manipulation.
+
+Plotting parameters for each map are managed via a `PlotParameters` dataclass, which allows for flexible configuration
+of colormap, normalization, colorbar, and other display options. These can be customized per map type or per instance.
+
+All classes are immutable to ensure data integrity during analysis pipelines.
+
+Both `PixelMap` and `PlotParameters` provide a `replace` method, which allows you to create a copy of the object with
+one or more attributes replaced, similar to `dataclasses.replace()`. This is useful for updating data or configuration
+in an immutable and chainable way, and supports partial updates of nested configuration (e.g., updating only a single
+plotting parameter).
+"""
+
 from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import KW_ONLY, MISSING, asdict, dataclass, field, replace
