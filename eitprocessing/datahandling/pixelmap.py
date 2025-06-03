@@ -492,4 +492,37 @@ class PendelluftMap(PixelMap):
     plot_parameters: PlotParameters | dict = field(default_factory=PlotParameters)
 
 
+@dataclass(frozen=True)
+class SignedPendelluftMap(PixelMap):
+    """Pixel map representing pendelluft values as signed values.
 
+    Values represent pendelluft severity. Negative values indicate pixels that have early inflation (before the global
+    inflation starts), while negative values indicate pixels that have late inflation (after the global inflation
+    starts).
+
+    Attributes:
+        values (np.ndarray): 2D array of pixel values.
+        label (str | None): Label for the pixel map.
+        plot_parameters (PlotParameters | dict):
+            Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
+    """
+
+    @dataclass(frozen=True)
+    class PlotParameters(PlotParameters):
+        """Configuration parameters for plotting signed pendelluft maps.
+
+        The default configuration uses:
+        - A diverging colormap from deeppink (early inflation) through black to forestgreen (late inflation)
+        - Centered normalization around 0 to properly show the difference between early and late inflation
+        - Absolute value formatting for the colorbar
+        - Default colorbar label "Pendelluft"
+        """
+
+        cmap: str | Colormap = field(
+            default_factory=lambda: LinearSegmentedColormap.from_list("Perfusion", ["deeppink", "black", "forestgreen"])
+        )
+        colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Pendelluft"))
+        absolute: bool = True
+        norm: Normalize = field(default_factory=_get_centered_norm)
+
+    plot_parameters: PlotParameters | dict = field(default_factory=PlotParameters)
