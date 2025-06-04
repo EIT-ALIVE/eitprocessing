@@ -49,7 +49,16 @@ nav:
       - basic_example.md
   - API Documentation:
       - api/loading.md
-      - api/datacontainers.md
+      - Data Containers:
+        - Sequence: api/datacontainers/sequence.md
+        - EITData: api/datacontainers/eitdata.md
+        - ContinuousData: api/datacontainers/continuousdata.md
+        - SparseData: api/datacontainers/sparsedata.md
+        - IntervalData: api/datacontainers/intervaldata.md
+        - PixelMap: api/datacontainers/pixelmap.md
+        - Breath: api/datacontainers/breath.md
+        - Event: api/datacontainers/event.md
+        - DataCollection: api/datacontainers/datacollection.md
       - api/filters.md
       - api/features.md
       - api/parameters.md
@@ -101,6 +110,7 @@ plugins:
   - exclude:
       glob:
         - __pycache__/*
+  - autorefs
   - mkdocstrings:
       handlers:
         python:
