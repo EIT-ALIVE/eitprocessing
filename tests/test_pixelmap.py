@@ -10,6 +10,7 @@ from matplotlib.ticker import PercentFormatter, ScalarFormatter
 from eitprocessing.datahandling.pixelmap import (
     DifferenceMap,
     ODCLMap,
+    PendelluftMap,
     PerfusionMap,
     PixelMap,
     PlotParameters,
@@ -264,3 +265,110 @@ def test_centered_norm():
     assert cm.colorbar.norm.vcenter == 0
     assert cm.colorbar.norm.vmin == -10
     assert cm.colorbar.norm.vmax == 10
+
+
+def test_add():
+    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_parameters={"absolute": True})
+    pm1_add = pm1 + 3
+    assert np.array_equal(pm1_add.values, np.array([[3, 4, 5, 6]]))
+    assert isinstance(pm1_add, PerfusionMap)
+    assert pm1_add.plot_parameters == pm1.plot_parameters
+
+    add_pm1 = 3 + pm1
+    assert np.array_equal(pm1_add.values, add_pm1.values)
+    assert isinstance(add_pm1, PerfusionMap)
+    assert add_pm1.plot_parameters == pm1.plot_parameters
+
+    pm2 = TIVMap([[1, 2, 3, 4]])
+    pm1_add_pm2 = pm1 + pm2
+    assert isinstance(pm1_add_pm2, PixelMap)
+    assert np.array_equal(pm1_add_pm2.values, [[1, 3, 5, 7]])
+
+
+def test_sub():
+    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_parameters={"absolute": True})
+    pm1_sub = pm1 - 3
+    assert np.array_equal(pm1_sub.values, np.array([[-3, -2, -1, 0]]))
+    assert isinstance(pm1_sub, PerfusionMap)
+    assert pm1_sub.plot_parameters == pm1.plot_parameters
+
+    sub_pm1 = 3 - pm1
+    assert np.array_equal(sub_pm1.values, [[3, 2, 1, 0]])
+    assert isinstance(sub_pm1, PerfusionMap)
+    assert sub_pm1.plot_parameters == pm1.plot_parameters
+
+    pm2 = TIVMap([[1, 2, 3, 4]])
+    pm1_sub_pm2 = pm1 - pm2
+    assert isinstance(pm1_sub_pm2, DifferenceMap)
+    assert np.array_equal(pm1_sub_pm2.values, [[-1, -1, -1, -1]])
+    pm2_sub_pm1 = pm2 - pm1
+    assert isinstance(pm2_sub_pm1, DifferenceMap)
+    assert np.array_equal(pm2_sub_pm1.values, [[1, 1, 1, 1]])
+
+
+def test_mul():
+    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_parameters={"absolute": True})
+    pm1_mul = pm1 * 3
+    assert np.array_equal(pm1_mul.values, np.array([[0, 3, 6, 9]]))
+    assert isinstance(pm1_mul, PerfusionMap)
+    assert pm1_mul.plot_parameters == pm1.plot_parameters
+
+    mul_pm1 = 3 * pm1
+    assert np.array_equal(pm1_mul.values, mul_pm1.values)
+    assert isinstance(mul_pm1, PerfusionMap)
+    assert mul_pm1.plot_parameters == pm1.plot_parameters
+
+    pm2 = TIVMap([[1, 2, 3, 4]])
+    pm1_mul_pm2 = pm1 * pm2
+    assert isinstance(pm1_mul_pm2, PixelMap)
+    assert np.array_equal(pm1_mul_pm2.values, [[0, 2, 6, 12]])
+
+    pm2_mul_pm1 = pm2 * pm1
+    assert isinstance(pm2_mul_pm1, PixelMap)
+    assert np.array_equal(pm1_mul_pm2.values, pm2_mul_pm1.values)
+
+
+def test_div():
+    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_parameters={"absolute": True})
+    pm1_div = pm1 / 3
+    assert np.array_equal(pm1_div.values, np.array([[0, 1 / 3, 2 / 3, 1]]))
+    assert isinstance(pm1_div, PerfusionMap)
+    assert pm1_div.plot_parameters == pm1.plot_parameters
+
+    with pytest.warns(UserWarning, match="Dividing by 0 will result in `np.nan`"):
+        div_pm1 = 3 / pm1
+    assert np.array_equal(div_pm1.values, [[np.nan, 3, 3 / 2, 1]], equal_nan=True)
+    assert isinstance(div_pm1, PerfusionMap)
+    assert div_pm1.plot_parameters == pm1.plot_parameters
+
+    pm2 = TIVMap([[1, 2, 3, 4]])
+    pm1_div_pm2 = pm1 / pm2
+    assert isinstance(pm1_div_pm2, PixelMap)
+    assert np.array_equal(pm1_div_pm2.values, [[0, 1 / 2, 2 / 3, 3 / 4]])
+
+    with pytest.warns(UserWarning, match="Dividing by 0 will result in `np.nan`"):
+        pm2_div_pm1 = pm2 / pm1
+    assert isinstance(pm2_div_pm1, PixelMap)
+    assert np.array_equal(pm2_div_pm1.values, [[np.nan, 2, 3 / 2, 4 / 3]], equal_nan=True)
+
+
+def test_nan():
+    # preventing 0-values, because the will lead to extra nan-values when dividing
+    pm1 = PendelluftMap(np.reshape(np.arange(1, 101), (10, 10)))
+    pm2 = ODCLMap(np.reshape(np.linspace(1, 2, 100), (10, 10)))
+
+    # picking random indices (rows/cols) to be set to np.nan
+    pm1_rows, pm1_cols = np.unravel_index(np.random.default_rng().choice(100, size=20, replace=False), (10, 10))
+    new_pm1_values = pm1.values.copy()
+    new_pm1_values[pm1_rows, pm1_cols] = np.nan
+    pm1 = pm1.update(values=new_pm1_values)
+
+    pm2_rows, pm2_cols = np.unravel_index(np.random.default_rng().choice(100, size=20, replace=False), (10, 10))
+    new_pm2_values = pm2.values.copy()
+    new_pm2_values[pm2_rows, pm2_cols] = np.nan
+    pm2 = pm2.update(values=new_pm2_values)
+
+    either_isnan = np.isnan(pm1.values) | np.isnan(pm2.values)
+
+    for pm in (pm1 + pm2, pm2 + pm1, pm1 - pm2, pm2 - pm1, pm1 * pm2, pm2 * pm1, pm1 / pm2, pm2 / pm1):
+        assert np.array_equal(np.isnan(pm.values), either_isnan)
