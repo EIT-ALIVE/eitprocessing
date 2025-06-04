@@ -25,6 +25,7 @@ in an immutable and chainable way, and supports partial updates of nested config
 plotting parameter).
 """
 
+import warnings
 from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import KW_ONLY, MISSING, asdict, dataclass, field, replace
@@ -374,6 +375,73 @@ class PixelMap:
             changes["plot_parameters"] = plot_parameters.update(**changes["plot_parameters"])
 
         return replace(self, **changes)
+
+    def _validate_other(self, other: "npt.ArrayLike | float | PixelMap") -> np.ndarray | float:
+        other_values = other.values if isinstance(other, PixelMap) else other
+
+        if isinstance(other, (float, int)):
+            return other
+
+        other_values = other.values if isinstance(other, PixelMap) else np.array(other_values)
+
+        if (os := other_values.shape) != (ss := self.values.shape):
+            msg = f"Shape of PixelMaps (self: {ss}, other: {os}) do not match."
+            raise ValueError(msg)
+
+        return other_values
+
+    def __add__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+        new_values = self.values + self._validate_other(other)
+        if isinstance(other, PixelMap):
+            return PixelMap(new_values)
+        return self.update(values=new_values, label=None)
+
+    __radd__ = __add__
+
+    def __sub__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+        new_values = self.values - self._validate_other(other)
+        if isinstance(other, PixelMap):
+            return DifferenceMap(new_values)
+        return self.update(values=new_values, label=None)
+
+    def __rsub__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+        new_values = -self.values + self._validate_other(other)
+        if isinstance(other, PixelMap):
+            return DifferenceMap(new_values)
+        return self.update(values=new_values, label=None)
+
+    def __mul__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+        new_values = self.values * self._validate_other(other)
+        if isinstance(other, PixelMap):
+            return PixelMap(new_values)
+        return self.update(values=new_values, label=None)
+
+    __rmul__ = __mul__
+
+    def __truediv__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+        other_values = self._validate_other(other)
+        if isinstance(other_values, np.ndarray) and 0 in other_values:
+            warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning)
+
+        invalid = np.isnan(self.values) | np.isnan(other_values) | (other_values == 0)
+        new_values = np.divide(self.values, other_values, where=~invalid)
+        new_values[invalid] = np.nan
+        if isinstance(other, PixelMap):
+            return PixelMap(new_values)
+        return self.update(values=new_values, label=None)
+
+    def __rtruediv__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+        other_values = self._validate_other(other)
+        if 0 in self.values:
+            warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning)
+        invalid = np.isnan(self.values) | np.isnan(other_values) | (self.values == 0)
+        new_values = np.divide(other_values, self.values, where=~invalid)
+        new_values[invalid] = np.nan
+
+        # other should never be a PixelMap, because this method is only called if other doesn't know how to divide,
+        # which is does if it is a PixelMap.
+
+        return self.update(values=new_values, label=None)
 
 
 @dataclass(frozen=True, init=False)
