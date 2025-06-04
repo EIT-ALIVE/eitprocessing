@@ -57,7 +57,7 @@ def _get_centered_norm() -> CenteredNorm:
     return CenteredNorm(vcenter=0)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class PlotParameters:
     """Configuration parameters for plotting pixel maps.
 
@@ -455,7 +455,7 @@ class TIVMap(PixelMap):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
-    @dataclass(frozen=True)
+    @dataclass(frozen=True, kw_only=True)
     class PlotParameters(PlotParameters):
         """Configuration parameters for plotting TIV maps.
 
@@ -493,7 +493,7 @@ class ODCLMap(PixelMap):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
-    @dataclass(frozen=True)
+    @dataclass(frozen=True, kw_only=True)
     class PlotParameters(PlotParameters):
         """Configuration parameters for plotting ODCL maps.
 
@@ -531,7 +531,7 @@ class DifferenceMap(PixelMap):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
-    @dataclass(frozen=True)
+    @dataclass(frozen=True, kw_only=True)
     class PlotParameters(PlotParameters):
         """Configuration parameters for plotting difference maps.
 
@@ -563,7 +563,7 @@ class PerfusionMap(PixelMap):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
-    @dataclass(frozen=True)
+    @dataclass(frozen=True, kw_only=True)
     class PlotParameters(PlotParameters):
         """Configuration parameters for plotting perfusion maps.
 
@@ -597,7 +597,7 @@ class PendelluftMap(PixelMap):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
-    @dataclass(frozen=True)
+    @dataclass(frozen=True, kw_only=True)
     class PlotParameters(PlotParameters):
         """Configuration parameters for plotting pendelluft maps.
 
@@ -632,7 +632,7 @@ class SignedPendelluftMap(PixelMap):
             Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
-    @dataclass(frozen=True)
+    @dataclass(frozen=True, kw_only=True)
     class PlotParameters(PlotParameters):
         """Configuration parameters for plotting signed pendelluft maps.
 
