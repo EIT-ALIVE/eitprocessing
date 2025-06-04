@@ -29,7 +29,7 @@ import warnings
 from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import KW_ONLY, MISSING, asdict, dataclass, field, replace
-from typing import Self, TypeVar, cast
+from typing import TypeVar, cast
 
 import matplotlib as mpl
 import numpy as np
@@ -41,6 +41,7 @@ from matplotlib.colors import CenteredNorm, Colormap, LinearSegmentedColormap, N
 from matplotlib.image import AxesImage
 from matplotlib.ticker import PercentFormatter
 from numpy import typing as npt
+from typing_extensions import Self
 
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
 
