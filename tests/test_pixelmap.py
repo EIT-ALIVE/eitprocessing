@@ -14,6 +14,7 @@ from eitprocessing.datahandling.pixelmap import (
     PerfusionMap,
     PixelMap,
     PlotParameters,
+    SignedPendelluftMap,
     TIVMap,
 )
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
@@ -284,6 +285,10 @@ def test_add():
     assert isinstance(pm1_add_pm2, PixelMap)
     assert np.array_equal(pm1_add_pm2.values, [[1, 3, 5, 7]])
 
+    pm3 = PixelMap([[1, 2, 3]])
+    with pytest.raises(ValueError, match=r"Shape of PixelMaps \(self: \(1, 4\), other: \(1, 3\)\) do not match."):
+        _ = pm1 + pm3
+
 
 def test_sub():
     pm1 = PerfusionMap([[0, 1, 2, 3]], plot_parameters={"absolute": True})
@@ -372,3 +377,38 @@ def test_nan():
 
     for pm in (pm1 + pm2, pm2 + pm1, pm1 - pm2, pm2 - pm1, pm1 * pm2, pm2 * pm1, pm1 / pm2, pm2 / pm1):
         assert np.array_equal(np.isnan(pm.values), either_isnan)
+
+
+def test_mean():
+    pm1 = PixelMap([[0, 1, 2, 3]])
+    pm2 = PerfusionMap([[1, 2, 3, 4]])
+    mean_pm1_pm2 = ODCLMap.from_mean([pm1, pm2])
+
+    assert np.array_equal(mean_pm1_pm2.values, [[0.5, 1.5, 2.5, 3.5]])
+    assert isinstance(mean_pm1_pm2, ODCLMap)
+
+    pm3 = PendelluftMap([[np.nan, 3, 4, np.nan]])
+    pm4 = DifferenceMap([[np.nan, np.nan, 5, 6]])
+    mean_pm3_pm4 = SignedPendelluftMap.from_mean([pm3, pm4])
+    assert isinstance(mean_pm3_pm4, SignedPendelluftMap)
+    assert np.array_equal(mean_pm3_pm4.values, [[np.nan, 3, 4.5, 6]], equal_nan=True)
+
+    mean_all = PixelMap.from_mean([pm1, pm2, pm3, pm4], label="foo", plot_parameters={"colorbar": False})
+    assert isinstance(mean_all, PixelMap)
+    assert np.array_equal(mean_all.values, np.array([[0.5, 2, 3.5, 13 / 3]]))
+    assert mean_all.label == "foo"
+    assert mean_all.plot_parameters.colorbar is False
+
+    array1 = [[0, 1, 2, 3]]
+    array2 = [[2, 3, 4, 5]]
+    mean_array1_array2 = TIVMap.from_mean([array1, array2])
+    assert isinstance(mean_array1_array2, TIVMap)
+    assert np.array_equal(mean_array1_array2.values, [[1, 2, 3, 4]])
+
+    array3 = [[[4, 5, 6, 7]]]
+    with pytest.raises(ValueError, match="should have 2 dimensions, not 3"):
+        _ = PixelMap.from_mean([array3])
+
+    array4 = [[4, 5, 6, 7], [5, 6, 7, 8]]
+    with pytest.raises(ValueError, match="all input arrays must have the same shape"):
+        _ = PixelMap.from_mean([array1, array4])

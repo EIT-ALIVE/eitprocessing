@@ -45,7 +45,7 @@ from typing_extensions import Self
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
 
     from matplotlib.axes import Axes
     from matplotlib.image import AxesImage
@@ -446,6 +446,40 @@ class PixelMap:
         # which is does if it is a PixelMap.
 
         return self.update(values=new_values, label=None)
+
+    @classmethod
+    def from_mean(cls, maps: Sequence[npt.ArrayLike | PixelMap], **return_attrs) -> Self:
+        """Get a pixel map of the the per-pixel mean of several pixel maps.
+
+        The maps can be 2D numpy arrays, sequences that can be converted to 2D numpy arrays, or PixelMap objects. The
+        mean is determined using `np.nanmean`, such that NaN values are ignored.
+
+        Returns the same class as this function was called from. Keyword arguments are passed to the initializer of that
+        object.
+
+        Args:
+            maps: sequence of maps that contribute to the mean
+            **return_attrs: keyword arguments to be passed to the initializer of the return object
+
+        Returns:
+            Self: A new instance with the per-pixel mean of the pixel maps.
+        """
+
+        def _get_values(map_: npt.ArrayLike | PixelMap) -> np.ndarray:
+            if isinstance(map_, PixelMap):
+                return map_.values
+
+            map_ = np.asarray(map_, dtype=float)
+
+            if map_.ndim != 2:  # noqa: PLR2004, ignore hardcoded value
+                msg = f"Map {map_} should have 2 dimensions, not {map_.ndim}."
+                raise ValueError(msg)
+
+            return map_
+
+        stacked = np.stack([_get_values(map_) for map_ in maps])
+        mean_values = np.nanmean(stacked, axis=0)
+        return cls(values=mean_values, **return_attrs)
 
 
 @dataclass(frozen=True, init=False)
