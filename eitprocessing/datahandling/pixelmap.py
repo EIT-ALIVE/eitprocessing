@@ -407,8 +407,6 @@ class PixelMap:
 
     def __rsub__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
         new_values = -self.values + self._validate_other(other)
-        if isinstance(other, PixelMap):
-            return DifferenceMap(new_values)
         return self.update(values=new_values, label=None)
 
     def __mul__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
