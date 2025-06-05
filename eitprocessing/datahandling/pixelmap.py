@@ -25,25 +25,30 @@ in an immutable and chainable way, and supports partial updates of nested config
 plotting parameter).
 """
 
+from __future__ import annotations
+
 import warnings
-from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import KW_ONLY, MISSING, asdict, dataclass, field, replace
-from typing import TypeVar, cast
+from typing import TYPE_CHECKING, TypeVar, cast
 
 import matplotlib as mpl
 import numpy as np
 from frozendict import frozendict
 from matplotlib import colorbar
 from matplotlib import pyplot as plt
-from matplotlib.axes import Axes
 from matplotlib.colors import CenteredNorm, Colormap, LinearSegmentedColormap, Normalize
-from matplotlib.image import AxesImage
 from matplotlib.ticker import PercentFormatter
 from numpy import typing as npt
 from typing_extensions import Self
 
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from matplotlib.axes import Axes
+    from matplotlib.image import AxesImage
 
 ColorType = str | tuple[float, float, float] | tuple[float, float, float, float] | float | Colormap
 
@@ -377,7 +382,7 @@ class PixelMap:
 
         return replace(self, **changes)
 
-    def _validate_other(self, other: "npt.ArrayLike | float | PixelMap") -> np.ndarray | float:
+    def _validate_other(self, other: npt.ArrayLike | float | PixelMap) -> np.ndarray | float:
         other_values = other.values if isinstance(other, PixelMap) else other
 
         if isinstance(other, (float, int)):
@@ -391,7 +396,7 @@ class PixelMap:
 
         return other_values
 
-    def __add__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+    def __add__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
         new_values = self.values + self._validate_other(other)
         if isinstance(other, PixelMap):
             return PixelMap(new_values)
@@ -399,17 +404,17 @@ class PixelMap:
 
     __radd__ = __add__
 
-    def __sub__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+    def __sub__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
         new_values = self.values - self._validate_other(other)
         if isinstance(other, PixelMap):
             return DifferenceMap(new_values)
         return self.update(values=new_values, label=None)
 
-    def __rsub__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+    def __rsub__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
         new_values = -self.values + self._validate_other(other)
         return self.update(values=new_values, label=None)
 
-    def __mul__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+    def __mul__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
         new_values = self.values * self._validate_other(other)
         if isinstance(other, PixelMap):
             return PixelMap(new_values)
@@ -417,7 +422,7 @@ class PixelMap:
 
     __rmul__ = __mul__
 
-    def __truediv__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+    def __truediv__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
         other_values = self._validate_other(other)
         if isinstance(other_values, np.ndarray) and 0 in other_values:
             warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning)
@@ -429,7 +434,7 @@ class PixelMap:
             return PixelMap(new_values)
         return self.update(values=new_values, label=None)
 
-    def __rtruediv__(self, other: "npt.ArrayLike | float | PixelMap") -> "PixelMap":
+    def __rtruediv__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
         other_values = self._validate_other(other)
         if 0 in self.values:
             warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning)
