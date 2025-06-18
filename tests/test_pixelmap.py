@@ -1,3 +1,5 @@
+import copy
+import sys
 from dataclasses import FrozenInstanceError
 
 import frozendict
@@ -35,6 +37,25 @@ def test_init_values():
 
     with pytest.raises(FrozenInstanceError, match="cannot assign to field 'values'"):
         pm.values = [[1]]
+
+
+@pytest.mark.skipif(sys.version_info < (3, 13), reason="Requires Python 3.13+")
+def test_update():
+    pm0 = PixelMap([[0]])
+
+    pm1 = copy.replace(pm0, values=[[1]])
+    assert pm1.values == [[1]]
+    assert pm1 == pm0.update(values=[[1]])
+
+    pm2 = copy.replace(pm1, label="test")
+    assert pm2.values == [[1]]
+    assert pm2.label == "test"
+    assert pm2 == pm0.update(values=[[1]], label="test")
+
+    pp0 = PlotParameters()
+    pp1 = copy.replace(pp0, cmap="foo")
+    assert pp1.cmap == "foo"
+    assert pp1 == pp0.update(cmap="foo")
 
 
 def test_init_plot_parameters():

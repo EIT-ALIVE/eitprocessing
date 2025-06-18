@@ -112,7 +112,7 @@ class PlotParameters:
 
             object.__setattr__(self, key, merged)
 
-    def update(self, **changes) -> Self:
+    def __replace__(self, /, **changes) -> Self:
         """Return a copy of the of the PlotParameters instance replacing attributes.
 
         Similar to dataclass.replace(), but with special handling of `colorbar_kwargs`. `colorbar_kwargs` is updated
@@ -128,6 +128,8 @@ class PlotParameters:
             changes["colorbar_kwargs"] = self.colorbar_kwargs | changes["colorbar_kwargs"]
 
         return replace(self, **changes)
+
+    update = __replace__
 
 
 @dataclass(frozen=True, init=False)
@@ -364,7 +366,7 @@ class PixelMap:
 
         return target_type(**data)
 
-    def update(self, **changes) -> Self:
+    def __replace__(self, /, **changes) -> Self:
         """Return a copy of the of the PixelMap instance replacing attributes.
 
         Similar to dataclass.replace(), but with special handling of `plot_parameters`. When `plot_parameters` is
@@ -381,6 +383,8 @@ class PixelMap:
             changes["plot_parameters"] = plot_parameters.update(**changes["plot_parameters"])
 
         return replace(self, **changes)
+
+    update = __replace__
 
     def _validate_other(self, other: npt.ArrayLike | float | PixelMap) -> np.ndarray | float:
         other_values = other.values if isinstance(other, PixelMap) else other
