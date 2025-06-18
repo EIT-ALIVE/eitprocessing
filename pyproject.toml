@@ -87,6 +87,7 @@ testpaths = ["tests"]
 branch = true
 source = ["eitprocessing"]
 command_line = "-m pytest"
+omit = ["tests/*", "*/tests/*"]
 
 [tool.coverage.report]
 exclude_lines = ["if TYPE_CHECKING:"]
