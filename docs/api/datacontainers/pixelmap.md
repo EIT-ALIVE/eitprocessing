@@ -8,4 +8,8 @@
         - PerfusionMap
         - PendelluftMap
         - SignedPendelluftMap
-        - PlotParameters
+
+::: eitprocessing.plotting.pixelmap_plotting
+    options:
+        members:
+        - PixelMapPlotting

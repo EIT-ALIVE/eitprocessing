@@ -28,108 +28,28 @@ plotting parameter).
 from __future__ import annotations
 
 import warnings
-from copy import deepcopy
-from dataclasses import KW_ONLY, MISSING, asdict, dataclass, field, replace
-from typing import TYPE_CHECKING, TypeVar, cast
+from dataclasses import KW_ONLY, InitVar, asdict, dataclass, field, replace
+from typing import TYPE_CHECKING, TypeVar
 
 import matplotlib as mpl
 import numpy as np
 from frozendict import frozendict
-from matplotlib import colorbar
-from matplotlib import pyplot as plt
 from matplotlib.colors import CenteredNorm, Colormap, LinearSegmentedColormap, Normalize
-from matplotlib.ticker import PercentFormatter
 from numpy import typing as npt
 from typing_extensions import Self
 
-from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
+from eitprocessing.plotting.pixelmap_plotting import (
+    ColorType,
+    Parameters,
+    PixelMapPlotting,
+    _get_centered_norm,
+    _get_zero_norm,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from matplotlib.axes import Axes
-    from matplotlib.image import AxesImage
-
-ColorType = str | tuple[float, float, float] | tuple[float, float, float, float] | float | Colormap
-
 T = TypeVar("T", bound="PixelMap")
-
-
-def _get_zero_norm() -> Normalize:
-    return Normalize(vmin=0)
-
-
-def _get_centered_norm() -> CenteredNorm:
-    return CenteredNorm(vcenter=0)
-
-
-@dataclass(frozen=True, kw_only=True)
-class PlotParameters:
-    """Configuration parameters for plotting pixel maps.
-
-    This class encapsulates visualization settings used when plotting pixel maps, providing a consistent interface for
-    controlling the appearance of plots.
-
-    Attributes:
-        cmap (str | Colormap):
-            The colormap to use for the plot. Can be a string name of a matplotlib colormap or a Colormap instance.
-            Defaults to "viridis".
-        norm (str | Normalize):
-            The normalization to use for the plot. Can be a string or a matplotlib Normalize instance. Defaults to
-            "linear".
-        facecolor (ColorType):
-            The background color for areas with NaN values. Defaults to "darkgrey".
-        colorbar (bool): Whether to display a colorbar. Defaults to True.
-        normalize (bool): Whether to normalize values before plotting. Defaults to False.
-        percentage (bool): Whether to display values as percentages. Defaults to False.
-        absolute (bool): Whether to use absolute values for plotting. Defaults to False.
-        colorbar_kwargs (dict | None): Additional arguments to pass to colorbar creation.
-            Defaults to None.
-        hide_axes (bool): Whether to hide the plot axes. Defaults to True.
-        extra_kwargs (dict): Extra arguments passed to `imshow`. Defaults to an empty dict.
-    """
-
-    cmap: str | Colormap = "viridis"
-    norm: str | Normalize = "linear"
-    facecolor: ColorType = "darkgrey"
-    colorbar: bool = True
-    normalize: bool = False
-    percentage: bool = False
-    absolute: bool = False
-    colorbar_kwargs: frozendict = field(default_factory=frozendict)
-    hide_axes: bool = True
-    extra_kwargs: frozendict = field(default_factory=frozendict)
-
-    def __post_init__(self):
-        for key in ("colorbar_kwargs", "extra_kwargs"):
-            default_factory = self.__dataclass_fields__[key].default_factory
-            default_value = default_factory() if default_factory is not MISSING else None
-
-            # tell type checker that this is definitely a frozendict
-            default_value = cast("frozendict", default_value)
-
-            merged = default_value | (getattr(self, key) or {})
-
-            object.__setattr__(self, key, merged)
-
-    def __replace__(self, /, **changes) -> Self:
-        """Return a copy of the of the PlotParameters instance replacing attributes.
-
-        Similar to dataclass.replace(), but with special handling of `colorbar_kwargs`. `colorbar_kwargs` is updated
-        with the provided dictionary, rather than replaced.
-
-        Args:
-            **changes: New values for attributes to replace.
-
-        Returns:
-            Self: A new instance with the replaced attributes.
-        """
-        if "colorbar_kwargs" in changes:
-            changes["colorbar_kwargs"] = self.colorbar_kwargs | changes["colorbar_kwargs"]
-
-        return replace(self, **changes)
-
-    update = __replace__
 
 
 @dataclass(frozen=True, init=False)
@@ -138,19 +58,62 @@ class PixelMap:
 
     For many common cases, specific classes with default plot parameters are available.
 
-    Attributes:
+    Args:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters):
+        plot_parameters (dict | None):
             Plotting parameters controlling colormap, normalization, colorbar, and other display options. Accepts both a
             PlotParameters instance or a dict, which is converted to PlotParameters during initialization.  Subclasses
             provide their own defaults.
+
+    Attributes:
+        plotting (PixelMapPlotting):
+            A utility class for plotting the pixel map with the specified parameters. Provides `imshow()` method to plot
+            image.
     """
+
+    @dataclass(frozen=True, kw_only=True)
+    class PlotParameters(Parameters):
+        """Configuration parameters for plotting pixel maps.
+
+        This class encapsulates visualization settings used when plotting pixel maps, providing a consistent interface
+        for controlling the appearance of plots.
+
+        Attributes:
+            cmap (str | Colormap):
+                The colormap to use for the plot. Can be a string name of a matplotlib colormap or a Colormap instance.
+                Defaults to "viridis".
+            norm (str | Normalize):
+                The normalization to use for the plot. Can be a string or a matplotlib Normalize instance. Defaults to
+                "linear".
+            facecolor (ColorType):
+                The background color for areas with NaN values. Defaults to "darkgrey".
+            colorbar (bool): Whether to display a colorbar. Defaults to True.
+            normalize (bool): Whether to normalize values before plotting. Defaults to False.
+            percentage (bool): Whether to display values as percentages. Defaults to False.
+            absolute (bool): Whether to use absolute values for plotting. Defaults to False.
+            colorbar_kwargs (dict | None): Additional arguments to pass to colorbar creation.
+                Defaults to None.
+            hide_axes (bool): Whether to hide the plot axes. Defaults to True.
+            extra_kwargs (dict): Extra arguments passed to `imshow`. Defaults to an empty dict.
+        """
+
+        cmap: str | Colormap = "viridis"
+        norm: str | Normalize = "linear"
+        facecolor: ColorType = "darkgrey"
+        colorbar: bool = True
+        normalize: bool = False
+        percentage: bool = False
+        absolute: bool = False
+        colorbar_kwargs: frozendict = field(default_factory=frozendict)
+        hide_axes: bool = True
+        extra_kwargs: frozendict = field(default_factory=frozendict)
 
     values: np.ndarray
     _: KW_ONLY
     label: str | None = None
-    plot_parameters: PlotParameters = field(default_factory=PlotParameters)
+    plot_parameters: InitVar[PlotParameters]
+    _plot_parameters: PlotParameters = field(init=False, repr=False)
 
     def __init__(
         self, values: npt.ArrayLike, *, label: str | None = None, plot_parameters: PlotParameters | dict | None = None
@@ -169,10 +132,15 @@ class PixelMap:
             plot_parameters = {}
         if isinstance(plot_parameters, dict):
             # subclasses define their own version, so grab that if it exists
-            plot_parameters_class = getattr(self.__class__, "PlotParameters", PlotParameters)
+            plot_parameters_class = getattr(self.__class__, "PlotParameters", PixelMap.PlotParameters)
             plot_parameters = plot_parameters_class(**plot_parameters)
 
-        object.__setattr__(self, "plot_parameters", plot_parameters)
+        object.__setattr__(self, "_plot_parameters", plot_parameters)
+
+    @property
+    def plotting(self) -> PixelMapPlotting:
+        """A utility class for plotting the pixel map with the specified parameters."""
+        return PixelMapPlotting(self)
 
     def threshold(
         self,
@@ -212,131 +180,7 @@ class PixelMap:
         new_values = np.where(comparator(compare_values, threshold), self.values, fill_value * sign)
 
         return_attrs = return_attrs or {}
-        return replace(self, values=new_values, **return_attrs)
-
-    def imshow(
-        self,
-        colorbar: bool | None = None,
-        normalize: bool | None = None,
-        percentage: bool | None = None,
-        absolute: bool | None = None,
-        colorbar_kwargs: dict | None = None,
-        facecolor: ColorType | None = None,
-        hide_axes: bool | None = None,
-        **kwargs,
-    ) -> AxesImage:
-        """Display the pixel map using `imshow`.
-
-        This method is a wrapper around `matplotlib.pyplot.imshow` that provides convenient defaults and formatting
-        options for displaying pixel maps.
-
-        Plotting parameters are taken from `plot_parameters`, unless overridden by explicit arguments. Any additional
-        keyword arguments are merged with `plot_parameters.extra_kwargs` and passed to `matplotlib.pyplot.imshow`.
-
-        If `colorbar` is True, a colorbar is added to the axes. If `normalize` is True, the pixel values are scaled
-        by their maximum value before plotting. The appearance of the colorbar can be modified using `percentage` and
-        `absolute` flags:
-
-        - `percentage=True` displays the colorbar in percentage units (where 1.0 → 100%).
-        - `absolute=True` uses the absolute value of the data for color scaling and labeling.
-
-        If the colormap has underflow or overflow colors (e.g., for negative values), the colorbar will extend
-        accordingly. Additional arguments can be passed to control or override the appearance of the colorbar via
-        `colorbar_kwargs`, which are passed directly to `matplotlib.pyplot.colorbar`.
-
-        If `hide_axes` is True, the axis ticks and labels are hidden (but the axes remain visible to retain background
-        styling such as facecolor).
-
-        Additional keyword arguments are passed directly to `imshow`, allowing for full control over image rendering.
-        Notably, you can pass an existing matplotlib Axes object using the `ax` keyword argument.
-
-        Args:
-            colorbar (bool | None): Whether to display a colorbar.
-            normalize (bool | None): Whether to scale by the maximum value.
-            percentage (bool | None): Whether to display the colorbar values as a percentage.
-            absolute (bool | None): Whether to display the colorbar using absolute values.
-            colorbar_kwargs (dict): Additional arguments passed to `matplotlib.pyplot.colorbar`.
-            facecolor (ColorType | None):
-                Background color for the axes. If None, uses the facecolor of the PixelMap.
-            hide_axes (bool | None): Whether to hide the axes ticks and labels.
-            ax (matplotlib.axes.Axes, optional): Axes to plot on. If not provided, uses the current axes.
-            **kwargs: Additional keyword arguments passed to `matplotlib.pyplot.imshow`.
-
-        Returns:
-            AxesImage: The image object created by imshow.
-        """
-        plot_parameters = self.plot_parameters
-        normalize = plot_parameters.normalize if normalize is None else normalize
-        colorbar = plot_parameters.colorbar if colorbar is None else colorbar
-        percentage = plot_parameters.percentage if percentage is None else percentage
-        absolute = plot_parameters.absolute if absolute is None else absolute
-        hide_axes = plot_parameters.hide_axes if hide_axes is None else hide_axes
-
-        kwargs = dict(plot_parameters.extra_kwargs | kwargs)
-        ax = kwargs.pop("ax", plt.gca())
-
-        kwargs.setdefault("cmap", plot_parameters.cmap)
-        norm = kwargs.setdefault("norm", plot_parameters.norm)
-
-        if isinstance(norm, Normalize):
-            if norm is plot_parameters.norm:
-                # prevent sharing norm between plots if not explicitly set when calling imshow
-                kwargs["norm"] = norm = deepcopy(norm)
-            vmin = kwargs.pop("vmin", None)
-            vmax = kwargs.pop("vmax", None)
-            if vmin is not None:
-                norm.vmin = vmin
-            if vmax is not None:
-                norm.vmax = vmax
-
-        values = self.values
-        if normalize:
-            values = values / np.nanmax(self.values, initial=1)
-
-        cm = ax.imshow(values, **kwargs)
-
-        colorbar_kwargs = dict(plot_parameters.colorbar_kwargs | (colorbar_kwargs or {}))
-
-        if colorbar:
-            self._create_colorbar(percentage, absolute, colorbar_kwargs, ax, cm)
-
-        if hide_axes:
-            ax.xaxis.set_visible(False)
-            ax.yaxis.set_visible(False)
-
-        ax.set(facecolor=facecolor or plot_parameters.facecolor)
-        return cm
-
-    def _create_colorbar(
-        self, percentage: bool, absolute: bool, colorbar_kwargs: dict | None, ax: Axes, cm: AxesImage
-    ) -> colorbar.Colorbar:
-        """Create a colorbar for the pixel map."""
-        colorbar_kwargs = dict(colorbar_kwargs or {})
-        plot_parameters = self.plot_parameters
-
-        if "format" not in colorbar_kwargs:
-            if absolute and percentage:
-                colorbar_kwargs["format"] = AbsolutePercentFormatter(xmax=1, decimals=0)
-            elif percentage:
-                colorbar_kwargs["format"] = PercentFormatter(xmax=1, decimals=0)
-            elif absolute:
-                colorbar_kwargs["format"] = AbsoluteScalarFormatter()
-
-        if isinstance((cmap := plot_parameters.cmap), Colormap):
-            extend_min = not np.all(cmap.get_under() == cmap(0.0))
-            extend_max = not np.all(cmap.get_over() == cmap(1.0))
-
-            extend = None
-            if extend_min and extend_max:
-                extend = "both"
-            elif extend_min:
-                extend = "min"
-            elif extend_max:
-                extend = "max"
-
-            colorbar_kwargs.setdefault("extend", extend)
-
-        return plt.colorbar(cm, ax=ax, **colorbar_kwargs or {})
+        return self.update(values=new_values, **return_attrs)
 
     def convert_to(self, target_type: type[T], *, keep_attrs: bool = False, **kwargs: dict) -> T:
         """Convert the pixel map to (a different subclass of) PixelMap.
@@ -360,7 +204,7 @@ class PixelMap:
         data = asdict(self)
 
         if not keep_attrs:
-            data.pop("plot_parameters")
+            data.pop("_plot_parameters")
 
         data.update(kwargs)
 
@@ -378,9 +222,10 @@ class PixelMap:
         Returns:
             Self: A new instance with the replaced attributes.
         """
-        plot_parameters = self.plot_parameters
-        if "plot_parameters" in changes and isinstance(changes["plot_parameters"], dict):
-            changes["plot_parameters"] = plot_parameters.update(**changes["plot_parameters"])
+        if "plot_parameters" not in changes:
+            changes["plot_parameters"] = self._plot_parameters
+        elif isinstance(changes["plot_parameters"], dict):
+            changes["plot_parameters"] = self._plot_parameters.update(**changes["plot_parameters"])
 
         return replace(self, **changes)
 
@@ -498,7 +343,7 @@ class TIVMap(PixelMap):
     """
 
     @dataclass(frozen=True, kw_only=True)
-    class PlotParameters(PlotParameters):
+    class PlotParameters(PixelMap.PlotParameters):
         """Configuration parameters for plotting TIV maps.
 
         The default configuration uses:
@@ -536,7 +381,7 @@ class ODCLMap(PixelMap):
     """
 
     @dataclass(frozen=True, kw_only=True)
-    class PlotParameters(PlotParameters):
+    class PlotParameters(PixelMap.PlotParameters):
         """Configuration parameters for plotting ODCL maps.
 
         The default configuration uses:
@@ -574,7 +419,7 @@ class DifferenceMap(PixelMap):
     """
 
     @dataclass(frozen=True, kw_only=True)
-    class PlotParameters(PlotParameters):
+    class PlotParameters(PixelMap.PlotParameters):
         """Configuration parameters for plotting difference maps.
 
         The default configuration uses:
@@ -606,7 +451,7 @@ class PerfusionMap(PixelMap):
     """
 
     @dataclass(frozen=True, kw_only=True)
-    class PlotParameters(PlotParameters):
+    class PlotParameters(PixelMap.PlotParameters):
         """Configuration parameters for plotting perfusion maps.
 
         The default configuration uses:
@@ -640,7 +485,7 @@ class PendelluftMap(PixelMap):
     """
 
     @dataclass(frozen=True, kw_only=True)
-    class PlotParameters(PlotParameters):
+    class PlotParameters(PixelMap.PlotParameters):
         """Configuration parameters for plotting pendelluft maps.
 
         The default configuration uses:
@@ -667,7 +512,7 @@ class SignedPendelluftMap(PixelMap):
     inflation starts), while negative values indicate pixels that have late inflation (after the global inflation
     starts).
 
-    Attributes:
+    Args:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
         plot_parameters (PlotParameters):
@@ -675,7 +520,7 @@ class SignedPendelluftMap(PixelMap):
     """
 
     @dataclass(frozen=True, kw_only=True)
-    class PlotParameters(PlotParameters):
+    class PlotParameters(PixelMap.PlotParameters):
         """Configuration parameters for plotting signed pendelluft maps.
 
         The default configuration uses:
