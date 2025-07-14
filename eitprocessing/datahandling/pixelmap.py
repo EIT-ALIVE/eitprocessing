@@ -38,7 +38,7 @@ from matplotlib.colors import CenteredNorm, Colormap, LinearSegmentedColormap, N
 from numpy import typing as npt
 from typing_extensions import Self
 
-from eitprocessing.plotting.pixelmap_plotting import (
+from eitprocessing.plotting.pixelmap import (
     ColorType,
     Parameters,
     PixelMapPlotting,
