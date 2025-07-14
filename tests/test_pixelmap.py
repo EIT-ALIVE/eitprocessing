@@ -53,14 +53,6 @@ def test_update():
     assert pm2 == pm0.update(values=[[1]], label="test")
 
 
-def test_update_plot_parameters():
-    pp0 = PixelMapPlotParameters()
-    assert isinstance(pp0, PixelMapPlotParameters)
-    pp1 = copy.replace(pp0, cmap="foo")
-    assert pp1.cmap == "foo"
-    assert pp1 == pp0.update(cmap="foo")
-
-
 def test_init_plot_parameters():
     pm0 = PixelMap([[0]])
     pm1 = PixelMap([[0]], plot_parameters={})
@@ -70,52 +62,64 @@ def test_init_plot_parameters():
     assert isinstance(pm0.plotting.parameters, PixelMapPlotParameters)
     assert isinstance(pm1.plotting.parameters, PixelMapPlotParameters)
 
-    assert pm0._plot_parameters == pm1._plot_parameters
-    assert pm0._plot_parameters is not pm1._plot_parameters
+    assert pm0.plotting.parameters == pm1.plotting.parameters
+    assert pm0.plotting.parameters is not pm1.plotting.parameters
 
     pm2 = PixelMap([[0]], plot_parameters=PixelMapPlotParameters(facecolor="white"))
     pm3 = PixelMap([[0]], plot_parameters={"facecolor": "white"})
 
     assert isinstance(pm2.plotting.parameters, PixelMapPlotParameters)
 
-    assert pm2._plot_parameters != pm0._plot_parameters
-    assert pm2._plot_parameters == pm3._plot_parameters
-
-    pm4 = pm0.update(plot_parameters=PixelMapPlotParameters(facecolor="white"))
-    pm5 = pm0.update(plot_parameters={"facecolor": "white"})
-
-    assert pm4._plot_parameters != pm0._plot_parameters
-    assert pm4._plot_parameters == pm2._plot_parameters
-    assert pm4._plot_parameters == pm5._plot_parameters
-
-    pm6 = pm2.update(plot_parameters={"cmap": "inferno"})
-    pm7 = pm2.update(plot_parameters=PixelMapPlotParameters(cmap="inferno"))
-    pm8 = pm2.update(plot_parameters=pm2._plot_parameters.update(cmap="inferno"))
-
-    # when passing a dict as plot_parameters, plot_parameters is *updated*, not *replaced*
-    # pm6 works the same as pm8 internally
-    # when passing a PlotParameters object, the entire object is replaced
-    # pm7 should probably almost never be used
-    assert pm6._plot_parameters != pm7._plot_parameters
-    assert pm7._plot_parameters.facecolor != "white"
-    assert pm6._plot_parameters == pm8._plot_parameters
+    assert pm2.plotting.parameters != pm0.plotting.parameters
+    assert pm2.plotting.parameters == pm3.plotting.parameters
 
     with pytest.raises(TypeError, match=r"PlotParameters.__init__\(\) got an unexpected keyword argument"):
         _ = PixelMap([[0]], plot_parameters={"non_existing": None})
 
     # normally, colorbar kwargs is empty
-    assert pm6._plot_parameters.colorbar_kwargs == {}
-    pm9 = PixelMap([[0]], plot_parameters={"colorbar_kwargs": {"key": "value"}})
-    assert pm9._plot_parameters.colorbar_kwargs == {"key": "value"}
-    assert isinstance(pm9._plot_parameters.colorbar_kwargs, frozendict.frozendict)
+    assert pm0.plotting.parameters.colorbar_kwargs == {}
+    pm3 = PixelMap([[0]], plot_parameters={"colorbar_kwargs": {"key": "value"}})
+    assert pm3.plotting.parameters.colorbar_kwargs == {"key": "value"}
+    assert isinstance(pm3.plotting.parameters.colorbar_kwargs, frozendict.frozendict)
+
+
+def test_update_plot_parameters():
+    pp0 = PixelMapPlotParameters()
+    assert isinstance(pp0, PixelMapPlotParameters)
+    pp1 = copy.replace(pp0, cmap="foo")
+    assert pp1.cmap == "foo"
+    assert pp1 == pp0.update(cmap="foo")
+
+    pm2 = PixelMap([[0]])
+    pm3 = PixelMap([[0]], plot_parameters=PixelMapPlotParameters(facecolor="white"))
+
+    pm4 = pm2.update(plot_parameters=PixelMapPlotParameters(facecolor="white"))
+    pm5 = pm2.update(plot_parameters={"facecolor": "white"})
+
+    assert pm4.plotting.parameters != pm2.plotting.parameters
+    assert pm4.plotting.parameters == pm3.plotting.parameters
+    assert pm4.plotting.parameters == pm5.plotting.parameters
+
+    pm6 = pm3.update(plot_parameters={"cmap": "inferno"})
+    pm7 = pm3.update(plot_parameters=PixelMapPlotParameters(cmap="inferno"))
+    pm8 = pm3.update(plot_parameters=pm3.plotting.parameters.update(cmap="inferno"))
+
+    # when passing a dict as plot_parameters, plot_parameters is *updated*, not *replaced*
+    # pm6 works the same as pm8 internally
+    # when passing a PlotParameters object, the entire object is replaced
+    # pm7 should probably almost never be used
+    assert pm6.plotting.parameters != pm7.plotting.parameters
+    assert pm7.plotting.parameters.facecolor != "white"
+    assert pm6.plotting.parameters == pm8.plotting.parameters
 
     # when updating, update colorbar kwargs instead of overwriting it
+    pm9 = PixelMap([[0]], plot_parameters={"colorbar_kwargs": {"key": "value"}})
     pm10 = pm9.update(plot_parameters={"colorbar_kwargs": {"foo": "bar"}})
-    assert pm10._plot_parameters.colorbar_kwargs == {"key": "value", "foo": "bar"}
+    assert pm10.plotting.parameters.colorbar_kwargs == {"key": "value", "foo": "bar"}
 
     # overriding existing value
     pm11 = pm9.update(plot_parameters={"colorbar_kwargs": {"key": "another value"}})
-    assert pm11._plot_parameters.colorbar_kwargs == {"key": "another value"}
+    assert pm11.plotting.parameters.colorbar_kwargs == {"key": "another value"}
 
 
 def test_threshold():
