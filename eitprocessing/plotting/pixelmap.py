@@ -263,9 +263,9 @@ class TIVMapPlotParameters(PixelMapPlotParameters):
 
     @staticmethod
     def _get_cmap() -> Colormap:
-        _tiv_colormap = mpl.colormaps["Blues"].reversed()
-        _tiv_colormap.set_under("purple")
-        return _tiv_colormap
+        tiv_colormap = mpl.colormaps["Blues"].reversed()
+        tiv_colormap.set_under("purple")
+        return tiv_colormap
 
     cmap: str | Colormap = field(default_factory=_get_cmap)
     norm: str | Normalize = field(default_factory=_get_zero_norm)
@@ -366,16 +366,16 @@ class SignedPendelluftMapPlotParameters(PixelMapPlotParameters):
 
 
 PIXELMAP_PLOT_PARAMETERS_REGISTRY = {
-    TIVMap: TIVMapPlotParameters,
-    ODCLMap: ODCLMapPlotParameters,
-    DifferenceMap: DifferenceMapPlotParameters,
-    PerfusionMap: PerfusionMapPlotParameters,
-    PendelluftMap: PendelluftMapPlotParameters,
-    SignedPendelluftMap: SignedPendelluftMapPlotParameters,
+    TIVMap: TIVMapPlotParameters(),
+    ODCLMap: ODCLMapPlotParameters(),
+    DifferenceMap: DifferenceMapPlotParameters(),
+    PerfusionMap: PerfusionMapPlotParameters(),
+    PendelluftMap: PendelluftMapPlotParameters(),
+    SignedPendelluftMap: SignedPendelluftMapPlotParameters(),
 }
 
 
-def get_pixelmap_plot_parameters(pixel_map: "PixelMap") -> type[PixelMapPlotParameters]:
+def get_pixelmap_plot_parameters(pixel_map: "PixelMap") -> PixelMapPlotParameters:
     """Get the appropriate plot parameters for a given pixel map type.
 
     Args:
@@ -388,4 +388,4 @@ def get_pixelmap_plot_parameters(pixel_map: "PixelMap") -> type[PixelMapPlotPara
         msg = f"Expected a PixelMap instance, got {type(pixel_map)}"
         raise TypeError(msg)
 
-    return PIXELMAP_PLOT_PARAMETERS_REGISTRY.get(type(pixel_map), PixelMapPlotParameters)
+    return PIXELMAP_PLOT_PARAMETERS_REGISTRY.get(type(pixel_map), PixelMapPlotParameters())

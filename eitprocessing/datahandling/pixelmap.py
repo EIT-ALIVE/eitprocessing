@@ -92,8 +92,8 @@ class PixelMap:
             # subclasses define their own version, so grab that if it exists
             from eitprocessing.plotting.pixelmap import get_pixelmap_plot_parameters
 
-            plot_parameters_class = get_pixelmap_plot_parameters(self)
-            plot_parameters = plot_parameters_class(**plot_parameters)
+            default_plot_parameters = get_pixelmap_plot_parameters(self)
+            plot_parameters = default_plot_parameters.update(**plot_parameters)
 
         object.__setattr__(self, "_plot_parameters", plot_parameters)
 
