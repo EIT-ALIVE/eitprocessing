@@ -19,7 +19,11 @@ from eitprocessing.datahandling.pixelmap import (
     TIVMap,
 )
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
-from eitprocessing.plotting.pixelmap import PixelMapPlotParameters, TIVMapPlotParameters
+from eitprocessing.plotting.pixelmap import (
+    PIXELMAP_PLOT_PARAMETERS_REGISTRY,
+    PixelMapPlotParameters,
+    TIVMapPlotParameters,
+)
 
 
 def test_init_values():
@@ -451,3 +455,31 @@ def test_mean():
     array4 = [[4, 5, 6, 7], [5, 6, 7, 8]]
     with pytest.raises(ValueError, match="all input arrays must have the same shape"):
         _ = PixelMap.from_mean([array1, array4])
+
+
+def test_replace_defaults():
+    """Test that replacing PixelMapPlotParameters defaults works as expected."""
+    pm0 = PixelMap([[0]])
+    assert pm0.plotting.parameters.cmap == "viridis"
+
+    PIXELMAP_PLOT_PARAMETERS_REGISTRY[PixelMap] = PixelMapPlotParameters(cmap="plasma")
+
+    pm1 = PixelMap([[0]])
+    assert pm0.plotting.parameters.cmap == "viridis"
+    assert pm1.plotting.parameters.cmap == "plasma"
+
+    pm2 = TIVMap([[0]])
+    assert isinstance(pm2.plotting.parameters.cmap, Colormap)
+    assert pm2.plotting.parameters.cmap.name == "Blues_r"
+
+    PIXELMAP_PLOT_PARAMETERS_REGISTRY[TIVMap] = PIXELMAP_PLOT_PARAMETERS_REGISTRY[TIVMap].update(cmap="Greens")
+
+    pm3 = TIVMap([[0]])
+    assert pm3.plotting.parameters.cmap == "Greens"
+    assert pm3.plotting.parameters.colorbar
+
+    PIXELMAP_PLOT_PARAMETERS_REGISTRY[TIVMap] = PIXELMAP_PLOT_PARAMETERS_REGISTRY[TIVMap].update(colorbar=False)
+
+    pm4 = TIVMap([[0]])
+    assert pm4.plotting.parameters.cmap == "Greens"
+    assert not pm4.plotting.parameters.colorbar
