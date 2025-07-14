@@ -19,6 +19,7 @@ from eitprocessing.datahandling.pixelmap import (
     TIVMap,
 )
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
+from eitprocessing.plotting.pixelmap import PixelMapPlotParameters, TIVMapPlotParameters
 
 
 def test_init_values():
@@ -51,8 +52,10 @@ def test_update():
     assert pm2.label == "test"
     assert pm2 == pm0.update(values=[[1]], label="test")
 
-    pp0 = PixelMap.PlotParameters()
-    assert isinstance(pp0, PixelMap.PlotParameters)
+
+def test_update_plot_parameters():
+    pp0 = PixelMapPlotParameters()
+    assert isinstance(pp0, PixelMapPlotParameters)
     pp1 = copy.replace(pp0, cmap="foo")
     assert pp1.cmap == "foo"
     assert pp1 == pp0.update(cmap="foo")
@@ -62,16 +65,23 @@ def test_init_plot_parameters():
     pm0 = PixelMap([[0]])
     pm1 = PixelMap([[0]], plot_parameters={})
 
+    assert pm0._plot_parameters is pm0.plotting.parameters
+    assert pm1._plot_parameters is pm1.plotting.parameters
+    assert isinstance(pm0.plotting.parameters, PixelMapPlotParameters)
+    assert isinstance(pm1.plotting.parameters, PixelMapPlotParameters)
+
     assert pm0._plot_parameters == pm1._plot_parameters
     assert pm0._plot_parameters is not pm1._plot_parameters
 
-    pm2 = PixelMap([[0]], plot_parameters=PixelMap.PlotParameters(facecolor="white"))
+    pm2 = PixelMap([[0]], plot_parameters=PixelMapPlotParameters(facecolor="white"))
     pm3 = PixelMap([[0]], plot_parameters={"facecolor": "white"})
+
+    assert isinstance(pm2.plotting.parameters, PixelMapPlotParameters)
 
     assert pm2._plot_parameters != pm0._plot_parameters
     assert pm2._plot_parameters == pm3._plot_parameters
 
-    pm4 = pm0.update(plot_parameters=PixelMap.PlotParameters(facecolor="white"))
+    pm4 = pm0.update(plot_parameters=PixelMapPlotParameters(facecolor="white"))
     pm5 = pm0.update(plot_parameters={"facecolor": "white"})
 
     assert pm4._plot_parameters != pm0._plot_parameters
@@ -79,7 +89,7 @@ def test_init_plot_parameters():
     assert pm4._plot_parameters == pm5._plot_parameters
 
     pm6 = pm2.update(plot_parameters={"cmap": "inferno"})
-    pm7 = pm2.update(plot_parameters=PixelMap.PlotParameters(cmap="inferno"))
+    pm7 = pm2.update(plot_parameters=PixelMapPlotParameters(cmap="inferno"))
     pm8 = pm2.update(plot_parameters=pm2._plot_parameters.update(cmap="inferno"))
 
     # when passing a dict as plot_parameters, plot_parameters is *updated*, not *replaced*
@@ -143,7 +153,7 @@ def test_convert():
     assert isinstance(pm2, PerfusionMap)
 
     with pytest.raises(TypeError, match=r"`target_type` must be \(a subclass of\) PixelMap"):
-        _ = pm0.convert_to(PixelMap.PlotParameters)
+        _ = pm0.convert_to(PixelMapPlotParameters)
 
     # TODO: test kwargs in `convert_to()`
 
@@ -161,6 +171,7 @@ def test_pixel_map():
 def test_tiv_map():
     pm = TIVMap([[0]])
 
+    assert isinstance(pm.plotting.parameters, TIVMapPlotParameters)
     assert isinstance(pm.plotting.parameters.cmap, Colormap)
     assert pm.plotting.parameters.cmap.name == "Blues_r"
 

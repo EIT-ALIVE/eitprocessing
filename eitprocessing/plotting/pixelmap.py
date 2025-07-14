@@ -1,23 +1,30 @@
 from copy import deepcopy
 from dataclasses import MISSING, Field, dataclass, field, fields, replace
-from typing import TYPE_CHECKING, Self, TypeVar, get_type_hints
+from typing import Self, TypeVar, get_type_hints
 
+import matplotlib as mpl
 import numpy as np
 from frozendict import frozendict
 from matplotlib import colorbar
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
-from matplotlib.colors import CenteredNorm, Colormap, Normalize
+from matplotlib.colors import CenteredNorm, Colormap, LinearSegmentedColormap, Normalize
 from matplotlib.image import AxesImage
 from matplotlib.ticker import PercentFormatter
 
+from eitprocessing.datahandling.pixelmap import (
+    DifferenceMap,
+    ODCLMap,
+    PendelluftMap,
+    PerfusionMap,
+    PixelMap,
+    SignedPendelluftMap,
+    TIVMap,
+)
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
 
 ColorType = str | tuple[float, float, float] | tuple[float, float, float, float] | float | Colormap
 
-
-if TYPE_CHECKING:
-    from eitprocessing.datahandling.pixelmap import PixelMap
 
 T = TypeVar("T")
 
@@ -75,10 +82,10 @@ def _get_centered_norm() -> CenteredNorm:
 class PixelMapPlotting:
     """Utility class for plotting pixel maps."""
 
-    pixel_map: "PixelMap" = field(compare=False, repr=False)
+    pixel_map: PixelMap = field(compare=False, repr=False)
 
     @property
-    def parameters(self) -> "PixelMap.PlotParameters":
+    def parameters(self) -> "PixelMapPlotParameters":
         """Plotting parameters for the pixel map."""
         return self.pixel_map._plot_parameters  # noqa: SLF001
 
@@ -203,3 +210,182 @@ class PixelMapPlotting:
             colorbar_kwargs.setdefault("extend", extend)
 
         return plt.colorbar(cm, ax=ax, **colorbar_kwargs or {})
+
+
+@dataclass(frozen=True, kw_only=True)
+class PixelMapPlotParameters(Parameters):
+    """Configuration parameters for plotting pixel maps.
+
+    This class encapsulates visualization settings used when plotting pixel maps, providing a consistent interface
+    for controlling the appearance of plots.
+
+    Attributes:
+        cmap (str | Colormap):
+            The colormap to use for the plot. Can be a string name of a matplotlib colormap or a Colormap instance.
+            Defaults to "viridis".
+        norm (str | Normalize):
+            The normalization to use for the plot. Can be a string or a matplotlib Normalize instance. Defaults to
+            "linear".
+        facecolor (ColorType):
+            The background color for areas with NaN values. Defaults to "darkgrey".
+        colorbar (bool): Whether to display a colorbar. Defaults to True.
+        normalize (bool): Whether to normalize values before plotting. Defaults to False.
+        percentage (bool): Whether to display values as percentages. Defaults to False.
+        absolute (bool): Whether to use absolute values for plotting. Defaults to False.
+        colorbar_kwargs (dict | None): Additional arguments to pass to colorbar creation.
+            Defaults to None.
+        hide_axes (bool): Whether to hide the plot axes. Defaults to True.
+        extra_kwargs (dict): Extra arguments passed to `imshow`. Defaults to an empty dict.
+    """
+
+    cmap: str | Colormap = "viridis"
+    norm: str | Normalize = "linear"
+    facecolor: ColorType = "darkgrey"
+    colorbar: bool = True
+    normalize: bool = False
+    percentage: bool = False
+    absolute: bool = False
+    colorbar_kwargs: frozendict = field(default_factory=frozendict)
+    hide_axes: bool = True
+    extra_kwargs: frozendict = field(default_factory=frozendict)
+
+
+@dataclass(frozen=True, kw_only=True)
+class TIVMapPlotParameters(PixelMapPlotParameters):
+    """Configuration parameters for plotting TIV maps.
+
+    The default configuration uses:
+
+    - The 'Blues' colormap reversed (dark blue is no ventilation, lighter blue/white is more/most ventilation)
+    - A zero-based normalization starting at 0 for no TIV
+    - Default colorbar label "TIV (a.u.)"
+    """
+
+    @staticmethod
+    def _get_cmap() -> Colormap:
+        _tiv_colormap = mpl.colormaps["Blues"].reversed()
+        _tiv_colormap.set_under("purple")
+        return _tiv_colormap
+
+    cmap: str | Colormap = field(default_factory=_get_cmap)
+    norm: str | Normalize = field(default_factory=_get_zero_norm)
+    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="TIV (a.u.)"))
+
+
+@dataclass(frozen=True, kw_only=True)
+class ODCLMapPlotParameters(PixelMapPlotParameters):
+    """Configuration parameters for plotting ODCL maps.
+
+    The default configuration uses:
+
+    - A diverging colormap from white (collapse) through black to dark orange (overdistention)
+    - Centered normalization around 0
+    - Absolute percentage value formatting for the colorbar
+    - Default colorbar label "Collapse/Overdistention (%)"
+    """
+
+    cmap: str | Colormap = field(
+        default_factory=lambda: LinearSegmentedColormap.from_list("ODCL", ["white", "black", "darkorange"])
+    )
+    norm: str | Normalize = field(default_factory=lambda: CenteredNorm(vcenter=0, halfrange=1))
+    percentage: bool = True
+    absolute: bool = True
+    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Collapse/Overdistention (%)"))
+
+
+@dataclass(frozen=True, kw_only=True)
+class DifferenceMapPlotParameters(PixelMapPlotParameters):
+    """Configuration parameters for plotting difference maps.
+
+    The default configuration uses:
+
+    - The 'vanimo' colormap
+    - Centered normalization around 0
+    - Default colorbar label "Difference"
+    """
+
+    cmap: str | Colormap = "vanimo"
+    norm: str | Normalize = field(default_factory=_get_centered_norm)
+    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Difference"))
+
+
+@dataclass(frozen=True, kw_only=True)
+class PerfusionMapPlotParameters(PixelMapPlotParameters):
+    """Configuration parameters for plotting perfusion maps.
+
+    The default configuration uses:
+
+    - A gradient colormap black (no perfusion) to red (most perfusion)
+    - A zero-based normalization starting at 0 for no perfusion
+    - Default colorbar label "Perfusion"
+    """
+
+    cmap: str | Colormap = field(
+        default_factory=lambda: LinearSegmentedColormap.from_list("Perfusion", ["black", "red"])
+    )
+    norm: str | Normalize = field(default_factory=_get_zero_norm)
+    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Perfusion"))
+
+
+@dataclass(frozen=True, kw_only=True)
+class PendelluftMapPlotParameters(PixelMapPlotParameters):
+    """Configuration parameters for plotting pendelluft maps.
+
+    The default configuration uses:
+
+    - A gradient colormap black (no pendelluft) to forestgreen (most pendelluft)
+    - A zero-based normalization starting at 0 for no perfusion
+    - Default colorbar label "Pendelluft"
+    """
+
+    cmap: str | Colormap = field(
+        default_factory=lambda: LinearSegmentedColormap.from_list("Perfusion", ["black", "forestgreen"])
+    )
+    norm: Normalize = field(default_factory=_get_zero_norm)
+    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Pendelluft"))
+
+
+@dataclass(frozen=True, kw_only=True)
+class SignedPendelluftMapPlotParameters(PixelMapPlotParameters):
+    """Configuration parameters for plotting signed pendelluft maps.
+
+    The default configuration uses:
+
+    - A diverging colormap from deeppink (early inflation) through black to forestgreen (late inflation)
+    - Centered normalization around 0 to properly show the difference between early and late inflation
+    - Absolute value formatting for the colorbar
+    - Default colorbar label "Pendelluft"
+    """
+
+    cmap: str | Colormap = field(
+        default_factory=lambda: LinearSegmentedColormap.from_list("Perfusion", ["deeppink", "black", "forestgreen"])
+    )
+    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Pendelluft"))
+    absolute: bool = True
+    norm: Normalize = field(default_factory=_get_centered_norm)
+
+
+PIXELMAP_PLOT_PARAMETERS_REGISTRY = {
+    TIVMap: TIVMapPlotParameters,
+    ODCLMap: ODCLMapPlotParameters,
+    DifferenceMap: DifferenceMapPlotParameters,
+    PerfusionMap: PerfusionMapPlotParameters,
+    PendelluftMap: PendelluftMapPlotParameters,
+    SignedPendelluftMap: SignedPendelluftMapPlotParameters,
+}
+
+
+def get_pixelmap_plot_parameters(pixel_map: "PixelMap") -> type[PixelMapPlotParameters]:
+    """Get the appropriate plot parameters for a given pixel map type.
+
+    Args:
+        pixel_map (PixelMap): The pixel map instance for which to get the plot parameters.
+
+    Returns:
+        PixelMapPlotParameters: The plot parameters specific to the pixel map type.
+    """
+    if not isinstance(pixel_map, PixelMap):
+        msg = f"Expected a PixelMap instance, got {type(pixel_map)}"
+        raise TypeError(msg)
+
+    return PIXELMAP_PLOT_PARAMETERS_REGISTRY.get(type(pixel_map), PixelMapPlotParameters)
