@@ -23,6 +23,8 @@ from eitprocessing.plotting.pixelmap import (
     PIXELMAP_PLOT_PARAMETERS_REGISTRY,
     PixelMapPlotParameters,
     TIVMapPlotParameters,
+    reset_pixelmap_plot_parameters,
+    set_pixelmap_plot_parameters,
 )
 
 
@@ -483,3 +485,40 @@ def test_replace_defaults():
     pm4 = TIVMap([[0]])
     assert pm4.plotting.parameters.cmap == "Greens"
     assert not pm4.plotting.parameters.colorbar
+
+    reset_pixelmap_plot_parameters()
+    pm0 = PixelMap([[0]])
+    assert pm0.plotting.parameters.cmap == "viridis"
+
+
+def test_set_pixelmap_plot_parameters():
+    """Test that set_pixelmap_plot_parameters works as expected."""
+    pm0 = PixelMap([[0]])
+    assert pm0.plotting.parameters.cmap == "viridis"
+
+    set_pixelmap_plot_parameters(PixelMap, cmap="plasma")
+
+    pm1 = PixelMap([[0]])
+    assert pm1.plotting.parameters.cmap == "plasma"
+
+    pm2 = TIVMap([[0]])
+    assert isinstance(pm2.plotting.parameters.cmap, Colormap)
+    assert pm2.plotting.parameters.cmap.name == "Blues_r"
+
+    set_pixelmap_plot_parameters(TIVMap, cmap="Greens")
+
+    pm3 = TIVMap([[0]])
+    assert pm3.plotting.parameters.cmap == "Greens"
+
+    set_pixelmap_plot_parameters(cmap="Reds", colorbar=False)
+    assert all(
+        cls([[0]]).plotting.parameters.cmap == "Reds" and not cls([[0]]).plotting.parameters.colorbar
+        for cls in PIXELMAP_PLOT_PARAMETERS_REGISTRY
+    )
+
+    reset_pixelmap_plot_parameters(PixelMap)
+
+    pm4 = PixelMap([[0]])
+    pm5 = TIVMap([[0]])
+    assert pm4.plotting.parameters.cmap == "viridis"
+    assert pm5.plotting.parameters.cmap == "Reds"

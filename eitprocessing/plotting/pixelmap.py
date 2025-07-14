@@ -366,6 +366,7 @@ class SignedPendelluftMapPlotParameters(PixelMapPlotParameters):
 
 
 PIXELMAP_PLOT_PARAMETERS_REGISTRY = {
+    PixelMap: PixelMapPlotParameters(),
     TIVMap: TIVMapPlotParameters(),
     ODCLMap: ODCLMapPlotParameters(),
     DifferenceMap: DifferenceMapPlotParameters(),
@@ -389,3 +390,31 @@ def get_pixelmap_plot_parameters(pixel_map: "PixelMap") -> PixelMapPlotParameter
         raise TypeError(msg)
 
     return PIXELMAP_PLOT_PARAMETERS_REGISTRY.get(type(pixel_map), PixelMapPlotParameters())
+
+
+def set_pixelmap_plot_parameters(*types, **parameters) -> None:
+    """Set or update the plot parameters for specified pixel map types.
+
+    Examples:
+        >>> set_pixelmap_plot_parameters(TIVMap, cmap="plasma")
+        >>> set_pixelmap_plot_parameters(PendelluftMap, SignedPendelluftMap, colorbar=False, absolute=True)
+        >>> set_pixelmap_plot_parameters(cmap="viridis")  # Update all types with new cmap
+
+    """
+    if not types:
+        types = PIXELMAP_PLOT_PARAMETERS_REGISTRY.keys()
+
+    for type_ in types:
+        PIXELMAP_PLOT_PARAMETERS_REGISTRY[type_] = PIXELMAP_PLOT_PARAMETERS_REGISTRY[type_].update(**parameters)
+
+
+def reset_pixelmap_plot_parameters(*types) -> None:
+    """Reset plot parameters to their defaults.
+
+    Resets the plot parameter defaults for the specified pixel map types. If no types are specified, all registered
+    pixel map types will be reset to their default parameters.
+    """
+    if not types:
+        types = PIXELMAP_PLOT_PARAMETERS_REGISTRY.keys()
+    for type_ in types:
+        PIXELMAP_PLOT_PARAMETERS_REGISTRY[type_] = PIXELMAP_PLOT_PARAMETERS_REGISTRY[type_].__class__()
