@@ -1,3 +1,32 @@
+"""Visualizing pixel maps.
+
+This module provides methods for visualizing pixel maps, as well as configuration parameters with (editable) defaults.
+`PixelMapPlotting` should not be used directly, but rather through the `PixelMap` class, which provides the methods of
+`PixelMapPlotting` through the `plotting` property.
+
+The plotting parameters are defined in the `PixelMapPlotParameters` class and its subclasses for specific pixel map
+types. PIXELMAP_PLOT_PARAMETERS_REGISTRY is a registry that maps pixel map types to their respective plotting
+parameters. At initialization of the `PixelMap` class, the appropriate plotting parameters are copied from the registry.
+The `get_pixelmap_plot_parameters` function retrieves the plotting parameters for a specific pixel map instance or type.
+The registry can be updated using the `set_pixelmap_plot_parameters` function, which allows for changing the defaults
+for specific pixel map types or all types at once. The registry can be reset to hardcoded defaults using the
+`reset_pixelmap_plot_parameters`.
+
+Examples:
+    >>> from eitprocessing.datahandling.pixelmap import PixelMap, TIVMap
+    >>> from eitprocessing.plotting.pixelmap import get_pixelmap_plot_parameters, set_pixelmap_plot_parameters
+
+    # Get default parameters for a pixel map instance
+    >>> pixel_map = PixelMap(values=np.random.rand(10, 10))
+    >>> params = get_pixelmap_plot_parameters(pixel_map)
+
+    # Update parameters for TIVMap
+    >>> set_pixelmap_plot_parameters(TIVMap, cmap="plasma")
+
+    # Reset all parameters to hardcoded defaults
+    >>> reset_pixelmap_plot_parameters()
+"""
+
 from copy import deepcopy
 from dataclasses import MISSING, Field, dataclass, field, fields, replace
 from typing import Self, TypeVar, get_type_hints
@@ -376,20 +405,24 @@ PIXELMAP_PLOT_PARAMETERS_REGISTRY = {
 }
 
 
-def get_pixelmap_plot_parameters(pixel_map: "PixelMap") -> PixelMapPlotParameters:
+def get_pixelmap_plot_parameters(obj: "PixelMap | type[PixelMap]") -> PixelMapPlotParameters:
     """Get the appropriate plot parameters for a given pixel map type.
 
     Args:
-        pixel_map (PixelMap): The pixel map instance for which to get the plot parameters.
+        obj (PixelMap | type[PixelMap]): The pixel map instance or pixel map type for which to get the plot parameters.
 
     Returns:
         PixelMapPlotParameters: The plot parameters specific to the pixel map type.
     """
-    if not isinstance(pixel_map, PixelMap):
-        msg = f"Expected a PixelMap instance, got {type(pixel_map)}"
+    if isinstance(obj, PixelMap):
+        cls_ = type(obj)
+    elif issubclass(obj, PixelMap):
+        cls_ = obj
+    else:
+        msg = f"Expected PixelMap instance or type, got {type(obj)}"
         raise TypeError(msg)
 
-    return PIXELMAP_PLOT_PARAMETERS_REGISTRY.get(type(pixel_map), PixelMapPlotParameters())
+    return PIXELMAP_PLOT_PARAMETERS_REGISTRY.get(cls_, PixelMapPlotParameters())
 
 
 def set_pixelmap_plot_parameters(*types, **parameters) -> None:

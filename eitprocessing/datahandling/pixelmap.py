@@ -1,7 +1,7 @@
-"""Handling and visualizing pixel-based data maps in EIT analysis.
+"""Handling pixel-based data maps in EIT analysis.
 
-This module provides classes for working with pixel-based data representations of EIT data. The main class hierarchy
-consists of:
+This module provides classes for working with pixel-based data representations of EIT data. Besides the base PixelMap
+class, several specialized subclasses are defined for specific use cases, each with its own default plotting parameters:
 
 - PixelMap: Base class for representing 2D pixel data with visualization and manipulation capabilities.
 - TIVMap: Specialized map for Tidal Impedance Variation (TIV) data.
@@ -11,18 +11,19 @@ consists of:
 - PendelluftMap: Specialized map for positive-only pendelluft values (severity, no direction).
 - SignedPendelluftMap: Specialized map for signed pendelluft values (severity and direction/phase).
 
-Each map type provides appropriate default colormaps and normalizations suitable for
-their specific use case, along with methods for visualization and data manipulation.
-
-Plotting parameters for each map are managed via a `PlotParameters` dataclass, which allows for flexible configuration
-of colormap, normalization, colorbar, and other display options. These can be customized per map type or per instance.
+The subclasses have no additional attributes beyond those of PixelMap, but they provide specific default plotting
+parameters. Plotting parameters for each map are managed via the `PixelMapPlotParameters` dataclass, which allows for
+flexible configuration of colormap, normalization, colorbar, and other display options. These can be customized per map
+type or per instance. Plotting parameters are defined and registered in `eitprocessing.plotting.pixelmap`. Each map
+type's default parameters provides appropriate default colormaps and normalizations suitable for their specific use
+case, along with methods for visualization and data manipulation.
 
 All classes are immutable to ensure data integrity during analysis pipelines.
 
-Both `PixelMap` and `PlotParameters` provide a `replace` method, which allows you to create a copy of the object with
-one or more attributes replaced, similar to `dataclasses.replace()`. This is useful for updating data or configuration
-in an immutable and chainable way, and supports partial updates of nested configuration (e.g., updating only a single
-plotting parameter).
+`PixelMap` provides an `update` method, which allows for creating a copy of the object with one or more attributes
+replaced, similar to `dataclasses.replace()` and `copy.replace()` in Python 3.13 and newer. This is useful for updating
+data or configuration in an immutable and chainable way, and supports partial updates of nested configuration (e.g.,
+updating only a single plotting parameter).
 """
 
 from __future__ import annotations
@@ -54,8 +55,8 @@ class PixelMap:
         label (str | None): Label for the pixel map.
         plot_parameters (dict | None):
             Plotting parameters controlling colormap, normalization, colorbar, and other display options. Accepts both a
-            PlotParameters instance or a dict, which is converted to PlotParameters during initialization.  Subclasses
-            provide their own defaults.
+            PixelMapPlotParameters instance or a dict, which is converted to PixelMapPlotParameters during
+            initialization. Subclasses provide their own defaults.
 
     Attributes:
         plotting (PixelMapPlotting):
@@ -295,14 +296,7 @@ class PixelMap:
 
 @dataclass(frozen=True, init=False)
 class TIVMap(PixelMap):
-    """Pixel map representing the tidal impedance variation or amplitude.
-
-    Attributes:
-        values (np.ndarray): 2D array of pixel values.
-        label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters):
-            Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
-    """
+    """Pixel map representing the tidal impedance variation or amplitude."""
 
 
 @dataclass(frozen=True, init=False)
@@ -311,12 +305,6 @@ class ODCLMap(PixelMap):
 
     Values between -1 and 0 represent collapse (-100% to 0%), while values between 0 and 1 represent overdistention (0%
     to 100%).
-
-    Attributes:
-        values (np.ndarray): 2D array of pixel values.
-        label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters):
-            Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
 
@@ -327,12 +315,6 @@ class DifferenceMap(PixelMap):
     The normalization is centered around zero, with positive values indicating an increase and negative values
     indicating a decrease in the pixel values compared to a reference map. If the values are all expected to be
     positive, converting to a normal `PixelMap` instead.
-
-    Attributes:
-        values (np.ndarray): 2D array of pixel values.
-        label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters):
-            Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
 
@@ -342,12 +324,6 @@ class PerfusionMap(PixelMap):
 
     Values represent perfusion, where higher values indicate better perfusion. The values are expected to be
     non-negative, with 0 representing no perfusion and higher values representing more perfusion.
-
-    Attributes:
-        values (np.ndarray): 2D array of pixel values.
-        label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters):
-            Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
 
 
@@ -356,13 +332,7 @@ class PendelluftMap(PixelMap):
     """Pixel map representing pendelluft values.
 
     Values represent pendelluft severity as positive values. There is no distinction between pixels with early inflation
-    and pixels with late inflation. Alternatively,
-
-    Attributes:
-        values (np.ndarray): 2D array of pixel values.
-        label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters):
-            Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
+    and pixels with late inflation. Alternatively, use SignedPendelluftMap for positive and negative values.
     """
 
 
@@ -373,10 +343,4 @@ class SignedPendelluftMap(PixelMap):
     Values represent pendelluft severity. Negative values indicate pixels that have early inflation (before the global
     inflation starts), while negative values indicate pixels that have late inflation (after the global inflation
     starts).
-
-    Args:
-        values (np.ndarray): 2D array of pixel values.
-        label (str | None): Label for the pixel map.
-        plot_parameters (PlotParameters):
-            Plotting parameters, with defaults specific to this map type (see `TIVMap.PlotParameters`).
     """
