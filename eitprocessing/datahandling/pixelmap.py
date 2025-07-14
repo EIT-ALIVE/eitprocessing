@@ -1,7 +1,8 @@
 """Handling pixel-based data maps in EIT analysis.
 
 This module provides classes for working with pixel-based data representations of EIT data. Besides the base PixelMap
-class, several specialized subclasses are defined for specific use cases, each with its own default plotting parameters:
+class, several specialized subclasses are defined for specific use cases, each with its own default plotting
+configuration:
 
 - PixelMap: Base class for representing 2D pixel data with visualization and manipulation capabilities.
 - TIVMap: Specialized map for Tidal Impedance Variation (TIV) data.
@@ -12,10 +13,10 @@ class, several specialized subclasses are defined for specific use cases, each w
 - SignedPendelluftMap: Specialized map for signed pendelluft values (severity and direction/phase).
 
 The subclasses have no additional attributes beyond those of PixelMap, but they provide specific default plotting
-parameters. Plotting parameters for each map are managed via the `PixelMapPlotParameters` dataclass, which allows for
+configuration. The configuration for each map are managed via the `PixelMapPlotConfig` dataclass, which allows for
 flexible configuration of colormap, normalization, colorbar, and other display options. These can be customized per map
-type or per instance. Plotting parameters are defined and registered in `eitprocessing.plotting.pixelmap`. Each map
-type's default parameters provides appropriate default colormaps and normalizations suitable for their specific use
+type or per instance. Plotting configurations are defined and registered in `eitprocessing.plotting.pixelmap`. Each map
+type's default configuration provides appropriate default colormaps and normalizations suitable for their specific use
 case, along with methods for visualization and data manipulation.
 
 All classes are immutable to ensure data integrity during analysis pipelines.
@@ -23,7 +24,7 @@ All classes are immutable to ensure data integrity during analysis pipelines.
 `PixelMap` provides an `update` method, which allows for creating a copy of the object with one or more attributes
 replaced, similar to `dataclasses.replace()` and `copy.replace()` in Python 3.13 and newer. This is useful for updating
 data or configuration in an immutable and chainable way, and supports partial updates of nested configuration (e.g.,
-updating only a single plotting parameter).
+updating only a single plotting configuration parameter).
 """
 
 from __future__ import annotations
@@ -39,7 +40,7 @@ from typing_extensions import Self
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from eitprocessing.plotting.pixelmap import PixelMapPlotParameters, PixelMapPlotting
+    from eitprocessing.plotting.pixelmap import PixelMapPlotConfig, PixelMapPlotting
 
 T = TypeVar("T", bound="PixelMap")
 
@@ -48,34 +49,34 @@ T = TypeVar("T", bound="PixelMap")
 class PixelMap:
     """Map representing a single value for each pixel.
 
-    For many common cases, specific classes with default plot parameters are available.
+    For many common cases, specific classes with default plotting configuration are available.
 
     Args:
         values (np.ndarray): 2D array of pixel values.
         label (str | None): Label for the pixel map.
-        plot_parameters (dict | None):
-            Plotting parameters controlling colormap, normalization, colorbar, and other display options. Accepts both a
-            PixelMapPlotParameters instance or a dict, which is converted to PixelMapPlotParameters during
+        plot_config (dict | None):
+            Plotting configuration controlling colormap, normalization, colorbar, and other display options. Accepts
+            both a PixelMapPlotConfig instance or a dict, which is converted to PixelMapPlotConfig during
             initialization. Subclasses provide their own defaults.
 
     Attributes:
         plotting (PixelMapPlotting):
-            A utility class for plotting the pixel map with the specified parameters. Provides `imshow()` method to plot
-            image.
+            A utility class for plotting the pixel map with the specified configuration. Provides `imshow()` method to
+            plot image.
     """
 
     values: np.ndarray
     _: KW_ONLY
     label: str | None = None
-    plot_parameters: InitVar[PixelMapPlotParameters | dict | None]
-    _plot_parameters: PixelMapPlotParameters = field(init=False, repr=False)
+    plot_config: InitVar[PixelMapPlotConfig | dict | None]
+    _plot_config: PixelMapPlotConfig = field(init=False, repr=False)
 
     def __init__(
         self,
         values: npt.ArrayLike,
         *,
         label: str | None = None,
-        plot_parameters: PixelMapPlotParameters | dict | None = None,
+        plot_config: PixelMapPlotConfig | dict | None = None,
     ):
         values = np.asarray(values, dtype=float)
         if values.ndim != 2:  # noqa: PLR2004, ignore hardcoded value
@@ -87,20 +88,20 @@ class PixelMap:
 
         object.__setattr__(self, "label", label)
 
-        if plot_parameters is None:
-            plot_parameters = {}
-        if isinstance(plot_parameters, dict):
+        if plot_config is None:
+            plot_config = {}
+        if isinstance(plot_config, dict):
             # subclasses define their own version, so grab that if it exists
-            from eitprocessing.plotting.pixelmap import get_pixelmap_plot_parameters
+            from eitprocessing.plotting.pixelmap import get_pixelmap_plot_config
 
-            default_plot_parameters = get_pixelmap_plot_parameters(self)
-            plot_parameters = default_plot_parameters.update(**plot_parameters)
+            default_plot_config = get_pixelmap_plot_config(self)
+            plot_config = default_plot_config.update(**plot_config)
 
-        object.__setattr__(self, "_plot_parameters", plot_parameters)
+        object.__setattr__(self, "_plot_config", plot_config)
 
     @property
     def plotting(self) -> PixelMapPlotting:
-        """A utility class for plotting the pixel map with the specified parameters."""
+        """A utility class for plotting the pixel map with the specified configuration."""
         from eitprocessing.plotting.pixelmap import PixelMapPlotting
 
         return PixelMapPlotting(self)
@@ -167,7 +168,7 @@ class PixelMap:
         data = asdict(self)
 
         if not keep_attrs:
-            data.pop("_plot_parameters")
+            data.pop("_plot_config")
 
         data.update(kwargs)
 
@@ -176,8 +177,8 @@ class PixelMap:
     def __replace__(self, /, **changes) -> Self:
         """Return a copy of the of the PixelMap instance replacing attributes.
 
-        Similar to dataclass.replace(), but with special handling of `plot_parameters`. When `plot_parameters` is
-        provided as a dict, it updates the existing `plot_parameters` instead of replacing them completely.
+        Similar to dataclass.replace(), but with special handling of `plot_config`. When `plot_config` is
+        provided as a dict, it updates the existing `plot_config` instead of replacing them completely.
 
         Args:
             **changes: New values for attributes to replace.
@@ -185,10 +186,10 @@ class PixelMap:
         Returns:
             Self: A new instance with the replaced attributes.
         """
-        if "plot_parameters" not in changes:
-            changes["plot_parameters"] = self._plot_parameters
-        elif isinstance(changes["plot_parameters"], dict):
-            changes["plot_parameters"] = self._plot_parameters.update(**changes["plot_parameters"])
+        if "plot_config" not in changes:
+            changes["plot_config"] = self._plot_config
+        elif isinstance(changes["plot_config"], dict):
+            changes["plot_config"] = self._plot_config.update(**changes["plot_config"])
 
         return replace(self, **changes)
 

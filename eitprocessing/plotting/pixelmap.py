@@ -8,20 +8,20 @@ The plotting parameters are defined in the `PixelMapPlotParameters` class and it
 types. PIXELMAP_PLOT_PARAMETERS_REGISTRY is a registry that maps pixel map types to their respective plotting
 parameters. At initialization of the `PixelMap` class, the appropriate plotting parameters are copied from the registry.
 The `get_pixelmap_plot_parameters` function retrieves the plotting parameters for a specific pixel map instance or type.
-The registry can be updated using the `set_pixelmap_plot_parameters` function, which allows for changing the defaults
+The registry can be updated using the `set_pixelmap_plot_config` function, which allows for changing the defaults
 for specific pixel map types or all types at once. The registry can be reset to hardcoded defaults using the
 `reset_pixelmap_plot_parameters`.
 
 Examples:
     >>> from eitprocessing.datahandling.pixelmap import PixelMap, TIVMap
-    >>> from eitprocessing.plotting.pixelmap import get_pixelmap_plot_parameters, set_pixelmap_plot_parameters
+    >>> from eitprocessing.plotting.pixelmap import get_pixelmap_plot_parameters, set_pixelmap_plot_config
 
     # Get default parameters for a pixel map instance
     >>> pixel_map = PixelMap(values=np.random.rand(10, 10))
     >>> params = get_pixelmap_plot_parameters(pixel_map)
 
     # Update parameters for TIVMap
-    >>> set_pixelmap_plot_parameters(TIVMap, cmap="plasma")
+    >>> set_pixelmap_plot_config(TIVMap, cmap="plasma")
 
     # Reset all parameters to hardcoded defaults
     >>> reset_pixelmap_plot_parameters()
@@ -65,8 +65,8 @@ def _get_field_type(field_: Field[T], cls: type) -> type[T]:
 
 
 @dataclass(frozen=True, kw_only=True)
-class Parameters:
-    """Base class for parameters."""
+class Config:
+    """Base class for configuration."""
 
     def __post_init__(self):
         for field_ in fields(self):
@@ -78,7 +78,7 @@ class Parameters:
                 object.__setattr__(self, field_.name, frozendict(merged))
 
     def __replace__(self, /, **changes) -> Self:
-        """Return a copy of the of the PlotParameters instance replacing attributes.
+        """Return a copy of the of the Config instance replacing attributes.
 
         Similar to dataclass.replace(), but with special handling of `colorbar_kwargs`. `colorbar_kwargs` is updated
         with the provided dictionary, rather than replaced.
@@ -114,9 +114,9 @@ class PixelMapPlotting:
     pixel_map: PixelMap = field(compare=False, repr=False)
 
     @property
-    def parameters(self) -> "PixelMapPlotParameters":
-        """Plotting parameters for the pixel map."""
-        return self.pixel_map._plot_parameters  # noqa: SLF001
+    def config(self) -> "PixelMapPlotConfig":
+        """Plotting configuration for the pixel map."""
+        return self.pixel_map._plot_config  # noqa: SLF001
 
     def imshow(
         self,
@@ -169,20 +169,20 @@ class PixelMapPlotting:
         Returns:
             AxesImage: The image object created by imshow.
         """
-        normalize = self.parameters.normalize if normalize is None else normalize
-        colorbar = self.parameters.colorbar if colorbar is None else colorbar
-        percentage = self.parameters.percentage if percentage is None else percentage
-        absolute = self.parameters.absolute if absolute is None else absolute
-        hide_axes = self.parameters.hide_axes if hide_axes is None else hide_axes
+        normalize = self.config.normalize if normalize is None else normalize
+        colorbar = self.config.colorbar if colorbar is None else colorbar
+        percentage = self.config.percentage if percentage is None else percentage
+        absolute = self.config.absolute if absolute is None else absolute
+        hide_axes = self.config.hide_axes if hide_axes is None else hide_axes
 
-        kwargs = dict(self.parameters.extra_kwargs | kwargs)
+        kwargs = dict(self.config.extra_kwargs | kwargs)
         ax = kwargs.pop("ax", plt.gca())
 
-        kwargs.setdefault("cmap", self.parameters.cmap)
-        norm = kwargs.setdefault("norm", self.parameters.norm)
+        kwargs.setdefault("cmap", self.config.cmap)
+        norm = kwargs.setdefault("norm", self.config.norm)
 
         if isinstance(norm, Normalize):
-            if norm is self.parameters.norm:
+            if norm is self.config.norm:
                 # prevent sharing norm between plots if not explicitly set when calling imshow
                 kwargs["norm"] = norm = deepcopy(norm)
             vmin = kwargs.pop("vmin", None)
@@ -198,7 +198,7 @@ class PixelMapPlotting:
 
         cm = ax.imshow(values, **kwargs)
 
-        colorbar_kwargs = dict(self.parameters.colorbar_kwargs | (colorbar_kwargs or {}))
+        colorbar_kwargs = dict(self.config.colorbar_kwargs | (colorbar_kwargs or {}))
 
         if colorbar:
             self._create_colorbar(percentage, absolute, colorbar_kwargs, ax, cm)
@@ -207,7 +207,7 @@ class PixelMapPlotting:
             ax.xaxis.set_visible(False)
             ax.yaxis.set_visible(False)
 
-        ax.set(facecolor=facecolor or self.parameters.facecolor)
+        ax.set(facecolor=facecolor or self.config.facecolor)
         return cm
 
     def _create_colorbar(
@@ -224,7 +224,7 @@ class PixelMapPlotting:
             elif absolute:
                 colorbar_kwargs["format"] = AbsoluteScalarFormatter()
 
-        if isinstance((cmap := self.parameters.cmap), Colormap):
+        if isinstance((cmap := self.config.cmap), Colormap):
             extend_min = not np.all(cmap.get_under() == cmap(0.0))
             extend_max = not np.all(cmap.get_over() == cmap(1.0))
 
@@ -242,8 +242,8 @@ class PixelMapPlotting:
 
 
 @dataclass(frozen=True, kw_only=True)
-class PixelMapPlotParameters(Parameters):
-    """Configuration parameters for plotting pixel maps.
+class PixelMapPlotConfig(Config):
+    """Configuration for plotting pixel maps.
 
     This class encapsulates visualization settings used when plotting pixel maps, providing a consistent interface
     for controlling the appearance of plots.
@@ -280,8 +280,8 @@ class PixelMapPlotParameters(Parameters):
 
 
 @dataclass(frozen=True, kw_only=True)
-class TIVMapPlotParameters(PixelMapPlotParameters):
-    """Configuration parameters for plotting TIV maps.
+class TIVMapPlotConfig(PixelMapPlotConfig):
+    """Configuration for plotting TIV maps.
 
     The default configuration uses:
 
@@ -302,8 +302,8 @@ class TIVMapPlotParameters(PixelMapPlotParameters):
 
 
 @dataclass(frozen=True, kw_only=True)
-class ODCLMapPlotParameters(PixelMapPlotParameters):
-    """Configuration parameters for plotting ODCL maps.
+class ODCLMapPlotConfig(PixelMapPlotConfig):
+    """Configuration for plotting ODCL maps.
 
     The default configuration uses:
 
@@ -323,8 +323,8 @@ class ODCLMapPlotParameters(PixelMapPlotParameters):
 
 
 @dataclass(frozen=True, kw_only=True)
-class DifferenceMapPlotParameters(PixelMapPlotParameters):
-    """Configuration parameters for plotting difference maps.
+class DifferenceMapPlotConfig(PixelMapPlotConfig):
+    """Configuration for plotting difference maps.
 
     The default configuration uses:
 
@@ -339,8 +339,8 @@ class DifferenceMapPlotParameters(PixelMapPlotParameters):
 
 
 @dataclass(frozen=True, kw_only=True)
-class PerfusionMapPlotParameters(PixelMapPlotParameters):
-    """Configuration parameters for plotting perfusion maps.
+class PerfusionMapPlotConfig(PixelMapPlotConfig):
+    """Configuration for plotting perfusion maps.
 
     The default configuration uses:
 
@@ -357,8 +357,8 @@ class PerfusionMapPlotParameters(PixelMapPlotParameters):
 
 
 @dataclass(frozen=True, kw_only=True)
-class PendelluftMapPlotParameters(PixelMapPlotParameters):
-    """Configuration parameters for plotting pendelluft maps.
+class PendelluftMapPlotConfig(PixelMapPlotConfig):
+    """Configuration for plotting pendelluft maps.
 
     The default configuration uses:
 
@@ -375,8 +375,8 @@ class PendelluftMapPlotParameters(PixelMapPlotParameters):
 
 
 @dataclass(frozen=True, kw_only=True)
-class SignedPendelluftMapPlotParameters(PixelMapPlotParameters):
-    """Configuration parameters for plotting signed pendelluft maps.
+class SignedPendelluftMapPlotConfig(PixelMapPlotConfig):
+    """Configuration for plotting signed pendelluft maps.
 
     The default configuration uses:
 
@@ -394,18 +394,18 @@ class SignedPendelluftMapPlotParameters(PixelMapPlotParameters):
     norm: Normalize = field(default_factory=_get_centered_norm)
 
 
-PIXELMAP_PLOT_PARAMETERS_REGISTRY = {
-    PixelMap: PixelMapPlotParameters(),
-    TIVMap: TIVMapPlotParameters(),
-    ODCLMap: ODCLMapPlotParameters(),
-    DifferenceMap: DifferenceMapPlotParameters(),
-    PerfusionMap: PerfusionMapPlotParameters(),
-    PendelluftMap: PendelluftMapPlotParameters(),
-    SignedPendelluftMap: SignedPendelluftMapPlotParameters(),
+PIXELMAP_PLOT_CONFIG_REGISTRY = {
+    PixelMap: PixelMapPlotConfig(),
+    TIVMap: TIVMapPlotConfig(),
+    ODCLMap: ODCLMapPlotConfig(),
+    DifferenceMap: DifferenceMapPlotConfig(),
+    PerfusionMap: PerfusionMapPlotConfig(),
+    PendelluftMap: PendelluftMapPlotConfig(),
+    SignedPendelluftMap: SignedPendelluftMapPlotConfig(),
 }
 
 
-def get_pixelmap_plot_parameters(obj: "PixelMap | type[PixelMap]") -> PixelMapPlotParameters:
+def get_pixelmap_plot_config(obj: "PixelMap | type[PixelMap]") -> PixelMapPlotConfig:
     """Get the appropriate plot parameters for a given pixel map type.
 
     Args:
@@ -422,32 +422,32 @@ def get_pixelmap_plot_parameters(obj: "PixelMap | type[PixelMap]") -> PixelMapPl
         msg = f"Expected PixelMap instance or type, got {type(obj)}"
         raise TypeError(msg)
 
-    return PIXELMAP_PLOT_PARAMETERS_REGISTRY.get(cls_, PixelMapPlotParameters())
+    return PIXELMAP_PLOT_CONFIG_REGISTRY.get(cls_, PixelMapPlotConfig())
 
 
-def set_pixelmap_plot_parameters(*types, **parameters) -> None:
+def set_pixelmap_plot_config(*types, **parameters) -> None:
     """Set or update the plot parameters for specified pixel map types.
 
     Examples:
-        >>> set_pixelmap_plot_parameters(TIVMap, cmap="plasma")
-        >>> set_pixelmap_plot_parameters(PendelluftMap, SignedPendelluftMap, colorbar=False, absolute=True)
-        >>> set_pixelmap_plot_parameters(cmap="viridis")  # Update all types with new cmap
+        >>> set_pixelmap_plot_config(TIVMap, cmap="plasma")
+        >>> set_pixelmap_plot_config(PendelluftMap, SignedPendelluftMap, colorbar=False, absolute=True)
+        >>> set_pixelmap_plot_config(cmap="viridis")  # Update all types with new cmap
 
     """
     if not types:
-        types = PIXELMAP_PLOT_PARAMETERS_REGISTRY.keys()
+        types = PIXELMAP_PLOT_CONFIG_REGISTRY.keys()
 
     for type_ in types:
-        PIXELMAP_PLOT_PARAMETERS_REGISTRY[type_] = PIXELMAP_PLOT_PARAMETERS_REGISTRY[type_].update(**parameters)
+        PIXELMAP_PLOT_CONFIG_REGISTRY[type_] = PIXELMAP_PLOT_CONFIG_REGISTRY[type_].update(**parameters)
 
 
-def reset_pixelmap_plot_parameters(*types) -> None:
-    """Reset plot parameters to their defaults.
+def reset_pixelmap_plot_config(*types) -> None:
+    """Reset plot config to their defaults.
 
-    Resets the plot parameter defaults for the specified pixel map types. If no types are specified, all registered
-    pixel map types will be reset to their default parameters.
+    Resets the plot config defaults for the specified pixel map types. If no types are specified, all registered pixel
+    map types will be reset to their default config.
     """
     if not types:
-        types = PIXELMAP_PLOT_PARAMETERS_REGISTRY.keys()
+        types = PIXELMAP_PLOT_CONFIG_REGISTRY.keys()
     for type_ in types:
-        PIXELMAP_PLOT_PARAMETERS_REGISTRY[type_] = PIXELMAP_PLOT_PARAMETERS_REGISTRY[type_].__class__()
+        PIXELMAP_PLOT_CONFIG_REGISTRY[type_] = PIXELMAP_PLOT_CONFIG_REGISTRY[type_].__class__()
