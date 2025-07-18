@@ -200,7 +200,7 @@ class PixelMap:
             threshold (float): The threshold value.
             comparator (Callable): A function that compares pixel values against the threshold.
             absolute (bool): If True, apply the threshold to the absolute values of the pixel map.
-            keep_sign (bool): If True, retain the sign of the original values when filling.
+            keep_sign (bool): If True, retain the sign of original values in the filled values.
             fill_value (float): The value to set for pixels that do not meet the threshold condition.
             **return_attrs (dict | None): Additional attributes to pass to the new PixelMap instance.
 
