@@ -646,7 +646,7 @@ class PendelluftMap(PixelMap):
         The default configuration uses:
 
         - A gradient colormap black (no pendelluft) to forestgreen (most pendelluft)
-        - A zero-based normalization starting at 0 for no perfusion
+        - A zero-based normalization starting at 0 for no pendelluft
         - Default colorbar label "Pendelluft"
         """
 
