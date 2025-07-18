@@ -136,6 +136,10 @@ class PlotParameters:
 class PixelMap:
     """Map representing a single value for each pixel.
 
+    At initialization, values are conveted to a 2D numpy array of floats. The values are immutable after initialization,
+    meaning that the `values` attribute cannot be changed directly. Instead, use the `replace(...)` method to create a
+    copy with new values or label.
+
     For many common cases, specific classes with default plot parameters are available.
 
     Attributes:
