@@ -386,6 +386,8 @@ class PixelMap:
         if "plot_parameters" in changes and isinstance(changes["plot_parameters"], dict):
             changes["plot_parameters"] = plot_parameters.update(**changes["plot_parameters"])
 
+        changes = {"label": None} | changes  # sets label to None if not provided
+
         return replace(self, **changes)
 
     update = __replace__
