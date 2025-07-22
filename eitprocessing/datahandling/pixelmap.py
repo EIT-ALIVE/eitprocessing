@@ -30,7 +30,7 @@ from __future__ import annotations
 import warnings
 from copy import deepcopy
 from dataclasses import KW_ONLY, MISSING, asdict, dataclass, field, replace
-from typing import TYPE_CHECKING, TypeVar, cast
+from typing import TYPE_CHECKING, Literal, TypeVar, cast
 
 import matplotlib as mpl
 import numpy as np
@@ -80,7 +80,6 @@ class PlotParameters:
         facecolor (ColorType):
             The background color for areas with NaN values. Defaults to "darkgrey".
         colorbar (bool): Whether to display a colorbar. Defaults to True.
-        normalize (bool): Whether to normalize values before plotting. Defaults to False.
         percentage (bool): Whether to display values as percentages. Defaults to False.
         absolute (bool): Whether to use absolute values for plotting. Defaults to False.
         colorbar_kwargs (dict | None): Additional arguments to pass to colorbar creation.
@@ -93,7 +92,6 @@ class PlotParameters:
     norm: str | Normalize = "linear"
     facecolor: ColorType = "darkgrey"
     colorbar: bool = True
-    normalize: bool = False
     percentage: bool = False
     absolute: bool = False
     colorbar_kwargs: frozendict = field(default_factory=frozendict)
@@ -178,6 +176,85 @@ class PixelMap:
 
         object.__setattr__(self, "plot_parameters", plot_parameters)
 
+    def normalize(
+        self,
+        mode: Literal["zero-based", "symmetric", "maximum", "reference"] = "zero-based",
+        reference: float | None = None,
+        **kwargs,
+    ) -> Self:
+        """Normalize the pixel map values.
+
+        Creates a copy of the pixel map with normalized values. Four normalization modes are available.
+
+        The default mode is "zero-based", which normalizes the values to the range [0, 1] by subtracting the minimum
+        value and dividing by the new maximum value. This ensures the lowest resulting value is 0 and the highest
+        resulting value is 1.
+
+        The mode "symmetric" divides the values by the maximum absolute value, resulting in a range of [-1, 1].
+
+        The mode "maximum" divides the values by the maximum value. If all values are positive, this normalizes
+        them to the range [0, 1] without shifting the minimum value to zero. Negative values are scaled by the maximum
+        values, and might result in values lower than -1.
+
+        The mode "reference" is similar to "maximum", except it divides by a user-defined reference value. A reference
+        value must be provided. Resulting values can fall outside the range [-1, 1].
+
+        Examples:
+        ```
+        >>> PixelMap([[1, 3, 5]]).normalize()  # Default is zero-based normalization
+        PixelMap(values=array([[0. , 0.5, 1. ]]), ...)
+
+        >>> PixelMap([[1, 3, 5]]).normalize(mode="maximum")
+        PixelMap(values=array([[0.2, 0.6, 1. ]]), ...)
+
+        >>> PixelMap([[-8, -1, 2]]).normalize()
+        PixelMap(values=array([[0. , 0.7, 1. ]]), ...)
+
+        >>> PixelMap([[-8, -1, 2]]).normalize(mode="symmetric")
+        PixelMap(values=array([[-1.   , -0.125,  0.25 ]]), ...)
+
+        >>> PixelMap([[-8, -1, 2]]).normalize(mode="reference", reference=4)
+        PixelMap(values=array([[-2.  , -0.25,  0.5 ]]), ...)
+        ```
+
+        Args:
+            mode (Literal["zero-based", "symmetric", "maximum", "reference"]):
+                The normalization mode to use. Defaults to "zero-based".
+            reference (float | None):
+                The reference value to use for normalization in "reference" mode.
+            kwargs (dict):
+                Additional keyword arguments to pass to the new PixelMap instance.
+        """
+        if reference is not None and mode != "reference":
+            msg = "`reference` can only be used with `mode='reference'`."
+            raise ValueError(msg)
+
+        if mode == "symmetric":
+            values = self.values
+            reference = np.nanmax(np.abs(self.values))
+
+        elif mode == "zero-based":
+            values = self.values - np.nanmin(self.values)
+            reference = np.nanmax(values)
+
+        elif mode == "maximum":
+            values = self.values
+            reference = np.nanmax(values)
+
+        elif mode == "reference":
+            if reference is None:
+                msg = "`reference` must be provided when `mode='reference'`."
+                raise ValueError(msg)
+            values = self.values
+
+        else:
+            msg = f"Unknown normalization mode: {mode}"
+            raise ValueError(msg)
+
+        new_values = values / reference
+
+        return self.update(values=new_values, **kwargs)
+
     def threshold(
         self,
         threshold: npt.ArrayLike,
@@ -211,6 +288,7 @@ class PixelMap:
         Returns:
             Self: A new object instance with the thresholded values.
         """
+        # TODO: add mode argument to allow for percentage/actual value thresholding
         compare_values = np.abs(self.values) if absolute else self.values
         sign = np.sign(self.values) if keep_sign else 1.0
         new_values = np.where(comparator(compare_values, threshold), self.values, fill_value * sign)
@@ -221,7 +299,6 @@ class PixelMap:
     def imshow(
         self,
         colorbar: bool | None = None,
-        normalize: bool | None = None,
         percentage: bool | None = None,
         absolute: bool | None = None,
         colorbar_kwargs: dict | None = None,
@@ -237,9 +314,8 @@ class PixelMap:
         Plotting parameters are taken from `plot_parameters`, unless overridden by explicit arguments. Any additional
         keyword arguments are merged with `plot_parameters.extra_kwargs` and passed to `matplotlib.pyplot.imshow`.
 
-        If `colorbar` is True, a colorbar is added to the axes. If `normalize` is True, the pixel values are scaled
-        by their maximum value before plotting. The appearance of the colorbar can be modified using `percentage` and
-        `absolute` flags:
+        If `colorbar` is True, a colorbar is added to the axes. The appearance of the colorbar can be modified using
+        `percentage` and `absolute` flags:
 
         - `percentage=True` displays the colorbar in percentage units (where 1.0 → 100%).
         - `absolute=True` uses the absolute value of the data for color scaling and labeling.
@@ -256,7 +332,6 @@ class PixelMap:
 
         Args:
             colorbar (bool | None): Whether to display a colorbar.
-            normalize (bool | None): Whether to scale by the maximum value.
             percentage (bool | None): Whether to display the colorbar values as a percentage.
             absolute (bool | None): Whether to display the colorbar using absolute values.
             colorbar_kwargs (dict): Additional arguments passed to `matplotlib.pyplot.colorbar`.
@@ -270,7 +345,6 @@ class PixelMap:
             AxesImage: The image object created by imshow.
         """
         plot_parameters = self.plot_parameters
-        normalize = plot_parameters.normalize if normalize is None else normalize
         colorbar = plot_parameters.colorbar if colorbar is None else colorbar
         percentage = plot_parameters.percentage if percentage is None else percentage
         absolute = plot_parameters.absolute if absolute is None else absolute
@@ -293,11 +367,7 @@ class PixelMap:
             if vmax is not None:
                 norm.vmax = vmax
 
-        values = self.values
-        if normalize:
-            values = values / np.nanmax(self.values, initial=1)
-
-        cm = ax.imshow(values, **kwargs)
+        cm = ax.imshow(self.values, **kwargs)
 
         colorbar_kwargs = dict(plot_parameters.colorbar_kwargs | (colorbar_kwargs or {}))
 
