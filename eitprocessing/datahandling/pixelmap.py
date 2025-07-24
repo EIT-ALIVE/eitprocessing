@@ -31,7 +31,7 @@ import sys
 import warnings
 from copy import deepcopy
 from dataclasses import KW_ONLY, MISSING, asdict, dataclass, field, replace
-from typing import TYPE_CHECKING, Literal, TypeVar, cast
+from typing import TYPE_CHECKING, ClassVar, Literal, TypeVar, cast
 
 import matplotlib as mpl
 import numpy as np
@@ -154,14 +154,35 @@ class PixelMap:
     _: KW_ONLY
     label: str | None = None
     plot_parameters: PlotParameters = field(default_factory=PlotParameters)
+    allows_negative_values: ClassVar[bool] = True
 
     def __init__(
-        self, values: npt.ArrayLike, *, label: str | None = None, plot_parameters: PlotParameters | dict | None = None
+        self,
+        values: npt.ArrayLike,
+        *,
+        label: str | None = None,
+        plot_parameters: PlotParameters | dict | None = None,
+        suppress_negative_warning: bool = False,
+        suppress_all_nan_warning: bool = False,
     ):
         values = np.asarray(values, dtype=float)
         if values.ndim != 2:  # noqa: PLR2004, ignore hardcoded value
             msg = f"`values` should have 2 dimensions, not {values.ndim}."
             raise ValueError(msg)
+
+        if not suppress_all_nan_warning and np.all(np.isnan(values)):
+            warnings.warn(
+                f"{self.__class__.__name__} initialized with all NaN values. "
+                "This may lead to unexpected behavior in plotting or analysis.",
+                UserWarning,
+            )
+
+        if not self.allows_negative_values and not suppress_negative_warning and np.any(values < 0):
+            warnings.warn(
+                f"{self.__class__.__name__} initialized with negative values, but `allows_negative_values` is False. "
+                "This may lead to unexpected behavior in plotting or analysis.",
+                UserWarning,
+            )
 
         values.flags.writeable = False  # Make the values array immutable
         object.__setattr__(self, "values", values)
@@ -252,6 +273,7 @@ class PixelMap:
             if not isinstance(reference, (float, int)):
                 msg = "`reference` must be a number."
                 raise TypeError(msg)
+            self._check_normalization_reference(reference)
 
         reference_: float
         match mode:
@@ -640,6 +662,7 @@ class TIVMap(PixelMap):
         colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="TIV (a.u.)"))
 
     plot_parameters: PlotParameters = field(default_factory=PlotParameters)
+    allows_negative_values: ClassVar[bool] = False
 
 
 @dataclass(frozen=True, init=False)
@@ -744,6 +767,7 @@ class PerfusionMap(PixelMap):
         colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Perfusion"))
 
     plot_parameters: PlotParameters = field(default_factory=PlotParameters)
+    allows_negative_values: ClassVar[bool] = False
 
 
 @dataclass(frozen=True, init=False)
@@ -778,6 +802,7 @@ class PendelluftMap(PixelMap):
         colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Pendelluft"))
 
     plot_parameters: PlotParameters = field(default_factory=PlotParameters)
+    allows_negative_values: ClassVar[bool] = False
 
 
 @dataclass(frozen=True, init=False)

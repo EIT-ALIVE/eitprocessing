@@ -1,5 +1,6 @@
 import copy
 import sys
+import warnings
 from dataclasses import FrozenInstanceError
 
 import frozendict
@@ -37,6 +38,12 @@ def test_init_values():
 
     with pytest.raises(FrozenInstanceError, match="cannot assign to field 'values'"):
         pm.values = [[1]]
+
+    with pytest.warns(UserWarning, match="PendelluftMap initialized with negative values"):
+        _ = PendelluftMap([[0, -1], [-2, -3]])
+    with warnings.catch_warnings(record=True) as w:
+        _ = SignedPendelluftMap([[0, -1], [-2, -3]])  # does not warn
+        assert len(w) == 0
 
 
 @pytest.mark.skipif(sys.version_info < (3, 13), reason="Requires Python 3.13+")
@@ -216,6 +223,11 @@ def test_normalize_values():
     pm9 = pm6.normalize(mode="reference", reference=0.1)
     assert pm9.values.max() == 20
     assert pm9.values.min() == -100
+
+
+def test_initialize_with_nan():
+    with pytest.warns(UserWarning, match="PixelMap initialized with all NaN values."):
+        _ = PixelMap([[np.nan, np.nan], [np.nan, np.nan]])
 
 
 def test_normalize_values_errors():
