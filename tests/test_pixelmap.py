@@ -183,25 +183,76 @@ def test_imshow():
     assert colorbar_axes.get_ylabel() == pm.plot_parameters.colorbar_kwargs["label"]
 
 
-def test_imshow_norm():
-    pm = TIVMap(np.reshape(np.arange(10, 110), (10, 10)))
+def test_normalize_values():
+    pm0 = PixelMap(np.random.default_rng().random((10, 10), dtype=float))
+    pm1 = pm0.normalize(mode="zero-based")
 
-    cm1 = pm.imshow()
-    assert cm1.norm.vmin == 0
-    assert cm1.norm.vmax == 109
-    assert np.amin(cm1.get_array()) == 10
-    assert np.amax(cm1.get_array()) == 109
+    assert pm1.values.min() == 0.0
+    assert pm1.values.max() == 1.0
 
-    cm2 = pm.imshow(vmin=20, vmax=50)
-    assert cm2.norm.vmin == 20
-    assert cm2.norm.vmax == 50
-    assert np.amin(cm2.get_array()) == 10
-    assert np.amax(cm2.get_array()) == 109
+    pm2 = pm0.normalize(mode="symmetric")
+    assert np.abs(pm2.values).max() == 1.0
+    assert np.abs(pm2.values).min() >= 0.0
 
-    cm3 = pm.imshow(normalize=True)
-    data = cm3.get_array()
-    assert np.amax(data) == 1
-    assert np.amin(data) == 10 / 109
+    pm3 = pm0 - 0.5
+    pm4 = pm3.normalize(mode="symmetric")
+    assert -1.0 <= pm4.values.min() <= 0.0
+    assert 0.0 <= pm4.values.max() <= 1.0
+    assert np.abs(pm4.values).max() == 1.0
+
+    pm5 = pm3.normalize(mode="maximum")
+    assert pm5.values.max() == 1.0
+    assert pm5.values.min() >= -1.0 / pm3.values.max()
+
+    pm6 = PixelMap(np.linspace(-10, 2, 100).reshape((10, 10)))
+    pm7 = pm6.normalize(mode="maximum")
+    assert pm7.values.max() == 1.0
+    assert pm7.values.min() == -5.0
+
+    pm8 = pm6.normalize(mode="reference", reference=4)
+    assert pm8.values.max() == 0.5
+    assert pm8.values.min() == -2.5
+
+    pm9 = pm6.normalize(mode="reference", reference=0.1)
+    assert pm9.values.max() == 20
+    assert pm9.values.min() == -100
+
+
+def test_normalize_values_errors():
+    pm = PixelMap(np.random.default_rng().random((10, 10), dtype=float))
+
+    with pytest.raises(ValueError, match="Unknown normalization mode"):
+        _ = pm.normalize(mode="non-existing")
+
+    with pytest.raises(ValueError, match="`reference` can only be used with"):
+        _ = pm.normalize(mode="maximum", reference=1)
+
+    with pytest.raises(ValueError, match="`reference` must be provided when `mode='reference'`"):
+        _ = pm.normalize(mode="reference")
+
+    with pytest.raises(TypeError, match="`reference` must be a number"):
+        _ = pm.normalize(mode="reference", reference="foo")
+
+    with pytest.raises(TypeError, match="`reference` must be a number"):
+        _ = pm.normalize(mode="reference", reference=[1, 2, 3])
+
+    with pytest.raises(TypeError, match="`reference` must be a number"):
+        _ = pm.normalize(mode="reference", reference=np.array([1, 2, 3]))
+
+    with pytest.raises(ZeroDivisionError, match="Normalization by zero is not allowed"):
+        _ = pm.normalize(mode="reference", reference=0)
+
+    with pytest.raises(ZeroDivisionError, match="Normalization by zero is not allowed"):
+        _ = PixelMap([[0]]).normalize()
+
+    with pytest.raises(ValueError, match="Normalization by NaN is not allowed"):
+        _ = pm.normalize(mode="reference", reference=np.nan)
+
+    with pytest.raises(ValueError, match="Normalization by NaN is not allowed"):
+        _ = PixelMap([[np.nan]]).normalize()
+
+    with pytest.warns(UserWarning, match="Normalization by a negative number"):
+        _ = pm.normalize(mode="reference", reference=-1)
 
 
 def test_plot_extend():
