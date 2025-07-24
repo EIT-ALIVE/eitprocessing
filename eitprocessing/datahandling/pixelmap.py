@@ -27,6 +27,7 @@ plotting parameter).
 
 from __future__ import annotations
 
+import sys
 import warnings
 from copy import deepcopy
 from dataclasses import KW_ONLY, MISSING, asdict, dataclass, field, replace
@@ -178,6 +179,7 @@ class PixelMap:
 
     def normalize(
         self,
+        *,
         mode: Literal["zero-based", "symmetric", "maximum", "reference"] = "zero-based",
         reference: float | None = None,
         **kwargs,
@@ -186,18 +188,17 @@ class PixelMap:
 
         Creates a copy of the pixel map with normalized values. Four normalization modes are available.
 
-        The default mode is "zero-based", which normalizes the values to the range [0, 1] by subtracting the minimum
-        value and dividing by the new maximum value. This ensures the lowest resulting value is 0 and the highest
-        resulting value is 1.
+        - "zero-based" (default): normalizes the values to the range [0, 1] by subtracting the minimum value and
+          dividing by the new maximum value. This ensures the lowest resulting value is 0 and the highest resulting
+          value is 1.
+        - "symmetric": divides the values by the maximum absolute value, resulting in a range of [-1, 1].
+        - "maximum": divides the values by the maximum value. If all values are positive, this normalizes them to the
+          range [0, 1] without shifting the minimum value to zero. The sign of values does not change. If negative
+          values are present, the result may extend below -1.
+        - "reference": is similar to "maximum", except it divides by a user-defined reference value. A reference value
+          must be provided. Resulting values can fall outside the range [-1, 1].
 
-        The mode "symmetric" divides the values by the maximum absolute value, resulting in a range of [-1, 1].
-
-        The mode "maximum" divides the values by the maximum value. If all values are positive, this normalizes
-        them to the range [0, 1] without shifting the minimum value to zero. Negative values are scaled by the maximum
-        values, and might result in values lower than -1.
-
-        The mode "reference" is similar to "maximum", except it divides by a user-defined reference value. A reference
-        value must be provided. Resulting values can fall outside the range [-1, 1].
+        NaN values are ignored when normalizing. All-NaN pixel maps results in a ValueError.
 
         Examples:
         ```
@@ -224,36 +225,80 @@ class PixelMap:
                 The reference value to use for normalization in "reference" mode.
             kwargs (dict):
                 Additional keyword arguments to pass to the new PixelMap instance.
+
+        Raises:
+            ValueError: If an invalid normalization mode is specifief.
+            ValueError: If no reference value is provided in "reference" mode.
+            ValueError: If a reference value is provided with a mode other than "reference".
+            TypeError: If the reference value is not a number.
+            ZeroDivisionError:
+                If normalization by zero is attempted (either `reference=0`, or the maximum (absolute) value in the
+                values is 0).
+            ValueError: If normalization by NaN is attempted (either `reference=np.nan`, or all values are NaN).
+
+        Warns:
+            UserWarning:
+                If normalization by a negative number is attempted (either `reference` is negative, or all values are
+                negative). This results in inverting the sign of the values.
         """
         if reference is not None and mode != "reference":
             msg = "`reference` can only be used with `mode='reference'`."
             raise ValueError(msg)
 
-        if mode == "symmetric":
-            values = self.values
-            reference = np.nanmax(np.abs(self.values))
-
-        elif mode == "zero-based":
-            values = self.values - np.nanmin(self.values)
-            reference = np.nanmax(values)
-
-        elif mode == "maximum":
-            values = self.values
-            reference = np.nanmax(values)
-
-        elif mode == "reference":
+        if mode == "reference":
             if reference is None:
                 msg = "`reference` must be provided when `mode='reference'`."
                 raise ValueError(msg)
-            values = self.values
+            if not isinstance(reference, (float, int)):
+                msg = "`reference` must be a number."
+                raise TypeError(msg)
 
-        else:
-            msg = f"Unknown normalization mode: {mode}"
-            raise ValueError(msg)
+        reference_: float
+        match mode:
+            case "symmetric":
+                values = self.values
+                reference_ = np.nanmax(np.abs(self.values))
+            case "zero-based":
+                values = self.values - np.nanmin(self.values)
+                reference_ = np.nanmax(values)
+            case "maximum":
+                values = self.values
+                reference_ = np.nanmax(values)
+            case "reference":
+                values = self.values
+                reference_ = cast("float", reference)
+            case _:
+                msg = f"Unknown normalization mode: {mode}"
+                raise ValueError(msg)
 
-        new_values = values / reference
+        self._check_normalization_reference(reference_)
+
+        new_values = values / reference_
 
         return self.update(values=new_values, **kwargs)
+
+    @staticmethod
+    def _check_normalization_reference(reference_: float) -> None:
+        if reference_ == 0:
+            msg = "Normalization by zero is not allowed."
+            exc = ZeroDivisionError(msg)
+            if sys.version_info >= (3, 11):
+                exc.add_note(
+                    "You are either trying to normalize by 0 explicitly, "
+                    "or are providing a PixelMap with no non-zero values."
+                )
+            raise exc
+        if np.isnan(reference_):
+            msg = "Normalization by NaN is not allowed."
+            exc = ValueError(msg)
+            if sys.version_info >= (3, 11):
+                exc.add_note(
+                    "You are either trying to normalize by NaN explicitly, "
+                    "or are providing a PixelMap with no non-NaN values."
+                )
+            raise exc
+        if reference_ < 0:
+            warnings.warn("Normalization by a negative number may lead to unexpected results.", UserWarning)
 
     def threshold(
         self,
