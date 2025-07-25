@@ -39,8 +39,15 @@ def test_init_values():
     with pytest.raises(FrozenInstanceError, match="cannot assign to field 'values'"):
         pm.values = [[1]]
 
+
+def test_init_negative_values():
     with pytest.warns(UserWarning, match="PendelluftMap initialized with negative values"):
         _ = PendelluftMap([[0, -1], [-2, -3]])
+
+    with warnings.catch_warnings(record=True) as w:
+        _ = PendelluftMap([[0, -1], [-2, -3]], suppress_negative_warning=True)  # does not warn
+        assert len(w) == 0
+
     with warnings.catch_warnings(record=True) as w:
         _ = SignedPendelluftMap([[0, -1], [-2, -3]])  # does not warn
         assert len(w) == 0
@@ -228,6 +235,10 @@ def test_normalize_values():
 def test_initialize_with_nan():
     with pytest.warns(UserWarning, match="PixelMap initialized with all NaN values."):
         _ = PixelMap([[np.nan, np.nan], [np.nan, np.nan]])
+
+    with warnings.catch_warnings(record=True) as w:
+        _ = PixelMap([[np.nan, np.nan], [np.nan, np.nan]], suppress_all_nan_warning=True)  # does not warn
+        assert len(w) == 0
 
 
 def test_normalize_values_errors():
