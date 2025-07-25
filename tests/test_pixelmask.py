@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+from eitprocessing.datahandling.pixelmap import PixelMap
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.roi import (
     DORSAL_MASK,
@@ -17,9 +18,6 @@ from eitprocessing.roi import (
     VENTRAL_MASK,
     PixelMask,
 )
-
-
-def test_pixelmask_init_basic(): ...
 
 
 def test_pixelmask_init_with_boolean_array():
@@ -165,7 +163,14 @@ def test_pixelmask_apply_eitdata(draeger1: Sequence):
     assert np.all(np.isnan(masked_eit_data.pixel_impedance[:, :, 23:]))
 
 
-def test_pixelmask_apply_pixelmap(): ...
+def test_pixelmask_apply_pixelmap():
+    pmap = PixelMap(np.random.default_rng().random((10, 10)))
+    mask = PixelMask(np.random.default_rng().random((10, 10)) > 0.5)  # Mask with some values > 0.5
+    masked_pmap = mask.apply(pmap)
+
+    assert masked_pmap.shape == pmap.shape
+    assert np.all(np.isnan(masked_pmap.values[np.isnan(mask.mask)]))
+    assert np.array_equal(pmap.values[~np.isnan(mask.mask)], masked_pmap.values[~np.isnan(mask.mask)])
 
 
 def test_pixelmask_apply_invalid_type():
