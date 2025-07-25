@@ -40,6 +40,20 @@ def test_init_values():
         pm.values = [[1]]
 
 
+def test_shape_property():
+    pm = PixelMap([[0]])
+    assert pm.shape == (1, 1)
+
+    pm = PixelMap(np.ones((2, 3)))
+    assert pm.shape == (2, 3)
+
+    pm = PendelluftMap([[0, 1], [2, 3]])
+    assert pm.shape == (2, 2)
+
+    pm = SignedPendelluftMap([[0, -1], [-2, -3]])
+    assert pm.shape == (2, 2)
+
+
 def test_init_negative_values():
     with pytest.warns(UserWarning, match="PendelluftMap initialized with negative values"):
         _ = PendelluftMap([[0, -1], [-2, -3]])

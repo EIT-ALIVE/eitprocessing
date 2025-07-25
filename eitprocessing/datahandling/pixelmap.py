@@ -198,6 +198,11 @@ class PixelMap:
 
         object.__setattr__(self, "plot_parameters", plot_parameters)
 
+    @property
+    def shape(self) -> tuple[int, int]:
+        """Get the shape of the pixel map values."""
+        return self.values.shape
+
     def normalize(
         self,
         *,
