@@ -135,29 +135,20 @@ def test_init_plot_parameters():
     assert pm11.plot_parameters.colorbar_kwargs == {"key": "another value"}
 
 
-def test_threshold():
-    pm = PixelMap(np.reshape(np.arange(-50, 50), (10, 10)))
-    pm_threshold = pm.threshold(10)
+def test_create_threshold_mask():
+    pm = PixelMap([[-2, -1, 0, 1, 2]])
 
-    assert type(pm) is type(pm_threshold)
+    mask = pm.create_mask_from_threshold(1)
+    assert np.array_equal(mask.mask, [[np.nan, np.nan, np.nan, 1.0, 1.0]], equal_nan=True)
 
-    pm = ODCLMap(np.reshape(np.arange(-50, 50), (10, 10)))
-    pm_threshold = pm.threshold(10)
+    mask = pm.create_mask_from_threshold(1, comparator=np.greater)
+    assert np.array_equal(mask.mask, [[np.nan, np.nan, np.nan, np.nan, 1.0]], equal_nan=True)
 
-    assert np.nanmin(pm_threshold.values) == 10
-    non_nan_values = pm_threshold.values[~np.isnan(pm_threshold.values)]
-    assert np.all(non_nan_values >= 10)
+    mask = pm.create_mask_from_threshold(1, absolute=True)
+    assert np.array_equal(mask.mask, [[1.0, 1.0, np.nan, 1.0, 1.0]], equal_nan=True)
 
-    pm_abs_threshold = pm.threshold(10, absolute=True)
-    assert np.nanmin(pm_abs_threshold.values) == -50
-
-    non_nan_values = pm_abs_threshold.values[~np.isnan(pm_abs_threshold.values)]
-    assert np.array_equal(non_nan_values, np.concatenate([np.arange(-50, -9), np.arange(10, 50)]))
-
-    pm_lower_threshold = pm.threshold(10, comparator=np.less)
-    assert np.nanmax(pm_lower_threshold.values) == 9
-    non_nan_values = pm_lower_threshold.values[~np.isnan(pm_lower_threshold.values)]
-    assert np.array_equal(non_nan_values, np.arange(-50, 10))
+    mask = pm.create_mask_from_threshold(1, comparator=np.less)
+    assert np.array_equal(mask.mask, [[1.0, 1.0, 1.0, np.nan, np.nan]], equal_nan=True)
 
 
 def test_convert():
