@@ -1,29 +1,30 @@
-"""Region of Interest selection and data masking.
+"""Region of Interest selection and pixel masking.
 
-This module contains tools for the selection of regions of interest and masking data. The central class of this module
-is `Mask`. Any type of region of interest selection results in a `Mask` object. A mask can be applied to any dataset.
+This module contains tools for the selection of regions of interest and masking pixel data. The central class of this
+module is `PixelMask`. Any type of region of interest selection results in a `PixelMask` object. A mask can be applied
+to any pixel dataset (EITData, PixelMap) with the same shape.
 
-Several default masks have been predefined:
+Several default masks have been predefined. NB: the right lung is to the left side of the EIT image and vice versa.
 
 - `VENTRAL_MASK` includes only the first 16 rows;
 - `DORSAL_MASK` includes only the last 16 rows;
-- `RIGHT_MASK` includes only the first 16 columns (NB: right means right lung, which is te left side of the EIT image);
-- `LEFT_MASK` includes only the last 16 columns (NB: left means left lung, which is te right side of the EIT image);
-- `QUADRANT_1_MASK` includes the top right quadrant (NB: right means right lung, which is te left side of the EIT
-  image);
-- `QUADRANT_2_MASK` includes the top left quadrant (NB: left means left lung, which is te right side of the EIT image);
-- `QUADRANT_3_MASK` includes the bottom right quadrant (NB: right means right lung, which is te left side of the EIT
-  image);
-- `QUADRANT_4_MASK` includes the bottom left quadrant (NB: left means left lung, which is te right side of the EIT
-image); - `LAYER_1_MASK` includes only the first 8 rows; - `LAYER_2_MASK` includes only the second set of 8 rows; -
-`LAYER_3_MASK` includes only the third set of 8 rows; - `LAYER_4_MASK` includes only the last 8 rows.
+- `RIGHT_LUNG_MASK` includes only the first 16 columns;
+- `LEFT_LUNG_MASK` includes only the last 16 columns;
+- `QUADRANT_1_MASK` includes the top right quadrant;
+- `QUADRANT_2_MASK` includes the top left quadrant;
+- `QUADRANT_3_MASK` includes the bottom right quadrant;
+- `QUADRANT_4_MASK` includes the bottom left quadrant;
+- `LAYER_1_MASK` includes only the first 8 rows;
+- `LAYER_2_MASK` includes only the second set of 8 rows;
+- `LAYER_3_MASK` includes only the third set of 8 rows;
+- `LAYER_4_MASK` includes only the last 8 rows.
 """
 
 import dataclasses
 import sys
-from dataclasses import InitVar, dataclass
+from dataclasses import InitVar, dataclass, field
 from dataclasses import replace as dataclass_replace
-from typing import Literal, Self, TypeVar, overload
+from typing import Self, TypeVar, overload
 
 import numpy as np
 
@@ -39,67 +40,82 @@ class PixelMap:  # noqa: D101
 T = TypeVar("T", np.ndarray, EITData, PixelMap)
 
 
-@dataclass
-class Mask:
+@dataclass(frozen=True)
+class PixelMask:
     """Mask pixels by selecting or weighing them individually.
 
-    A mask is an array with a value for each pixel. Normally, this value is 0 (or False), 1 (or True), and less commonly
-    a value between 0 and 1. When a mask is applied to a dataset, each pixel in that dataset is multiplied by the
-    corresponding masking value. Masking is often used to remove specific pixels by multiplying them by 0. Masking can
-    also be used to weigh pixels, e.g., for a weighted summation. Masking values that are negative or higher than 1 will
-    result in a `ValueError` being raised. You can override this check with `ignore_value_range=True`.
+    A mask is a 2D array with a value for each pixel. Most often, this value is NaN (`np.nan`, 'not a number') or 1, and
+    less commonly a value between 0 and 1. NaN values indicate the pixel is not part of the region of interest, e.g.,
+    falls outside the functional lung space, or is not part of the ventral region of the lung. A value of 1 indicates
+    the pixel is included in the region of interest. A value between 0 and 1 indicates that the pixel is part of the
+    region of interest, but is weighted, e.g., for a weighted summation of pixel values, or because the pixel is
+    considered part of multiple regions of interest.
 
-    By default, any masking pixel with the value 0 is converted to `np.nan` ('not a number', NaN). NaN values are
-    different from 0, in that 0 means 'this value is small' and NaN means 'there is no value'. E.g., values outside the
-    region of interest should generally be NaN, not 0. You can prevent the conversion of 0 values to NaN with
-    `zeros_to_nan=False`.
+    You can initialize a mask using a nested list. At initialization, the mask is converted to a numpy array.
 
-    Masks can be combined by either adding or multiplying them. In either case, the masking values are multiplied to
-    create a new mask.
+    By default, 0-values are converted tot NaN. You can override this behaviour with `keep_zeros=True`. You can
+    therefore create a mask by supplying boolean values, where `True` indicates the pixel is part of the region of
+    interest (`True` equals 1), and `False` indicates it is not (`False` equals 0, and will be converted to NaN).
+
+    Since masking is not intended for other operations, masking values that are negative or higher than 1 will result in
+    a `ValueError`. You can override this check with `suppress_value_range_error=True`.
+
+    A mask can be applied to any pixel dataset, such as an `EITData` object or a `PixelMap` object. The mask is applied
+    to the last two dimensions of the data, which must match the shape of the mask. The mask is applied by multiplying
+    each pixel in the dataset by the corresponding masking value. Multiplication by NaN always results in NaN.
+
+    Masks can be combined by either adding or multiplying them. Adding masks results in a mask that includes all pixels
+    that are in either mask. Multiplying masks results in a mask that includes only pixels that are in both masks.
 
     Example:
     ```python
-    assert VENTRAL_MASK + RIGHT_MASK == QUADRANT_1_MASK  # True, quadrant 1 is the ventral part of the right lung
-    assert DORSAL_MASK * LEFT_MASK == QUADRANT_4_MASK  # True, quadrant 4 is the dorsal part of the left lung
+    >>> assert VENTRAL_MASK + RIGHT_LUNG_MASK == QUADRANT_1_MASK
+    True  # quadrant 1 is the ventral part of the right lung
+    >>> assert DORSAL_MASK * LEFT_LUNG_MASK == QUADRANT_4_MASK
+    True  # quadrant 4 is the dorsal part of the left lung
     ```
 
     """
 
     mask: np.ndarray
-    description: str | None = None
-    zeros_to_nan: InitVar[bool] = True
-    ignore_value_range: InitVar[bool] = False
+    keep_zeros: InitVar[bool] = field(default=False, kw_only=True)
+    suppress_value_range_error: InitVar[bool] = field(default=False, kw_only=True)
 
-    def __post_init__(self, zeros_to_nan: bool, ignore_value_range: bool):
-        if not any(np.issubdtype(self.mask.dtype, type_) for type_ in (np.integer, np.floating, np.bool_)):
-            msg = f"Mask data type should be a bool, int or float, not {self.mask.dtype}."
+    def __init__(self, mask: list | np.ndarray, keep_zeros: bool = False, suppress_value_range_error: bool = False):
+        mask = np.array(mask, dtype=float)
 
-        if not ignore_value_range and self.is_weighted and (np.any(self.mask > 1) or np.any(self.mask < 0)):
+        if mask.ndim != 2:  # noqa: PLR2004
+            msg = f"Mask should be a 2D array, not {mask.ndim}D."
+            raise ValueError(msg)
+
+        if (not suppress_value_range_error) and (np.nanmax(mask) > 1 or np.nanmin(mask) < 0):
             msg = "One or more mask values fall outside the range 0 to 1."
             exc = ValueError(msg)
             if sys.version_info >= (3, 11):
-                exc.add_note("Mask values should normally be a boolean value or a number from 0 to 1.")
+                exc.add_note("Provided values should normally be a boolean value or a number from 0 to 1.")
                 exc.add_note(
                     "In case you need a mask with values outside this range, "
-                    "provide `ignore_value_range=True` when initializing a Mask."
+                    "provide `suppress_value_range_warning=True` when initializing a Mask."
                 )
+            raise exc
 
-        if zeros_to_nan:
-            new_mask = np.copy(self.mask)
-            new_mask[new_mask == 0.0] = np.nan
-            object.__setattr__(self, "mask", new_mask)
+        if not keep_zeros:
+            mask[mask == 0] = np.nan
 
-    @overload
-    def apply(self, data: np.ndarray, label: Literal[None] = ...) -> np.ndarray: ...
-
-    @overload
-    def apply(self, data: EITData, label: str | None = ...) -> EITData: ...
+        mask.flags["WRITEABLE"] = False
+        object.__setattr__(self, "mask", mask)
 
     @overload
-    def apply(self, data: PixelMap, label: str | None = ...) -> PixelMap: ...
+    def apply(self, data: np.ndarray) -> np.ndarray: ...
 
-    def apply(self, data, label=None):
-        """Apply mask to data, returning a copy of the object with values masked.
+    @overload
+    def apply(self, data: EITData, **kwargs) -> EITData: ...
+
+    @overload
+    def apply(self, data: "PixelMap", **kwargs) -> "PixelMap": ...
+
+    def apply(self, data, **kwargs):
+        """Apply pixel mask to data, returning a copy of the object with pixel values masked.
 
         Data can be a numpy array, an EITData object or PixelMap object. In case of an EITData object, the mask will be
         applied to the `pixel_impedance` attribute. In case of a PixelMap, the mask will be applied to the `values`
@@ -114,47 +130,62 @@ class Mask:
         """
 
         def transform_and_mask(data: np.ndarray) -> np.ndarray:
-            transform_data = np.copy(data)
-            for _ in range(transform_data.ndim - 2):
-                # add dimensions, to allow proper multiplication of multi-dimensional array
-                transform_data = transform_data[None, ...]
+            """Transform the mask to ensure it has the correct shape for the given data, and apply the mask.
 
-            return transform_data * self.mask
+            The mask is transformed by adding new axes to the beginning of the array, such that the number of dimensions
+            match the number of dimensions of the data. The last two dimensions will contain the mask itself. This
+            allows the mask to be applied correctly, even if the data has more than two dimensions (e.g., a 3D array
+            with shape (time, channels, rows, cols)).
+            """
+            if self.mask.shape[-2:] != data.shape[-2:]:
+                msg = (
+                    f"Data shape {data.shape} does not match Mask shape {self.mask.shape}. "
+                    "The last two dimensions of the mask and data must match."
+                )
+                raise ValueError(msg)
+            mask = self.mask[*([np.newaxis] * (data.ndim - 2)), ...]
+            return data * mask
 
         match data:
             case np.ndarray():
                 return transform_and_mask(data)
             case EITData():
-                return dataclass_replace(
-                    data, pixel_impedance=transform_and_mask(data.pixel_impedance), label=label or data.label
-                )
+                return dataclass_replace(data, pixel_impedance=transform_and_mask(data.pixel_impedance), **kwargs)
             case PixelMap():
-                return dataclass_replace(data, values=transform_and_mask(data.values), label=label or data.label)
+                return data.update(values=transform_and_mask(data.values), **kwargs)
             case _:
                 msg = f"Data should be an array, or EITData or PixelMap object, not {type(data)}."
                 raise TypeError(msg)
 
     @property
     def is_weighted(self) -> bool:
-        """Whether the mask multiplies any pixels with a number other than 0 or 1."""
-        return set(np.unique(self.mask.astype(float)).tolist()) != {0.0, 1.0}
+        """Whether the mask multiplies any pixels with a number other than NaN or 1."""
+        return not bool(np.all(np.isnan(self.mask) | (self.mask == 1.0)))
 
-    def __add__(self, other: Self) -> Self:
+    def __mul__(self, other: Self) -> Self:
         """Combine masks by multiplying masking values."""
         return dataclasses.replace(self, mask=self.mask * other.mask)
 
-    __mul__ = __add__
+    def __add__(self, other: Self) -> Self:
+        """Combine masks by adding masking values.
+
+        Values are clipped at 1, so that the resulting mask does not contain values higher than 1.
+        """
+        return dataclasses.replace(self, mask=np.clip(np.nansum([self.mask, other.mask], axis=0), a_min=None, a_max=1))
 
 
-VENTRAL_MASK = Mask(np.concat([np.ones((16, 32)), np.zeros((16, 32))], axis=0))
-DORSAL_MASK = Mask(np.concat([np.zeros((16, 32)), np.ones((16, 32))], axis=0))
-RIGHT_MASK = Mask(np.concat([np.ones((32, 16)), np.zeros((32, 16))], axis=1))
-LEFT_MASK = Mask(np.concat([np.zeros((32, 16)), np.ones((32, 16))], axis=1))
-QUADRANT_1_MASK = VENTRAL_MASK + RIGHT_MASK
-QUADRANT_2_MASK = VENTRAL_MASK + LEFT_MASK
-QUADRANT_3_MASK = DORSAL_MASK + RIGHT_MASK
-QUADRANT_4_MASK = DORSAL_MASK + LEFT_MASK
-LAYER_1_MASK = Mask(np.concat([np.ones((8, 32)), np.zeros((24, 32))], axis=0))
-LAYER_2_MASK = Mask(np.concat([np.zeros((8, 32)), np.ones((8, 32)), np.zeros((16, 32))], axis=0))
-LAYER_3_MASK = Mask(np.concat([np.zeros((16, 32)), np.ones((8, 32)), np.zeros((8, 32))], axis=0))
-LAYER_4_MASK = Mask(np.concat([np.zeros((24, 32)), np.ones((8, 32))], axis=0))
+LAYER_1_MASK = PixelMask(np.concat([np.ones((8, 32)), np.zeros((24, 32))], axis=0))
+LAYER_2_MASK = PixelMask(np.concat([np.zeros((8, 32)), np.ones((8, 32)), np.zeros((16, 32))], axis=0))
+LAYER_3_MASK = PixelMask(np.concat([np.zeros((16, 32)), np.ones((8, 32)), np.zeros((8, 32))], axis=0))
+LAYER_4_MASK = PixelMask(np.concat([np.zeros((24, 32)), np.ones((8, 32))], axis=0))
+
+VENTRAL_MASK = LAYER_1_MASK + LAYER_2_MASK
+DORSAL_MASK = LAYER_3_MASK + LAYER_4_MASK
+
+RIGHT_LUNG_MASK = PixelMask(np.concat([np.ones((32, 16)), np.zeros((32, 16))], axis=1))
+LEFT_LUNG_MASK = PixelMask(np.concat([np.zeros((32, 16)), np.ones((32, 16))], axis=1))
+
+QUADRANT_1_MASK = VENTRAL_MASK * RIGHT_LUNG_MASK
+QUADRANT_2_MASK = VENTRAL_MASK * LEFT_LUNG_MASK
+QUADRANT_3_MASK = DORSAL_MASK * RIGHT_LUNG_MASK
+QUADRANT_4_MASK = DORSAL_MASK * LEFT_LUNG_MASK
