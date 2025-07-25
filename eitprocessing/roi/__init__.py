@@ -28,7 +28,13 @@ from typing import Literal, Self, TypeVar, overload
 import numpy as np
 
 from eitprocessing.datahandling.eitdata import EITData
-from eitprocessing.datahandling.map import PixelMap
+
+
+class PixelMap:  # noqa: D101
+    values: np.ndarray
+
+    def update(self, *args, **kwargs) -> Self: ...  # noqa: D102
+
 
 T = TypeVar("T", np.ndarray, EITData, PixelMap)
 
