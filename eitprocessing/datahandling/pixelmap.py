@@ -156,7 +156,7 @@ class PixelMap:
     _: KW_ONLY
     label: str | None = None
     plot_parameters: PlotParameters = field(default_factory=PlotParameters)
-    allows_negative_values: ClassVar[bool] = True
+    allow_negative_values: ClassVar[bool] = True
 
     def __init__(
         self,
@@ -179,7 +179,7 @@ class PixelMap:
                 UserWarning,
             )
 
-        if not self.allows_negative_values and not suppress_negative_warning and np.any(values < 0):
+        if not self.allow_negative_values and not suppress_negative_warning and np.any(values < 0):
             warnings.warn(
                 f"{self.__class__.__name__} initialized with negative values, but `allows_negative_values` is False. "
                 "This may lead to unexpected behavior in plotting or analysis.",
