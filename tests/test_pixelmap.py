@@ -16,11 +16,16 @@ from eitprocessing.datahandling.pixelmap import (
     PendelluftMap,
     PerfusionMap,
     PixelMap,
-    PlotParameters,
     SignedPendelluftMap,
     TIVMap,
 )
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
+from eitprocessing.plotting.pixelmap import (
+    PIXELMAP_PLOT_CONFIG_REGISTRY,
+    PixelMapPlotConfig,
+    reset_pixelmap_plot_config,
+    set_pixelmap_plot_config,
+)
 
 
 def test_init_values():
@@ -80,59 +85,80 @@ def test_update():
     assert pm2.label == "test"
     assert pm2 == pm0.update(values=[[1]], label="test")
 
-    pp0 = PlotParameters()
+    pp0 = PixelMapPlotConfig()
     pp1 = copy.replace(pp0, cmap="foo")
     assert pp1.cmap == "foo"
     assert pp1 == pp0.update(cmap="foo")
 
 
-def test_init_plot_parameters():
+def test_init_plot_config():
     pm0 = PixelMap([[0]])
-    pm1 = PixelMap([[0]], plot_parameters={})
+    pm1 = PixelMap([[0]], plot_config={})
 
-    assert pm0.plot_parameters == pm1.plot_parameters
-    assert pm0.plot_parameters is not pm1.plot_parameters
+    assert pm0._plot_config is pm0.plotting.config
+    assert pm1._plot_config is pm1.plotting.config
+    assert isinstance(pm0.plotting.config, PixelMapPlotConfig)
+    assert isinstance(pm1.plotting.config, PixelMapPlotConfig)
 
-    pm2 = PixelMap([[0]], plot_parameters=PlotParameters(facecolor="white"))
-    pm3 = PixelMap([[0]], plot_parameters={"facecolor": "white"})
+    assert pm0.plotting.config == pm1.plotting.config
+    assert pm0.plotting.config is not pm1.plotting.config
 
-    assert pm2.plot_parameters != pm0.plot_parameters
-    assert pm2.plot_parameters == pm3.plot_parameters
+    pm2 = PixelMap([[0]], plot_config=PixelMapPlotConfig(facecolor="white"))
+    pm3 = PixelMap([[0]], plot_config={"facecolor": "white"})
 
-    pm4 = pm0.update(plot_parameters=PlotParameters(facecolor="white"))
-    pm5 = pm0.update(plot_parameters={"facecolor": "white"})
+    assert pm2.plotting.config != pm0.plotting.config
+    assert pm2.plotting.config == pm3.plotting.config
 
-    assert pm4.plot_parameters != pm0.plot_parameters
-    assert pm4.plot_parameters == pm2.plot_parameters
-    assert pm4.plot_parameters == pm5.plot_parameters
+    with pytest.raises(TypeError, match=r"PixelMapPlotConfig.__init__\(\) got an unexpected keyword argument"):
+        _ = PixelMap([[0]], plot_config={"non_existing": None})
 
-    pm6 = pm2.update(plot_parameters={"cmap": "inferno"})
-    pm7 = pm2.update(plot_parameters=PlotParameters(cmap="inferno"))
-    pm8 = pm2.update(plot_parameters=pm2.plot_parameters.update(cmap="inferno"))
-
-    # when passing a dict as plot_parameters, plot_parameters is *updated*, not *replaced*
-    # pm6 works the same as pm8 internally
-    # when passing a PlotParameters object, the entire object is replaced
-    # pm7 should probably almost never be used
-    assert pm6.plot_parameters != pm7.plot_parameters
-    assert pm7.plot_parameters.facecolor != "white"
-    assert pm6.plot_parameters == pm8.plot_parameters
-
-    with pytest.raises(TypeError, match=r"PlotParameters.__init__\(\) got an unexpected keyword argument"):
-        _ = PixelMap([[0]], plot_parameters={"non_existing": None})
+    pm6 = pm2.update(plot_config={"cmap": "inferno"})
 
     # normally, colorbar kwargs is empty
-    assert pm6.plot_parameters.colorbar_kwargs == {}
-    pm9 = PixelMap([[0]], plot_parameters={"colorbar_kwargs": {"key": "value"}})
-    assert pm9.plot_parameters.colorbar_kwargs == {"key": "value"}
+    assert pm6.plotting.config.colorbar_kwargs == {}
+    pm9 = PixelMap([[0]], plot_config={"colorbar_kwargs": {"key": "value"}})
+    assert pm9.plotting.config.colorbar_kwargs == {"key": "value"}
+    assert isinstance(pm3.plotting.config.colorbar_kwargs, frozendict.frozendict)
+
+
+def test_update_plot_config():
+    pp0 = PixelMapPlotConfig()
+    assert isinstance(pp0, PixelMapPlotConfig)
+    pp1 = copy.replace(pp0, cmap="foo")
+    assert pp1.cmap == "foo"
+    assert pp1 == pp0.update(cmap="foo")
+
+    pm0 = PixelMap([[0]])
+    pm2 = PixelMap([[0]], plot_config=PixelMapPlotConfig(facecolor="white"))
+
+    pm4 = pm0.update(plot_config=PixelMapPlotConfig(facecolor="white"))
+    pm5 = pm0.update(plot_config={"facecolor": "white"})
+
+    assert pm4.plotting.config != pm0.plotting.config
+    assert pm4.plotting.config == pm2.plotting.config
+    assert pm4.plotting.config == pm5.plotting.config
+
+    pm6 = pm2.update(plot_config={"cmap": "inferno"})
+    pm7 = pm2.update(plot_config=PixelMapPlotConfig(cmap="inferno"))
+    pm8 = pm2.update(plot_config=pm2.plotting.config.update(cmap="inferno"))
+
+    # when passing a dict as plot_config, plot_config is *updated*, not *replaced*
+    # pm6 works the same as pm8 internally
+    # when passing a PixelMapPlotConfig object, the entire object is replaced
+    # pm7 should probably almost never be used
+    assert pm6.plotting.config != pm7.plotting.config
+    assert pm7.plotting.config.facecolor != "white"
+    assert pm6.plotting.config == pm8.plotting.config
+
+    pm9 = PixelMap([[0]], plot_config={"colorbar_kwargs": {"key": "value"}})
 
     # when updating, update colorbar kwargs instead of overwriting it
-    pm10 = pm9.update(plot_parameters={"colorbar_kwargs": {"foo": "bar"}})
-    assert pm10.plot_parameters.colorbar_kwargs == {"key": "value", "foo": "bar"}
+    pm10 = pm9.update(plot_config={"colorbar_kwargs": {"foo": "bar"}})
+    assert pm10.plotting.config.colorbar_kwargs == {"key": "value", "foo": "bar"}
 
     # overriding existing value
-    pm11 = pm9.update(plot_parameters={"colorbar_kwargs": {"key": "another value"}})
-    assert pm11.plot_parameters.colorbar_kwargs == {"key": "another value"}
+    pm11 = pm9.update(plot_config={"colorbar_kwargs": {"key": "another value"}})
+    assert pm11.plotting.config.colorbar_kwargs == {"key": "another value"}
 
 
 def test_create_threshold_mask():
@@ -161,45 +187,47 @@ def test_convert():
     assert isinstance(pm2, PerfusionMap)
 
     with pytest.raises(TypeError, match=r"`target_type` must be \(a subclass of\) PixelMap"):
-        _ = pm0.convert_to(PlotParameters)
+        _ = pm0.convert_to(PixelMapPlotConfig)
+
+    # TODO: test kwargs in `convert_to()`
 
 
 def test_pixel_map():
     pm = PixelMap([[0]])
 
-    assert pm.plot_parameters.cmap == "viridis"
-    assert pm.plot_parameters.norm == "linear"
+    assert pm._plot_config.cmap == "viridis"
+    assert pm._plot_config.norm == "linear"
 
-    assert isinstance(pm.plot_parameters.colorbar_kwargs, frozendict.frozendict)
-    assert pm.plot_parameters.colorbar_kwargs == {}
+    assert isinstance(pm._plot_config.colorbar_kwargs, frozendict.frozendict)
+    assert pm._plot_config.colorbar_kwargs == {}
 
 
 def test_tiv_map():
     pm = TIVMap([[0]])
 
-    assert isinstance(pm.plot_parameters.cmap, Colormap)
-    assert pm.plot_parameters.cmap.name == "Blues_r"
+    assert isinstance(pm.plotting.config.cmap, Colormap)
+    assert pm.plotting.config.cmap.name == "Blues_r"
 
-    assert isinstance(pm.plot_parameters.norm, Normalize)
-    assert pm.plot_parameters.norm.vmin == 0
-    assert pm.plot_parameters.norm.vmax is None
+    assert isinstance(pm.plotting.config.norm, Normalize)
+    assert pm.plotting.config.norm.vmin == 0
+    assert pm.plotting.config.norm.vmax is None
 
-    assert isinstance(pm.plot_parameters.colorbar_kwargs, frozendict.frozendict)
-    assert pm.plot_parameters.colorbar_kwargs["label"] == "TIV (a.u.)"
+    assert isinstance(pm.plotting.config.colorbar_kwargs, frozendict.frozendict)
+    assert pm.plotting.config.colorbar_kwargs["label"] == "TIV (a.u.)"
 
 
 def test_imshow():
     pm = TIVMap(np.reshape(np.arange(100), (10, 10)))
-    cm = pm.imshow()
+    cm = pm.plotting.imshow()
     assert cm.axes == plt.gca()
-    assert cm.cmap == pm.plot_parameters.cmap
+    assert cm.cmap == pm.plotting.config.cmap
     axes = cm.figure.get_axes()
     assert len(axes) == 2  # colorbar is also an axes
 
     assert cm.axes in axes
     colorbar_axes = next(iter(set(axes) - {cm.axes}))
 
-    assert colorbar_axes.get_ylabel() == pm.plot_parameters.colorbar_kwargs["label"]
+    assert colorbar_axes.get_ylabel() == pm.plotting.config.colorbar_kwargs["label"]
 
 
 def test_normalize_values():
@@ -291,29 +319,29 @@ def test_plot_extend():
     assert np.array_equal(cmap.get_over(), cmap(1.0))
 
     # colorbar has no extend
-    cm0 = PixelMap([[0]], plot_parameters={"cmap": cmap}).imshow()
+    cm0 = PixelMap([[0]], plot_config={"cmap": cmap}).plotting.imshow()
     assert cm0.colorbar.extend == "neither"
 
     # with under set to a different color, colorbar has min extend
     cmap.set_under("orange")
-    cm1 = PixelMap([[0]], plot_parameters={"cmap": cmap}).imshow()
+    cm1 = PixelMap([[0]], plot_config={"cmap": cmap}).plotting.imshow()
     assert cm1.colorbar.extend == "min"
 
     # with under and over set to a different color, colorbar has both extend
     cmap.set_over("red")
-    cm2 = PixelMap([[0]], plot_parameters={"cmap": cmap}).imshow()
+    cm2 = PixelMap([[0]], plot_config={"cmap": cmap}).plotting.imshow()
     assert cm2.colorbar.extend == "both"
 
     # with over set to a different color, colorbar has max extend
     cmap = plt.colormaps["Greens"]
     cmap.set_over("red")
-    cm3 = PixelMap([[0]], plot_parameters={"cmap": cmap}).imshow()
+    cm3 = PixelMap([[0]], plot_config={"cmap": cmap}).plotting.imshow()
     assert cm3.colorbar.extend == "max"
 
 
 def test_formatter():
     pm = PixelMap([[-1, 1]])
-    cm1 = pm.imshow()
+    cm1 = pm.plotting.imshow()
 
     plt.gcf().canvas.draw()  # an actual draw is required to test ticks
 
@@ -324,7 +352,7 @@ def test_formatter():
     assert float(formatter(ticks[0]).replace("\N{MINUS SIGN}", "-")) == -1.0
     assert float(formatter(ticks[-1])) == 1.0
 
-    cm2 = pm.imshow(absolute=True)
+    cm2 = pm.plotting.imshow(absolute=True)
 
     plt.gcf().canvas.draw()  # an actual draw is required to test ticks
 
@@ -335,7 +363,7 @@ def test_formatter():
     assert float(formatter(ticks[0]).replace("\N{MINUS SIGN}", "-")) == 1.0
     assert float(formatter(ticks[-1])) == 1.0
 
-    cm3 = pm.imshow(percentage=True)
+    cm3 = pm.plotting.imshow(percentage=True)
 
     plt.gcf().canvas.draw()  # an actual draw is required to test ticks
 
@@ -346,7 +374,7 @@ def test_formatter():
     assert formatter(ticks[0]) == "\N{MINUS SIGN}100%"
     assert formatter(ticks[-1]) == "100%"
 
-    cm4 = pm.imshow(percentage=True, absolute=True)
+    cm4 = pm.plotting.imshow(percentage=True, absolute=True)
 
     plt.gcf().canvas.draw()  # an actual draw is required to test ticks
 
@@ -360,25 +388,25 @@ def test_formatter():
 
 def test_centered_norm():
     pm = DifferenceMap([[-10, 1]])
-    assert isinstance(pm.plot_parameters.norm, CenteredNorm)
+    assert isinstance(pm.plotting.config.norm, CenteredNorm)
 
-    cm = pm.imshow()
+    cm = pm.plotting.imshow()
     assert cm.colorbar.norm.vcenter == 0
     assert cm.colorbar.norm.vmin == -10
     assert cm.colorbar.norm.vmax == 10
 
 
 def test_add():
-    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_parameters={"absolute": True})
+    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_config={"absolute": True})
     pm1_add = pm1 + 3
     assert np.array_equal(pm1_add.values, np.array([[3, 4, 5, 6]]))
     assert isinstance(pm1_add, PerfusionMap)
-    assert pm1_add.plot_parameters == pm1.plot_parameters
+    assert pm1_add.plotting.config == pm1.plotting.config
 
     add_pm1 = 3 + pm1
     assert np.array_equal(pm1_add.values, add_pm1.values)
     assert isinstance(add_pm1, PerfusionMap)
-    assert add_pm1.plot_parameters == pm1.plot_parameters
+    assert add_pm1.plotting.config == pm1.plotting.config
 
     pm2 = TIVMap([[1, 2, 3, 4]])
     pm1_add_pm2 = pm1 + pm2
@@ -391,16 +419,16 @@ def test_add():
 
 
 def test_sub():
-    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_parameters={"absolute": True})
+    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_config={"absolute": True})
     pm1_sub = pm1 - 3
     assert np.array_equal(pm1_sub.values, np.array([[-3, -2, -1, 0]]))
     assert isinstance(pm1_sub, PerfusionMap)
-    assert pm1_sub.plot_parameters == pm1.plot_parameters
+    assert pm1_sub.plotting.config == pm1.plotting.config
 
     sub_pm1 = 3 - pm1
     assert np.array_equal(sub_pm1.values, [[3, 2, 1, 0]])
     assert isinstance(sub_pm1, PerfusionMap)
-    assert sub_pm1.plot_parameters == pm1.plot_parameters
+    assert sub_pm1.plotting.config == pm1.plotting.config
 
     pm2 = TIVMap([[1, 2, 3, 4]])
     pm1_sub_pm2 = pm1 - pm2
@@ -412,16 +440,16 @@ def test_sub():
 
 
 def test_mul():
-    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_parameters={"absolute": True})
+    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_config={"absolute": True})
     pm1_mul = pm1 * 3
     assert np.array_equal(pm1_mul.values, np.array([[0, 3, 6, 9]]))
     assert isinstance(pm1_mul, PerfusionMap)
-    assert pm1_mul.plot_parameters == pm1.plot_parameters
+    assert pm1_mul.plotting.config == pm1.plotting.config
 
     mul_pm1 = 3 * pm1
     assert np.array_equal(pm1_mul.values, mul_pm1.values)
     assert isinstance(mul_pm1, PerfusionMap)
-    assert mul_pm1.plot_parameters == pm1.plot_parameters
+    assert mul_pm1.plotting.config == pm1.plotting.config
 
     pm2 = TIVMap([[1, 2, 3, 4]])
     pm1_mul_pm2 = pm1 * pm2
@@ -434,17 +462,17 @@ def test_mul():
 
 
 def test_div():
-    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_parameters={"absolute": True})
+    pm1 = PerfusionMap([[0, 1, 2, 3]], plot_config={"absolute": True})
     pm1_div = pm1 / 3
     assert np.array_equal(pm1_div.values, np.array([[0, 1 / 3, 2 / 3, 1]]))
     assert isinstance(pm1_div, PerfusionMap)
-    assert pm1_div.plot_parameters == pm1.plot_parameters
+    assert pm1_div.plotting.config == pm1.plotting.config
 
     with pytest.warns(UserWarning, match="Dividing by 0 will result in `np.nan`"):
         div_pm1 = 3 / pm1
     assert np.array_equal(div_pm1.values, [[np.nan, 3, 3 / 2, 1]], equal_nan=True)
     assert isinstance(div_pm1, PerfusionMap)
-    assert div_pm1.plot_parameters == pm1.plot_parameters
+    assert div_pm1.plotting.config == pm1.plotting.config
 
     pm2 = TIVMap([[1, 2, 3, 4]])
     pm1_div_pm2 = pm1 / pm2
@@ -493,11 +521,11 @@ def test_mean():
     assert isinstance(mean_pm3_pm4, SignedPendelluftMap)
     assert np.array_equal(mean_pm3_pm4.values, [[np.nan, 3, 4.5, 6]], equal_nan=True)
 
-    mean_all = PixelMap.from_mean([pm1, pm2, pm3, pm4], label="foo", plot_parameters={"colorbar": False})
+    mean_all = PixelMap.from_mean([pm1, pm2, pm3, pm4], label="foo", plot_config={"colorbar": False})
     assert isinstance(mean_all, PixelMap)
     assert np.array_equal(mean_all.values, np.array([[0.5, 2, 3.5, 13 / 3]]))
     assert mean_all.label == "foo"
-    assert mean_all.plot_parameters.colorbar is False
+    assert mean_all._plot_config.colorbar is False
 
     array1 = [[0, 1, 2, 3]]
     array2 = [[2, 3, 4, 5]]
@@ -512,3 +540,68 @@ def test_mean():
     array4 = [[4, 5, 6, 7], [5, 6, 7, 8]]
     with pytest.raises(ValueError, match="all input arrays must have the same shape"):
         _ = PixelMap.from_mean([array1, array4])
+
+
+def test_replace_defaults():
+    """Test that replacing PixelMapPlotParameters defaults works as expected."""
+    pm0 = PixelMap([[0]])
+    assert pm0.plotting.config.cmap == "viridis"
+
+    PIXELMAP_PLOT_CONFIG_REGISTRY[PixelMap] = PixelMapPlotConfig(cmap="plasma")
+
+    pm1 = PixelMap([[0]])
+    assert pm0.plotting.config.cmap == "viridis"
+    assert pm1.plotting.config.cmap == "plasma"
+
+    pm2 = TIVMap([[0]])
+    assert isinstance(pm2.plotting.config.cmap, Colormap)
+    assert pm2.plotting.config.cmap.name == "Blues_r"
+
+    PIXELMAP_PLOT_CONFIG_REGISTRY[TIVMap] = PIXELMAP_PLOT_CONFIG_REGISTRY[TIVMap].update(cmap="Greens")
+
+    pm3 = TIVMap([[0]])
+    assert pm3.plotting.config.cmap == "Greens"
+    assert pm3.plotting.config.colorbar
+
+    PIXELMAP_PLOT_CONFIG_REGISTRY[TIVMap] = PIXELMAP_PLOT_CONFIG_REGISTRY[TIVMap].update(colorbar=False)
+
+    pm4 = TIVMap([[0]])
+    assert pm4.plotting.config.cmap == "Greens"
+    assert not pm4.plotting.config.colorbar
+
+    reset_pixelmap_plot_config()
+    pm0 = PixelMap([[0]])
+    assert pm0.plotting.config.cmap == "viridis"
+
+
+def test_set_pixelmap_plot_parameters():
+    """Test that set_pixelmap_plot_parameters works as expected."""
+    pm0 = PixelMap([[0]])
+    assert pm0.plotting.config.cmap == "viridis"
+
+    set_pixelmap_plot_config(PixelMap, cmap="plasma")
+
+    pm1 = PixelMap([[0]])
+    assert pm1.plotting.config.cmap == "plasma"
+
+    pm2 = TIVMap([[0]])
+    assert isinstance(pm2.plotting.config.cmap, Colormap)
+    assert pm2.plotting.config.cmap.name == "Blues_r"
+
+    set_pixelmap_plot_config(TIVMap, cmap="Greens")
+
+    pm3 = TIVMap([[0]])
+    assert pm3.plotting.config.cmap == "Greens"
+
+    set_pixelmap_plot_config(cmap="Reds", colorbar=False)
+    assert all(
+        cls([[0]]).plotting.config.cmap == "Reds" and not cls([[0]]).plotting.config.colorbar
+        for cls in PIXELMAP_PLOT_CONFIG_REGISTRY
+    )
+
+    reset_pixelmap_plot_config(PixelMap)
+
+    pm4 = PixelMap([[0]])
+    pm5 = TIVMap([[0]])
+    assert pm4.plotting.config.cmap == "viridis"
+    assert pm5.plotting.config.cmap == "Reds"
