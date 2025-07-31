@@ -340,7 +340,7 @@ class PixelMap:
 
         The values of the pixel map are compared to the threshold values. By default, the comparator is `>=`
         (`np.greater_equal`), such that the resulting mask is 1.0 where the map values are at least the threshold
-        values, and NaN elsewhere. The comperator can be set to any comparison function, e.g., `np.less`, function from
+        values, and NaN elsewhere. The comparator can be set to any comparison function, e.g.`np.less`, a function from
         the `operator` module or custom function which takes pixel map values array and threshold as arguments, and
         returns a boolean array with the same shape as the array.
 
