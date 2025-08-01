@@ -500,28 +500,50 @@ class TIVMap(PixelMap):
 
 @dataclass(frozen=True, init=False)
 class ODCLMap(PixelMap):
-    """Pixel map representing normalized overdistention and collapse."""
+    """Pixel map representing normalized overdistention and collapse.
+
+    Values between -1 and 0 (-100% to 0%) represent compliance change due to collapse , while values between 0 and 1 (0%
+    to 100%) represent compliance change due to overdistention.
+    """
 
 
 @dataclass(frozen=True, init=False)
 class DifferenceMap(PixelMap):
-    """Pixel map representing the difference between two pixel maps."""
+    """Pixel map representing the difference between two pixel maps.
+
+    Values are centered around zero, with positive values indicating an increase and negative values indicating a
+    decrease in the pixel values compared to a reference map. If the values are all expected to be positive, consider
+    converting to a normal `PixelMap` or other subclass instead.
+    """
 
 
 @dataclass(frozen=True, init=False)
 class PerfusionMap(PixelMap):
-    """Pixel map representing perfusion values."""
+    """Pixel map representing perfusion values.
+
+    Values represent perfusion, where higher values indicate more perfusion. The values are expected to be non-negative,
+    with 0 representing no perfusion.
+    """
 
     allow_negative_values: ClassVar[bool] = False
 
 
 @dataclass(frozen=True, init=False)
 class PendelluftMap(PixelMap):
-    """Pixel map representing positive-only pendelluft values."""
+    """Pixel map representing positive-only pendelluft values.
+
+    Values represent pendelluft severity as positive values. There is no distinction between pixels with early inflation
+    and pixels with late inflation. Alternatively, you can use a SignedPendelluftMap for signed data.
+    """
 
     allow_negative_values: ClassVar[bool] = False
 
 
 @dataclass(frozen=True, init=False)
 class SignedPendelluftMap(PixelMap):
-    """Pixel map representing pendelluft values as signed values."""
+    """Pixel map representing pendelluft values as signed values.
+
+    Values represent pendelluft severity. Negative values indicate pixels that have early inflation (before the global
+    inflation starts), while negative values indicate pixels that have late inflation (after the global inflation
+    starts).
+    """
