@@ -1,7 +1,8 @@
 from dataclasses import MISSING, Field, dataclass, fields, replace
-from typing import Self, TypeVar, get_type_hints
+from typing import TypeVar, get_type_hints
 
 from frozendict import frozendict
+from typing_extensions import Self
 
 T = TypeVar("T")
 
