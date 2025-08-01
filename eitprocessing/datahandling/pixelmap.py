@@ -437,7 +437,7 @@ class PixelMap:
         new_values[invalid] = np.nan
 
         # other should never be a PixelMap, because this method is only called if other doesn't know how to divide,
-        # which is does if it is a PixelMap.
+        # which it does if it is a PixelMap.
 
         return self.update(values=new_values, label=None)
 
