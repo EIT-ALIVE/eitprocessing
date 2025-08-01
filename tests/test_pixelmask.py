@@ -4,17 +4,17 @@ import pytest
 from eitprocessing.datahandling.pixelmap import PixelMap
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.roi import (
+    ANATOMICAL_LEFT_MASK,
+    ANATOMICAL_RIGHT_MASK,
     DORSAL_MASK,
     LAYER_1_MASK,
     LAYER_2_MASK,
     LAYER_3_MASK,
     LAYER_4_MASK,
-    LEFT_LUNG_MASK,
     QUADRANT_1_MASK,
     QUADRANT_2_MASK,
     QUADRANT_3_MASK,
     QUADRANT_4_MASK,
-    RIGHT_LUNG_MASK,
     VENTRAL_MASK,
     PixelMask,
 )
@@ -236,14 +236,16 @@ def test_predefined_ventral_dorsal_masks():
 
 
 def test_predefined_left_right_masks():
-    assert np.all(RIGHT_LUNG_MASK.mask[:, :16] == 1.0)
-    assert np.all(np.isnan(RIGHT_LUNG_MASK.mask[:, 16:]))
+    assert np.all(ANATOMICAL_RIGHT_MASK.mask[:, :16] == 1.0)
+    assert np.all(np.isnan(ANATOMICAL_RIGHT_MASK.mask[:, 16:]))
 
-    assert np.all(LEFT_LUNG_MASK.mask[:, 16:] == 1.0)
-    assert np.all(np.isnan(LEFT_LUNG_MASK.mask[:, :16]))
+    assert np.all(ANATOMICAL_LEFT_MASK.mask[:, 16:] == 1.0)
+    assert np.all(np.isnan(ANATOMICAL_LEFT_MASK.mask[:, :16]))
 
-    assert np.array_equal(np.ones((32, 32)), (RIGHT_LUNG_MASK + LEFT_LUNG_MASK).mask)
-    assert np.array_equal(np.full((32, 32), np.nan), (RIGHT_LUNG_MASK * LEFT_LUNG_MASK).mask, equal_nan=True)
+    assert np.array_equal(np.ones((32, 32)), (ANATOMICAL_RIGHT_MASK + ANATOMICAL_LEFT_MASK).mask)
+    assert np.array_equal(
+        np.full((32, 32), np.nan), (ANATOMICAL_RIGHT_MASK * ANATOMICAL_LEFT_MASK).mask, equal_nan=True
+    )
 
 
 def test_predefined_quadrant_masks():

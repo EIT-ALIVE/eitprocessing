@@ -4,12 +4,13 @@ This module contains tools for the selection of regions of interest and masking 
 module is `PixelMask`. Any type of region of interest selection results in a `PixelMask` object. A mask can be applied
 to any pixel dataset (EITData, PixelMap) with the same shape.
 
-Several default masks have been predefined. NB: the right lung is to the left side of the EIT image and vice versa.
+Several default masks have been predefined. NB: the right side of the patient is to the left side of the EIT image and
+vice versa.
 
 - `VENTRAL_MASK` includes only the first 16 rows;
 - `DORSAL_MASK` includes only the last 16 rows;
-- `RIGHT_LUNG_MASK` includes only the first 16 columns;
-- `LEFT_LUNG_MASK` includes only the last 16 columns;
+- `ANATOMICAL_RIGHT_MASK` includes only the first 16 columns;
+- `ANATOMICAL_LEFT_MASK` includes only the last 16 columns;
 - `QUADRANT_1_MASK` includes the top right quadrant;
 - `QUADRANT_2_MASK` includes the top left quadrant;
 - `QUADRANT_3_MASK` includes the bottom right quadrant;
@@ -45,7 +46,8 @@ class PixelMask:
     region of interest, but is weighted, e.g., for a weighted summation of pixel values, or because the pixel is
     considered part of multiple regions of interest.
 
-    You can initialize a mask using a nested list. At initialization, the mask is converted to a numpy array.
+    You can initialize a mask using an array or nested list. At initialization, the mask is converted to a floating
+    point numpy array.
 
     By default, 0-values are converted tot NaN. You can override this behaviour with `keep_zeros=True`. You can
     therefore create a mask by supplying boolean values, where `True` indicates the pixel is part of the region of
@@ -63,9 +65,9 @@ class PixelMask:
 
     Example:
     ```python
-    >>> assert VENTRAL_MASK + RIGHT_LUNG_MASK == QUADRANT_1_MASK
+    >>> assert VENTRAL_MASK * ANATOMICAL_RIGHT_MASK == QUADRANT_1_MASK
     True  # quadrant 1 is the ventral part of the right lung
-    >>> assert DORSAL_MASK * LEFT_LUNG_MASK == QUADRANT_4_MASK
+    >>> assert DORSAL_MASK * ANATOMICAL_LEFT_MASK == QUADRANT_4_MASK
     True  # quadrant 4 is the dorsal part of the left lung
     ```
 
@@ -176,10 +178,10 @@ LAYER_4_MASK = PixelMask(np.concat([np.zeros((24, 32)), np.ones((8, 32))], axis=
 VENTRAL_MASK = LAYER_1_MASK + LAYER_2_MASK
 DORSAL_MASK = LAYER_3_MASK + LAYER_4_MASK
 
-RIGHT_LUNG_MASK = PixelMask(np.concat([np.ones((32, 16)), np.zeros((32, 16))], axis=1))
-LEFT_LUNG_MASK = PixelMask(np.concat([np.zeros((32, 16)), np.ones((32, 16))], axis=1))
+ANATOMICAL_RIGHT_MASK = PixelMask(np.concat([np.ones((32, 16)), np.zeros((32, 16))], axis=1))
+ANATOMICAL_LEFT_MASK = PixelMask(np.concat([np.zeros((32, 16)), np.ones((32, 16))], axis=1))
 
-QUADRANT_1_MASK = VENTRAL_MASK * RIGHT_LUNG_MASK
-QUADRANT_2_MASK = VENTRAL_MASK * LEFT_LUNG_MASK
-QUADRANT_3_MASK = DORSAL_MASK * RIGHT_LUNG_MASK
-QUADRANT_4_MASK = DORSAL_MASK * LEFT_LUNG_MASK
+QUADRANT_1_MASK = VENTRAL_MASK * ANATOMICAL_RIGHT_MASK
+QUADRANT_2_MASK = VENTRAL_MASK * ANATOMICAL_LEFT_MASK
+QUADRANT_3_MASK = DORSAL_MASK * ANATOMICAL_RIGHT_MASK
+QUADRANT_4_MASK = DORSAL_MASK * ANATOMICAL_LEFT_MASK
