@@ -78,7 +78,7 @@ class PixelMask:
     mask: np.ndarray
     keep_zeros: InitVar[bool] = field(default=False, kw_only=True)
     suppress_value_range_error: InitVar[bool] = field(default=False, kw_only=True)
-    suppress_zero_value_warning: InitVar[bool] = field(default=False, kw_only=True)
+    suppress_zero_conversion_warning: InitVar[bool] = field(default=False, kw_only=True)
 
     def __init__(
         self,
