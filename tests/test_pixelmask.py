@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pytest
 
@@ -77,6 +79,26 @@ def test_pixelmask_init_keep_zeros_true():
 
     assert np.array_equal(mask.mask == 0.0, values < 0.5)  # NaN for values < 0.5
     assert np.array_equal(mask.mask[mask.mask >= 0.5], values[mask.mask >= 0.5])  # non-NaN values are unaltered
+
+
+def test_pixelmask_warns_when_keep_zeros_false():
+    values = np.random.default_rng().random((10, 10))
+    values[values < 0.5] = 0.0
+
+    with pytest.warns(UserWarning, match="Mask contains 0 values, which will be converted to NaN"):
+        _ = PixelMask(values)
+
+
+def test_pixelmask_does_not_warn_when_boolean_array_has_zeros():
+    values = np.random.default_rng().random((10, 10))
+    values = values > 0.5  # boolean array
+
+    with warnings.catch_warnings(record=True) as w:
+        _ = PixelMask(values)  # as boolean array
+        assert len(w) == 0
+
+    with pytest.warns(UserWarning, match="Mask contains 0 values, which will be converted to NaN"):
+        _ = PixelMask(values.astype(int))  # the same values, but as integer array
 
 
 def test_pixelmask_init_invalid_dtype():

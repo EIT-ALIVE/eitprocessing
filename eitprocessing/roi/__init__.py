@@ -23,6 +23,7 @@ vice versa.
 
 import dataclasses
 import sys
+import warnings
 from dataclasses import InitVar, dataclass, field
 from dataclasses import replace as dataclass_replace
 from typing import TypeVar, overload
@@ -77,8 +78,16 @@ class PixelMask:
     mask: np.ndarray
     keep_zeros: InitVar[bool] = field(default=False, kw_only=True)
     suppress_value_range_error: InitVar[bool] = field(default=False, kw_only=True)
+    suppress_zero_value_warning: InitVar[bool] = field(default=False, kw_only=True)
 
-    def __init__(self, mask: list | np.ndarray, keep_zeros: bool = False, suppress_value_range_error: bool = False):
+    def __init__(
+        self,
+        mask: list | np.ndarray,
+        keep_zeros: bool = False,
+        suppress_value_range_error: bool = False,
+        suppress_zero_conversion_warning: bool = False,
+    ):
+        is_boolean_mask = np.array(mask).dtype == bool
         mask = np.array(mask, dtype=float)
 
         if mask.ndim != 2:  # noqa: PLR2004
@@ -96,7 +105,16 @@ class PixelMask:
                 )
             raise exc
 
-        if not keep_zeros:
+        if (not keep_zeros) and np.any(mask == 0):
+            if (not is_boolean_mask) and not suppress_zero_conversion_warning:
+                msg = (
+                    "Mask contains 0 values, which will be converted to NaN. "
+                    "If you want to keep 0 values, provide `keep_zeros=True` when initializing a Mask. "
+                    "If you want to suppress this warning, provide `suppress_value_range_warning=True` "
+                    "or provide boolean values as input (only for non-weighted masks)."
+                )
+                warnings.warn(msg, UserWarning)
+
             mask[mask == 0] = np.nan
 
         mask.flags["WRITEABLE"] = False
