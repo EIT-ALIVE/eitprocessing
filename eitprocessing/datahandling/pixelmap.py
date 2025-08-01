@@ -32,7 +32,7 @@ Mathematical Operations:
 
     - Multiplication (*): Returns a `PixelMap` with values multiplied element-wise.
 
-    - Division (/): Returns a Pi`xelMap with values divided element-wise. Division by zero results in NaN values with a
+    - Division (/): Returns a `PixelMap` with values divided element-wise. Division by zero results in NaN values with a
       warning.
 
     When operating with another `PixelMap` of any type, operations typically return the base PixelMap type, except for

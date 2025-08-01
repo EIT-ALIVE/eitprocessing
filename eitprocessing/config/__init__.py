@@ -21,7 +21,7 @@ class Config:
                 object.__setattr__(self, field_.name, frozendict(merged))
 
     def __replace__(self, /, **changes) -> Self:
-        """Return a copy of the of the Config instance replacing attributes.
+        """Return a copy of the Config instance replacing attributes.
 
         Similar to dataclass.replace(), but with special handling of `colorbar_kwargs`. `colorbar_kwargs` is updated
         with the provided dictionary, rather than replaced.
