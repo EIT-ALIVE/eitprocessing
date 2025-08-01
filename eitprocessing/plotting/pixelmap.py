@@ -29,6 +29,7 @@ Examples:
 
 from copy import deepcopy
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 import matplotlib as mpl
 import numpy as np
@@ -41,33 +42,19 @@ from matplotlib.image import AxesImage
 from matplotlib.ticker import PercentFormatter
 
 from eitprocessing.config import Config
-from eitprocessing.datahandling.pixelmap import (
-    DifferenceMap,
-    ODCLMap,
-    PendelluftMap,
-    PerfusionMap,
-    PixelMap,
-    SignedPendelluftMap,
-    TIVMap,
-)
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
 
+if TYPE_CHECKING:
+    from eitprocessing.datahandling.pixelmap import PixelMap
+
 ColorType = str | tuple[float, float, float] | tuple[float, float, float, float] | float | Colormap
-
-
-def _get_zero_norm() -> Normalize:
-    return Normalize(vmin=0)
-
-
-def _get_centered_norm() -> CenteredNorm:
-    return CenteredNorm(vcenter=0)
 
 
 @dataclass
 class PixelMapPlotting:
     """Utility class for plotting pixel maps."""
 
-    pixel_map: PixelMap = field(compare=False, repr=False)
+    pixel_map: "PixelMap" = field(compare=False, repr=False)
 
     @property
     def config(self) -> "PixelMapPlotConfig":
@@ -195,6 +182,14 @@ class PixelMapPlotting:
             colorbar_kwargs.setdefault("extend", extend)
 
         return plt.colorbar(cm, ax=ax, **colorbar_kwargs or {})
+
+
+def _get_zero_norm() -> Normalize:
+    return Normalize(vmin=0)
+
+
+def _get_centered_norm() -> CenteredNorm:
+    return CenteredNorm(vcenter=0)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -348,63 +343,3 @@ class SignedPendelluftMapPlotConfig(PixelMapPlotConfig):
     colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Pendelluft"))
     absolute: bool = True
     norm: Normalize = field(default_factory=_get_centered_norm)
-
-
-PIXELMAP_PLOT_CONFIG_REGISTRY = {
-    PixelMap: PixelMapPlotConfig(),
-    TIVMap: TIVMapPlotConfig(),
-    ODCLMap: ODCLMapPlotConfig(),
-    DifferenceMap: DifferenceMapPlotConfig(),
-    PerfusionMap: PerfusionMapPlotConfig(),
-    PendelluftMap: PendelluftMapPlotConfig(),
-    SignedPendelluftMap: SignedPendelluftMapPlotConfig(),
-}
-
-
-def get_pixelmap_plot_config(obj: "PixelMap | type[PixelMap]") -> PixelMapPlotConfig:
-    """Get the appropriate plot configuration for a given pixel map type.
-
-    Args:
-        obj (PixelMap | type[PixelMap]):
-            The pixel map instance or pixel map type for which to get the plot configuration.
-
-    Returns:
-        PixelMapPlotConfig: The plot configuration specific to the pixel map type.
-    """
-    if isinstance(obj, PixelMap):
-        cls_ = type(obj)
-    elif issubclass(obj, PixelMap):
-        cls_ = obj
-    else:
-        msg = f"Expected PixelMap instance or type, got {type(obj)}"
-        raise TypeError(msg)
-
-    return PIXELMAP_PLOT_CONFIG_REGISTRY.get(cls_, PixelMapPlotConfig())
-
-
-def set_pixelmap_plot_config(*types, **parameters) -> None:
-    """Set or update the plot configuration for specified pixel map types.
-
-    Examples:
-        >>> set_pixelmap_plot_config(TIVMap, cmap="plasma")
-        >>> set_pixelmap_plot_config(PendelluftMap, SignedPendelluftMap, colorbar=False, absolute=True)
-        >>> set_pixelmap_plot_config(cmap="viridis")  # Update all types with new cmap
-
-    """
-    if not types:
-        types = PIXELMAP_PLOT_CONFIG_REGISTRY.keys()
-
-    for type_ in types:
-        PIXELMAP_PLOT_CONFIG_REGISTRY[type_] = PIXELMAP_PLOT_CONFIG_REGISTRY[type_].update(**parameters)
-
-
-def reset_pixelmap_plot_config(*types) -> None:
-    """Reset plot config to their defaults.
-
-    Resets the plot config defaults for the specified pixel map types. If no types are specified, all registered pixel
-    map types will be reset to their default config.
-    """
-    if not types:
-        types = PIXELMAP_PLOT_CONFIG_REGISTRY.keys()
-    for type_ in types:
-        PIXELMAP_PLOT_CONFIG_REGISTRY[type_] = PIXELMAP_PLOT_CONFIG_REGISTRY[type_].__class__()

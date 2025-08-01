@@ -19,13 +19,9 @@ from eitprocessing.datahandling.pixelmap import (
     SignedPendelluftMap,
     TIVMap,
 )
+from eitprocessing.plotting import _PLOT_CONFIG_REGISTRY, reset_plot_config, set_plot_config_parameters
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
-from eitprocessing.plotting.pixelmap import (
-    PIXELMAP_PLOT_CONFIG_REGISTRY,
-    PixelMapPlotConfig,
-    reset_pixelmap_plot_config,
-    set_pixelmap_plot_config,
-)
+from eitprocessing.plotting.pixelmap import PixelMapPlotConfig
 
 
 def test_init_values():
@@ -124,9 +120,11 @@ def test_init_plot_config():
 def test_update_plot_config():
     pp0 = PixelMapPlotConfig()
     assert isinstance(pp0, PixelMapPlotConfig)
-    pp1 = copy.replace(pp0, cmap="foo")
-    assert pp1.cmap == "foo"
-    assert pp1 == pp0.update(cmap="foo")
+
+    if sys.version_info >= (3, 13):
+        pp1 = copy.replace(pp0, cmap="foo")
+        assert pp1.cmap == "foo"
+        assert pp1 == pp0.update(cmap="foo")
 
     pm0 = PixelMap([[0]])
     pm2 = PixelMap([[0]], plot_config=PixelMapPlotConfig(facecolor="white"))
@@ -547,7 +545,7 @@ def test_replace_defaults():
     pm0 = PixelMap([[0]])
     assert pm0.plotting.config.cmap == "viridis"
 
-    PIXELMAP_PLOT_CONFIG_REGISTRY[PixelMap] = PixelMapPlotConfig(cmap="plasma")
+    _PLOT_CONFIG_REGISTRY[PixelMap] = PixelMapPlotConfig(cmap="plasma")
 
     pm1 = PixelMap([[0]])
     assert pm0.plotting.config.cmap == "viridis"
@@ -557,19 +555,19 @@ def test_replace_defaults():
     assert isinstance(pm2.plotting.config.cmap, Colormap)
     assert pm2.plotting.config.cmap.name == "Blues_r"
 
-    PIXELMAP_PLOT_CONFIG_REGISTRY[TIVMap] = PIXELMAP_PLOT_CONFIG_REGISTRY[TIVMap].update(cmap="Greens")
+    _PLOT_CONFIG_REGISTRY[TIVMap] = _PLOT_CONFIG_REGISTRY[TIVMap].update(cmap="Greens")
 
     pm3 = TIVMap([[0]])
     assert pm3.plotting.config.cmap == "Greens"
     assert pm3.plotting.config.colorbar
 
-    PIXELMAP_PLOT_CONFIG_REGISTRY[TIVMap] = PIXELMAP_PLOT_CONFIG_REGISTRY[TIVMap].update(colorbar=False)
+    _PLOT_CONFIG_REGISTRY[TIVMap] = _PLOT_CONFIG_REGISTRY[TIVMap].update(colorbar=False)
 
     pm4 = TIVMap([[0]])
     assert pm4.plotting.config.cmap == "Greens"
     assert not pm4.plotting.config.colorbar
 
-    reset_pixelmap_plot_config()
+    reset_plot_config()
     pm0 = PixelMap([[0]])
     assert pm0.plotting.config.cmap == "viridis"
 
@@ -579,7 +577,7 @@ def test_set_pixelmap_plot_parameters():
     pm0 = PixelMap([[0]])
     assert pm0.plotting.config.cmap == "viridis"
 
-    set_pixelmap_plot_config(PixelMap, cmap="plasma")
+    set_plot_config_parameters(PixelMap, cmap="plasma")
 
     pm1 = PixelMap([[0]])
     assert pm1.plotting.config.cmap == "plasma"
@@ -588,18 +586,18 @@ def test_set_pixelmap_plot_parameters():
     assert isinstance(pm2.plotting.config.cmap, Colormap)
     assert pm2.plotting.config.cmap.name == "Blues_r"
 
-    set_pixelmap_plot_config(TIVMap, cmap="Greens")
+    set_plot_config_parameters(TIVMap, cmap="Greens")
 
     pm3 = TIVMap([[0]])
     assert pm3.plotting.config.cmap == "Greens"
 
-    set_pixelmap_plot_config(cmap="Reds", colorbar=False)
+    set_plot_config_parameters(cmap="Reds", colorbar=False)
     assert all(
         cls([[0]]).plotting.config.cmap == "Reds" and not cls([[0]]).plotting.config.colorbar
-        for cls in PIXELMAP_PLOT_CONFIG_REGISTRY
+        for cls in _PLOT_CONFIG_REGISTRY
     )
 
-    reset_pixelmap_plot_config(PixelMap)
+    reset_plot_config(PixelMap)
 
     pm4 = PixelMap([[0]])
     pm5 = TIVMap([[0]])

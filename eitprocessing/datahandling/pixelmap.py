@@ -129,9 +129,9 @@ class PixelMap:
         if plot_config is None:
             plot_config = {}
         if isinstance(plot_config, dict):
-            from eitprocessing.plotting.pixelmap import get_pixelmap_plot_config
+            from eitprocessing.plotting import get_plot_config
 
-            default_config = get_pixelmap_plot_config(self)
+            default_config = get_plot_config(self)
             plot_config = default_config.update(**plot_config)
 
         object.__setattr__(self, "_plot_config", plot_config)
