@@ -25,9 +25,10 @@ import dataclasses
 import sys
 from dataclasses import InitVar, dataclass, field
 from dataclasses import replace as dataclass_replace
-from typing import Self, TypeVar, overload
+from typing import TypeVar, overload
 
 import numpy as np
+from typing_extensions import Self
 
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.pixelmap import PixelMap
@@ -139,7 +140,10 @@ class PixelMask:
                     "The last two dimensions of the mask and data must match."
                 )
                 raise ValueError(msg)
-            mask = self.mask[*([np.newaxis] * (data.ndim - 2)), ...]
+
+            mask = self.mask[tuple([np.newaxis] * (data.ndim - 2)) + (...,)]  # noqa: RUF005
+            # TODO: Fix line above when compatibility with Python 3.10 is no longer needed
+
             return data * mask
 
         match data:
