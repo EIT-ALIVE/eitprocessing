@@ -442,21 +442,36 @@ class PixelMap:
         return self.update(values=new_values, label=None)
 
     @classmethod
-    def from_mean(cls, maps: Sequence[npt.ArrayLike | PixelMap], **return_attrs) -> Self:
-        """Get a pixel map of the the per-pixel mean of several pixel maps.
+    def from_aggregate(
+        cls,
+        maps: Sequence[npt.ArrayLike | PixelMap],
+        aggregator: Callable[[np.ndarray, int], np.ndarray],
+        **return_attrs,
+    ) -> Self:
+        """Get a pixel map by aggregating several pixel maps with a specified function.
 
-        The maps can be 2D numpy arrays, sequences that can be converted to 2D numpy arrays, or PixelMap objects. The
-        mean is determined using `np.nanmean`, such that NaN values are ignored.
+        The maps can be 2D numpy arrays, sequences that can be converted to 2D numpy arrays (e.g., nested lists), or
+        PixelMap objects. The aggregation is performed using the provided function along the first axis of the stacked
+        maps. NaN values are typically ignored by using numpy's nan-aware functions (np.nanmean, np.nanmedian, etc.).
 
-        Returns the same class as this function was called from. Keyword arguments are passed to the initializer of that
-        object.
+        Returns the same class as this function was called from. Keyword arguments are passed to the initializer
+        of that object.
 
         Args:
-            maps: sequence of maps that contribute to the mean
-            **return_attrs: keyword arguments to be passed to the initializer of the return object
+            maps: Sequence of maps to be aggregated
+            aggregator: Function to aggregate the maps along the first axis. Should accept an array and axis parameter.
+            **return_attrs: Keyword arguments to be passed to the initializer of the return object
 
         Returns:
-            Self: A new instance with the per-pixel mean of the pixel maps.
+            Self: A new instance with the aggregated values of the pixel maps.
+
+        Examples:
+            >>> maps = [PixelMap([[1, 2]]), PixelMap([[3, 4]]), PixelMap([[5, 6]])]
+            >>> TIVMap.from_aggregate(maps, np.nanmean)  # Mean: [[3, 4]]
+            >>> TIVMap.from_aggregate(maps, np.nanmedian)  # Median: [[3, 4]]
+            >>> TIVMap.from_aggregate(maps, np.nanmax)  # Maximum: [[5, 6]]
+            >>> TIVMap.from_aggregate(maps, np.nanmin)  # Minimum: [[1, 2]]
+            >>> TIVMap.from_aggregate(maps, lambda x, axis: np.nanpercentile(x, 75, axis=axis))  # 75th percentile
         """
 
         def _get_values(map_: npt.ArrayLike | PixelMap) -> np.ndarray:
@@ -472,8 +487,8 @@ class PixelMap:
             return map_
 
         stacked = np.stack([_get_values(map_) for map_ in maps])
-        mean_values = np.nanmean(stacked, axis=0)
-        return cls(values=mean_values, **return_attrs)
+        aggregated_values = aggregator(stacked, axis=0)
+        return cls(values=aggregated_values, **return_attrs)
 
 
 @dataclass(frozen=True, init=False)

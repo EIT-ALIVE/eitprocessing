@@ -508,18 +508,18 @@ def test_nan():
 def test_mean():
     pm1 = PixelMap([[0, 1, 2, 3]])
     pm2 = PerfusionMap([[1, 2, 3, 4]])
-    mean_pm1_pm2 = ODCLMap.from_mean([pm1, pm2])
+    mean_pm1_pm2 = ODCLMap.from_aggregate([pm1, pm2], np.mean)
 
     assert np.array_equal(mean_pm1_pm2.values, [[0.5, 1.5, 2.5, 3.5]])
     assert isinstance(mean_pm1_pm2, ODCLMap)
 
     pm3 = PendelluftMap([[np.nan, 3, 4, np.nan]])
     pm4 = DifferenceMap([[np.nan, np.nan, 5, 6]])
-    mean_pm3_pm4 = SignedPendelluftMap.from_mean([pm3, pm4])
+    mean_pm3_pm4 = SignedPendelluftMap.from_aggregate([pm3, pm4], np.nanmean)
     assert isinstance(mean_pm3_pm4, SignedPendelluftMap)
     assert np.array_equal(mean_pm3_pm4.values, [[np.nan, 3, 4.5, 6]], equal_nan=True)
 
-    mean_all = PixelMap.from_mean([pm1, pm2, pm3, pm4], label="foo", plot_config={"colorbar": False})
+    mean_all = PixelMap.from_aggregate([pm1, pm2, pm3, pm4], np.nanmean, label="foo", plot_config={"colorbar": False})
     assert isinstance(mean_all, PixelMap)
     assert np.array_equal(mean_all.values, np.array([[0.5, 2, 3.5, 13 / 3]]))
     assert mean_all.label == "foo"
@@ -527,17 +527,17 @@ def test_mean():
 
     array1 = [[0, 1, 2, 3]]
     array2 = [[2, 3, 4, 5]]
-    mean_array1_array2 = TIVMap.from_mean([array1, array2])
+    mean_array1_array2 = TIVMap.from_aggregate([array1, array2], np.mean)
     assert isinstance(mean_array1_array2, TIVMap)
     assert np.array_equal(mean_array1_array2.values, [[1, 2, 3, 4]])
 
     array3 = [[[4, 5, 6, 7]]]
     with pytest.raises(ValueError, match="should have 2 dimensions, not 3"):
-        _ = PixelMap.from_mean([array3])
+        _ = PixelMap.from_aggregate([array3], np.mean)
 
     array4 = [[4, 5, 6, 7], [5, 6, 7, 8]]
     with pytest.raises(ValueError, match="all input arrays must have the same shape"):
-        _ = PixelMap.from_mean([array1, array4])
+        _ = PixelMap.from_aggregate([array1, array4], np.mean)
 
 
 def test_replace_defaults():
