@@ -387,7 +387,7 @@ def test_phase_modes(draeger1: Sequence, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
-    ssequence = draeger1
+    ssequence = copy.deepcopy(draeger1)
     eit_data = ssequence.eit_data["raw"]
 
     # reduce the pixel set to middly 'well-behaved' pixels with positive TIV
