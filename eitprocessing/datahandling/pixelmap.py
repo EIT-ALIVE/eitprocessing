@@ -382,7 +382,7 @@ class PixelMap:
         if isinstance(other, (float, int)):
             return other
 
-        other_values = other.values if isinstance(other, PixelMap) else np.array(other_values)
+        other_values = np.array(other_values)
 
         if (os := other_values.shape) != (ss := self.values.shape):
             msg = f"Shape of PixelMaps (self: {ss}, other: {os}) do not match."
