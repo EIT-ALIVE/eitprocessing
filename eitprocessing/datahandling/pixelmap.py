@@ -51,6 +51,8 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.image import AxesImage
 
+    from eitprocessing.roi import PixelMask
+
 ColorType = str | tuple[float, float, float] | tuple[float, float, float, float] | float | Colormap
 
 T = TypeVar("T", bound="PixelMap")
@@ -327,46 +329,60 @@ class PixelMap:
         if reference_ < 0:
             warnings.warn("Normalization by a negative number may lead to unexpected results.", UserWarning)
 
-    def threshold(
+    def create_mask_from_threshold(
         self,
-        threshold: npt.ArrayLike,
+        threshold: float,
         *,
         comparator: Callable = np.greater_equal,
         absolute: bool = False,
-        keep_sign: bool = False,
-        fill_value: float = np.nan,
-        **return_attrs: dict | None,
-    ) -> Self:
-        """Threshold the pixel map values.
+    ) -> PixelMask:
+        """Create a pixel mask from the pixel map based on threshold values.
 
-        This method applies a threshold to the pixel map values, setting values that do not meet the threshold condition
-        to a specified fill value. The comparison is done using the provided comparator function (default is `>=`).
+        The values of the pixel map are compared to the threshold values. By default, the comparator is `>=`
+        (`np.greater_equal`), such that the resulting mask is 1.0 where the map values are at least the threshold
+        values, and NaN elsewhere. The comparator can be set to any comparison function, e.g.`np.less`, a function from
+        the `operator` module or custom function which takes pixel map values array and threshold as arguments, and
+        returns a boolean array with the same shape as the array.
 
-        If `absolute` is True, the threshold is applied to the absolute values of the pixel map. If `keep_sign` is True,
-        the sign of the original pixel values is retained when filling with the `fill_value`. Otherwise, the fill value
-        is applied uniformly.
+        If `absolute` is True, absolute values are compared to the threshold.
 
-        The `threshold` method returns a new instance of the same class with the modified values. Other attributes of
-        the returned object can be set using keyword arguments.
+        The shape of the pixel mask is the same as the shape of the pixel map.
 
         Args:
             threshold (float): The threshold value.
             comparator (Callable): A function that compares pixel values against the threshold.
             absolute (bool): If True, apply the threshold to the absolute values of the pixel map.
-            keep_sign (bool): If True, retain the sign of original values in the filled values.
-            fill_value (float): The value to set for pixels that do not meet the threshold condition.
-            **return_attrs (dict | None): Additional attributes to pass to the new PixelMap instance.
 
         Returns:
-            Self: A new object instance with the thresholded values.
-        """
-        # TODO: add mode argument to allow for percentage/actual value thresholding
-        compare_values = np.abs(self.values) if absolute else self.values
-        sign = np.sign(self.values) if keep_sign else 1.0
-        new_values = np.where(comparator(compare_values, threshold), self.values, fill_value * sign)
+            PixelMask:
+                A PixelMask instance with values 1.0 where comparison is true, and NaN elsewhere.
 
-        return_attrs = return_attrs or {}
-        return replace(self, values=new_values, **return_attrs)
+        Raises:
+            TypeError: If `threshold` is not a float or `comparator` is not callable.
+
+        Examples:
+        >>> pm = PixelMap([[0.1, 0.5, 0.9]])
+        >>> mask = pm.create_mask_from_threshold(0.5)
+        PixelMask(mask=array([[nan,  1.,  1.]]))
+        >>> mask.apply(pm)
+        PixelMap(values=array([[nan, 0.5, 0.9]]), ...)
+
+        >>> mask = pm.create_mask_from_threshold(0.5, comparator=np.less)
+        PixelMask(mask=array([[ 1., nan, nan]]))
+        """
+        if not isinstance(threshold, (float, np.floating, int, np.integer)):
+            msg = "`threshold` must be a number."
+            raise TypeError(msg)
+
+        if not callable(comparator):
+            msg = "`comparator` must be a callable function."
+            raise TypeError(msg)
+
+        from eitprocessing.roi import PixelMask
+
+        compare_values = np.abs(self.values) if absolute else self.values
+        mask_values = comparator(compare_values, threshold)
+        return PixelMask(mask_values)
 
     def imshow(
         self,
