@@ -35,7 +35,7 @@ def test_pixelmask_init_with_boolean_array():
 
 def test_pixelmask_init_with_integer_array():
     values = np.random.default_rng().integers(0, 2, (10, 10))
-    mask = PixelMask(values)
+    mask = PixelMask(values, suppress_zero_conversion_warning=True)
 
     assert np.all((np.isnan(mask.mask)) | (mask.mask == 1.0))
     assert np.array_equal(np.isnan(mask.mask), values == 0)
@@ -46,7 +46,7 @@ def test_pixelmask_init_with_float_array_non_weighted():
     values = np.random.default_rng().random((10, 10)).round()
     assert np.all((values == 0.0) | (values == 1.0))
 
-    mask = PixelMask(values)
+    mask = PixelMask(values, suppress_zero_conversion_warning=True)
 
     assert np.all((np.isnan(mask.mask)) | (mask.mask == 1.0))
     assert np.array_equal(np.isnan(mask.mask), values == 0.0)
@@ -57,7 +57,7 @@ def test_pixelmask_init_with_float_array_weighted():
     values = np.random.default_rng().random((10, 10))
     values[values < 0.5] = 0.0
 
-    mask = PixelMask(values)
+    mask = PixelMask(values, suppress_zero_conversion_warning=True)
 
     assert np.array_equal(np.isnan(mask.mask), values < 0.5)  # NaN for values < 0.5
     assert np.array_equal(~np.isnan(mask.mask), values >= 0.5)  # non-NaN for values >= 0.5
@@ -66,7 +66,7 @@ def test_pixelmask_init_with_float_array_weighted():
 
 def test_pixelmask_init_with_list():
     values = [[1, 0, 1], [0, 1, 0]]
-    mask = PixelMask(values)
+    mask = PixelMask(values, suppress_zero_conversion_warning=True)
 
     assert np.array_equal(mask.mask, np.array([[1.0, np.nan, 1.0], [np.nan, 1.0, np.nan]]), equal_nan=True)
 
@@ -142,12 +142,12 @@ def test_pixelmask_is_weighted_true():
 
 
 def test_pixelmask_is_weighted_false():
-    pm = PixelMask(np.round(np.random.default_rng().random((10, 10))))
+    pm = PixelMask(np.round(np.random.default_rng().random((10, 10))), suppress_zero_conversion_warning=True)
     assert not pm.is_weighted
 
 
 def test_pixelmask_apply_numpy_array():
-    pm = PixelMask([[0, 1], [1, 0]])
+    pm = PixelMask([[0, 1], [1, 0]], suppress_zero_conversion_warning=True)
     data = np.array([[1, 2], [3, 4]])
     result = pm.apply(data)
     assert np.array_equal(result, np.array([[np.nan, 2], [3, np.nan]]), equal_nan=True)
@@ -159,7 +159,7 @@ def test_pixelmask_apply_numpy_array():
 
 
 def test_pixelmask_apply_numpy_array_higher_dimensions():
-    pm = PixelMask([[0, 1], [1, 0]])
+    pm = PixelMask([[0, 1], [1, 0]], suppress_zero_conversion_warning=True)
     data = np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
     result = pm.apply(data)
     assert np.array_equal(result, np.array([[[np.nan, 2], [3, np.nan]], [[np.nan, 6], [7, np.nan]]]), equal_nan=True)
@@ -167,7 +167,9 @@ def test_pixelmask_apply_numpy_array_higher_dimensions():
 
 def test_pixelmask_apply_eitdata(draeger1: Sequence):
     eit_data = draeger1.eit_data["raw"]
-    mask = PixelMask(np.full((32, 32), np.nan))
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="All-NaN slice encountered", category=RuntimeWarning)
+        mask = PixelMask(np.full((32, 32), np.nan), suppress_all_nan_warning=True)
     masked_eit_data = mask.apply(eit_data)
 
     assert masked_eit_data.pixel_impedance.shape == eit_data.pixel_impedance.shape
@@ -197,7 +199,7 @@ def test_pixelmask_apply_pixelmap():
 
 def test_pixelmask_apply_invalid_type():
     with pytest.raises(TypeError, match="Data should be an array, or EITData or PixelMap object, not <class 'str'>"):
-        PixelMask([[0]]).apply("invalid type")
+        PixelMask([[1]]).apply("invalid type")
 
     with pytest.raises(TypeError, match="Data should be an array, or EITData or PixelMap object, not <class 'list'>"):
         PixelMask([[1]]).apply([[1]])
@@ -212,15 +214,15 @@ def test_pixelmask_apply_dimension_mismatch():
 
 
 def test_pixelmask_multiply_masks():
-    pm1 = PixelMask([[0, 0.1], [0.2, 0.3]], suppress_value_range_error=True)
-    pm2 = PixelMask([[0.1, 0.2], [0.3, 0.4]], suppress_value_range_error=True)
+    pm1 = PixelMask([[0, 0.1], [0.2, 0.3]], suppress_zero_conversion_warning=True)
+    pm2 = PixelMask([[0.1, 0.2], [0.3, 0.4]], suppress_zero_conversion_warning=True)
     pm3 = pm1 * pm2
     assert np.allclose(pm3.mask, np.array([[np.nan, 0.02], [0.06, 0.12]]), equal_nan=True)
 
 
 def test_pixelmask_add_masks():
-    pm1 = PixelMask([[0, 0, 1, 1], [0.2, 0.3, 0, 0]])
-    pm2 = PixelMask([[1, 0, 0, 1], [0, 0.5, 1, 0]])
+    pm1 = PixelMask([[0, 0, 1, 1], [0.2, 0.3, 0, 0]], suppress_zero_conversion_warning=True)
+    pm2 = PixelMask([[1, 0, 0, 1], [0, 0.5, 1, 0]], suppress_zero_conversion_warning=True)
     pm3 = pm1 + pm2
     assert np.array_equal(pm3.mask, np.array([[1, np.nan, 1, 1], [0.2, 0.8, 1, np.nan]]), equal_nan=True)
 
@@ -241,9 +243,16 @@ def test_predefined_layer_masks():
     assert np.all(np.isnan(LAYER_4_MASK.mask[:24, :]))
 
     assert np.array_equal((LAYER_1_MASK + LAYER_2_MASK + LAYER_3_MASK + LAYER_4_MASK).mask, np.ones((32, 32)))
-    assert np.array_equal(
-        (LAYER_1_MASK * LAYER_2_MASK * LAYER_3_MASK * LAYER_4_MASK).mask, np.full((32, 32), np.nan), equal_nan=True
-    )
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="Mask contains only NaN values. This will create in all-NaN results when applied",
+            category=UserWarning,
+        )
+        warnings.filterwarnings("ignore", message="All-NaN slice encountered", category=RuntimeWarning)
+        assert np.array_equal(
+            (LAYER_1_MASK * LAYER_2_MASK * LAYER_3_MASK * LAYER_4_MASK).mask, np.full((32, 32), np.nan), equal_nan=True
+        )
 
 
 def test_predefined_ventral_dorsal_masks():
@@ -254,7 +263,14 @@ def test_predefined_ventral_dorsal_masks():
     assert np.all(np.isnan(DORSAL_MASK.mask[:16, :]))
 
     assert np.array_equal(np.ones((32, 32)), (VENTRAL_MASK + DORSAL_MASK).mask)
-    assert np.array_equal(np.full((32, 32), np.nan), (VENTRAL_MASK * DORSAL_MASK).mask, equal_nan=True)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="Mask contains only NaN values. This will create in all-NaN results when applied",
+            category=UserWarning,
+        )
+        warnings.filterwarnings("ignore", message="All-NaN slice encountered", category=RuntimeWarning)
+        assert np.array_equal(np.full((32, 32), np.nan), (VENTRAL_MASK * DORSAL_MASK).mask, equal_nan=True)
 
 
 def test_predefined_left_right_masks():
@@ -265,9 +281,17 @@ def test_predefined_left_right_masks():
     assert np.all(np.isnan(ANATOMICAL_LEFT_MASK.mask[:, :16]))
 
     assert np.array_equal(np.ones((32, 32)), (ANATOMICAL_RIGHT_MASK + ANATOMICAL_LEFT_MASK).mask)
-    assert np.array_equal(
-        np.full((32, 32), np.nan), (ANATOMICAL_RIGHT_MASK * ANATOMICAL_LEFT_MASK).mask, equal_nan=True
-    )
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="Mask contains only NaN values. This will create in all-NaN results when applied",
+            category=UserWarning,
+        )
+        warnings.filterwarnings("ignore", message="All-NaN slice encountered", category=RuntimeWarning)
+        assert np.array_equal(
+            np.full((32, 32), np.nan), (ANATOMICAL_RIGHT_MASK * ANATOMICAL_LEFT_MASK).mask, equal_nan=True
+        )
 
 
 def test_predefined_quadrant_masks():
@@ -290,15 +314,23 @@ def test_predefined_quadrant_masks():
     assert np.array_equal(
         (QUADRANT_1_MASK + QUADRANT_2_MASK + QUADRANT_3_MASK + QUADRANT_4_MASK).mask, np.ones((32, 32))
     )
-    assert np.array_equal(
-        (QUADRANT_1_MASK * QUADRANT_2_MASK * QUADRANT_3_MASK * QUADRANT_4_MASK).mask,
-        np.full((32, 32), np.nan),
-        equal_nan=True,
-    )
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="Mask contains only NaN values. This will create in all-NaN results when applied",
+            category=UserWarning,
+        )
+        warnings.filterwarnings("ignore", message="All-NaN slice encountered", category=RuntimeWarning)
+        assert np.array_equal(
+            (QUADRANT_1_MASK * QUADRANT_2_MASK * QUADRANT_3_MASK * QUADRANT_4_MASK).mask,
+            np.full((32, 32), np.nan),
+            equal_nan=True,
+        )
 
 
 def test_pixelmask_immutability():
-    pm = PixelMask([[0, 1], [1, 0]])
+    pm = PixelMask([[0, 1], [1, 0]], suppress_zero_conversion_warning=True)
     original_mask = pm.mask.copy()
 
     with pytest.raises(ValueError, match="assignment destination is read-only"):
