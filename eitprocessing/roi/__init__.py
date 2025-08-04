@@ -24,7 +24,7 @@ vice versa.
 import dataclasses
 import sys
 import warnings
-from dataclasses import InitVar, dataclass, field
+from dataclasses import InitVar, dataclass, field, replace
 from dataclasses import replace as dataclass_replace
 from typing import TypeVar, overload
 
@@ -119,6 +119,9 @@ class PixelMask:
 
         mask.flags["WRITEABLE"] = False
         object.__setattr__(self, "mask", mask)
+
+    update = replace
+    # TODO: add tests for update
 
     @overload
     def apply(self, data: np.ndarray) -> np.ndarray: ...
