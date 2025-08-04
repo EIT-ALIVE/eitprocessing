@@ -80,6 +80,7 @@ class PixelMask:
     keep_zeros: InitVar[bool] = field(default=False, kw_only=True)
     suppress_value_range_error: InitVar[bool] = field(default=False, kw_only=True)
     suppress_zero_conversion_warning: InitVar[bool] = field(default=False, kw_only=True)
+    suppress_all_nan_warning: InitVar[bool] = field(default=False, kw_only=True)
 
     def __init__(
         self,
@@ -89,6 +90,7 @@ class PixelMask:
         keep_zeros: bool = False,
         suppress_value_range_error: bool = False,
         suppress_zero_conversion_warning: bool = False,
+        suppress_all_nan_warning: bool = False,
     ):
         is_boolean_mask = np.array(mask).dtype == bool
         mask = np.array(mask, dtype=float)
@@ -96,6 +98,13 @@ class PixelMask:
         if mask.ndim != 2:  # noqa: PLR2004
             msg = f"Mask should be a 2D array, not {mask.ndim}D."
             raise ValueError(msg)
+
+        if (not suppress_all_nan_warning) and np.all(np.isnan(mask)):
+            warnings.warn(
+                "Mask contains only NaN values. This will create in all-NaN results when applied.",
+                UserWarning,
+                stacklevel=2,
+            )
 
         if (not suppress_value_range_error) and (np.nanmax(mask) > 1 or np.nanmin(mask) < 0):
             msg = "One or more mask values fall outside the range 0 to 1."
@@ -116,7 +125,7 @@ class PixelMask:
                     "If you want to suppress this warning, provide `suppress_value_range_warning=True` "
                     "or provide boolean values as input (only for non-weighted masks)."
                 )
-                warnings.warn(msg, UserWarning)
+                warnings.warn(msg, UserWarning, stacklevel=2)
 
             mask[mask == 0] = np.nan
 
@@ -196,19 +205,21 @@ class PixelMask:
 
         Values are clipped at 1, so that the resulting mask does not contain values higher than 1.
         """
-        return dataclasses.replace(self, mask=np.clip(np.nansum([self.mask, other.mask], axis=0), a_min=None, a_max=1))
+        new_mask = np.clip(np.nansum([self.mask, other.mask], axis=0), a_min=None, a_max=1)
+        new_mask[new_mask == 0] = np.nan
+        return dataclasses.replace(self, mask=new_mask)
 
 
-LAYER_1_MASK = PixelMask(np.concat([np.ones((8, 32)), np.zeros((24, 32))], axis=0))
-LAYER_2_MASK = PixelMask(np.concat([np.zeros((8, 32)), np.ones((8, 32)), np.zeros((16, 32))], axis=0))
-LAYER_3_MASK = PixelMask(np.concat([np.zeros((16, 32)), np.ones((8, 32)), np.zeros((8, 32))], axis=0))
-LAYER_4_MASK = PixelMask(np.concat([np.zeros((24, 32)), np.ones((8, 32))], axis=0))
+LAYER_1_MASK = PixelMask(np.concat([np.ones((8, 32)), np.full((24, 32), np.nan)], axis=0))
+LAYER_2_MASK = PixelMask(np.concat([np.full((8, 32), np.nan), np.ones((8, 32)), np.full((16, 32), np.nan)], axis=0))
+LAYER_3_MASK = PixelMask(np.concat([np.full((16, 32), np.nan), np.ones((8, 32)), np.full((8, 32), np.nan)], axis=0))
+LAYER_4_MASK = PixelMask(np.concat([np.full((24, 32), np.nan), np.ones((8, 32))], axis=0))
 
 VENTRAL_MASK = LAYER_1_MASK + LAYER_2_MASK
 DORSAL_MASK = LAYER_3_MASK + LAYER_4_MASK
 
-ANATOMICAL_RIGHT_MASK = PixelMask(np.concat([np.ones((32, 16)), np.zeros((32, 16))], axis=1))
-ANATOMICAL_LEFT_MASK = PixelMask(np.concat([np.zeros((32, 16)), np.ones((32, 16))], axis=1))
+ANATOMICAL_RIGHT_MASK = PixelMask(np.concat([np.ones((32, 16)), np.full((32, 16), np.nan)], axis=1))
+ANATOMICAL_LEFT_MASK = PixelMask(np.concat([np.full((32, 16), np.nan), np.ones((32, 16))], axis=1))
 
 QUADRANT_1_MASK = VENTRAL_MASK * ANATOMICAL_RIGHT_MASK
 QUADRANT_2_MASK = VENTRAL_MASK * ANATOMICAL_LEFT_MASK
