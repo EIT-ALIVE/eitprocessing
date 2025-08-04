@@ -76,6 +76,7 @@ class PixelMask:
     """
 
     mask: np.ndarray
+    label: str | None = None
     keep_zeros: InitVar[bool] = field(default=False, kw_only=True)
     suppress_value_range_error: InitVar[bool] = field(default=False, kw_only=True)
     suppress_zero_conversion_warning: InitVar[bool] = field(default=False, kw_only=True)
@@ -83,6 +84,8 @@ class PixelMask:
     def __init__(
         self,
         mask: list | np.ndarray,
+        *,
+        label: str | None = None,
         keep_zeros: bool = False,
         suppress_value_range_error: bool = False,
         suppress_zero_conversion_warning: bool = False,
@@ -119,6 +122,7 @@ class PixelMask:
 
         mask.flags["WRITEABLE"] = False
         object.__setattr__(self, "mask", mask)
+        object.__setattr__(self, "label", label)
 
     update = replace
     # TODO: add tests for update
