@@ -191,7 +191,7 @@ class PixelMap:
                 Additional keyword arguments to pass to the new PixelMap instance.
 
         Raises:
-            ValueError: If an invalid normalization mode is specifief.
+            ValueError: If an invalid normalization mode is specified.
             ValueError: If no reference value is provided in "reference" mode.
             ValueError: If a reference value is provided with a mode other than "reference".
             TypeError: If the reference value is not a number.
@@ -458,7 +458,7 @@ class PixelMap:
         of that object.
 
         Args:
-            maps: Sequence of maps to be aggregated
+            maps: list/tuple of maps to be aggregated
             aggregator: Function to aggregate the maps along the first axis. Should accept an array and axis parameter.
             **return_attrs: Keyword arguments to be passed to the initializer of the return object
 
