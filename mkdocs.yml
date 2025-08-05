@@ -60,6 +60,9 @@ nav:
         - Event: api/datacontainers/event.md
         - DataCollection: api/datacontainers/datacollection.md
       - api/filters.md
+      - Regions of Interest:
+        - Regions of Interest: api/roi/roi.md
+        - PixelMaskCollection: api/roi/pixelmaskcollection.md
       - api/features.md
       - api/parameters.md
       - api/categories.md
