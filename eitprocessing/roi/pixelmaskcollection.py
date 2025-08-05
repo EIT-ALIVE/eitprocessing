@@ -34,6 +34,7 @@ class PixelMaskCollection:
     mapping each mask's key (label or index) to the resulting masked data.
 
     Example:
+    ```python
     >>> mask_collection = PixelMaskCollection(
             [
                 PixelMask(right_lung_data, label="right lung"),
@@ -41,6 +42,7 @@ class PixelMaskCollection:
             ],
             label="lung masks",
         )
+    ```
 
     Args:
         masks (dict): A dictionary mapping mask names to their corresponding pixel masks.
@@ -125,8 +127,10 @@ class PixelMaskCollection:
         Masks can be added as positional arguments or keyword arguments (non-anonymous masks only).
 
         Example:
+        ```python
         >>> left_lung_mask = PixelMask(data, label="left_lung")
         >>> mask_collection.add(left_lung_mask)  # equals mask_collection.add(left_lung=left_lung_mask)
+        ```
 
         Args:
             *mask (PixelMask): One or more `PixelMask` instances to add to the collection.
@@ -135,7 +139,7 @@ class PixelMaskCollection:
                 Keyword arguments where the key is the label of the mask and the value is the mask itself.
 
         Returns:
-        A new `PixelMaskCollection` instance with the added masks.
+            A new `PixelMaskCollection` instance with the added masks.
 
         Raises:
             ValueError:
@@ -197,6 +201,15 @@ class PixelMaskCollection:
         union of the represented ROIs. If "product" is used, the masks are multiplied, generally resulting in the
         intersection of the ROIs.
 
+        Example:
+        ```python
+        >>> pm1 = PixelMask([[True, False], [False, True]])
+        >>> pm2 = PixelMask([[True, True], [False, False]])
+        >>> collection = PixelMaskCollection([pm1, pm2])
+        >>> summed_mask = collection.combine(method="sum")
+        PixelMask(mask=array([[ 1.,  1.], [nan,  1.]]))
+        ```
+
         Args:
             method (Literal["sum", "product"]): The method to combine the masks. Defaults to "sum".
             label (str | None): The label for the combined mask.
@@ -239,12 +252,14 @@ class PixelMaskCollection:
         `ValueError`.
 
         Example:
+        ```python
         >>> mask_collection = PixelMaskCollection([
                 PixelMask(data, label="right lung"),
                 PixelMask(data, label="left lung")
             ])
         >>> mask_collection.apply(eit_data, label_format="masked {mask_label}")
         {"right lung": EITData(label="masked right lung"), "left lung": EITData(label="masked left lung")}
+        ```
 
         Args:
             data (np.ndarray | EITData | PixelMap): The data to which the masks will be applied.
