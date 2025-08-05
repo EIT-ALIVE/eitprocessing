@@ -37,13 +37,14 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "matplotlib >= 3.7.1",
+    "matplotlib>=3.10",
     "numpy >= 1.24.2",
     "scipy >= 1.10.1",
     "strenum >= 0.4.10",
     "anytree >= 2.12.1 ",
     "typing_extensions",
     "pyyaml",
+    "frozendict>=2.4.6",
 ]
 
 [project.optional-dependencies]
@@ -90,7 +91,10 @@ command_line = "-m pytest"
 omit = ["tests/*", "*/tests/*"]
 
 [tool.coverage.report]
-exclude_lines = ["if TYPE_CHECKING:"]
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "if sys\\.version_info"
+]
 
 [tool.setuptools.packages.find]
 include = ["eitprocessing*", "eitprocessing.*"]
