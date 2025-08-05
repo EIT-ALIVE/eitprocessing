@@ -1,7 +1,8 @@
 import warnings
 from collections.abc import Hashable
 from dataclasses import dataclass, field, replace
-from typing import TypeVar, cast, overload
+from functools import reduce
+from typing import Literal, TypeVar, cast, overload
 
 import numpy as np
 from frozendict import frozendict
@@ -188,6 +189,31 @@ class PixelMaskCollection:
         return self.update(masks=self.masks | new_masks)
 
     update = replace  # dataclasses.replace
+
+    def combine(self, method: Literal["sum", "product"] = "sum", label: str | None = None) -> PixelMask:
+        """Combine all masks in the collection into a single mask using the specified method.
+
+        The method can be either "sum" or "product". If "sum" is used, the masks are summed, generally resulting in the
+        union of the represented ROIs. If "product" is used, the masks are multiplied, generally resulting in the
+        intersection of the ROIs.
+
+        Args:
+            method (Literal["sum", "product"]): The method to combine the masks. Defaults to "sum".
+            label (str | None): The label for the combined mask.
+
+        Returns:
+            PixelMask: A new `PixelMask` instance representing the combined mask.
+
+        Raises:
+            ValueError: If an unsupported method is provided.
+        """
+        if method not in ("sum", "product"):
+            msg = f"Unsupported method: {method}. Use 'sum' or 'product'."
+            raise ValueError(msg)
+
+        func = PixelMask.__add__ if method == "sum" else PixelMask.__mul__
+        combined_mask = reduce(func, self.masks.values())
+        return combined_mask.update(label=label)
 
     @overload
     def apply(self, data: np.ndarray) -> dict[Hashable, np.ndarray]: ...

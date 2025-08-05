@@ -448,3 +448,31 @@ def test_update_method(anonymous_boolean_mask: Callable):
     assert collection.label is None
     assert updated_collection1.label == "first"
     assert updated_collection2.label == "second"
+
+
+def test_combine_boolean():
+    pm1 = PixelMask([[True, False], [False, True]])
+    pm2 = PixelMask([[True, True], [False, False]])
+    collection = PixelMaskCollection([pm1, pm2])
+
+    summed_mask = collection.combine(method="sum", label="combined_sum")
+    assert summed_mask.label == "combined_sum"
+    assert np.array_equal(summed_mask.mask, np.array([[1.0, 1.0], [np.nan, 1.0]]), equal_nan=True)
+
+    multiplied_mask = collection.combine(method="product", label="combined_product")
+    assert multiplied_mask.label == "combined_product"
+    assert np.array_equal(multiplied_mask.mask, np.array([[1.0, np.nan], [np.nan, np.nan]]), equal_nan=True)
+
+
+def test_combine_weighted():
+    pm1 = PixelMask([[0, 0.1], [0.2, 1]], suppress_zero_conversion_warning=True)
+    pm2 = PixelMask([[1, 1], [0.3, 0.2]])
+    collection = PixelMaskCollection([pm1, pm2])
+
+    summed_mask = collection.combine(method="sum", label="combined_sum")
+    assert summed_mask.label == "combined_sum"
+    assert np.array_equal(summed_mask.mask, np.array([[1.0, 1.0], [0.5, 1.0]]), equal_nan=True)
+
+    multiplied_mask = collection.combine(method="product", label="combined_product")
+    assert multiplied_mask.label == "combined_product"
+    assert np.array_equal(multiplied_mask.mask, np.array([[np.nan, 0.1], [0.06, 0.2]]), equal_nan=True)
