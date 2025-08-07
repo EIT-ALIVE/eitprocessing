@@ -123,7 +123,7 @@ def test_init_rate_detection():
     rd = RateDetection("adult")
     assert rd.subject_type == "adult"
     assert rd.refine_estimated_frequency is True
-    assert rd.welch_window == 60.0
+    assert rd.welch_window == 30.0
     assert rd.welch_overlap == 0.5
     assert isinstance(rd.plotting, RateDetectionPlotting)
 
