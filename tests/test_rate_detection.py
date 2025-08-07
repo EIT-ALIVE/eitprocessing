@@ -170,14 +170,10 @@ def test_frequencies(
     )
 
     rd = RateDetection("adult", refine_estimated_frequency=True)
-    refined_rr, refined_hr = rd.detect_respiratory_heart_rate(
-        signal, suppress_edge_case_warning=True, suppress_length_warnings=True
-    )
+    refined_rr, refined_hr = rd.apply(signal, suppress_edge_case_warning=True, suppress_length_warnings=True)
 
     rd = RateDetection("adult", refine_estimated_frequency=False)
-    non_refined_rr, non_refined_hr = rd.detect_respiratory_heart_rate(
-        signal, suppress_edge_case_warning=True, suppress_length_warnings=True
-    )
+    non_refined_rr, non_refined_hr = rd.apply(signal, suppress_edge_case_warning=True, suppress_length_warnings=True)
 
     assert np.isclose(refined_rr, high_power_frequency, rtol=0.05, atol=0.5 / MINUTE)
     assert np.isclose(refined_hr, low_power_frequency, rtol=0.05, atol=0.5 / MINUTE)
@@ -215,7 +211,7 @@ def test_harmonic_heart_rate(
     )
 
     rd = RateDetection("adult", refine_estimated_frequency=True)
-    rr, hr = rd.detect_respiratory_heart_rate(signal, suppress_edge_case_warning=True, suppress_length_warnings=True)
+    rr, hr = rd.apply(signal, suppress_edge_case_warning=True, suppress_length_warnings=True)
 
     assert np.isclose(rr, high_power_frequency, rtol=0.05, atol=0.5 / MINUTE)
     assert np.isclose(hr, low_power_frequency, rtol=0.05, atol=0.5 / MINUTE)
@@ -256,7 +252,7 @@ def test_multiple_frequencies(
     )
 
     rd = RateDetection("adult", refine_estimated_frequency=True)
-    rr, hr = rd.detect_respiratory_heart_rate(signal, suppress_edge_case_warning=True, suppress_length_warnings=True)
+    rr, hr = rd.apply(signal, suppress_edge_case_warning=True, suppress_length_warnings=True)
 
     assert np.any(np.isclose(rr, high_power_frequencies, rtol=0.05, atol=0.5 / MINUTE))
     assert np.any(np.isclose(hr, low_power_frequencies, rtol=0.05, atol=0.5 / MINUTE))
@@ -294,7 +290,7 @@ def test_changing_frequency(
     )
 
     rd = RateDetection("adult", refine_estimated_frequency=True)
-    rr, hr = rd.detect_respiratory_heart_rate(signal, suppress_edge_case_warning=True, suppress_length_warnings=True)
+    rr, hr = rd.apply(signal, suppress_edge_case_warning=True, suppress_length_warnings=True)
 
     assert np.isclose(rr, high_power_frequency * (1 + high_frequency_scale_factor) / 2, rtol=0.1, atol=0.5 / MINUTE)
     assert np.isclose(hr, low_power_frequency * (1 + low_frequency_scale_factor) / 2, rtol=0.1, atol=0.5 / MINUTE)
@@ -315,7 +311,7 @@ def test_with_data(sequence: Sequence, slice_: slice, expected_rr: float, expect
     eit_data: EITData = sequence.eit_data["raw"]
     sub_data = eit_data.t[slice_]
 
-    rr, hr = rd.detect_respiratory_heart_rate(sub_data)
+    rr, hr = rd.apply(sub_data)
 
     assert isinstance(rr, float)
     assert isinstance(hr, float)

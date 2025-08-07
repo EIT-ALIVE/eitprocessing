@@ -121,7 +121,7 @@ class RateDetection:
         ):
             object.__setattr__(self, attr, locals().get(attr, None) or DEFAULT_RATE_LIMITS[attr][self.subject_type])
 
-    def detect_respiratory_heart_rate(
+    def apply(
         self,
         eit_data: EITData,
         *,
