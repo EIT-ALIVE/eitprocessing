@@ -76,7 +76,7 @@ class RateDetection:
     min_respiratory_rate: float
     max_respiratory_rate: float
 
-    welch_window: float = 60
+    welch_window: float = 30.0
     welch_overlap: float = 0.5
 
     refine_estimated_frequency: bool = True
@@ -85,7 +85,7 @@ class RateDetection:
         self,
         subject_type: Literal["adult", "neonate"],
         *,
-        welch_window: float = 60,
+        welch_window: float = 30.0,
         welch_overlap: float = 0.5,
         min_heart_rate: float | None = None,
         max_heart_rate: float | None = None,
