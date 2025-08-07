@@ -41,3 +41,4 @@ venv3
 uv.lock
 
 worktrees
+docs/examples/notebooks

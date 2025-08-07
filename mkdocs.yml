@@ -46,7 +46,8 @@ nav:
   - Home: index.md
   - Getting started:
       - installation.md
-      - basic_example.md
+      - Example Notebooks:
+        - examples/notebooks/test_ratedetection.ipynb
   - API Documentation:
       - api/loading.md
       - Data Containers:
@@ -118,6 +119,7 @@ plugins:
       glob:
         - __pycache__/*
   - autorefs
+  - mkdocs-jupyter
   - mkdocstrings:
       handlers:
         python:
