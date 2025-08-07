@@ -28,7 +28,7 @@ class RateDetection:
     specified range is taken as the heart rate.
 
     If either rate is variable, the algorithm will in most cases return an average frequency. If there are multiple
-    distinct frequencies, e.g., due to a change in the controlled respiratory rate, multiple peaks will be visible in
+    distinct frequencies, e.g., due to a change in the controlled respiratory rate, multiple peaks might be visible in
     the power spectrum. The algorithm will only return the frequency with the highest power in the specified range.
 
     The algorithm can't distinguish between the respiratory and heart rate if they are too close together, especially in
@@ -159,7 +159,9 @@ class RateDetection:
 
         if len(summed_impedance) < len_segment:
             if not suppress_length_warnings:
-                warnings.warn("Segment length is larger than the data length, using the full data length instead.")
+                warnings.warn(
+                    "Segment length is larger than the data length, using the full data length instead.", UserWarning
+                )
             len_segment = len(summed_impedance)
 
         len_overlap = int(len_segment * self.welch_overlap)
