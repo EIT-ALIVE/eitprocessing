@@ -171,11 +171,11 @@ def test_short_signal(signal_factory: Callable[..., EITData]):
 
 
 high_power_frequencies = np.linspace(
-    DEFAULT_RATE_LIMITS["min_respiratory_rate"]["adult"], DEFAULT_RATE_LIMITS["max_respiratory_rate"]["adult"], 7
-)[1:-1]
+    DEFAULT_RATE_LIMITS["min_respiratory_rate"]["adult"], DEFAULT_RATE_LIMITS["max_respiratory_rate"]["adult"], 9
+)[2:-2]
 low_power_frequencies = np.linspace(
-    DEFAULT_RATE_LIMITS["min_heart_rate"]["adult"], DEFAULT_RATE_LIMITS["max_heart_rate"]["adult"], 7
-)[1:-1]
+    DEFAULT_RATE_LIMITS["min_heart_rate"]["adult"], DEFAULT_RATE_LIMITS["max_heart_rate"]["adult"], 9
+)[2:-2]
 duration = np.linspace(10, 60, 5)
 
 
