@@ -1,6 +1,7 @@
 # %%
 
 import itertools
+import warnings
 from collections.abc import Callable
 
 import numpy as np
@@ -140,6 +141,33 @@ def test_init_rate_detection():
 
     with pytest.raises(ValueError, match="Welch window must be at least 10 seconds."):
         _ = RateDetection("adult", welch_window=9)
+
+
+def test_short_signal(signal_factory: Callable[..., EITData]):
+    rd = RateDetection("adult", welch_window=30.0)
+
+    short_signal = signal_factory(
+        high_power_frequencies=(0.25,),
+        low_power_frequencies=(1.75,),
+        duration=15,
+    )
+    with pytest.warns(UserWarning, match="Segment length is larger than the data length"):
+        _ = rd.apply(short_signal)
+
+    long_signal = signal_factory(
+        high_power_frequencies=(0.25,),
+        low_power_frequencies=(1.75,),
+        duration=30,
+    )
+    with warnings.catch_warnings(record=True) as w:
+        rd.apply(long_signal)
+        assert len(w) == 0
+
+    rd_short = RateDetection("adult", welch_window=10)
+    with warnings.catch_warnings(record=True) as w:
+        rd_short.apply(long_signal)
+        rd_short.apply(short_signal)
+        assert len(w) == 0
 
 
 high_power_frequencies = np.linspace(
