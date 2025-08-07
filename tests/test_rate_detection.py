@@ -101,6 +101,8 @@ def signal_factory() -> Callable[..., EITData]:
             captures["high_power_signal"] = high_power_signal
             captures["low_power_signal"] = low_power_signal
             captures["time"] = time
+            captures["pixel_impedance"] = pixel_impedance
+            captures["summed_impedance"] = np.nansum(pixel_impedance, axis=(1, 2))
 
         return EITData(
             path=".",
