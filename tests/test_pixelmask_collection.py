@@ -127,6 +127,15 @@ def test_init_with_dict_label_mismatch_raises(labelled_boolean_mask: Callable):
         PixelMaskCollection({"mask1": pm1, "mask3": pm2})
 
 
+def test_init_with_dict_mixed_labelled_and_anonymous_raises(
+    labelled_boolean_mask: Callable, anonymous_boolean_mask: Callable
+):
+    pm1 = labelled_boolean_mask("mask1")
+    pm2 = anonymous_boolean_mask()
+    with pytest.raises(ValueError, match="Cannot mix labelled and anonymous masks in a collection."):
+        PixelMaskCollection({"mask1": pm1, 0: pm2})
+
+
 def test_init_with_wrong_input_raises(anonymous_boolean_mask: Callable):
     with pytest.raises(TypeError, match="Expected a list or a dictionary, got"):
         _ = PixelMaskCollection((anonymous_boolean_mask(),))
