@@ -93,7 +93,8 @@ omit = ["tests/*", "*/tests/*"]
 [tool.coverage.report]
 exclude_lines = [
     "if TYPE_CHECKING:",
-    "if sys\\.version_info"
+    "if sys\\.version_info",
+    "@overload"
 ]
 
 [tool.setuptools.packages.find]
