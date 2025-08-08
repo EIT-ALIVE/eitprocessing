@@ -148,10 +148,10 @@ def test_init_with_wrong_input_raises(anonymous_boolean_mask: Callable):
 
 
 def test_init_with_non_pixelmasks_raises():
-    with pytest.raises(TypeError, match="All items in the collection must be instances of PixelMask."):
+    with pytest.raises(TypeError, match="All items must be instances of PixelMask."):
         _ = PixelMaskCollection([1, 2, 3])
 
-    with pytest.raises(TypeError, match="All items in the collection must be instances of PixelMask."):
+    with pytest.raises(TypeError, match="All items must be instances of PixelMask."):
         _ = PixelMaskCollection({"mask1": 1, "mask2": 2})
 
 
