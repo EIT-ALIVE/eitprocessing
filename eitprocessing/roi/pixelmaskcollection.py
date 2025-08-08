@@ -84,36 +84,37 @@ class PixelMaskCollection:
             raise ValueError(msg)
 
         if isinstance(masks, list):
-            return self._validate_and_convert_list_input(masks)
+            masks = self._convert_list_to_dict(masks)
 
-        return self._validate_and_convert_dict_input(masks)
-
-    def _validate_and_convert_list_input(self, masks: list[PixelMask]) -> frozendict[Hashable, PixelMask]:
-        if any(not isinstance(mask, PixelMask) for mask in masks):
-            msg = "All items in the collection must be instances of PixelMask."
-            raise TypeError(msg)
-        if all(mask.label is None for mask in masks):
-            return frozendict(enumerate(masks))
-        if all(isinstance(mask.label, str) for mask in masks):
-            return frozendict({cast("str", mask.label): mask for mask in masks})
-
-        msg = "Cannot mix labelled and anonymous masks in a collection."
-        raise ValueError(msg)
-
-    def _validate_and_convert_dict_input(
-        self, masks: dict[Hashable, PixelMask] | frozendict[Hashable, PixelMask]
-    ) -> frozendict[Hashable, PixelMask]:
         if any(not isinstance(mask, PixelMask) for mask in masks.values()):
-            msg = "All items in the collection must be instances of PixelMask."
+            msg = "All items must be instances of PixelMask."
             raise TypeError(msg)
-        if all(mask.label is None for mask in masks.values()):
-            if set(masks.keys()) != set(range(len(masks))):
-                msg = "Anonymous masks should be indexed with consecutive integers starting from 0."
-                raise ValueError(msg)
-        elif any(mask.label != key for key, mask in masks.items()):
+
+        all_none_labels = all(mask.label is None for mask in masks.values())
+        all_str_labels = all(isinstance(mask.label, str) for mask in masks.values())
+        if not (all_none_labels or all_str_labels):
+            msg = "Cannot mix labelled and anonymous masks in a collection."
+            raise ValueError(msg)
+        if all_none_labels and set(masks.keys()) != set(range(len(masks))):
+            msg = "Anonymous masks should be indexed with consecutive integers starting from 0."
+            raise ValueError(msg)
+        if all_str_labels and any(mask.label != key for key, mask in masks.items()):
             msg = "Keys should match the masks' label."
             raise KeyError(msg)
         return frozendict(masks)
+
+    def _convert_list_to_dict(self, masks: list[PixelMask]) -> dict[Hashable, PixelMask]:
+        """Validate a list of masks and convert it to a dictionary."""
+        if not all(isinstance(mask, PixelMask) for mask in masks):
+            msg = "All items must be instances of PixelMask."
+            raise TypeError(msg)
+        if all(mask.label is None for mask in masks):
+            return dict(enumerate(masks))
+        if all(isinstance(mask.label, str) for mask in masks):
+            return {cast("str", mask.label): mask for mask in masks}
+
+        msg = "Cannot mix labelled and anonymous masks in a collection."
+        raise ValueError(msg)
 
     @property
     def is_anonymous(self) -> bool:
