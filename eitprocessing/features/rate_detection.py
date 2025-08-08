@@ -23,9 +23,9 @@ class RateDetection:
     power of the heart rate is relatively high. The algorithm uses Welch's method to estimate the power spectrum of the
     summed pixel data and individual pixels. It then identifies the respiratory rate as the frequency with the highest
     power for the summed pixels within the specified range. The power spectra of the individual pixels are normalized
-    and averaged. The normalized power spectrum of the summed pixels is subtracted from the average of the the
-    normalized individual power spectra. The frequency with the highest relative power in this difference within the
-    specified range is taken as the heart rate.
+    and averaged. The normalized power spectrum of the summed pixels is subtracted from the average of the normalized
+    individual power spectra. The frequency with the highest relative power in this difference within the specified
+    range is taken as the heart rate.
 
     If either rate is variable, the algorithm will in most cases return an average frequency. If there are multiple
     distinct frequencies, e.g., due to a change in the controlled respiratory rate, multiple peaks might be visible in
@@ -38,12 +38,12 @@ class RateDetection:
     If the `refine_estimated_frequency` attribute is set to False, the estimated frequency is simply the location of the
     peak of the power Welch spectrum. Since Welch's method results in a limited number of frequency bins, this can lead
     to inaccuracies, especially with short or low-sample frequency data. If `refine_estimated_frequency` is set to True
-    (default), the estimated frequency is refined using parabolic interpolation, which often yields more accurates
+    (default), the estimated frequency is refined using parabolic interpolation, which often yields more accurate
     results, even with short signals, low signal-to-noise ratio and very similar (but distinct) respiratory and heart
     rates. See e.g. [Quadratic Interpolation of Spectral
     Peaks](https://ccrma.stanford.edu/~jos/sasp/Quadratic_Interpolation_Spectral_Peaks.html).
 
-    The respiratory and heart rate limits can be set when initializing this algorithms. Defaults values for adults and
+    The respiratory and heart rate limits can be set when initializing this algorithm. Default values for adults and
     neonates are set in `DEFAULT_RATE_LIMITS`.
 
     Although the algorithm might perform reasonably on data as short as 10 seconds (200 samples), it is recommended to
@@ -248,7 +248,8 @@ class RateDetection:
     def plotting(self) -> "RateDetectionPlotting":
         """A utility class for plotting the the results of the RateDetection algorithm.
 
-        The `plotting.plot(**captures)` method can be used to plot the results of the algorithm. It takes the
+        The `plotting.plot(**captures)` method can be used to plot the results of the algorithm. It takes the captured
+        variables from the `apply` method as keyword arguments.
 
         Example:
         ```python
