@@ -160,7 +160,8 @@ class RateDetection:
         if len(summed_impedance) < len_segment:
             if not suppress_length_warnings:
                 warnings.warn(
-                    "Segment length is larger than the data length, using the full data length instead.", UserWarning
+                    "The Welch window is longer than the data. Reducing the window length to the lenght of the data.",
+                    UserWarning,
                 )
             len_segment = len(summed_impedance)
 

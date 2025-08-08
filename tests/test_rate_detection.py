@@ -151,7 +151,7 @@ def test_short_signal(signal_factory: Callable[..., EITData]):
         low_power_frequencies=(1.75,),
         duration=15,
     )
-    with pytest.warns(UserWarning, match="Segment length is larger than the data length"):
+    with pytest.warns(UserWarning, match="The Welch window is longer than the data. Reducing the window length"):
         _ = rd.apply(short_signal)
 
     long_signal = signal_factory(
