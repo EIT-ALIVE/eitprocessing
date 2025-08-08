@@ -101,7 +101,7 @@ class RateDetectionPlotting:
             A matplotlib figure or subfigure (if provided) containing the plots of the frequency analysis.
         """
         if fig is None:
-            fig = plt.figure(figsize=(6, 4))
+            fig = plt.figure(figsize=(6, 4.5))
 
         axes = fig.subplots(3, 1, sharex=True)
         frequency_range = frequencies < self.obj.max_heart_rate * 1.25
@@ -136,9 +136,7 @@ class RateDetectionPlotting:
             label="RR range",
         )
         axes[0].set(ylim=ylim0)
-        axes[0].axvline(
-            estimated_respiratory_rate * MINUTE, color="r", alpha=0.5, label="Estimated RR", zorder=1.9, lw=1.5
-        )
+        axes[0].axvline(estimated_respiratory_rate * MINUTE, color="r", label="Estimated RR", zorder=1.9, lw=1.5)
 
         ylim2 = axes[2].get_ylim()
         axes[2].fill_betweenx(
@@ -150,7 +148,7 @@ class RateDetectionPlotting:
             label="HR range",
         )
         axes[2].set(ylim=ylim2)
-        axes[2].axvline(estimated_heart_rate * MINUTE, color="r", alpha=0.5, label="Estimated HR", zorder=1.9, lw=1.5)
+        axes[2].axvline(estimated_heart_rate * MINUTE, color="r", label="Estimated HR", zorder=1.9, lw=1.5)
 
         axes[0].set(ylabel="Power (a.u.)", xmargin=0)
         axes[1].set(ylabel="Power (a.u.)")
@@ -162,7 +160,28 @@ class RateDetectionPlotting:
         axes[2].legend(loc="upper right")
 
         for axis in fig.axes:
-            axis.xaxis.set_major_locator(MaxNLocator(nbins=10))
+            axis.xaxis.set_major_locator(MaxNLocator(nbins=15))
+
+        axis0_top_x = axes[0].twiny()
+        axis0_top_x.set(
+            ylim=axes[0].get_ylim(),
+            xlim=axes[0].get_xlim(),
+            xticks=[estimated_respiratory_rate * MINUTE],
+            xticklabels=[f"{estimated_respiratory_rate * MINUTE:.1f} bpm"],
+        )
+
+        axis2_top_x = axes[2].twiny()
+        axis2_top_x.set(
+            ylim=axes[2].get_ylim(),
+            xlim=axes[2].get_xlim(),
+            xticks=[estimated_heart_rate * MINUTE],
+            xticklabels=[f"{estimated_heart_rate * MINUTE:.1f} bpm"],
+        )
+
+        for axis in (axis0_top_x, axis2_top_x):
+            axis.tick_params(axis="x", length=0)
+            for label in axis.get_xticklabels():
+                label.set_color("red")
 
         fig.suptitle("Rate Detection Results")
         fig.align_ylabels(axes)
