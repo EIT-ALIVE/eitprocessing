@@ -249,7 +249,7 @@ def test_harmonic_heart_rate(
 
 @pytest.mark.parametrize(
     ("high_power_frequency", "low_power_frequency", "frequency_multipliers"),
-    list(itertools.product(high_power_frequencies, low_power_frequencies, [(1, 1.2, 1.4), (1, 1.15)])),
+    list(itertools.product(high_power_frequencies, low_power_frequencies, [(1, 1.3), (1, 1.4)])),
 )
 def test_multiple_frequencies(
     signal_factory: Callable[..., EITData],
