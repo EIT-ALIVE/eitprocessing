@@ -27,8 +27,7 @@ class PixelMaskCollection:
 
     At initialization, masks can be provided as a list or a dictionary. If provided as a list, the masks are converted
     to a dictionary with either their labels as keys (if all masks have labels) or their indices as keys (if none have
-    labels). If provided as a dictionary, the keys must match the labels of the masks; anonymous PixelMaps can not be
-    provided as a dictionary.
+    labels). If provided as a dictionary, the keys must match the labels of the masks.
 
     When the `apply` method is called, it applies each mask to the provided data and returns a dictionary
     mapping each mask's key (label or index) to the resulting masked data.
@@ -45,7 +44,7 @@ class PixelMaskCollection:
     ```
 
     Args:
-        masks (dict): A dictionary mapping mask names to their corresponding pixel masks.
+        masks (dict | list): A dictionary mapping mask names to their corresponding pixel masks or a list of masks.
         label (str | None): An optional label for the collection of masks.
 
     Attributes:
