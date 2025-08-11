@@ -59,13 +59,30 @@ class FilterROIBySize:
         raise ValueError(msg)
 
     def apply(self, mask: PixelMask) -> PixelMask:
-        """Label and select connected regions in a PixelMask and return a new PixelMask.
+        """Identify connected regions in a PixelMask, filter them by size, and return a combined mask.
+
+        This method:
+        1. Converts the input PixelMask into a binary representation where all non-NaN values
+            are treated as part of a region and NaNs are excluded.
+        2. Labels connected components using the specified connectivity structure.
+        3. Keeps only those connected regions whose pixel count is greater than or equal
+            to `self.min_region_size`.
+        4. Combines the remaining regions into a single PixelMask.
 
         Args:
-            mask (PixelMask): Input binary mask indicating pixels to be labeled.
+            mask (PixelMask):
+                Input mask where non-NaN pixels are considered valid region pixels.
+                NaNs are treated as excluded/background.
 
         Returns:
-            PixelMask: PixelMask object representing labeled regions that have at least `min_region_size` pixels.
+            PixelMask:
+                A new PixelMask representing the union of all regions that meet the
+                `min_region_size` criterion.
+
+        Raises:
+            RuntimeError:
+                If no connected regions meet the size threshold (e.g., mask is empty,
+                all regions are too small, or connectivity is too restrictive).
         """
         binary_array = ~np.isnan(mask.mask)
         labeled_array, num_features = nd_label(binary_array, structure=self.connectivity)
