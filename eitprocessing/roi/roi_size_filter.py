@@ -8,6 +8,8 @@ from scipy.ndimage import label as nd_label
 from eitprocessing.roi import PixelMask
 from eitprocessing.roi.pixelmaskcollection import PixelMaskCollection
 
+DEFAULT_MIN_REGION_SIZE = 10
+
 
 @dataclass(frozen=True, kw_only=True)
 class FilterROIBySize:
@@ -35,7 +37,7 @@ class FilterROIBySize:
         connectivity (Literal[1, 2] | np.ndarray): Connectivity type or custom array. Defaults to 1.
     """
 
-    min_region_size: int = 10
+    min_region_size: int = DEFAULT_MIN_REGION_SIZE
     connectivity: Literal[1, 2] | np.ndarray = 1
 
     def __post_init__(self):
@@ -61,6 +63,7 @@ class FilterROIBySize:
         """Identify connected regions in a PixelMask, filter them by size, and return a combined mask.
 
         This method:
+
         1. Converts the input PixelMask into a binary representation where all non-NaN values
             are treated as part of a region and NaNs are excluded.
         2. Labels connected components using the specified connectivity structure.
