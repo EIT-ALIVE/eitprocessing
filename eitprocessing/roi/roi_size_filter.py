@@ -46,16 +46,19 @@ class FilterROIBySize:
         )  # required with frozen objects
 
     def _parse_connectivity(self, connectivity: str | np.ndarray) -> np.ndarray:
-        if connectivity == "1-connectivity":
-            return generate_binary_structure(2, 1)
-        if connectivity == "2-connectivity":
-            return generate_binary_structure(2, 2)
+        if isinstance(connectivity, str):
+            if connectivity == "1-connectivity":
+                return generate_binary_structure(2, 1)
+            if connectivity == "2-connectivity":
+                return generate_binary_structure(2, 2)
+            msg = (
+                f"Unsupported connectivity string: {connectivity}. "
+                "Change to '1-connectivity' or '2-connectivity' or input a custom structure"
+            )
+            raise ValueError(msg)
         if isinstance(connectivity, np.ndarray):
             return connectivity
-        msg = (
-            f"Unsupported connectivity string: {connectivity}. "
-            "Change to '1-connectivity' or '2-connectivity' or input a custom structure"
-        )
+        msg = f"Unsupported connectivity type: {type(connectivity)}. Must be a string or numpy array."
         raise ValueError(msg)
 
     def apply(self, mask: PixelMask) -> PixelMask:
