@@ -36,5 +36,5 @@ class ROILabeller:
         for region_label in range(1, num_features + 1):
             region = labeled_array == region_label
             if np.sum(region) >= self.min_pixels:
-                masks.append(PixelMask(region))
+                masks.append(PixelMask(region, label=region_label))
         return PixelMaskCollection(masks)
