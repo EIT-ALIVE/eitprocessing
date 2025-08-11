@@ -15,7 +15,7 @@ class ROISelector:
         """Initialize a ROILabeller instance to identify and label regions of interest (ROIs) in a PixelMask.
 
         Args:
-        min_pixels (int): Minimum number of pixels for a region to be considered an ROI.
+        min_region_size (int): Minimum number of pixels in a region for it to be considered an ROI.
         structure (str | np.ndarray | None): Connectivity type ("4-connectivity", "8-connectivity") or custom array.
         """
         self.min_pixels = min_pixels
