@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 from scipy.ndimage import label as nd_label
 
@@ -20,15 +22,14 @@ class ROISelector:
         self.min_pixels = min_pixels
         self.structure = structure
 
-    def select_regions(self, mask: PixelMask) -> PixelMaskCollection:
-        """Label and select connected regions in a PixelMask and return as a new PixelMask.
+    def select_regions(self, mask: PixelMask) -> PixelMask:
+        """Label and select connected regions in a PixelMask and return a new PixelMask.
 
         Args:
             mask (PixelMask): Input binary mask indicating pixels to be labeled.
 
         Returns:
-            PixelMask: PixelMask object representing the union of labeled regions
-                that have at least `min_pixels` pixels.
+            PixelMask: PixelMask object representing labeled regions that have at least `min_pixels` pixels.
         """
         binary_array = ~np.isnan(mask.mask)
         labeled_array, num_features = nd_label(binary_array, structure=self.structure)
@@ -36,6 +37,12 @@ class ROISelector:
         for region_label in range(1, num_features + 1):
             region = labeled_array == region_label
             if np.sum(region) >= self.min_pixels:
-                masks.append(PixelMask(region, label=f"{region_label}"))
+                masks.append(PixelMask(region.astype(float), label=f"{region_label}", suppress_value_range_error=True))
+
+        if not masks:
+            warnings.warn("No regions found above min_pixels threshold.", UserWarning)
+            empty_mask = np.full(mask.mask.shape, np.nan)
+            return PixelMask(empty_mask)
+
         mask_collection = PixelMaskCollection(masks)
         return mask_collection.combine()
