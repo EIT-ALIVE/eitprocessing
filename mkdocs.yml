@@ -123,7 +123,8 @@ plugins:
       glob:
         - __pycache__/*
   - autorefs
-  - mkdocs-jupyter
+  - mkdocs-jupyter:
+      ignore: ["**/ignore/*.ipynb", "**/ignore/*.py"]
   - mkdocstrings:
       handlers:
         python:
