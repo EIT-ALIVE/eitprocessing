@@ -11,14 +11,14 @@ from eitprocessing.roi.pixelmaskcollection import PixelMaskCollection
 class ROISelector:
     """Class for labeling and selecting connected regions in a PixelMask."""
 
-    def __init__(self, min_pixels: int = 10, structure: str | np.ndarray | None = None):
+    def __init__(self, min_region_size: int = 10, structure: str | np.ndarray | None = None):
         """Initialize a ROILabeller instance to identify and label regions of interest (ROIs) in a PixelMask.
 
         Args:
         min_region_size (int): Minimum number of pixels in a region for it to be considered an ROI.
         structure (str | np.ndarray | None): Connectivity type ("4-connectivity", "8-connectivity") or custom array.
         """
-        self.min_pixels = min_pixels
+        self.min_region_size = min_region_size
         self.structure = self._parse_structure(structure)
 
     def _parse_structure(self, structure: str | np.ndarray | None) -> np.ndarray | None:
@@ -47,7 +47,7 @@ class ROISelector:
         masks = []
         for region_label in range(1, num_features + 1):
             region = labeled_array == region_label
-            if np.sum(region) >= self.min_pixels:
+            if np.sum(region) >= self.min_region_size:
                 masks.append(PixelMask(region.astype(float), label=f"{region_label}", suppress_value_range_error=True))
 
         if not masks:
