@@ -1,5 +1,4 @@
-import warnings
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Literal
 
 import numpy as np
@@ -59,7 +58,7 @@ class FilterROIBySize:
         )
         raise ValueError(msg)
 
-    def select_regions(self, mask: PixelMask) -> PixelMask:
+    def apply(self, mask: PixelMask) -> PixelMask:
         """Label and select connected regions in a PixelMask and return a new PixelMask.
 
         Args:
@@ -69,7 +68,7 @@ class FilterROIBySize:
             PixelMask: PixelMask object representing labeled regions that have at least `min_region_size` pixels.
         """
         binary_array = ~np.isnan(mask.mask)
-        labeled_array, num_features = nd_label(binary_array, connectivity=self.connectivity)
+        labeled_array, num_features = nd_label(binary_array, structure=self.connectivity)
         masks = []
         for region_label in range(1, num_features + 1):
             region = labeled_array == region_label
