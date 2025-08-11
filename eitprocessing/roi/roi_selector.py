@@ -1,6 +1,7 @@
 import warnings
 
 import numpy as np
+from scipy.ndimage import generate_binary_structure
 from scipy.ndimage import label as nd_label
 
 from eitprocessing.roi import PixelMask
@@ -10,17 +11,27 @@ from eitprocessing.roi.pixelmaskcollection import PixelMaskCollection
 class ROISelector:
     """Class for labeling and selecting connected regions in a PixelMask."""
 
-    def __init__(self, min_pixels: int = 10, structure: np.ndarray | None = None):
-        """Initialize a ROISelector instance to identify and label regions of interest (ROIs) in a PixelMask.
+    def __init__(self, min_pixels: int = 10, structure: str | np.ndarray | None = None):
+        """Initialize a ROILabeller instance to identify and label regions of interest (ROIs) in a PixelMask.
 
         Args:
-            min_pixels (int): Minimum number of pixels for a region to be considered an ROI.
-                Regions smaller than this are discarded. Defaults to 10.
-            structure (np.ndarray | None): Structuring element defining pixel connectivity for labeling.
-                If None, uses default nearest-neighbor connectivity (e.g., 4-connectivity in 2D).
+        min_pixels (int): Minimum number of pixels for a region to be considered an ROI.
+        structure (str | np.ndarray | None): Connectivity type ("4-connectivity", "8-connectivity") or custom array.
         """
         self.min_pixels = min_pixels
-        self.structure = structure
+        self.structure = self._parse_structure(structure)
+
+    def _parse_structure(self, structure: str | np.ndarray | None) -> np.ndarray | None:
+        if structure is None:
+            return None  # default nearest-neighbor
+        if isinstance(structure, str):
+            if structure == "4-connectivity":
+                return generate_binary_structure(2, 1)
+            if structure == "8-connectivity":
+                return generate_binary_structure(2, 2)
+            msg = f"Unknown connectivity string: {structure}"
+            raise ValueError(msg)
+        return structure  # assume array
 
     def select_regions(self, mask: PixelMask) -> PixelMask:
         """Label and select connected regions in a PixelMask and return a new PixelMask.
