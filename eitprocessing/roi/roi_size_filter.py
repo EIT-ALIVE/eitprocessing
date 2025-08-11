@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from typing import Literal
+import warnings
 
 import numpy as np
 from scipy.ndimage import generate_binary_structure
@@ -9,99 +8,52 @@ from eitprocessing.roi import PixelMask
 from eitprocessing.roi.pixelmaskcollection import PixelMaskCollection
 
 
-@dataclass(frozen=True, kw_only=True)
 class FilterROIBySize:
-    """Class for labeling and selecting connected regions in a PixelMask.
+    """Class for labeling and selecting connected regions in a PixelMask."""
 
-    This dataclass identifies and labels regions of interest (ROIs) in a PixelMask.
-    You can specify the minimum region size and the connectivity structure.
-
-    Args:
-        min_region_size (int): Minimum number of pixels in a region for it to be considered an ROI.
-        connectivity (Literal["1-connectivity", "2-connectivity"] | np.ndarray):
-            Connectivity type ("4-connectivity", "8-connectivity") or custom array.
-
-    Connectivity:
-        For 2D images, connectivity determines which pixels are considered neighbors when labeling regions.
-        - "1-connectivity" (also called 4-connectivity in image processing):
-                Only directly adjacent pixels (up, down, left, right) are considered neighbors.
-        - "2-connectivity" (also called 8-connectivity in image processing):
-                Both directly adjacent and diagonal pixels are considered neighbors.
-
-        If a custom array is provided, it must be a boolean or integer array specifying the neighborhood structure.
-        See the documentation for `scipy.ndimage.label`:
-        https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.label.html
-
-    Note:
-        The default is "1-connectivity", which matches the default behavior of `scipy.ndimage.label`.
-        `None` is not allowed for the connectivity argument; use "1-connectivity" for the default behavior.
-    """
-
-    min_region_size: int = 10
-    connectivity: Literal["1-connectivity", "2-connectivity"] | np.ndarray = "1-connectivity"
-
-    def __post_init__(self):
-        object.__setattr__(
-            self, "connectivity", self._parse_connectivity(self.connectivity)
-        )  # required with frozen objects
-
-    def _parse_connectivity(self, connectivity: str | np.ndarray) -> np.ndarray:
-        if isinstance(connectivity, str):
-            if connectivity == "1-connectivity":
-                return generate_binary_structure(2, 1)
-            if connectivity == "2-connectivity":
-                return generate_binary_structure(2, 2)
-            msg = (
-                f"Unsupported connectivity string: {connectivity}. "
-                "Change to '1-connectivity' or '2-connectivity' or input a custom structure"
-            )
-            raise ValueError(msg)
-        if isinstance(connectivity, np.ndarray):
-            return connectivity
-        msg = f"Unsupported connectivity type: {type(connectivity)}. Must be a string or numpy array."
-        raise ValueError(msg)
-
-    def apply(self, mask: PixelMask) -> PixelMask:
-        """Identify connected regions in a PixelMask, filter them by size, and return a combined mask.
-
-        This method:
-        1. Converts the input PixelMask into a binary representation where all non-NaN values
-            are treated as part of a region and NaNs are excluded.
-        2. Labels connected components using the specified connectivity structure.
-        3. Keeps only those connected regions whose pixel count is greater than or equal
-            to `self.min_region_size`.
-        4. Combines the remaining regions into a single PixelMask.
+    def __init__(self, min_region_size: int = 10, structure: str | np.ndarray | None = None):
+        """Initialize a ROILabeller instance to identify and label regions of interest (ROIs) in a PixelMask.
 
         Args:
-            mask (PixelMask):
-                Input mask where non-NaN pixels are considered valid region pixels.
-                NaNs are treated as excluded/background.
+        min_region_size (int): Minimum number of pixels in a region for it to be considered an ROI.
+        structure (str | np.ndarray | None): Connectivity type ("4-connectivity", "8-connectivity") or custom array.
+        """
+        self.min_region_size = min_region_size
+        self.structure = self._parse_structure(structure)
+
+    def _parse_structure(self, structure: str | np.ndarray | None) -> np.ndarray | None:
+        if structure is None:
+            return None  # default nearest-neighbor
+        if isinstance(structure, str):
+            if structure == "4-connectivity":
+                return generate_binary_structure(2, 1)
+            if structure == "8-connectivity":
+                return generate_binary_structure(2, 2)
+            msg = f"Unknown connectivity string: {structure}"
+            raise ValueError(msg)
+        return structure  # assume array
+
+    def select_regions(self, mask: PixelMask) -> PixelMask:
+        """Label and select connected regions in a PixelMask and return a new PixelMask.
+
+        Args:
+            mask (PixelMask): Input binary mask indicating pixels to be labeled.
 
         Returns:
-            PixelMask:
-                A new PixelMask representing the union of all regions that meet the
-                `min_region_size` criterion.
-
-        Raises:
-            RuntimeError:
-                If no connected regions meet the size threshold (e.g., mask is empty,
-                all regions are too small, or connectivity is too restrictive).
+            PixelMask: PixelMask object representing labeled regions that have at least `min_pixels` pixels.
         """
         binary_array = ~np.isnan(mask.mask)
-        labeled_array, num_features = nd_label(binary_array, structure=self.connectivity)
+        labeled_array, num_features = nd_label(binary_array, structure=self.structure)
         masks = []
         for region_label in range(1, num_features + 1):
             region = labeled_array == region_label
             if np.sum(region) >= self.min_region_size:
-                masks.append(PixelMask(region, suppress_value_range_error=True))
+                masks.append(PixelMask(region.astype(float), label=f"{region_label}", suppress_value_range_error=True))
 
         if not masks:
-            msg = (
-                "No regions found above min_region_size threshold. "
-                "This can occur if your input mask is empty, all regions are too small,"
-                " or your connectivity is too restrictive."
-            )
-            raise RuntimeError(msg)
+            warnings.warn("No regions found above min_pixels threshold.", UserWarning)
+            empty_mask = np.full(mask.mask.shape, np.nan)
+            return PixelMask(empty_mask)
 
         mask_collection = PixelMaskCollection(masks)
         return mask_collection.combine()
