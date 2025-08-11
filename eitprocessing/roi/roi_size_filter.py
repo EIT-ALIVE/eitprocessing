@@ -77,9 +77,12 @@ class FilterROIBySize:
                 masks.append(PixelMask(region, suppress_value_range_error=True))
 
         if not masks:
-            warnings.warn("No regions found above min_region_size threshold.", UserWarning)
-            empty_mask = np.full(mask.mask.shape, np.nan)
-            return PixelMask(empty_mask)
+            msg = (
+                "No regions found above min_region_size threshold. "
+                "This can occur if your input mask is empty, all regions are too small,"
+                " or your connectivity is too restrictive."
+            )
+            raise RuntimeError(msg)
 
         mask_collection = PixelMaskCollection(masks)
         return mask_collection.combine()
