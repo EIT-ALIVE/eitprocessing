@@ -3,7 +3,7 @@ import pytest
 import scipy.ndimage as ndi
 
 from eitprocessing.roi import PixelMask
-from eitprocessing.roi.roi_size_filter import FilterROIBySize
+from eitprocessing.roi.filter_by_size import FilterROIBySize
 
 
 def test_basic_region_selection():
