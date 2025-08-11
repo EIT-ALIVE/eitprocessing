@@ -68,6 +68,7 @@ nav:
       - api/filters.md
       - Regions of Interest:
         - Regions of Interest: api/roi/roi.md
+        - FilterROIBySize: api/roi/filterbysize.md
         - PixelMaskCollection: api/roi/pixelmaskcollection.md
       - api/parameters.md
       - api/categories.md
