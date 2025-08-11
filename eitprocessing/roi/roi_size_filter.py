@@ -1,5 +1,6 @@
 import warnings
 from dataclasses import dataclass, field
+from typing import Literal
 
 import numpy as np
 from scipy.ndimage import generate_binary_structure
@@ -9,7 +10,7 @@ from eitprocessing.roi import PixelMask
 from eitprocessing.roi.pixelmaskcollection import PixelMaskCollection
 
 
-@dataclass
+@dataclass(frozen=True, kw_only=True)
 class FilterROIBySize:
     """Class for labeling and selecting connected regions in a PixelMask.
 
@@ -18,7 +19,8 @@ class FilterROIBySize:
 
     Args:
         min_region_size (int): Minimum number of pixels in a region for it to be considered an ROI.
-        connectivity (str | np.ndarray): Connectivity type ("1-connectivity", "2-connectivity") or a custom structuring array.
+        connectivity (Literal["1-connectivity", "2-connectivity"] | np.ndarray):
+            Connectivity type ("4-connectivity", "8-connectivity") or custom array.
 
     Connectivity:
         For 2D images, connectivity determines which pixels are considered neighbors when labeling regions.
@@ -37,20 +39,25 @@ class FilterROIBySize:
     """
 
     min_region_size: int = 10
-    connectivity: str | np.ndarray = "1-connectivity"
+    connectivity: Literal["1-connectivity", "2-connectivity"] | np.ndarray = "1-connectivity"
 
     def __post_init__(self):
-        self.connectivity = self._parse_structure(self.connectivity)
+        object.__setattr__(
+            self, "connectivity", self._parse_connectivity(self.connectivity)
+        )  # required with frozen objects
 
-    def _parse_structure(self, structure: str | np.ndarray) -> np.ndarray:
-        if isinstance(structure, str):
-            if structure == "1-connectivity":
-                return generate_binary_structure(2, 1)
-            if structure == "2-connectivity":
-                return generate_binary_structure(2, 2)
-            msg = f"Unknown connectivity string: {structure}"
-            raise ValueError(msg)
-        return structure  # assume array
+    def _parse_connectivity(self, connectivity: str | np.ndarray) -> np.ndarray:
+        if connectivity == "1-connectivity":
+            return generate_binary_structure(2, 1)
+        if connectivity == "2-connectivity":
+            return generate_binary_structure(2, 2)
+        if isinstance(connectivity, np.ndarray):
+            return connectivity
+        msg = (
+            f"Unsupported connectivity string: {connectivity}. "
+            "Change to '1-connectivity' or '2-connectivity' or input a custom structure"
+        )
+        raise ValueError(msg)
 
     def select_regions(self, mask: PixelMask) -> PixelMask:
         """Label and select connected regions in a PixelMask and return a new PixelMask.
@@ -67,7 +74,7 @@ class FilterROIBySize:
         for region_label in range(1, num_features + 1):
             region = labeled_array == region_label
             if np.sum(region) >= self.min_region_size:
-                masks.append(PixelMask(region.astype(float), label=f"{region_label}", suppress_value_range_error=True))
+                masks.append(PixelMask(region, suppress_value_range_error=True))
 
         if not masks:
             warnings.warn("No regions found above min_region_size threshold.", UserWarning)
