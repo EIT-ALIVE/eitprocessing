@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from eitprocessing.datahandling.loading import load_eit_data
+from eitprocessing.datahandling.sequence import Sequence
 
 # ruff: noqa: ERA001  #TODO: remove this line
 
@@ -22,32 +23,32 @@ dummy_file = data_directory / "not_a_file.dummy"
 
 
 @pytest.fixture(scope="session")
-def draeger1():
+def draeger1() -> Sequence:
     return load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20, label="draeger1")
 
 
 @pytest.fixture(scope="session")
-def draeger2():
+def draeger2() -> Sequence:
     return load_eit_data(draeger_file2, vendor="draeger", sample_frequency=20, label="draeger2")
 
 
 @pytest.fixture(scope="session")
-def draeger_both():
+def draeger_both() -> Sequence:
     return load_eit_data([draeger_file2, draeger_file1], vendor="draeger", sample_frequency=20, label="draeger_both")
 
 
 @pytest.fixture(scope="session")
-def draeger_pp():
+def draeger_pp() -> Sequence:
     return load_eit_data(draeger_file_pp, vendor="draeger", sample_frequency=50, label="draeger2")
 
 
 @pytest.fixture(scope="session")
-def timpel1():
+def timpel1() -> Sequence:
     return load_eit_data(timpel_file, vendor="timpel", label="timpel")
 
 
 @pytest.fixture(scope="session")
-def draeger_wrapped_time_axis():
+def draeger_wrapped_time_axis() -> Sequence:
     return load_eit_data(
         draeger_wrapped_time_axis_file, vendor="draeger", sample_frequency=20, label="draeger_wrapped_time_axis"
     )
@@ -56,3 +57,10 @@ def draeger_wrapped_time_axis():
 # @pytest.fixture(scope="session")
 # def timpel_double():
 #     return load_eit_data([timpel_file, timpel_file], vendor="timpel", label="timpel_double")
+
+
+# TODO: Replace request.getfixturevalue() with sequence where possible in other tests
+@pytest.fixture
+def sequence(request: pytest.FixtureRequest) -> Sequence:
+    """Return a Sequence fixture."""
+    return request.getfixturevalue(request.param)

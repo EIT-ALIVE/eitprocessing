@@ -46,7 +46,8 @@ nav:
   - Home: index.md
   - Getting started:
       - installation.md
-      - basic_example.md
+      - Example Notebooks:
+        - examples/notebooks/test_ratedetection.ipynb
   - API Documentation:
       - api/loading.md
       - Data Containers:
@@ -59,11 +60,15 @@ nav:
         - Breath: api/datacontainers/breath.md
         - Event: api/datacontainers/event.md
         - DataCollection: api/datacontainers/datacollection.md
+      - Features:
+        - Breath Detection: api/features/breath_detection.md
+        - Pixel Breath: api/features/pixel_breath.md
+        - Rate Detection: api/features/rate_detection.md
+        - Moving Average: api/features/moving_average.md
       - api/filters.md
       - Regions of Interest:
         - Regions of Interest: api/roi/roi.md
         - PixelMaskCollection: api/roi/pixelmaskcollection.md
-      - api/features.md
       - api/parameters.md
       - api/categories.md
       - api/mixins.md
@@ -114,6 +119,7 @@ plugins:
       glob:
         - __pycache__/*
   - autorefs
+  - mkdocs-jupyter
   - mkdocstrings:
       handlers:
         python:

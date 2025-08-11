@@ -45,6 +45,7 @@ dependencies = [
     "typing_extensions",
     "pyyaml",
     "frozendict>=2.4.6",
+    "mkdocs-jupyter>=0.25.1",
 ]
 
 [project.optional-dependencies]
@@ -94,7 +95,8 @@ omit = ["tests/*", "*/tests/*"]
 exclude_lines = [
     "if TYPE_CHECKING:",
     "if sys\\.version_info",
-    "@overload"
+    "@overload",
+    "if captures is not None:"
 ]
 
 [tool.setuptools.packages.find]
