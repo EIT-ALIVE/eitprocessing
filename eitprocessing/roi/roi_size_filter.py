@@ -8,7 +8,7 @@ from eitprocessing.roi import PixelMask
 from eitprocessing.roi.pixelmaskcollection import PixelMaskCollection
 
 
-class ROISelector:
+class FilterROIBySize:
     """Class for labeling and selecting connected regions in a PixelMask."""
 
     def __init__(self, min_region_size: int = 10, structure: str | np.ndarray | None = None):
