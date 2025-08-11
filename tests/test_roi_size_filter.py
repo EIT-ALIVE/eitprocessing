@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
-from scipy.ndimage import generate_binary_structure
-from scipy.ndimage import label as nd_label
+import scipy.ndimage as ndi
 
 from eitprocessing.roi import PixelMask
 from eitprocessing.roi.roi_size_filter import FilterROIBySize
@@ -57,7 +56,7 @@ def test_custom_connectivity():
     assert not np.all(np.isnan(result_diag.mask))
 
     # Custom structure
-    custom_structure = generate_binary_structure(2, 2)
+    custom_structure = ndi.generate_binary_structure(2, 2)
     selector_custom = FilterROIBySize(min_region_size=2, connectivity=custom_structure)
     result_custom = selector_custom.apply(mask)
     assert not np.all(np.isnan(result_custom.mask))
@@ -136,7 +135,7 @@ def test_touching_regions_are_separated():
     # Step 1: Check intermediate labeling for 1-connectivity
     binary_array = ~np.isnan(mask.mask)
     structure1 = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])  # 1-connectivity
-    labeled_array1, num_features1 = nd_label(binary_array, structure=structure1)
+    labeled_array1, num_features1 = ndi.label(binary_array, structure=structure1)
     assert num_features1 == 2, f"Expected 2 regions, got {num_features1}"
     sizes1 = [np.sum(labeled_array1 == i) for i in range(1, num_features1 + 1)]
     assert sorted(sizes1) == [2, 4], f"Unexpected sizes for 1-connectivity: {sizes1}"
@@ -147,7 +146,7 @@ def test_touching_regions_are_separated():
 
     # Step 2: Check intermediate labeling for 2-connectivity
     structure2 = np.ones((3, 3), dtype=int)  # 2-connectivity
-    labeled_array2, num_features2 = nd_label(binary_array, structure=structure2)
+    labeled_array2, num_features2 = ndi.label(binary_array, structure=structure2)
     assert num_features2 == 1, f"Expected 1 region for 2-connectivity, got {num_features2}"
 
     selector8 = FilterROIBySize(min_region_size=6, connectivity=2)
@@ -164,7 +163,7 @@ def test_structure_input_variants():
     # Integer
     selector_int = FilterROIBySize(min_region_size=4, connectivity=1)
     # Array
-    structure_arr = generate_binary_structure(2, 1)
+    structure_arr = ndi.generate_binary_structure(2, 1)
     selector_arr = FilterROIBySize(min_region_size=4, connectivity=structure_arr)
 
     # Check that the internal structure is the same

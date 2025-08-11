@@ -2,8 +2,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 import numpy as np
-from scipy.ndimage import generate_binary_structure
-from scipy.ndimage import label as nd_label
+import scipy.ndimage as ndi
 
 from eitprocessing.roi import PixelMask
 from eitprocessing.roi.pixelmaskcollection import PixelMaskCollection
@@ -53,7 +52,7 @@ class FilterROIBySize:
                     " Must be 1 or 2, or input a custom structure as array."
                 )
                 raise ValueError(msg)
-            return generate_binary_structure(2, connectivity)
+            return ndi.generate_binary_structure(2, connectivity)
         if isinstance(connectivity, np.ndarray):
             return connectivity
         msg = f"Unsupported connectivity type: {type(connectivity)}. Must be an integer or numpy array."
@@ -87,7 +86,7 @@ class FilterROIBySize:
                 all regions are too small, or connectivity is too restrictive).
         """
         binary_array = ~np.isnan(mask.mask)
-        labeled_array, num_features = nd_label(binary_array, structure=self.connectivity)
+        labeled_array, num_features = ndi.label(binary_array, structure=self.connectivity)
         masks = []
         for region_label in range(1, num_features + 1):
             region = labeled_array == region_label
