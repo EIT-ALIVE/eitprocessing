@@ -16,11 +16,6 @@ class FilterROIBySize:
     This dataclass identifies and labels regions of interest (ROIs) in a PixelMask.
     You can specify the minimum region size and the connectivity structure.
 
-    Args:
-        min_region_size (int): Minimum number of pixels in a region for it to be considered an ROI.
-        connectivity (Literal["1-connectivity", "2-connectivity"] | np.ndarray):
-            Connectivity type ("4-connectivity", "8-connectivity") or custom array.
-
     Connectivity:
         For 2D images, connectivity determines which pixels are considered neighbors when labeling regions.
         - "1-connectivity" (also called 4-connectivity in image processing):
@@ -28,13 +23,17 @@ class FilterROIBySize:
         - "2-connectivity" (also called 8-connectivity in image processing):
                 Both directly adjacent and diagonal pixels are considered neighbors.
 
+        The default value is "1-connectivity". 
+
         If a custom array is provided, it must be a boolean or integer array specifying the neighborhood structure.
         See the documentation for `scipy.ndimage.label`:
         https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.label.html
 
-    Note:
-        The default is "1-connectivity", which matches the default behavior of `scipy.ndimage.label`.
-        `None` is not allowed for the connectivity argument; use "1-connectivity" for the default behavior.
+
+    Args:
+        min_region_size (int): Minimum number of pixels in a region for it to be considered an ROI.
+        connectivity (Literal["1-connectivity", "2-connectivity"] | np.ndarray):
+            Connectivity type ("4-connectivity", "8-connectivity") or custom array.
     """
 
     min_region_size: int = 10
