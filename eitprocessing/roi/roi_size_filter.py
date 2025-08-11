@@ -18,12 +18,12 @@ class FilterROIBySize:
 
     Connectivity:
         For 2D images, connectivity determines which pixels are considered neighbors when labeling regions.
-        - "1-connectivity" (also called 4-connectivity in image processing):
+        - 1-connectivity (also called 4-connectivity in image processing):
                 Only directly adjacent pixels (up, down, left, right) are considered neighbors.
-        - "2-connectivity" (also called 8-connectivity in image processing):
+        - 2-connectivity (also called 8-connectivity in image processing):
                 Both directly adjacent and diagonal pixels are considered neighbors.
 
-        The default value is "1-connectivity". 
+        The default value is 1-connectivity.
 
         If a custom array is provided, it must be a boolean or integer array specifying the neighborhood structure.
         See the documentation for `scipy.ndimage.label`:
@@ -31,33 +31,30 @@ class FilterROIBySize:
 
 
     Args:
-        min_region_size (int): Minimum number of pixels in a region for it to be considered an ROI.
-        connectivity (Literal["1-connectivity", "2-connectivity"] | np.ndarray):
-            Connectivity type ("4-connectivity", "8-connectivity") or custom array.
+        min_region_size (int): Minimum number of pixels in a region for it to be considered an ROI. Defaults to 10.
+        connectivity (Literal[1, 2] | np.ndarray): Connectivity type or custom array. Defaults to 1.
     """
 
     min_region_size: int = 10
-    connectivity: Literal["1-connectivity", "2-connectivity"] | np.ndarray = "1-connectivity"
+    connectivity: Literal[1, 2] | np.ndarray = 1
 
     def __post_init__(self):
         object.__setattr__(
             self, "connectivity", self._parse_connectivity(self.connectivity)
         )  # required with frozen objects
 
-    def _parse_connectivity(self, connectivity: str | np.ndarray) -> np.ndarray:
-        if isinstance(connectivity, str):
-            if connectivity == "1-connectivity":
-                return generate_binary_structure(2, 1)
-            if connectivity == "2-connectivity":
-                return generate_binary_structure(2, 2)
-            msg = (
-                f"Unsupported connectivity string: {connectivity}. "
-                "Change to '1-connectivity' or '2-connectivity' or input a custom structure"
-            )
-            raise ValueError(msg)
+    def _parse_connectivity(self, connectivity: int | np.ndarray) -> np.ndarray:
+        if isinstance(connectivity, int):
+            if connectivity not in (1, 2):
+                msg = (
+                    f"Unsupported connectivity value: {connectivity}."
+                    " Must be 1 or 2, or input a custom structure as array."
+                )
+                raise ValueError(msg)
+            return generate_binary_structure(2, connectivity)
         if isinstance(connectivity, np.ndarray):
             return connectivity
-        msg = f"Unsupported connectivity type: {type(connectivity)}. Must be a string or numpy array."
+        msg = f"Unsupported connectivity type: {type(connectivity)}. Must be an integer or numpy array."
         raise ValueError(msg)
 
     def apply(self, mask: PixelMask) -> PixelMask:
