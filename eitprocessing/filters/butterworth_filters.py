@@ -1,9 +1,9 @@
 import sys
+import warnings
 from dataclasses import InitVar, dataclass
 from typing import Literal
 
 import numpy as np
-import numpy.typing as npt
 from scipy import signal
 
 from eitprocessing.filters import TimeDomainFilter
@@ -131,7 +131,12 @@ class ButterworthFilter(TimeDomainFilter):
             msg = f"Invalid `sample_frequency` ({self.sample_frequency}). Must be positive"
             raise ValueError(msg)
 
-    def apply_filter(self, input_data: npt.ArrayLike, axis: int = -1) -> np.ndarray:
+    def apply_filter(self, *args, **kwargs) -> np.ndarray:
+        """Deprecated method. Use `apply()` instead."""
+        warnings.warn("The `apply_filter` method is deprecated. Use `apply` instead.", DeprecationWarning, stacklevel=2)
+        return self.apply(*args, **kwargs)
+
+    def apply(self, input_data: np.ndarray, axis: int = -1) -> np.ndarray:
         """Apply the filter to the input data.
 
         Args:

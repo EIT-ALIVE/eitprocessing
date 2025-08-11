@@ -185,6 +185,12 @@ def test_specified_butterworth_equivalence(filter_arguments: dict):
     assert filter7 == filter8
 
 
+def test_apply_filter_warns(filter_arguments: dict):
+    filter_ = ButterworthFilter(**filter_arguments)
+    with pytest.warns(DeprecationWarning, match="The `apply_filter` method is deprecated. Use `apply` instead."):
+        _ = filter_.apply_filter(np.random.default_rng().random(1000))
+
+
 def test_butterworth_functionality():
     """Tests the functionality of the Butterworth filters.
 
@@ -247,8 +253,8 @@ def test_butterworth_functionality():
             order=order,
             sample_frequency=sample_frequency,
         )
-        result1 = filter1.apply_filter(data, axis=axis)
-        result2 = filter2.apply_filter(data, axis=axis)
+        result1 = filter1.apply(data, axis=axis)
+        result2 = filter2.apply(data, axis=axis)
         assert np.array_equal(result1, result2)
 
         sos = signal.butter(
