@@ -16,7 +16,7 @@ def test_basic_region_selection():
     arr[1:4, 1:4] = True
     mask = make_pixel_mask(arr)
     selector = FilterROIBySize(min_region_size=5, connectivity="4-connectivity")
-    result = selector.select_regions(mask)
+    result = selector.apply(mask)
     expected_mask = np.full(arr.shape, np.nan)
     expected_mask[1:4, 1:4] = 1
     np.testing.assert_array_equal(result.mask, expected_mask)
@@ -28,7 +28,7 @@ def test_region_smaller_than_threshold_is_excluded():
     arr[2:4, 2:5] = True
     mask = make_pixel_mask(arr)
     selector = FilterROIBySize(min_region_size=5, connectivity="4-connectivity")
-    result = selector.select_regions(mask)
+    result = selector.apply(mask)
     expected = np.zeros_like(arr, dtype=float)
     expected[2:4, 2:5] = 1
     expected[expected == 0] = np.nan
@@ -41,7 +41,7 @@ def test_no_regions_above_threshold_warns_and_returns_empty():
     mask = make_pixel_mask(arr)
     selector = FilterROIBySize(min_region_size=5, connectivity="4-connectivity")
     with pytest.warns(UserWarning, match="No regions found above min_pixels threshold."):
-        result = selector.select_regions(mask)
+        result = selector.apply(mask)
     assert isinstance(result, PixelMask)
     assert np.all(np.isnan(result.mask))
 
@@ -54,16 +54,16 @@ def test_custom_connectivity():
     # Default (4-connectivity) — should warn and return empty
     selector_default = FilterROIBySize(min_region_size=2, connectivity="4-connectivity")
     with pytest.warns(UserWarning, match="No regions found above min_pixels threshold."):
-        result_default = selector_default.select_regions(mask)
+        result_default = selector_default.apply(mask)
     assert np.all(np.isnan(result_default.mask))
     # 8-connectivity — diagonal pixels connected
     selector_diag = FilterROIBySize(min_region_size=2, connectivity="8-connectivity")
-    result_diag = selector_diag.select_regions(mask)
+    result_diag = selector_diag.apply(mask)
     assert not np.all(np.isnan(result_diag.mask))
     # Custom structure
     custom_structure = generate_binary_structure(2, 2)
     selector_custom = FilterROIBySize(min_region_size=2, connectivity=custom_structure)
-    result_custom = selector_custom.select_regions(mask)
+    result_custom = selector_custom.apply(mask)
     assert not np.all(np.isnan(result_custom.mask))
 
 
@@ -71,7 +71,7 @@ def test_empty_mask_returns_empty():
     arr = np.full((4, 4), np.nan)
     mask = make_pixel_mask(arr)
     selector = FilterROIBySize(min_region_size=1, connectivity="4-connectivity")
-    result = selector.select_regions(mask)
+    result = selector.apply(mask)
     assert np.all(np.isnan(result.mask))
 
 
@@ -79,7 +79,7 @@ def test_all_nan_mask_returns_empty():
     arr = np.full((4, 4), np.nan)
     mask = PixelMask(arr)
     selector = FilterROIBySize(min_region_size=1, connectivity="4-connectivity")
-    result = selector.select_regions(mask)
+    result = selector.apply(mask)
     assert np.all(np.isnan(result.mask))
 
 
@@ -87,7 +87,7 @@ def test_zeros_are_regions_nans_are_excluded():
     arr = np.array([[0, 1, np.nan], [0, 0.5, np.nan], [np.nan, np.nan, 0]], dtype=float)
     mask = make_pixel_mask(arr)
     selector = FilterROIBySize(min_region_size=3, connectivity="4-connectivity")
-    result_mask = selector.select_regions(mask).mask
+    result_mask = selector.apply(mask).mask
     result_binary = ~np.isnan(result_mask)
     expected_binary = np.zeros_like(arr, dtype=bool)
     expected_binary[0:2, 0:2] = True
@@ -100,7 +100,7 @@ def test_multiple_large_regions_are_all_included():
     arr[4:6, 4:6] = True
     mask = make_pixel_mask(arr)
     selector = FilterROIBySize(min_region_size=4, connectivity="4-connectivity")
-    result = selector.select_regions(mask)
+    result = selector.apply(mask)
     assert np.sum(~np.isnan(result.mask)) == 8
 
 
@@ -108,7 +108,7 @@ def test_all_true_mask_returns_full_mask():
     arr = np.ones((3, 3), dtype=bool)
     mask = make_pixel_mask(arr)
     selector = FilterROIBySize(min_region_size=1, connectivity="4-connectivity")
-    result = selector.select_regions(mask)
+    result = selector.apply(mask)
     assert np.all(result.mask == 1)
 
 
@@ -117,7 +117,7 @@ def test_edge_connected_region():
     arr[0, :] = True
     mask = make_pixel_mask(arr)
     selector = FilterROIBySize(min_region_size=5, connectivity="4-connectivity")
-    result = selector.select_regions(mask)
+    result = selector.apply(mask)
     assert np.sum(~np.isnan(result.mask)) == 5
 
 
@@ -126,10 +126,10 @@ def test_min_pixels_threshold_variation():
     arr[1:3, 1:3] = True
     mask = make_pixel_mask(arr)
     selector = FilterROIBySize(min_region_size=4, connectivity="4-connectivity")
-    result = selector.select_regions(mask)
+    result = selector.apply(mask)
     assert np.sum(~np.isnan(result.mask)) == 4
     selector2 = FilterROIBySize(min_region_size=5, connectivity="4-connectivity")
-    result2 = selector2.select_regions(mask)
+    result2 = selector2.apply(mask)
     assert np.all(np.isnan(result2.mask))
 
 
@@ -139,10 +139,10 @@ def test_touching_regions_are_separated():
     arr[3, 1:3] = True
     mask = make_pixel_mask(arr)
     selector = FilterROIBySize(min_region_size=2, connectivity="4-connectivity")
-    result = selector.select_regions(mask)
+    result = selector.apply(mask)
     assert np.sum(~np.isnan(result.mask)) == 6
     selector8 = FilterROIBySize(min_region_size=6, connectivity="8-connectivity")
-    result8 = selector8.select_regions(mask)
+    result8 = selector8.apply(mask)
     assert np.sum(~np.isnan(result8.mask)) == 6
 
 
@@ -153,14 +153,14 @@ def test_structure_input_variants():
     mask = make_pixel_mask(arr)
     # None (should default to 4-connectivity)
     selector_none = FilterROIBySize(min_region_size=4, connectivity=None)
-    result_none = selector_none.select_regions(mask)
+    result_none = selector_none.apply(mask)
     assert np.sum(~np.isnan(result_none.mask)) == 4
     # String
     selector_str = FilterROIBySize(min_region_size=4, connectivity="4-connectivity")
-    result_str = selector_str.select_regions(mask)
+    result_str = selector_str.apply(mask)
     assert np.sum(~np.isnan(result_str.mask)) == 4
     # Array
     structure_arr = generate_binary_structure(2, 1)
     selector_arr = FilterROIBySize(min_region_size=4, connectivity=structure_arr)
-    result_arr = selector_arr.select_regions(mask)
+    result_arr = selector_arr.apply(mask)
     assert np.sum(~np.isnan(result_arr.mask)) == 4
