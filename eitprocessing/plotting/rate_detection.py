@@ -21,6 +21,7 @@ class RateDetectionPlotting:
     >>> captures = {}
     >>> rr, hr = rd.apply(eit_data, captures=captures)
     >>> fig = rd.plotting(**captures)
+    >>> fig.savefig("rate_detection.png")  # Save the figure to a file
     ```
     """
 
