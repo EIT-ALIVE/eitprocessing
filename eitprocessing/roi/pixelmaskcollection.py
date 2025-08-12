@@ -79,10 +79,6 @@ class PixelMaskCollection:
             msg = f"Expected a list or a dictionary, got {type(masks)}."
             raise TypeError(msg)
 
-        # if not masks:
-        #     msg = "A PixelMaskCollection should contain at least one mask."
-        #     raise ValueError(msg)
-
         if isinstance(masks, list):
             masks = self._convert_list_to_dict(masks)
 
