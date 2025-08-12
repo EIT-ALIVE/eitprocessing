@@ -71,32 +71,46 @@ class PixelMaskCollection:
         """Validate the input masks and convert to a frozendict.
 
         The input masks are valid if:
+        - The input is empty (allowed — empty collection).
         - The input is a list with all labelled or all anonymous PixelMask instances.
         - The input is a dictionary where each PixelMask instance's label matches the key.
         """
-        # Check for type before checking for length, e.g., and empty string should raise a TypeError, not ValueError
+        # Check for type first
         if not isinstance(masks, (list, dict, frozendict)):
             msg = f"Expected a list or a dictionary, got {type(masks)}."
             raise TypeError(msg)
 
+        # Allow empty collections without error
+        if isinstance(masks, list) and not masks:
+            return frozendict()
+        if isinstance(masks, (dict, frozendict)) and not masks:
+            return frozendict()
+
+        # Convert list -> dict if needed
         if isinstance(masks, list):
             masks = self._convert_list_to_dict(masks)
 
+        # Validate PixelMask instances
         if any(not isinstance(mask, PixelMask) for mask in masks.values()):
             msg = "All items must be instances of PixelMask."
             raise TypeError(msg)
 
+        # Label consistency checks
         all_none_labels = all(mask.label is None for mask in masks.values())
         all_str_labels = all(isinstance(mask.label, str) for mask in masks.values())
+
         if not (all_none_labels or all_str_labels):
             msg = "Cannot mix labelled and anonymous masks in a collection."
             raise ValueError(msg)
+
         if all_none_labels and set(masks.keys()) != set(range(len(masks))):
             msg = "Anonymous masks should be indexed with consecutive integers starting from 0."
             raise ValueError(msg)
+
         if all_str_labels and any(mask.label != key for key, mask in masks.items()):
             msg = "Keys should match the masks' label."
             raise KeyError(msg)
+
         return frozendict(masks)
 
     def _convert_list_to_dict(self, masks: list[PixelMask]) -> dict[Hashable, PixelMask]:
