@@ -7,6 +7,7 @@ import numpy as np
 from scipy import signal
 
 from eitprocessing.filters import TimeDomainFilter
+from eitprocessing.utils import make_capture
 
 
 @dataclass(kw_only=True)
@@ -136,7 +137,7 @@ class ButterworthFilter(TimeDomainFilter):
         warnings.warn("The `apply_filter` method is deprecated. Use `apply` instead.", DeprecationWarning, stacklevel=2)
         return self.apply(*args, **kwargs)
 
-    def apply(self, input_data: np.ndarray, axis: int = -1) -> np.ndarray:
+    def apply(self, input_data: np.ndarray, axis: int = -1, captures: dict | None = None) -> np.ndarray:
         """Apply the filter to the input data.
 
         Args:
@@ -144,10 +145,27 @@ class ButterworthFilter(TimeDomainFilter):
                 the filter is applied to the last axis.
             axis: Data axis the filter should be applied to. This defaults to the last axis,
                 assuming this to be the time axis of the input data.
+            captures:
+                Optional. A dictionary to capture intermediate date, useful for plotting and debugging.
 
         Returns:
             The filtered output with the same shape as the input data.
         """
+        capture = make_capture(captures)
+        capture("unfiltered_data", input_data)
+        capture("sample_frequency", self.sample_frequency)
+
+        match self.filter_type:
+            case "lowpass":
+                capture("low_pass_frequency", self.cutoff_frequency)
+            case "highpass":
+                capture("high_pass_frequency", self.cutoff_frequency)
+            case "bandpass":
+                capture("low_pass_frequency", self.cutoff_frequency[1])
+                capture("high_pass_frequency", self.cutoff_frequency[0])
+            case "bandstop":
+                capture("frequency_bands", self.cutoff_frequency, append_to_list=True)
+
         if np.any(np.isnan(input_data)):
             msg = "Input data contains NaN-values."
             exc = ValueError(msg)
@@ -166,7 +184,9 @@ class ButterworthFilter(TimeDomainFilter):
             output="sos",
         )
 
-        return signal.sosfiltfilt(sos, input_data, axis=axis)
+        filtered_data = signal.sosfiltfilt(sos, input_data, axis=axis)
+        capture("filtered_data", filtered_data)
+        return filtered_data
 
 
 @dataclass(kw_only=True)
