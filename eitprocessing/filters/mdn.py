@@ -10,6 +10,7 @@ from scipy import signal
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.filters import TimeDomainFilter
+from eitprocessing.plotting.filter import FilterPlotting
 from eitprocessing.utils import _CaptureFunc, make_capture
 
 MINUTE = 60
@@ -221,3 +222,10 @@ class MDNFilter(TimeDomainFilter):
         capture("frequency_bands", (lower_limit, upper_limit), append_to_list=True)
 
         return signal.sosfiltfilt(sos, data_, axis=axis)
+
+    @property
+    def plotting(self) -> FilterPlotting:
+        """Return the plotting class for this filter."""
+        from eitprocessing.plotting.filter import FilterPlotting
+
+        return FilterPlotting()
