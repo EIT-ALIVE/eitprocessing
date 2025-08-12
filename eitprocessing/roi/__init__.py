@@ -99,14 +99,15 @@ class PixelMask:
             msg = f"Mask should be a 2D array, not {mask.ndim}D."
             raise ValueError(msg)
 
-        if (not suppress_all_nan_warning) and np.all(np.isnan(mask)):
+        all_nan = np.all(np.isnan(mask))
+        if (not suppress_all_nan_warning) and all_nan:
             warnings.warn(
                 "Mask contains only NaN values. This will create in all-NaN results when applied.",
                 UserWarning,
                 stacklevel=2,
             )
 
-        if (not suppress_value_range_error) and (np.nanmax(mask) > 1 or np.nanmin(mask) < 0):
+        if (not all_nan) and (not suppress_value_range_error) and (np.nanmax(mask) > 1 or np.nanmin(mask) < 0):
             msg = "One or more mask values fall outside the range 0 to 1."
             exc = ValueError(msg)
             if sys.version_info >= (3, 11):
