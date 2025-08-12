@@ -58,7 +58,7 @@ class PixelMaskCollection:
 
     def __init__(
         self,
-        masks: dict[Hashable, PixelMask] | frozendict[Hashable, PixelMask] | list[PixelMask],
+        masks: dict[Hashable, PixelMask] | frozendict[Hashable, PixelMask] | list[PixelMask] | None = None,
         *,
         label: str | None = None,
     ):
@@ -66,7 +66,7 @@ class PixelMaskCollection:
         object.__setattr__(self, "label", label)
 
     def _validate_and_convert_input_masks(
-        self, masks: dict[Hashable, PixelMask] | frozendict[Hashable, PixelMask] | list[PixelMask]
+        self, masks: dict[Hashable, PixelMask] | frozendict[Hashable, PixelMask] | list[PixelMask] | None
     ) -> frozendict[Hashable, PixelMask]:
         """Validate the input masks and convert to a frozendict.
 
@@ -75,15 +75,16 @@ class PixelMaskCollection:
         - The input is a list with all labelled or all anonymous PixelMask instances.
         - The input is a dictionary where each PixelMask instance's label matches the key.
         """
+        if masks is None:
+            return frozendict()
+
         # Check for type first
         if not isinstance(masks, (list, dict, frozendict)):
             msg = f"Expected a list or a dictionary, got {type(masks)}."
             raise TypeError(msg)
 
-        # Allow empty collections without error
-        if isinstance(masks, list) and not masks:
-            return frozendict()
-        if isinstance(masks, (dict, frozendict)) and not masks:
+        # Allow empty collections
+        if not masks:
             return frozendict()
 
         # Convert list -> dict if needed

@@ -321,24 +321,19 @@ def test_apply_with_extra_kwargs_on_array_raises(labelled_boolean_mask: Callable
 
 
 def test_empty_collection_behavior():
-    # Still expect TypeError if no 'masks' argument is provided at all
-    with pytest.raises(
-        TypeError, match=r"PixelMaskCollection.__init__\(\) missing 1 required positional argument: 'masks'"
-    ):
-        _ = PixelMaskCollection()
+    # Allow emtpy collection initialization
+    _ = PixelMaskCollection()  # No masks provided
+    _ = PixelMaskCollection([])  # Empty list
+    _ = PixelMaskCollection({})  # Empty dict
 
-    # Test both empty list and empty dict forms
-    for empty_input in ([], {}):
-        collection = PixelMaskCollection(empty_input)
-        assert len(collection.masks) == 0
+    collection = PixelMaskCollection()
+    # combine() should raise ValueError
+    with pytest.raises(ValueError, match="Cannot combine masks: the PixelMaskCollection is empty."):
+        collection.combine()
 
-        # combine() should raise ValueError
-        with pytest.raises(ValueError, match="Cannot combine masks: the PixelMaskCollection is empty."):
-            collection.combine()
-
-        # apply() should raise ValueError
-        with pytest.raises(ValueError, match="Cannot apply masks: the PixelMaskCollection is empty."):
-            collection.apply(np.zeros((2, 2)))  # apply to dummy data
+    # apply() should raise ValueError
+    with pytest.raises(ValueError, match="Cannot apply masks: the PixelMaskCollection is empty."):
+        collection.apply(np.zeros((2, 2)))  # apply to dummy data
 
 
 def test_add_labelled_mask(labelled_boolean_mask: Callable):
