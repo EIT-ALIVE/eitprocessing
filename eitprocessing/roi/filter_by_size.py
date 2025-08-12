@@ -87,13 +87,13 @@ class FilterROIBySize:
         """
         binary_array = ~np.isnan(mask.mask)
         labeled_array, num_features = ndi.label(binary_array, structure=self.connectivity)
-        masks = []
+        mask_collection = PixelMaskCollection({})
         for region_label in range(1, num_features + 1):
             region = labeled_array == region_label
             if np.sum(region) >= self.min_region_size:
-                masks.append(PixelMask(region, suppress_value_range_error=True))
+                mask_collection = mask_collection.add(PixelMask(region, suppress_value_range_error=True))
 
-        if not masks:
+        if not mask_collection.masks:
             msg = (
                 "No regions found above min_region_size threshold. "
                 "This can occur if your input mask is empty, all regions are too small,"
@@ -101,5 +101,4 @@ class FilterROIBySize:
             )
             raise RuntimeError(msg)
 
-        mask_collection = PixelMaskCollection(masks)
         return mask_collection.combine()
