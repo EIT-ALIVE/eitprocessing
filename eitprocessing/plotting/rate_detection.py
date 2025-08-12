@@ -17,10 +17,10 @@ class RateDetectionPlotting:
 
     Example:
     ```python
-    rd = RateDetection("adult")
-    captures = {}
-    rr, hr = rd.apply(eit_data, captures=captures)
-    fig = rd.plotting(**captures)
+    >>> rd = RateDetection("adult")
+    >>> captures = {}
+    >>> rr, hr = rd.apply(eit_data, captures=captures)
+    >>> fig = rd.plotting(**captures)
     ```
     """
 
