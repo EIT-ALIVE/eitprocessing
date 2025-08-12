@@ -194,7 +194,7 @@ def test_close_respiratory_and_heart_rate(signal_factory: Callable):
     mdn_filter = MDNFilter(respiratory_rate=respiratory_rate, heart_rate=heart_rate)
     _ = mdn_filter.apply(signal, sample_frequency=50, captures=(captures := {}))
 
-    assert captures["n_harmonics"] == 5
+    assert captures["n_harmonics"] == 4
 
     # With the rates this close, the first band start exactly between them
     assert captures["frequency_bands"][0][0] == np.mean([respiratory_rate, heart_rate])

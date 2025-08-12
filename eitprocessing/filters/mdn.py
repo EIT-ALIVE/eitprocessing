@@ -120,7 +120,7 @@ class MDNFilter(TimeDomainFilter):
         )
 
         # Ensure the data is filtered up to the point where lower_limit would be larger than the noise frequency limit
-        n_harmonics = math.ceil((self.noise_frequency_limit + self.notch_distance) / self.heart_rate)
+        n_harmonics = math.floor((self.noise_frequency_limit + self.notch_distance) / self.heart_rate)
 
         if captures is not None:
             captures["n_harmonics"] = n_harmonics
