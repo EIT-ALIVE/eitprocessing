@@ -87,7 +87,7 @@ class FilterROIBySize:
         """
         binary_array = ~np.isnan(mask.mask)
         labeled_array, num_features = ndi.label(binary_array, structure=self.connectivity)
-        mask_collection = PixelMaskCollection({})
+        mask_collection = PixelMaskCollection()
         for region_label in range(1, num_features + 1):
             region = labeled_array == region_label
             if np.sum(region) >= self.min_region_size:
