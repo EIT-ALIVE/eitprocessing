@@ -17,11 +17,10 @@ class RateDetectionPlotting:
 
     Example:
     ```python
-    >>> rd = RateDetection("adult")
-    >>> captures = {}
-    >>> estimated_respiratory_rate, estimated_heart_rate = rd.detect_respiratory_heart_rate(eit_data, captures=captures)
-    >>> fig = rd.plotting(**captures)
-    >>> fig.savefig(...)
+    rd = RateDetection("adult")
+    captures = {}
+    rr, hr = rd.apply(eit_data, captures=captures)
+    fig = rd.plotting(**captures)
     ```
     """
 
