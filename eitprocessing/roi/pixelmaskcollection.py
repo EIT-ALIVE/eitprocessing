@@ -79,9 +79,9 @@ class PixelMaskCollection:
             msg = f"Expected a list or a dictionary, got {type(masks)}."
             raise TypeError(msg)
 
-        if not masks:
-            msg = "A PixelMaskCollection should contain at least one mask."
-            raise ValueError(msg)
+        # if not masks:
+        #     msg = "A PixelMaskCollection should contain at least one mask."
+        #     raise ValueError(msg)
 
         if isinstance(masks, list):
             masks = self._convert_list_to_dict(masks)
@@ -218,8 +218,13 @@ class PixelMaskCollection:
             PixelMask: A new `PixelMask` instance representing the combined mask.
 
         Raises:
+            ValueError: If the PixelMaskCollection is empty.
             ValueError: If an unsupported method is provided.
         """
+        if not self.masks:
+            msg = "Cannot combine masks: the PixelMaskCollection is empty."
+            raise ValueError(msg)
+
         if method not in ("sum", "product"):
             msg = f"Unsupported method: {method}. Use 'sum' or 'product'."
             raise ValueError(msg)
@@ -271,12 +276,17 @@ class PixelMaskCollection:
             A dictionary mapping each mask's key (label or index) to the resulting masked data.
 
         Raises:
+            ValueError: If the PixelMaskCollection is empty.
             ValueError: If a label is passed as a keyword argument.
             ValueError:
                 If label_format or additional keyword arguments are provided when the input data is a numpy array.
             ValueError: If provided label format does not contain '{mask_label}'.
             TypeError: If provided data is not an array, EITData, or PixelMap.
         """
+        if not self.masks:
+            msg = "Cannot apply masks: the PixelMaskCollection is empty."
+            raise ValueError(msg)
+
         if "label" in kwargs:
             msg = "Cannot pass 'label' as a keyword argument to `apply()`. Use 'label_format' instead."
             raise ValueError(msg)
