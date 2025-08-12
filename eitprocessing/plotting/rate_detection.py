@@ -19,9 +19,9 @@ class RateDetectionPlotting:
     ```python
     >>> rd = RateDetection("adult")
     >>> captures = {}
-    >>> estimated_respiratory_rate, estimated_heart_rate = rd.detect_respiratory_heart_rate(eit_data, captures=captures)
+    >>> rr, hr = rd.apply(eit_data, captures=captures)
     >>> fig = rd.plotting(**captures)
-    >>> fig.savefig(...)
+    >>> fig.savefig("rate_detection.png")  # Save the figure to a file
     ```
     """
 
