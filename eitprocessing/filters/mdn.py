@@ -10,6 +10,7 @@ from scipy import signal
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.filters import TimeDomainFilter
+from eitprocessing.utils import _CaptureFunc, make_capture
 
 MINUTE = 60
 NOISE_FREQUENCY_LIMIT: float = 220 / MINUTE
@@ -22,8 +23,7 @@ UPPER_HEART_RATE_LIMIT: float = 210 / MINUTE
 T = TypeVar("T", bound=np.ndarray | ContinuousData | EITData)
 
 
-class MISSING:
-    """Sentinel value to indicate that an argument was not provided."""
+MISSING = object()
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -93,8 +93,8 @@ class MDNFilter(TimeDomainFilter):
     def apply(  # pyright: ignore[reportInconsistentOverload]
         self,
         input_data: T,
-        sample_frequency: float | type[MISSING] = MISSING,
-        axis: int | type[MISSING] = MISSING,
+        sample_frequency: float | object = MISSING,
+        axis: int | object = MISSING,
         captures: dict | None = None,
         **kwargs,
     ) -> T:
@@ -113,7 +113,9 @@ class MDNFilter(TimeDomainFilter):
                 number of harmonics and the frequency bands used for filtering.
             **kwargs: Additional keyword arguments to pass to the ContinuousData or EITData object (e.g., `label`).
         """
-        data: np.ndarray
+        capture = make_capture(captures)
+        capture("low_pass_frequency", self.noise_frequency_limit)
+        capture("unfiltered_data", input_data)
 
         sample_frequency_, axis_, data = self._validate_arguments(
             input_data=input_data, sample_frequency=sample_frequency, axis=axis
@@ -121,13 +123,10 @@ class MDNFilter(TimeDomainFilter):
 
         # Ensure the data is filtered up to the point where lower_limit would be larger than the noise frequency limit
         n_harmonics = math.floor((self.noise_frequency_limit + self.notch_distance) / self.heart_rate)
-
-        if captures is not None:
-            captures["n_harmonics"] = n_harmonics
-            captures["frequency_bands"] = []
+        capture("n_harmonics", n_harmonics)
 
         for harmonic in range(1, n_harmonics + 1):
-            data = self._filter_harmonic_with_bandstop(data, harmonic, axis_, sample_frequency_, captures)
+            data = self._filter_harmonic_with_bandstop(data, harmonic, axis_, sample_frequency_, capture)
 
         # Filter everything above noise limit
         sos = signal.butter(
@@ -140,6 +139,7 @@ class MDNFilter(TimeDomainFilter):
         new_data = signal.sosfiltfilt(sos, data, axis_)
 
         if isinstance(input_data, np.ndarray):
+            capture("filtered_data", new_data)
             return new_data
 
         # TODO: Replace with input_data.update(...) when implemented
@@ -152,47 +152,56 @@ class MDNFilter(TimeDomainFilter):
         elif isinstance(return_object, EITData):
             return_object.pixel_impedance = new_data
 
+        capture("filtered_data", return_object)
         return return_object
 
     def _validate_arguments(
         self,
         input_data: np.ndarray | ContinuousData | EITData,
-        sample_frequency: float | type[MISSING],
-        axis: int | type[MISSING],
+        sample_frequency: float | object,
+        axis: int | object,
     ) -> tuple[float, int, np.ndarray]:
         if isinstance(input_data, ContinuousData | EITData):
             if sample_frequency is not MISSING:
                 msg = "Sample frequency should not be provided when using ContinuousData or EITData."
                 raise ValueError(msg)
 
-            # TODO: remove when sample_frequency is no longer able to be None
-            sample_frequency_ = cast("float", input_data.sample_frequency)
-
             if axis is not MISSING:
                 msg = "Axis should not be provided when using ContinuousData or EITData."
                 raise ValueError(msg)
 
-            axis_ = 0
-
         if isinstance(input_data, ContinuousData):
             data = input_data.values
+            sample_frequency_ = cast("float", input_data.sample_frequency)
+            axis_ = 0
         elif isinstance(input_data, EITData):
             data = input_data.pixel_impedance
+            sample_frequency_ = cast("float", input_data.sample_frequency)
+            axis_ = 0
         elif isinstance(input_data, np.ndarray):
             data = input_data
             axis_ = DEFAULT_AXIS if axis is MISSING else axis
-            sample_frequency_ = sample_frequency
+            axis_ = cast("int", axis_)
+            if sample_frequency is MISSING:
+                msg = "Sample frequency must be provided when using a numpy array."
+                raise ValueError(msg)
+            sample_frequency_: float = cast("float", sample_frequency)
         else:
             msg = f"Invalid input data type ({type(input_data)}). Must be a numpy array, ContinuousData, or EITData."
             raise TypeError(msg)
 
-        if not sample_frequency_ or sample_frequency_ is MISSING:
+        if not sample_frequency_:
             msg = "Sample frequency must be provided."
             raise ValueError(msg)
         return sample_frequency_, axis_, data
 
     def _filter_harmonic_with_bandstop(
-        self, data_: np.ndarray, harmonic: int, axis: int, sample_frequency: float, captures: dict | None
+        self,
+        data_: np.ndarray,
+        harmonic: int,
+        axis: int,
+        sample_frequency: float,
+        capture: _CaptureFunc,
     ) -> np.ndarray:
         lower_limit = self.heart_rate * harmonic - self.notch_distance
         upper_limit = self.heart_rate * harmonic + self.notch_distance
@@ -209,7 +218,6 @@ class MDNFilter(TimeDomainFilter):
             output="sos",
         )
 
-        if captures is not None:
-            captures["frequency_bands"].append((lower_limit, upper_limit))
+        capture("frequency_bands", (lower_limit, upper_limit), append_to_list=True)
 
         return signal.sosfiltfilt(sos, data_, axis=axis)
