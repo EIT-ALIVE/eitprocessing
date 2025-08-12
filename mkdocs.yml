@@ -48,6 +48,7 @@ nav:
       - installation.md
       - Example Notebooks:
         - examples/notebooks/test_ratedetection.ipynb
+        - examples/notebooks/test_plot_filter_results.ipynb
   - API Documentation:
       - api/loading.md
       - Data Containers:
@@ -78,6 +79,7 @@ nav:
       - Plotting:
         - Rate Detection: api/plotting/rate_detection.md
         - PixelMap: api/plotting/pixelmap.md
+        - Filter: api/plotting/filter.md
   - About:
       - Contributing: contributing_doc.md
       - Code of Conduct: code_of_conduct_doc.md
