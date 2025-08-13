@@ -337,7 +337,14 @@ def test_apply_to_eitdata_branch():
     eit_data_mock.pixel_impedance = np.array([[1.0, 2.0], [3.0, 4.0]])
 
     # Ensure .apply() on a PixelMask returns an EITData instance (or mock)
-    def mock_apply(self, data, **kwargs):
+    def mock_apply(
+        _self: "PixelMaskCollection",
+        _data: "EITData | np.ndarray | PixelMap",
+        *,
+        _label: str | None = None,
+        **_kwargs: object,
+    ) -> EITData:
+        """Mock apply method for PixelMaskCollection."""
         return MagicMock(spec=EITData)
 
     # Patch PixelMask.apply for this test
