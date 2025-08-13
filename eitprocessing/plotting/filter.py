@@ -17,7 +17,7 @@ MISSING = object()
 
 @dataclass(frozen=True)
 class FilterPlotting:
-    """Utility class for plotting the effects of freqency filtering."""
+    """Utility class for plotting the effects of frequency filtering."""
 
     @classmethod
     def plot_results(
