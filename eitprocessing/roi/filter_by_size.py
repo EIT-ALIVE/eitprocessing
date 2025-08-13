@@ -51,10 +51,7 @@ class FilterROIBySize:
             case 1 | 2:
                 return ndi.generate_binary_structure(2, connectivity)
             case int():  # another integer
-                msg = (
-                    f"Unsupported connectivity value: {connectivity}."
-                    " Must be 1 or 2, or input a custom structure as array."
-                )
+                msg = f"Unsupported connectivity value: {connectivity}. Must be 1, 2 or a custom structure array."
                 raise ValueError(msg)
             case _:
                 msg = f"Unsupported connectivity type: {type(connectivity)}. Must be an integer or numpy array."
