@@ -99,7 +99,7 @@ class MDNFilter(TimeDomainFilter):
         captures: dict | None = None,
         **kwargs,
     ) -> T:
-        """Filter data using multiple multiple digital notch filters.
+        """Filter data using multiple digital notch filters.
 
         Args:
             input_data: The data to filter. Can be a numpy array, ContinuousData, or EITData.
