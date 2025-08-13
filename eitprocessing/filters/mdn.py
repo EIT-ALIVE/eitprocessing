@@ -35,8 +35,8 @@ class MDNFilter(TimeDomainFilter):
     ± the notch distance. This is repeated for every harmonic of the heart rate below the noise
     frequency limit. Lastly, a low pass filter removes noise above the noise frequency limit.
 
-    By default, the notch distance is set to 0.1̅6 Hz (10 BPM), and the noise frequency limit is
-    set to 3.̅6 Hz (220 BPM).
+    By default, the notch distance is set to 0.166... Hz (10 BPM), and the noise frequency limit is
+    set to 3.66... Hz (220 BPM).
 
     Warning:
         The respiratory and heart rate should be in provided Hz, not BPM. We recommend defining `MINUTE = 60` and using,
