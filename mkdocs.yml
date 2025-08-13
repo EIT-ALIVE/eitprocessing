@@ -48,6 +48,7 @@ nav:
       - installation.md
       - Example Notebooks:
         - examples/notebooks/test_ratedetection.ipynb
+        - examples/notebooks/test_plot_filter_results.ipynb
   - API Documentation:
       - api/loading.md
       - Data Containers:
@@ -65,7 +66,9 @@ nav:
         - Pixel Breath: api/features/pixel_breath.md
         - Rate Detection: api/features/rate_detection.md
         - Moving Average: api/features/moving_average.md
-      - api/filters.md
+      - Filters:
+        - Butterworth filters: api/filters/butterworth.md
+        - MDN filter: api/filters/mdn.md
       - Regions of Interest:
         - Regions of Interest: api/roi/roi.md
         - FilterROIBySize: api/roi/filterbysize.md
@@ -76,6 +79,7 @@ nav:
       - Plotting:
         - Rate Detection: api/plotting/rate_detection.md
         - PixelMap: api/plotting/pixelmap.md
+        - Filter: api/plotting/filter.md
   - About:
       - Contributing: contributing_doc.md
       - Code of Conduct: code_of_conduct_doc.md
@@ -123,7 +127,8 @@ plugins:
       glob:
         - __pycache__/*
   - autorefs
-  - mkdocs-jupyter
+  - mkdocs-jupyter:
+      ignore: ["**/ignore/*.ipynb", "**/ignore/*.py"]
   - mkdocstrings:
       handlers:
         python:
