@@ -45,18 +45,20 @@ class FilterROIBySize:
         )  # required with frozen objects
 
     def _parse_connectivity(self, connectivity: int | np.ndarray) -> np.ndarray:
-        if isinstance(connectivity, int):
-            if connectivity not in (1, 2):
+        match connectivity:
+            case np.ndarray():
+                return connectivity
+            case 1 | 2:
+                return ndi.generate_binary_structure(2, connectivity)
+            case int():  # another integer
                 msg = (
                     f"Unsupported connectivity value: {connectivity}."
                     " Must be 1 or 2, or input a custom structure as array."
                 )
                 raise ValueError(msg)
-            return ndi.generate_binary_structure(2, connectivity)
-        if isinstance(connectivity, np.ndarray):
-            return connectivity
-        msg = f"Unsupported connectivity type: {type(connectivity)}. Must be an integer or numpy array."
-        raise ValueError(msg)
+            case _:
+                msg = f"Unsupported connectivity type: {type(connectivity)}. Must be an integer or numpy array."
+                raise ValueError(msg)
 
     def apply(self, mask: PixelMask) -> PixelMask:
         """Identify connected regions in a PixelMask, filter them by size, and return a combined mask.
