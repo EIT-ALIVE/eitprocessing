@@ -64,6 +64,9 @@ class MDNFilter(TimeDomainFilter):
                 "Make sure to use the correct unit (Hz, not BPM)."
             )
             warnings.warn(msg, UserWarning, stacklevel=2)
+        if self.respiratory_rate <= 0:
+            msg = f"The provided respiratory rate ({self.respiratory_rate:.2f}) must be positive."
+            raise ValueError(msg)
 
         if self.heart_rate > UPPER_HEART_RATE_LIMIT:
             msg = (
@@ -72,6 +75,9 @@ class MDNFilter(TimeDomainFilter):
                 "Make sure this is correct, and to use the correct unit."
             )
             warnings.warn(msg, UserWarning, stacklevel=2)
+        if self.heart_rate <= 0:
+            msg = f"The provided heart rate ({self.heart_rate:.2f}) must be positive."
+            raise ValueError(msg)
 
         if self.respiratory_rate > self.heart_rate:
             msg = (

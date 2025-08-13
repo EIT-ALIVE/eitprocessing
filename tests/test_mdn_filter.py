@@ -84,6 +84,22 @@ def test_heart_rate_above_limits():
         )
 
 
+def test_negative_respiratory_rate():
+    with pytest.raises(ValueError, match=r"The provided respiratory rate \(.*\) must be positive."):
+        _ = MDNFilter(
+            respiratory_rate=-1 / MINUTE,
+            heart_rate=80 / MINUTE,
+        )
+
+
+def test_negative_heart_rate():
+    with pytest.raises(ValueError, match=r"The provided heart rate \(.*\) must be positive."):
+        _ = MDNFilter(
+            respiratory_rate=10 / MINUTE,
+            heart_rate=-80 / MINUTE,
+        )
+
+
 def test_respiratory_rate_higher_than_heart_rate():
     with pytest.raises(ValueError, match=r"The respiratory rate \(.* Hz\) is higher than the heart rate \(.* Hz\)"):
         _ = MDNFilter(
