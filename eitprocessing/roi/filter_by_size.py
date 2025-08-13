@@ -91,7 +91,7 @@ class FilterROIBySize:
         for region_label in range(1, num_features + 1):
             region = labeled_array == region_label
             if np.sum(region) >= self.min_region_size:
-                mask_collection = mask_collection.add(PixelMask(region, suppress_value_range_error=True))
+                mask_collection = mask_collection.add(PixelMask(region))
 
         if not mask_collection.masks:
             msg = (
