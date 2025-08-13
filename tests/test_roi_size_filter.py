@@ -9,7 +9,7 @@ from eitprocessing.roi.filter_by_size import FilterROIBySize
 def test_basic_region_selection():
     arr = np.full((5, 5), np.nan)
     arr[1:4, 1:4] = True
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
     selector = FilterROIBySize(min_region_size=5, connectivity=1)
     result = selector.apply(mask)
     expected_mask = np.full(arr.shape, np.nan)
@@ -21,7 +21,7 @@ def test_region_smaller_than_threshold_is_excluded():
     arr = np.full((5, 5), np.nan)
     arr[0, 0:2] = True
     arr[2:4, 2:5] = True
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
     selector = FilterROIBySize(min_region_size=5, connectivity=1)
     result = selector.apply(mask)
     expected = np.zeros_like(arr, dtype=float)
@@ -33,7 +33,7 @@ def test_region_smaller_than_threshold_is_excluded():
 def test_no_regions_above_threshold_raises():
     arr = np.full((4, 4), np.nan)
     arr[0, 0] = True
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
     selector = FilterROIBySize(min_region_size=5, connectivity=1)
     with pytest.raises(RuntimeError, match="No regions found above min_region_size threshold"):
         selector.apply(mask)
@@ -43,7 +43,7 @@ def test_custom_connectivity():
     arr = np.full((3, 3), np.nan)
     arr[0, 0] = True
     arr[1, 1] = True
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
 
     # Default (1-connectivity) — should raise
     selector_default = FilterROIBySize(min_region_size=2, connectivity=1)
@@ -64,7 +64,7 @@ def test_custom_connectivity():
 
 def test_empty_mask_raises():
     arr = np.full((4, 4), np.nan)
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
     selector = FilterROIBySize(min_region_size=1, connectivity=1)
     with pytest.raises(RuntimeError, match="No regions found above min_region_size threshold"):
         selector.apply(mask)
@@ -83,7 +83,7 @@ def test_multiple_large_regions_are_all_included():
     arr = np.full((6, 6), np.nan)
     arr[0:2, 0:2] = True
     arr[4:6, 4:6] = True
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
     selector = FilterROIBySize(min_region_size=4, connectivity=1)
     result = selector.apply(mask)
     assert np.sum(~np.isnan(result.mask)) == 8
@@ -91,7 +91,7 @@ def test_multiple_large_regions_are_all_included():
 
 def test_all_true_mask_returns_full_mask():
     arr = np.ones((3, 3), dtype=bool)
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
     selector = FilterROIBySize(min_region_size=1, connectivity=1)
     result = selector.apply(mask)
     assert np.all(result.mask == 1)
@@ -107,7 +107,7 @@ def test_edge_connected_region():
     arr[-1, :] = True  # bottom edge
     arr[:, 0] = True  # left edge
     arr[:, -1] = True  # right edge
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
     selector = FilterROIBySize(min_region_size=16, connectivity=1)
     result = selector.apply(mask)
     # There are 16 edge pixels in a 5x5 array (corners counted only once)
@@ -117,7 +117,7 @@ def test_edge_connected_region():
 def test_min_pixels_threshold_variation():
     arr = np.full((5, 5), np.nan)
     arr[1:3, 1:3] = True
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
     selector = FilterROIBySize(min_region_size=4, connectivity=1)
     result = selector.apply(mask)
     assert np.sum(~np.isnan(result.mask)) == 4
@@ -130,7 +130,7 @@ def test_touching_regions_are_separated():
     arr = np.full((5, 5), np.nan)
     arr[1:3, 1:3] = True
     arr[3:4, 3:5] = True
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
 
     # Step 1: Check intermediate labeling for 1-connectivity
     binary_array = ~np.isnan(mask.mask)
@@ -146,7 +146,7 @@ def test_touching_regions_are_separated():
 
     # Step 2: Check intermediate labeling for 2-connectivity
     structure2 = np.ones((3, 3), dtype=int)  # 2-connectivity
-    labeled_array2, num_features2 = ndi.label(binary_array, structure=structure2)
+    _, num_features2 = ndi.label(binary_array, structure=structure2)
     assert num_features2 == 1, f"Expected 1 region for 2-connectivity, got {num_features2}"
 
     selector8 = FilterROIBySize(min_region_size=6, connectivity=2)
@@ -158,7 +158,7 @@ def test_structure_input_variants():
     """Test that selector.connectivity is the same for 1 and the equivalent custom array."""
     arr = np.full((4, 4), np.nan)
     arr[1:3, 1:3] = True
-    mask = PixelMask(arr, keep_zeros=True)
+    mask = PixelMask(arr)
 
     # Integer
     selector_int = FilterROIBySize(min_region_size=4, connectivity=1)
@@ -176,8 +176,6 @@ def test_structure_input_variants():
 
 
 def test_invalid_connectivity_none_raises():
-    arr = np.full((4, 4), np.nan)
-    arr[1:3, 1:3] = True
     with pytest.raises(
         ValueError, match="Unsupported connectivity type: <class 'NoneType'>. Must be an integer or numpy array."
     ):
@@ -185,7 +183,5 @@ def test_invalid_connectivity_none_raises():
 
 
 def test_invalid_connectivity_value_raises():
-    arr = np.full((4, 4), np.nan)
-    arr[1:3, 1:3] = True
     with pytest.raises(ValueError, match="Unsupported connectivity value: 3."):
         FilterROIBySize(min_region_size=4, connectivity=3)
