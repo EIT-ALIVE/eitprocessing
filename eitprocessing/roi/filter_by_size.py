@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 from typing import Literal
 
@@ -93,11 +94,13 @@ class FilterROIBySize:
                 mask_collection = mask_collection.add(PixelMask(region))
 
         if not mask_collection.masks:
-            msg = (
-                "No regions found above min_region_size threshold. "
-                "This can occur if your input mask is empty, all regions are too small,"
-                " or your connectivity is too restrictive."
-            )
-            raise RuntimeError(msg)
+            msg = "No regions found above min_region_size threshold."
+            exc = RuntimeError(msg)
+            if sys.version_info >= (3, 11):
+                exc.add_note(
+                    "This can occur if your input mask is empty, all regions are too small,"
+                    " or your connectivity is too restrictive."
+                )
+            raise exc
 
         return mask_collection.combine()
