@@ -58,7 +58,7 @@ class PixelMaskCollection:
 
     def __init__(
         self,
-        masks: dict[Hashable, PixelMask] | frozendict[Hashable, PixelMask] | list[PixelMask],
+        masks: dict[Hashable, PixelMask] | frozendict[Hashable, PixelMask] | list[PixelMask] | None = None,
         *,
         label: str | None = None,
     ):
@@ -66,41 +66,52 @@ class PixelMaskCollection:
         object.__setattr__(self, "label", label)
 
     def _validate_and_convert_input_masks(
-        self, masks: dict[Hashable, PixelMask] | frozendict[Hashable, PixelMask] | list[PixelMask]
+        self, masks: dict[Hashable, PixelMask] | frozendict[Hashable, PixelMask] | list[PixelMask] | None
     ) -> frozendict[Hashable, PixelMask]:
         """Validate the input masks and convert to a frozendict.
 
         The input masks are valid if:
+        - The input is empty (allowed — empty collection).
         - The input is a list with all labelled or all anonymous PixelMask instances.
         - The input is a dictionary where each PixelMask instance's label matches the key.
         """
-        # Check for type before checking for length, e.g., and empty string should raise a TypeError, not ValueError
+        if masks is None:
+            return frozendict()
+
+        # Check for type first
         if not isinstance(masks, (list, dict, frozendict)):
             msg = f"Expected a list or a dictionary, got {type(masks)}."
             raise TypeError(msg)
 
+        # Allow empty collections
         if not masks:
-            msg = "A PixelMaskCollection should contain at least one mask."
-            raise ValueError(msg)
+            return frozendict()
 
+        # Convert list -> dict if needed
         if isinstance(masks, list):
             masks = self._convert_list_to_dict(masks)
 
+        # Validate PixelMask instances
         if any(not isinstance(mask, PixelMask) for mask in masks.values()):
             msg = "All items must be instances of PixelMask."
             raise TypeError(msg)
 
+        # Label consistency checks
         all_none_labels = all(mask.label is None for mask in masks.values())
         all_str_labels = all(isinstance(mask.label, str) for mask in masks.values())
+
         if not (all_none_labels or all_str_labels):
             msg = "Cannot mix labelled and anonymous masks in a collection."
             raise ValueError(msg)
+
         if all_none_labels and set(masks.keys()) != set(range(len(masks))):
             msg = "Anonymous masks should be indexed with consecutive integers starting from 0."
             raise ValueError(msg)
+
         if all_str_labels and any(mask.label != key for key, mask in masks.items()):
             msg = "Keys should match the masks' label."
             raise KeyError(msg)
+
         return frozendict(masks)
 
     def _convert_list_to_dict(self, masks: list[PixelMask]) -> dict[Hashable, PixelMask]:
@@ -218,8 +229,13 @@ class PixelMaskCollection:
             PixelMask: A new `PixelMask` instance representing the combined mask.
 
         Raises:
+            ValueError: If the PixelMaskCollection is empty.
             ValueError: If an unsupported method is provided.
         """
+        if not self.masks:
+            msg = "Cannot combine masks: the PixelMaskCollection is empty."
+            raise ValueError(msg)
+
         if method not in ("sum", "product"):
             msg = f"Unsupported method: {method}. Use 'sum' or 'product'."
             raise ValueError(msg)
@@ -271,12 +287,17 @@ class PixelMaskCollection:
             A dictionary mapping each mask's key (label or index) to the resulting masked data.
 
         Raises:
+            ValueError: If the PixelMaskCollection is empty.
             ValueError: If a label is passed as a keyword argument.
             ValueError:
                 If label_format or additional keyword arguments are provided when the input data is a numpy array.
             ValueError: If provided label format does not contain '{mask_label}'.
             TypeError: If provided data is not an array, EITData, or PixelMap.
         """
+        if not self.masks:
+            msg = "Cannot apply masks: the PixelMaskCollection is empty."
+            raise ValueError(msg)
+
         if "label" in kwargs:
             msg = "Cannot pass 'label' as a keyword argument to `apply()`. Use 'label_format' instead."
             raise ValueError(msg)
