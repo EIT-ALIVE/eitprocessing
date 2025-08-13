@@ -46,7 +46,7 @@ class MDNFilter(TimeDomainFilter):
       respiratory_rate: the respiratory rate of the subject in Hz
       heart_rate: the heart rate of the subject in Hz
       noise_frequency_limit: the highest frequency to filter in Hz
-      notch_distance: the half width of the band stop filters frequency range
+      notch_distance: the half width of the band stop filter's frequency range
     """
 
     respiratory_rate: float
