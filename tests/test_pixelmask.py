@@ -227,6 +227,13 @@ def test_pixelmask_add_masks():
     assert np.array_equal(pm3.mask, np.array([[1, np.nan, 1, 1], [0.2, 0.8, 1, np.nan]]), equal_nan=True)
 
 
+def test_pixelmask_subtract():
+    pm1 = PixelMask([[0, 0, 1, 1], [0.2, 0.3, 0.6, 0.5]], suppress_zero_conversion_warning=True)
+    pm2 = PixelMask([[1, 0, 0, 1], [0.1, 0.5, 0.6, 0]], suppress_zero_conversion_warning=True)
+    pm3 = pm1 - pm2
+    assert np.array_equal(pm3.mask, np.array([[np.nan, np.nan, 1, np.nan], [0.1, np.nan, np.nan, 0.5]]), equal_nan=True)
+
+
 def test_predefined_layer_masks():
     assert np.all(LAYER_1_MASK.mask[:8, :] == 1.0)
     assert np.all(np.isnan(LAYER_1_MASK.mask[8:, :]))

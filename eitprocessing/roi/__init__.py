@@ -42,10 +42,10 @@ class PixelMask:
     """Mask pixels by selecting or weighing them individually.
 
     A mask is a 2D array with a value for each pixel. Most often, this value is NaN (`np.nan`, 'not a number') or 1, and
-    less commonly a value between 0 and 1. NaN values indicate the pixel is not part of the region of interest, e.g.,
-    falls outside the functional lung space, or is not part of the ventral region of the lung. A value of 1 indicates
-    the pixel is included in the region of interest. A value between 0 and 1 indicates that the pixel is part of the
-    region of interest, but is weighted, e.g., for a weighted summation of pixel values, or because the pixel is
+    less commonly a value in the range 0 to 1. NaN values indicate the pixel is not part of the region of interest,
+    e.g., falls outside the functional lung space or is not part of the ventral region of the lung. A value of 1
+    indicates the pixel is included in the region of interest. A value between 0 and 1 indicates that the pixel is part
+    of the region of interest, but is weighted, e.g., for a weighted summation of pixel values, or because the pixel is
     considered part of multiple regions of interest.
 
     You can initialize a mask using an array or nested list. At initialization, the mask is converted to a floating
@@ -53,7 +53,8 @@ class PixelMask:
 
     By default, 0-values are converted tot NaN. You can override this behaviour with `keep_zeros=True`. You can
     therefore create a mask by supplying boolean values, where `True` indicates the pixel is part of the region of
-    interest (`True` equals 1), and `False` indicates it is not (`False` equals 0, and will be converted to NaN).
+    interest (`True` equals 1), and `False` indicates it is not (`False` equals 0, and will by default be converted to
+    NaN).
 
     Since masking is not intended for other operations, masking values that are negative or higher than 1 will result in
     a `ValueError`. You can override this check with `suppress_value_range_error=True`.
@@ -62,8 +63,19 @@ class PixelMask:
     to the last two dimensions of the data, which must match the shape of the mask. The mask is applied by multiplying
     each pixel in the dataset by the corresponding masking value. Multiplication by NaN always results in NaN.
 
-    Masks can be combined by either adding or multiplying them. Adding masks results in a mask that includes all pixels
-    that are in either mask. Multiplying masks results in a mask that includes only pixels that are in both masks.
+    Adding, subtracting and multiplying:
+        Masks can be combined by adding, subtracting or multiplying them.
+
+        Adding masks results in a mask that includes
+        all pixels that are in either mask. For non-weighted masks this is similar to a union of sets. Weighted pixels
+        are added and clipped at 1.
+
+        Subtracting masks results in the pixels that are part of the second masks being
+        removed from the first mask. For non-weighted masks this is similar to a set difference.
+
+        Multiplying masks
+        results in a mask that includes only pixels that are in both masks. For non-weighted masks this is similar to an
+        intersection of sets.
 
     Example:
     ```python
@@ -209,6 +221,10 @@ class PixelMask:
         new_mask = np.clip(np.nansum([self.mask, other.mask], axis=0), a_min=None, a_max=1)
         new_mask[new_mask == 0] = np.nan
         return dataclasses.replace(self, mask=new_mask)
+
+    def __sub__(self, other: Self) -> Self:
+        mask = (np.nan_to_num(self.mask, nan=0) - np.nan_to_num(other.mask, nan=0)).astype(float).clip(min=0)
+        return dataclasses.replace(self, mask=mask, keep_zeros=False)
 
 
 LAYER_1_MASK = PixelMask(np.concat([np.ones((8, 32)), np.full((24, 32), np.nan)], axis=0))
