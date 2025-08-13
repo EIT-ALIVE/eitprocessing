@@ -31,9 +31,9 @@ MISSING = object()
 class MDNFilter(TimeDomainFilter):
     """Multiple Digital Notch filter.
 
-    This filter is used to remove heart rate noise from data. A band stop filter removes heart rate
-    ± the notch distance. This is repeated for every harmonic of the heart rate below the noise
-    frequency limit. Lastly, a low pass filter removes noise above the noise frequency limit.
+    This filter is used to remove heart rate noise from EIT data. A band stop filter removes heart rate ± the notch
+    distance. This is repeated for every harmonic of the heart rate below the noise frequency limit. Lastly, a low pass
+    filter removes noise above the noise frequency limit.
 
     By default, the notch distance is set to 0.166... Hz (10 BPM), and the noise frequency limit is
     set to 3.66... Hz (220 BPM).
@@ -41,6 +41,11 @@ class MDNFilter(TimeDomainFilter):
     Warning:
         The respiratory and heart rate should be in provided Hz, not BPM. We recommend defining `MINUTE = 60` and using,
         e.g., `heart_rate=80 / MINUTE` to manually set the heart rate to 80 BPM.
+
+    Warning:
+        This filter was designed to remove heart rate noise from EIT data, and testing in a limited number of cases. The
+        filter may not work as expected for other data types, different cohorts or non-traditional ventilation modes.
+        Use at your own discretion.
 
     Args:
       respiratory_rate: the respiratory rate of the subject in Hz
