@@ -101,7 +101,9 @@ def test_negative_heart_rate():
 
 
 def test_respiratory_rate_higher_than_heart_rate():
-    with pytest.raises(ValueError, match=r"The respiratory rate \(.* Hz\) is higher than the heart rate \(.* Hz\)"):
+    with pytest.raises(
+        ValueError, match=r"The respiratory rate \(.* Hz\) is equal to or higher than the heart rate \(.* Hz\)"
+    ):
         _ = MDNFilter(
             respiratory_rate=UPPER_RESPIRATORY_RATE_LIMIT - 0.01,
             heart_rate=UPPER_RESPIRATORY_RATE_LIMIT - 0.02,
@@ -196,6 +198,14 @@ def test_sample_frequency_not_provided():
 
     with pytest.raises(ValueError, match="Sample frequency must be provided."):
         mdn_filter.apply(signal, sample_frequency=None)
+
+
+def test_respiratory_rate_and_heart_rate_equal():
+    common_rate = 60 / MINUTE
+    with pytest.raises(
+        ValueError, match=r"The respiratory rate \(.* Hz\) is equal to or higher than the heart rate \(.* Hz\)"
+    ):
+        _ = MDNFilter(respiratory_rate=common_rate, heart_rate=common_rate)
 
 
 def test_close_respiratory_and_heart_rate(signal_factory: Callable):

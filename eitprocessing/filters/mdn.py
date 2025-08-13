@@ -79,9 +79,9 @@ class MDNFilter(TimeDomainFilter):
             msg = f"The provided heart rate ({self.heart_rate:.2f}) must be positive."
             raise ValueError(msg)
 
-        if self.respiratory_rate > self.heart_rate:
+        if self.respiratory_rate >= self.heart_rate:
             msg = (
-                f"The respiratory rate ({self.respiratory_rate:.1f} Hz) is higher than the heart "
+                f"The respiratory rate ({self.respiratory_rate:.1f} Hz) is equal to or higher than the heart "
                 f"rate ({self.heart_rate:.1f} Hz)."
             )
             raise ValueError(msg)
