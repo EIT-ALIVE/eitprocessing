@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -320,6 +321,40 @@ def test_apply_with_extra_kwargs_on_array_raises(labelled_boolean_mask: Callable
         _ = collection.apply(array, sample_frequency="test")
 
 
+def test_apply_unsupported_type():
+    pm = PixelMask([[True, False], [False, True]])
+    collection = PixelMaskCollection([pm])
+
+    # Passing a string should trigger the `case _:` TypeError
+    with pytest.raises(TypeError) as excinfo:
+        collection.apply("not a valid type")
+    assert "Unsupported data type" in str(excinfo.value)
+
+
+def test_apply_to_eitdata_branch():
+    # Create a MagicMock that is recognized as an instance of EITData
+    eit_data_mock = MagicMock(spec=EITData)
+    eit_data_mock.pixel_impedance = np.array([[1.0, 2.0], [3.0, 4.0]])
+
+    # Ensure .apply() on a PixelMask returns an EITData instance (or mock)
+    def mock_apply(self, data, **kwargs):
+        return MagicMock(spec=EITData)
+
+    # Patch PixelMask.apply for this test
+    PixelMask.apply = mock_apply
+
+    pm1 = PixelMask([[True, False], [False, True]], label="mask1")
+    pm2 = PixelMask([[True, True], [False, False]], label="mask2")
+
+    collection = PixelMaskCollection([pm1, pm2])
+
+    result = collection.apply(eit_data_mock)
+
+    assert isinstance(result, dict)
+    assert set(result.keys()) == {"mask1", "mask2"}
+    assert all(isinstance(v, EITData) for v in result.values())
+
+
 def test_empty_collection_behavior():
     # Allow emtpy collection initialization
     _ = PixelMaskCollection()  # No masks provided
@@ -488,3 +523,22 @@ def test_combine_weighted():
     multiplied_mask = collection.combine(method="product", label="combined_product")
     assert multiplied_mask.label == "combined_product"
     assert np.array_equal(multiplied_mask.mask, np.array([[np.nan, 0.1], [0.06, 0.2]]), equal_nan=True)
+
+
+def test_combine_method_argument():
+    pm1 = PixelMask([[True, False], [False, True]])
+    pm2 = PixelMask([[True, True], [False, False]])
+    collection = PixelMaskCollection([pm1, pm2])
+
+    # Test sum method
+    summed = collection.combine(method="sum")
+    assert isinstance(summed, PixelMask)
+
+    # Test product method
+    product = collection.combine(method="product")
+    assert isinstance(product, PixelMask)
+
+    # Test unsupported method raises ValueError
+    with pytest.raises(ValueError) as excinfo:
+        collection.combine(method="invalid")
+    assert "Unsupported method" in str(excinfo.value)
