@@ -168,7 +168,7 @@ def test_create_threshold_mask():
     mask = pm.create_mask_from_threshold(1, comparator=np.greater)
     assert np.array_equal(mask.mask, [[np.nan, np.nan, np.nan, np.nan, 1.0]], equal_nan=True)
 
-    mask = pm.create_mask_from_threshold(1, absolute=True)
+    mask = pm.create_mask_from_threshold(1, use_magnitude=True)
     assert np.array_equal(mask.mask, [[1.0, 1.0, np.nan, 1.0, 1.0]], equal_nan=True)
 
     mask = pm.create_mask_from_threshold(1, comparator=np.less)
@@ -595,6 +595,7 @@ def test_set_pixelmap_plot_parameters():
     assert all(
         cls([[0]]).plotting.config.cmap == "Reds" and not cls([[0]]).plotting.config.colorbar
         for cls in _PLOT_CONFIG_REGISTRY
+        if not isinstance(cls, str)
     )
 
     reset_plot_config(PixelMap)
