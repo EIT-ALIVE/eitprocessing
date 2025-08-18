@@ -33,7 +33,8 @@ class HasPlottableConfig(Protocol):
     def _plot_config(self) -> Config: ...
 
 
-_PLOT_CONFIG_REGISTRY: dict[type[HasPlottableConfig], Config] = {
+_PLOT_CONFIG_REGISTRY: dict[type[HasPlottableConfig] | str, Config] = {
+    "default": PixelMapPlotConfig(),
     PixelMap: PixelMapPlotConfig(),
     TIVMap: TIVMapPlotConfig(),
     ODCLMap: ODCLMapPlotConfig(),
@@ -60,7 +61,7 @@ def get_plot_config(obj: HasPlottableConfig | type[HasPlottableConfig]) -> Confi
     type_ = cast("type[HasPlottableConfig]", type_)
 
     try:
-        return _PLOT_CONFIG_REGISTRY[type_]
+        return _PLOT_CONFIG_REGISTRY.get(type_, _PLOT_CONFIG_REGISTRY["default"])
     except KeyError as e:
         msg = f"No plot configuration registered for type {type_}."
         raise ValueError(msg) from e
