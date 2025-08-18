@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import warnings
-from dataclasses import dataclass, field
+from dataclasses import InitVar, dataclass, field
 from enum import auto
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
 import numpy as np
-from strenum import LowercaseStrEnum
+from strenum import LowercaseStrEnum  # TODO: EOL 3.10: replace with native StrEnum
 
 from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.continuousdata import ContinuousData
@@ -50,8 +50,9 @@ class EITData(DataContainer, SelectByTime):
     description: str = field(default="", compare=False, repr=False)
     name: str | None = field(default=None, compare=False, repr=False)
     pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
+    suppress_simulated_warning: InitVar[bool] = False
 
-    def __post_init__(self):
+    def __post_init__(self, suppress_simulated_warning: bool) -> None:
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
 
@@ -180,3 +181,4 @@ class Vendor(LowercaseStrEnum):
     SENTEC = auto()
     DRAGER = DRAEGER
     DRÄGER = DRAEGER  # noqa: PLC2401
+    SIMULATED = auto()
