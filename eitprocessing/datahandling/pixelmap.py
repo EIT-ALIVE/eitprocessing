@@ -522,6 +522,38 @@ class PixelMap:
         aggregated_values = aggregator(stacked, axis=0)
         return cls(values=aggregated_values, **return_attrs)
 
+    def to_boolean_array(self) -> np.ndarray:
+        """Convert the pixel map values to a boolean array.
+
+        NaN values are replaced with False, and the resulting array is cast to boolean.
+
+        Returns:
+            np.ndarray: A 2D numpy array of booleans, where NaN values are replaced with False.
+        """
+        return self.to_nan_nan_array(0, bool)
+
+    def to_integer_array(self) -> np.ndarray:
+        """Convert the pixel map values to an integer array.
+
+        NaN values are replaced with 0, and the resulting array is cast to integers.
+
+        Returns:
+            np.ndarray: A 2D numpy array of integers, where NaN values are replaced with 0.
+        """
+        return self.to_non_nan_array(0, int)
+
+    def to_non_nan_array(self, fill_value: float = 0.0, dtype: type | np.dtype = float) -> np.ndarray:
+        """Convert the pixel map values to a numpy array, replacing NaN with a fill value.
+
+        Args:
+            fill_value (float): The value to replace NaN values with. Defaults to 0.0.
+            dtype (type | np.dtype): The data type of the resulting array. Defaults to float.
+
+        Returns:
+            np.ndarray: A 2D numpy array with NaN values replaced by `fill_value` and cast to the specified `dtype`.
+        """
+        return np.nan_to_num(self.values, nan=fill_value).astype(dtype)
+
 
 @dataclass(frozen=True, init=False)
 class TIVMap(PixelMap):
