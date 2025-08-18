@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build and Test (uv)
 
 on:
   push:
@@ -30,12 +30,12 @@ jobs:
       EIT_PROCESSING_TEST_DATA: ${{ github.workspace }}/../eitprocessing_data/
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/install_eitprocessing
+      - uses: ./.github/actions/install_eitprocessing_uv
         with:
-          dependencies: testing
+          dependencies: --extra testing
           extract-data: true
           python-version: ${{ matrix.python-version }}
           token: ${{ secrets.GITHUB_TOKEN }}
           data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
       - name: Run pytest
-        run: pytest -v
+        run: uv run pytest -v
