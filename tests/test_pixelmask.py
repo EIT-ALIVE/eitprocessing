@@ -5,21 +5,7 @@ import pytest
 
 from eitprocessing.datahandling.pixelmap import PixelMap
 from eitprocessing.datahandling.sequence import Sequence
-from eitprocessing.roi import (
-    ANATOMICAL_LEFT_MASK,
-    ANATOMICAL_RIGHT_MASK,
-    DORSAL_MASK,
-    LAYER_1_MASK,
-    LAYER_2_MASK,
-    LAYER_3_MASK,
-    LAYER_4_MASK,
-    QUADRANT_1_MASK,
-    QUADRANT_2_MASK,
-    QUADRANT_3_MASK,
-    QUADRANT_4_MASK,
-    VENTRAL_MASK,
-    PixelMask,
-)
+from eitprocessing.roi import PixelMask, get_geometric_mask
 
 
 def test_pixelmask_init_with_boolean_array():
@@ -234,22 +220,47 @@ def test_pixelmask_subtract():
     assert np.array_equal(pm3.mask, np.array([[np.nan, np.nan, 1, np.nan], [0.1, np.nan, np.nan, 0.5]]), equal_nan=True)
 
 
-def test_predefined_layer_masks():
-    assert np.all(LAYER_1_MASK.mask[:8, :] == 1.0)
-    assert np.all(np.isnan(LAYER_1_MASK.mask[8:, :]))
+@pytest.mark.parametrize("shape", [(32, 1), (64, 1), (16, 1), (100, 1), (4, 1)])
+def test_predefined_layer_masks(shape: tuple[int, int]):
+    quarter_height = shape[0] // 4
+    first = slice(None, quarter_height)
+    second = slice(quarter_height, 2 * quarter_height)
+    third = slice(2 * quarter_height, 3 * quarter_height)
+    fourth = slice(3 * quarter_height, None)
+    layer1_mask = get_geometric_mask("layer 1", shape)
 
-    assert np.all(LAYER_2_MASK.mask[8:16, :] == 1.0)
-    assert np.all(np.isnan(LAYER_2_MASK.mask[:8, :]))
-    assert np.all(np.isnan(LAYER_2_MASK.mask[16, :]))
+    assert layer1_mask.label == "layer 1"
+    assert layer1_mask == get_geometric_mask("L1", shape)
+    assert get_geometric_mask("L1").label == "layer 1"
+    assert layer1_mask.shape == shape
 
-    assert np.all(LAYER_3_MASK.mask[16:24, :] == 1.0)
-    assert np.all(np.isnan(LAYER_3_MASK.mask[:16, :]))
-    assert np.all(np.isnan(LAYER_3_MASK.mask[24, :]))
+    assert np.all(layer1_mask.mask[first, :] == 1.0)
+    assert np.all(np.isnan(layer1_mask.mask[second, :]))
+    assert np.all(np.isnan(layer1_mask.mask[third, :]))
+    assert np.all(np.isnan(layer1_mask.mask[fourth, :]))
 
-    assert np.all(LAYER_4_MASK.mask[24:, :] == 1.0)
-    assert np.all(np.isnan(LAYER_4_MASK.mask[:24, :]))
+    layer2_mask = get_geometric_mask("layer 2", shape)
+    assert layer2_mask.label == "layer 2"
+    assert np.all(np.isnan(layer2_mask.mask[first, :]))
+    assert np.all(layer2_mask.mask[second, :] == 1.0)
+    assert np.all(np.isnan(layer2_mask.mask[third, :]))
+    assert np.all(np.isnan(layer2_mask.mask[fourth, :]))
 
-    assert np.array_equal((LAYER_1_MASK + LAYER_2_MASK + LAYER_3_MASK + LAYER_4_MASK).mask, np.ones((32, 32)))
+    layer3_mask = get_geometric_mask("layer 3", shape)
+    assert layer3_mask.label == "layer 3"
+    assert np.all(np.isnan(layer3_mask.mask[first, :]))
+    assert np.all(np.isnan(layer3_mask.mask[second, :]))
+    assert np.all(layer3_mask.mask[third, :] == 1.0)
+    assert np.all(np.isnan(layer3_mask.mask[fourth, :]))
+
+    layer4_mask = get_geometric_mask("layer 4", shape)
+    assert layer4_mask.label == "layer 4"
+    assert np.all(np.isnan(layer4_mask.mask[first, :]))
+    assert np.all(np.isnan(layer4_mask.mask[second, :]))
+    assert np.all(np.isnan(layer4_mask.mask[third, :]))
+    assert np.all(layer4_mask.mask[fourth, :] == 1.0)
+
+    assert np.array_equal((layer1_mask + layer2_mask + layer3_mask + layer4_mask).mask, np.ones(shape))
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore",
@@ -258,18 +269,27 @@ def test_predefined_layer_masks():
         )
         warnings.filterwarnings("ignore", message="All-NaN slice encountered", category=RuntimeWarning)
         assert np.array_equal(
-            (LAYER_1_MASK * LAYER_2_MASK * LAYER_3_MASK * LAYER_4_MASK).mask, np.full((32, 32), np.nan), equal_nan=True
+            (layer1_mask * layer2_mask * layer3_mask * layer4_mask).mask, np.full(shape, np.nan), equal_nan=True
         )
 
 
 def test_predefined_ventral_dorsal_masks():
-    assert np.all(VENTRAL_MASK.mask[:16, :] == 1.0)
-    assert np.all(np.isnan(VENTRAL_MASK.mask[16:, :]))
+    ventral_mask = get_geometric_mask("ventral", (32, 32))
+    assert ventral_mask.label == "ventral"
+    assert ventral_mask.shape == (32, 32)
+    assert ventral_mask == get_geometric_mask("V")
+    assert get_geometric_mask("V").label == "ventral"
 
-    assert np.all(DORSAL_MASK.mask[16:, :] == 1.0)
-    assert np.all(np.isnan(DORSAL_MASK.mask[:16, :]))
+    dorsal_mask = get_geometric_mask("dorsal", (32, 32))
+    assert dorsal_mask.label == "dorsal"
 
-    assert np.array_equal(np.ones((32, 32)), (VENTRAL_MASK + DORSAL_MASK).mask)
+    assert np.all(ventral_mask.mask[:16, :] == 1.0)
+    assert np.all(np.isnan(ventral_mask.mask[16:, :]))
+
+    assert np.all(dorsal_mask.mask[16:, :] == 1.0)
+    assert np.all(np.isnan(dorsal_mask.mask[:16, :]))
+
+    assert np.array_equal(np.ones((32, 32)), (ventral_mask + dorsal_mask).mask)
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore",
@@ -277,17 +297,24 @@ def test_predefined_ventral_dorsal_masks():
             category=UserWarning,
         )
         warnings.filterwarnings("ignore", message="All-NaN slice encountered", category=RuntimeWarning)
-        assert np.array_equal(np.full((32, 32), np.nan), (VENTRAL_MASK * DORSAL_MASK).mask, equal_nan=True)
+        assert np.array_equal(np.full((32, 32), np.nan), (ventral_mask * dorsal_mask).mask, equal_nan=True)
 
 
 def test_predefined_left_right_masks():
-    assert np.all(ANATOMICAL_RIGHT_MASK.mask[:, :16] == 1.0)
-    assert np.all(np.isnan(ANATOMICAL_RIGHT_MASK.mask[:, 16:]))
+    right_mask = get_geometric_mask("anatomical right", (32, 32))
 
-    assert np.all(ANATOMICAL_LEFT_MASK.mask[:, 16:] == 1.0)
-    assert np.all(np.isnan(ANATOMICAL_LEFT_MASK.mask[:, :16]))
+    assert right_mask.label == "anatomical right"
+    assert right_mask.shape == (32, 32)
 
-    assert np.array_equal(np.ones((32, 32)), (ANATOMICAL_RIGHT_MASK + ANATOMICAL_LEFT_MASK).mask)
+    assert np.all(right_mask.mask[:, :16] == 1.0)
+    assert np.all(np.isnan(right_mask.mask[:, 16:]))
+
+    left_mask = get_geometric_mask("anatomical left", (32, 32))
+    assert left_mask.label == "anatomical left"
+    assert np.all(left_mask.mask[:, 16:] == 1.0)
+    assert np.all(np.isnan(left_mask.mask[:, :16]))
+
+    assert np.array_equal(np.ones((32, 32)), (right_mask + left_mask).mask)
 
     with warnings.catch_warnings():
         warnings.filterwarnings(
@@ -296,31 +323,37 @@ def test_predefined_left_right_masks():
             category=UserWarning,
         )
         warnings.filterwarnings("ignore", message="All-NaN slice encountered", category=RuntimeWarning)
-        assert np.array_equal(
-            np.full((32, 32), np.nan), (ANATOMICAL_RIGHT_MASK * ANATOMICAL_LEFT_MASK).mask, equal_nan=True
-        )
+        assert np.array_equal(np.full((32, 32), np.nan), (right_mask * left_mask).mask, equal_nan=True)
 
 
 def test_predefined_quadrant_masks():
-    assert np.all(QUADRANT_1_MASK.mask[:16, :16] == 1.0)
-    assert np.all(np.isnan(QUADRANT_1_MASK.mask[16:, :]))
-    assert np.all(np.isnan(QUADRANT_1_MASK.mask[:, 16:]))
+    quadrant1_mask = get_geometric_mask("quadrant 1", (32, 32))
 
-    assert np.all(QUADRANT_2_MASK.mask[:16, 16:] == 1.0)
-    assert np.all(np.isnan(QUADRANT_2_MASK.mask[16:, :]))
-    assert np.all(np.isnan(QUADRANT_2_MASK.mask[:, :16]))
+    assert quadrant1_mask.label == "quadrant 1"
+    assert quadrant1_mask.shape == (32, 32)
+    assert quadrant1_mask == get_geometric_mask("Q1")
+    assert get_geometric_mask("Q1").label == "quadrant 1"
 
-    assert np.all(QUADRANT_3_MASK.mask[16:, :16] == 1.0)
-    assert np.all(np.isnan(QUADRANT_3_MASK.mask[:16, :]))
-    assert np.all(np.isnan(QUADRANT_3_MASK.mask[:, 16:]))
+    assert np.all(quadrant1_mask.mask[:16, :16] == 1.0)
+    assert np.all(np.isnan(quadrant1_mask.mask[16:, :]))
+    assert np.all(np.isnan(quadrant1_mask.mask[:, 16:]))
 
-    assert np.all(QUADRANT_4_MASK.mask[16:, 16:] == 1.0)
-    assert np.all(np.isnan(QUADRANT_4_MASK.mask[:16, :]))
-    assert np.all(np.isnan(QUADRANT_4_MASK.mask[:, :16]))
+    quadrant2_mask = get_geometric_mask("quadrant 2", (32, 32))
+    assert np.all(quadrant2_mask.mask[:16, 16:] == 1.0)
+    assert np.all(np.isnan(quadrant2_mask.mask[16:, :]))
+    assert np.all(np.isnan(quadrant2_mask.mask[:, :16]))
 
-    assert np.array_equal(
-        (QUADRANT_1_MASK + QUADRANT_2_MASK + QUADRANT_3_MASK + QUADRANT_4_MASK).mask, np.ones((32, 32))
-    )
+    quadrant3_mask = get_geometric_mask("quadrant 3", (32, 32))
+    assert np.all(quadrant3_mask.mask[16:, :16] == 1.0)
+    assert np.all(np.isnan(quadrant3_mask.mask[:16, :]))
+    assert np.all(np.isnan(quadrant3_mask.mask[:, 16:]))
+
+    quadrant4_mask = get_geometric_mask("quadrant 4", (32, 32))
+    assert np.all(quadrant4_mask.mask[16:, 16:] == 1.0)
+    assert np.all(np.isnan(quadrant4_mask.mask[:16, :]))
+    assert np.all(np.isnan(quadrant4_mask.mask[:, :16]))
+
+    assert np.array_equal((quadrant1_mask + quadrant2_mask + quadrant3_mask + quadrant4_mask).mask, np.ones((32, 32)))
 
     with warnings.catch_warnings():
         warnings.filterwarnings(
@@ -330,7 +363,7 @@ def test_predefined_quadrant_masks():
         )
         warnings.filterwarnings("ignore", message="All-NaN slice encountered", category=RuntimeWarning)
         assert np.array_equal(
-            (QUADRANT_1_MASK * QUADRANT_2_MASK * QUADRANT_3_MASK * QUADRANT_4_MASK).mask,
+            (quadrant1_mask * quadrant2_mask * quadrant3_mask * quadrant4_mask).mask,
             np.full((32, 32), np.nan),
             equal_nan=True,
         )
@@ -347,3 +380,26 @@ def test_pixelmask_immutability():
         pm.mask = np.array([[1, 0], [0, 1]])
 
     assert np.array_equal(pm.mask, original_mask, equal_nan=True)  # Ensure the mask is unchanged
+
+
+@pytest.mark.parametrize(
+    ("mask_name", "shape"),
+    [
+        ("ventral", (33, 32)),
+        ("dorsal", (33, 32)),
+        ("layer 1", (18, 16)),
+        ("layer 3", (15, 16)),
+        ("quadrant 1", (16, 15)),
+        ("quadrant 2", (15, 16)),
+        ("quadrant 3", (15, 15)),
+        ("anatomical right", (32, 33)),
+        ("anatomical left", (32, 33)),
+    ],
+)
+def test_get_geometric_mask_raises(mask_name: str, shape: tuple[int, int]):
+    with pytest.raises(ValueError, match=r"Shape \(.*\) is not compatible with a .* mask."):
+        _ = get_geometric_mask(mask_name, shape)
+
+
+def test_plotting_works():
+    _ = get_geometric_mask("layer 1", (32, 32)).plotting.imshow()
