@@ -64,7 +64,7 @@ if TYPE_CHECKING:
 PixelMapT = TypeVar("PixelMapT", bound="PixelMap")
 
 
-@dataclass(frozen=True, init=False)
+@dataclass(frozen=True)
 class PixelMap:
     """Map representing a single value for each pixel.
 
@@ -274,7 +274,8 @@ class PixelMap:
         threshold: float,
         *,
         comparator: Callable = np.greater_equal,
-        absolute: bool = False,
+        use_magnitude: bool = False,
+        fraction_of_max: bool = False,
     ) -> PixelMask:
         """Create a pixel mask from the pixel map based on threshold values.
 
@@ -284,14 +285,19 @@ class PixelMap:
         the `operator` module or custom function which takes pixel map values array and threshold as arguments, and
         returns a boolean array with the same shape as the array.
 
-        If `absolute` is True, absolute values are compared to the threshold.
+        If `use_magnitude` is True, absolute values are compared to the threshold.
+
+        If `fraction_of_max` is True, the threshold is interpreted as a fraction of the maximum value in the map. For
+        example, a threshold of 0.2 with `fraction_of_max=True` will create a mask where values are at least 20% of the
+        maximum value.
 
         The shape of the pixel mask is the same as the shape of the pixel map.
 
         Args:
-            threshold (float): The threshold value.
+            threshold (float): The threshold value or fraction, depending on `fraction_of_max` argument.
             comparator (Callable): A function that compares pixel values against the threshold.
-            absolute (bool): If True, apply the threshold to the absolute values of the pixel map.
+            use_magnitude (bool): If True, apply the threshold to the absolute values of the pixel map.
+            fraction_of_max (bool): If True, interpret threshold as a fraction of the maximum value.
 
         Returns:
             PixelMask:
@@ -302,10 +308,11 @@ class PixelMap:
 
         Examples:
         >>> pm = PixelMap([[0.1, 0.5, 0.9]])
-        >>> mask = pm.create_mask_from_threshold(0.5)
+        >>> mask = pm.create_mask_from_threshold(0.5)  # Absolute threshold of 0.5
         PixelMask(mask=array([[nan,  1.,  1.]]))
-        >>> mask.apply(pm)
-        PixelMap(values=array([[nan, 0.5, 0.9]]), ...)
+
+        >>> mask = pm.create_mask_from_threshold(0.5, fraction_of_max=True)  # 50% of max value (=0.45)
+        PixelMask(mask=array([[nan,  1.,  1.]]))
 
         >>> mask = pm.create_mask_from_threshold(0.5, comparator=np.less)
         PixelMask(mask=array([[ 1., nan, nan]]))
@@ -320,8 +327,21 @@ class PixelMap:
 
         from eitprocessing.roi import PixelMask
 
-        compare_values = np.abs(self.values) if absolute else self.values
-        mask_values = comparator(compare_values, threshold)
+        compare_values = np.abs(self.values) if use_magnitude else self.values
+
+        if fraction_of_max:
+            # Convert the threshold to an absolute value
+            max_val = np.nanmax(compare_values)
+
+            if np.isnan(max_val):
+                msg = ("All values in the pixel map are NaN. Cannot compute fraction of maximum value.",)
+                raise ValueError(msg)
+
+            actual_threshold = threshold * max_val
+        else:
+            actual_threshold = threshold
+
+        mask_values = comparator(compare_values, actual_threshold)
         return PixelMask(mask_values)
 
     @property
