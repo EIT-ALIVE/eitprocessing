@@ -351,6 +351,24 @@ class SignedPendelluftMapPlotConfig(PixelMapPlotConfig):
 
 
 @dataclass(frozen=True, kw_only=True)
+class IntegerMapPlotConfig(PixelMapPlotConfig):
+    """Configuration for plotting integer maps.
+
+    The default configuration uses:
+
+    - A colormap that maps integers to colors
+    - A zero-based normalization starting at 0 for the first integer
+    - Default colorbar label "Integer Map"
+    """
+
+    cmap: str | Colormap = "tab20"
+    norm: str | Normalize = field(
+        default_factory=lambda: BoundaryNorm(np.arange(-0.5, 19.5, 1), ncolors=20, extend="neither", clip=True)
+    )
+    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Integer Map"))
+
+
+@dataclass(frozen=True, kw_only=True)
 class PixelMaskPlotConfig(PixelMapPlotConfig):
     """Configuration for plotting pixel masks.
 

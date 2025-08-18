@@ -2,6 +2,7 @@ from typing import Protocol, cast, runtime_checkable
 
 from eitprocessing.datahandling.pixelmap import (
     DifferenceMap,
+    IntegerMap,
     ODCLMap,
     PendelluftMap,
     PerfusionMap,
@@ -12,6 +13,7 @@ from eitprocessing.datahandling.pixelmap import (
 from eitprocessing.plotting.pixelmap import (
     Config,
     DifferenceMapPlotConfig,
+    IntegerMapPlotConfig,
     ODCLMapPlotConfig,
     PendelluftMapPlotConfig,
     PerfusionMapPlotConfig,
@@ -39,6 +41,7 @@ _PLOT_CONFIG_REGISTRY: dict[type[HasPlottableConfig], Config] = {
     PerfusionMap: PerfusionMapPlotConfig(),
     PendelluftMap: PendelluftMapPlotConfig(),
     SignedPendelluftMap: SignedPendelluftMapPlotConfig(),
+    IntegerMap: IntegerMapPlotConfig(),
     PixelMask: PixelMaskPlotConfig(),
 }
 

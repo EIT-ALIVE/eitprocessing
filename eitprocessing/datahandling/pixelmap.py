@@ -48,7 +48,7 @@ from __future__ import annotations
 import sys
 import warnings
 from dataclasses import KW_ONLY, InitVar, asdict, dataclass, field, replace
-from typing import TYPE_CHECKING, ClassVar, Literal, TypeVar, cast
+from typing import TYPE_CHECKING, ClassVar, Literal, NoReturn, TypeVar, cast
 
 import numpy as np
 from numpy import typing as npt
@@ -579,3 +579,24 @@ class SignedPendelluftMap(PixelMap):
     inflation starts), while negative values indicate pixels that have late inflation (after the global inflation
     starts).
     """
+
+
+@dataclass(frozen=True, init=False)
+class IntegerMap(PixelMap):
+    """Pixel map with integer values.
+
+    This class is a wrapper around PixelMap that ensures the values are integers. It is useful for pixel maps that
+    represent labels or discrete values.
+    """
+
+    def __init__(self, values: npt.ArrayLike, **kwargs):
+        values_ = np.asarray(values, dtype=int)
+        super().__init__(values=values_, **kwargs)
+        values_ = values_.astype(int)
+        values_.flags.writeable = False  # Make the values array immutable
+        object.__setattr__(self, "values", values_)
+
+    def normalize(self, *args, **kwargs) -> NoReturn:
+        """Normalization is not supported for IntegerPixelMap."""
+        msg = "Normalization is not supported for IntegerPixelMap."
+        raise NotImplementedError(msg)
