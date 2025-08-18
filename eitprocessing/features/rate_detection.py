@@ -163,6 +163,7 @@ class RateDetection:
                 warnings.warn(
                     "The Welch window is longer than the data. Reducing the window length to the lenght of the data.",
                     UserWarning,
+                    stacklevel=2,
                 )
             len_segment = len(summed_impedance)
 
@@ -231,7 +232,11 @@ class RateDetection:
         if self.refine_estimated_frequency and (index_max_power == 0 or index_max_power == len(power_range) - 1):
             # If the maximum power is at the edge of the range, we cannot refine the frequency
             if not suppress_edge_case_warning:
-                warnings.warn("Maximum power is at the edge of the range, cannot refine the frequency.")
+                warnings.warn(
+                    "Maximum power is at the edge of the range, cannot refine the frequency.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
             estimated_rate = frequency_range[index_max_power]
 
         elif self.refine_estimated_frequency:

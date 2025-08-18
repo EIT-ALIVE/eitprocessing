@@ -112,6 +112,7 @@ class PixelMap:
                 f"{self.__class__.__name__} initialized with all NaN values. "
                 "This may lead to unexpected behavior in plotting or analysis.",
                 UserWarning,
+                stacklevel=2,
             )
 
         if not self.allow_negative_values and not suppress_negative_warning and np.any(values < 0):
@@ -119,6 +120,7 @@ class PixelMap:
                 f"{self.__class__.__name__} initialized with negative values, but `allow_negative_values` is False. "
                 "This may lead to unexpected behavior in plotting or analysis.",
                 UserWarning,
+                stacklevel=2,
             )
 
         values.flags.writeable = False  # Make the values array immutable
@@ -263,7 +265,9 @@ class PixelMap:
                 )
             raise exc
         if reference_ < 0:
-            warnings.warn("Normalization by a negative number may lead to unexpected results.", UserWarning)
+            warnings.warn(
+                "Normalization by a negative number may lead to unexpected results.", UserWarning, stacklevel=2
+            )
 
     def create_mask_from_threshold(
         self,
@@ -419,7 +423,7 @@ class PixelMap:
     def __truediv__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
         other_values = self._validate_other(other)
         if isinstance(other_values, np.ndarray) and 0 in other_values:
-            warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning)
+            warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning, stacklevel=2)
 
         invalid = np.isnan(self.values) | np.isnan(other_values) | (other_values == 0)
         new_values = np.divide(self.values, other_values, where=~invalid)
@@ -431,7 +435,7 @@ class PixelMap:
     def __rtruediv__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
         other_values = self._validate_other(other)
         if 0 in self.values:
-            warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning)
+            warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning, stacklevel=2)
         invalid = np.isnan(self.values) | np.isnan(other_values) | (self.values == 0)
         new_values = np.divide(other_values, self.values, where=~invalid)
         new_values[invalid] = np.nan

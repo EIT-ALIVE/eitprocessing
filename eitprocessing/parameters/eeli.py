@@ -41,6 +41,7 @@ class EELI(ParameterCalculation):
                 "`breath_detection_kwargs` is deprecated and will be removed soon. "
                 "Replace with `breath_detection=BreathDetection(**breath_detection_kwargs)`.",
                 DeprecationWarning,
+                stacklevel=2,
             )
 
         _methods = get_args(EELI.__dataclass_fields__["method"].type)

@@ -64,12 +64,21 @@ class EITData(DataContainer, SelectByTime):
             msg = f"The number of time points ({lt}) does not match the number of pixel impedance values ({lv})."
             raise ValueError(msg)
 
+        if not suppress_simulated_warning and self.vendor == Vendor.SIMULATED:
+            warnings.warn(
+                "The simulated vendor is used for testing purposes. "
+                "It is not a real vendor and should not be used in production code.",
+                UserWarning,
+                stacklevel=2,
+            )
+
     @property
     def framerate(self) -> float:
         """Deprecated alias to `sample_frequency`."""
         warnings.warn(
             "The `framerate` attribute has been deprecated. Use `sample_frequency` instead.",
             DeprecationWarning,
+            stacklevel=2,
         )
         return self.sample_frequency
 
