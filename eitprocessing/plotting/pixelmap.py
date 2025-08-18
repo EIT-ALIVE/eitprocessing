@@ -33,15 +33,18 @@ from dataclasses import dataclass, field
 import matplotlib as mpl
 import numpy as np
 from frozendict import frozendict
-from matplotlib import colorbar
+from matplotlib import axes, colorbar
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.colors import BoundaryNorm, CenteredNorm, Colormap, LinearSegmentedColormap, ListedColormap, Normalize
 from matplotlib.image import AxesImage
 from matplotlib.ticker import PercentFormatter
+from mpl_toolkits import mplot3d
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from scipy import ndimage
 
 from eitprocessing.config import Config
-from eitprocessing.datahandling.pixelmap import PixelMap
+from eitprocessing.datahandling.pixelmap import IntegerMap, PixelMap
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
 from eitprocessing.roi import PixelMask
 
@@ -185,6 +188,161 @@ class PixelMapPlotting:
             colorbar_kwargs.setdefault("extend", extend)
 
         return plt.colorbar(cm, ax=ax, **colorbar_kwargs or {})
+
+    def contour(self, **kwargs) -> mpl.contour.ContourSet:
+        """Create a contour plot of the pixel map or mask.
+
+        This method uses `matplotlib.pyplot.contour` to create a contour plot of the pixel map values.
+
+        Args:
+            **kwargs: Additional keyword arguments passed to `matplotlib.pyplot.contour`.
+
+        Returns:
+            QuadContourSet: The contour set created by the contour function.
+        """
+        ax = kwargs.pop("ax", plt.gca())
+        ax.set(aspect=kwargs.pop("aspect", "equal"))
+
+        origin = kwargs.pop("origin", "upper")
+
+        if origin not in ("upper", "lower"):
+            msg = f"Invalid origin '{origin}'. Expected 'upper' or 'lower'."
+            raise ValueError(msg)
+
+        if origin == "upper":
+            ax.invert_yaxis()
+
+        y_grid, x_grid = np.indices(self.pixel_map.shape)
+        return ax.contour(x_grid, y_grid, self.pixel_map.values, **kwargs)
+
+    def surface(self, **kwargs) -> Poly3DCollection:
+        """Create a 3D surface plot of the pixel map or mask.
+
+        This method uses `matplotlib.pyplot.axes3d.plot_surface` to create a 3D surface plot of the pixel map values.
+
+        Args:
+            **kwargs: Additional keyword arguments passed to `matplotlib.pyplot.axes3d.plot_surface`.
+
+        Returns:
+            Axes3D: The 3D axes object containing the surface plot.
+        """
+        ax = kwargs.pop("ax", None)
+        if ax is not None:
+            if not isinstance(ax, mplot3d.Axes3D):
+                msg = "Expected ax to be a 3D Axes object."
+                raise TypeError(msg)
+        else:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection="3d")
+
+        ax.view_init(elev=45, azim=10)
+        y_grid, x_grid = np.indices(self.pixel_map.shape)
+        return ax.plot_surface(
+            x_grid,
+            y_grid,
+            self.pixel_map.values,
+            cmap=kwargs.pop("cmap", self.config.cmap),
+            vmin=kwargs.pop("vmin", 0),
+            **kwargs,
+        )
+
+    def add_region_markers(self, ax: axes.Axes, label_map: dict | None = None, **kwargs) -> list[mpl.text.Text]:
+        """Add markers to an integer map plot.
+
+        This methods adds text labels at the center of all pixels with the same label, assuming continuous regions where
+        the center of mass is inside the region itself. If the regions is not continuous, the label is placed in the
+        largest region. If the center of mass of the region is outside the region, the label position is determined by
+        repeatedly eroding the region (using `scipy.ndimage.erosion`).
+
+        By default, the text labels are the integer values converted to strings. You can customize labels by providing a
+        dictionary `label_map`, mapping the integer values to custom labels.
+
+        Center of mass:
+            For any regular shape, the center of mass is near the geometrical center of a region. However, for e.g. a
+            C-shaped region, the center of mass might fall outside the region itself.
+
+        Args:
+            ax: The axes to add the markers to.
+            label_map: A dictionary mapping integer labels to string labels. If None, the integer label itself is used.
+            **kwargs: Additional keyword arguments passed to the text function, such as `color` and `fontsize`.
+
+        Returns:
+            list[mpl.text.Text]: A list of text objects created for the labels.
+        """
+        if not isinstance(self.pixel_map, IntegerMap):
+            msg = "`add_region_markers` is only implemented for IntegerMap."
+            raise NotImplementedError(msg)
+
+        labels = self.pixel_map.values
+        label_map = label_map or {}
+        default_bbox = {"facecolor": "white", "edgecolor": "none", "alpha": 0.7, "pad": 2}
+
+        text_objects = []
+
+        for label in np.unique(labels):
+            region = labels == label
+
+            if not region.any():
+                continue
+
+            cy, cx = self._find_point_inside_region(region)
+            text = ax.text(
+                cx,
+                cy,
+                label_map.get(label, str(label)),
+                ha="center",
+                va="center",
+                color=kwargs.get("color", "black"),
+                fontsize=kwargs.get("fontsize", 10),
+                bbox=default_bbox | kwargs.get("bbox", {}),
+            )
+            text_objects.append(text)
+
+        return text_objects
+
+    @staticmethod
+    def _find_point_inside_region(region: np.ndarray) -> tuple[float, float]:
+        """Find a point guaranteed to be inside a 2D binary region.
+
+        Args:
+            region: Binary mask of the region
+
+        Returns:
+            (y, x) coordinates of a point inside the region
+        """
+
+        def fallback(region_: np.ndarray) -> tuple[float, float]:
+            """Fallback to any point in the region if center of mass is outside."""
+            y, x = np.where(region_)
+            mid_idx = len(y) // 2
+            return float(y[mid_idx]), float(x[mid_idx])
+
+        # First try center of mass (efficient and works for most shapes)
+        labeled, n = ndimage.label(region)
+        if n == 0:
+            return fallback(region)
+
+        if n > 1:
+            counts = np.bincount(labeled.ravel())
+            counts[0] = 0
+            region = labeled == np.argmax(counts)
+
+        eroded = ndimage.binary_erosion(region)
+
+        if not eroded.any():
+            return fallback(region)
+
+        cy, cx = ndimage.center_of_mass(region)
+        # Check if center of mass is inside the once-eroded region (to prevent having the label on the edge)
+        y, x = round(cy), round(cx)
+        if 0 <= y < eroded.shape[0] and 0 <= x < eroded.shape[1] and eroded[y, x]:
+            return cy, cx
+
+        # If center of mass is outside, use to clear the edge, and then find the point inside with the largest distance
+        # to the edge.
+        distance: np.ndarray = ndimage.distance_transform_edt(eroded)
+        ys, xs = np.unravel_index(np.argmax(distance), distance.shape)
+        return float(ys), float(xs)
 
 
 def _get_zero_norm() -> Normalize:
