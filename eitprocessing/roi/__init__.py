@@ -283,6 +283,16 @@ class PixelMask:
         mask = (np.nan_to_num(self.mask, nan=0) - np.nan_to_num(other.mask, nan=0)).astype(float).clip(min=0)
         return self.update(mask=mask, keep_zeros=False, label=None)
 
+    def __eq__(self, other: object) -> bool:
+        """Check if two masks are equal.
+
+        Two masks are equal if they have the same shape and the same values. The label is not considered in the
+        equality check.
+        """
+        if not isinstance(other, PixelMask):
+            return False
+        return self.mask.shape == other.mask.shape and np.array_equal(self.mask, other.mask, equal_nan=True)
+
 
 LAYER_1_MASK = PixelMask(np.concat([np.ones((8, 32)), np.full((24, 32), np.nan)], axis=0))
 LAYER_2_MASK = PixelMask(np.concat([np.full((8, 32), np.nan), np.ones((8, 32)), np.full((16, 32), np.nan)], axis=0))
