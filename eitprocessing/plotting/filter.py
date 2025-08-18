@@ -121,7 +121,7 @@ class FilterPlotting:
         xscale = kwargs.pop("xscale", "linear")
 
         if yscale == "log":
-            new_ylim_narrow = np.quantile(np.concat((unfiltered_power, filtered_power)), (0.05, 1))
+            new_ylim_narrow = np.quantile(np.concatenate((unfiltered_power, filtered_power)), (0.05, 1))
             log_ylim = [np.log10(y) for y in new_ylim_narrow]
             range_ = log_ylim[1] - log_ylim[0]
             new_ylim = (10 ** (log_ylim[0] - 0.1 * range_), 10 ** (log_ylim[1] + 0.1 * range_))
