@@ -54,6 +54,8 @@ import numpy as np
 from numpy import typing as npt
 from typing_extensions import Self
 
+from eitprocessing.utils import make_capture
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
@@ -276,6 +278,7 @@ class PixelMap:
         comparator: Callable = np.greater_equal,
         use_magnitude: bool = False,
         fraction_of_max: bool = False,
+        captures: dict | None = None,
     ) -> PixelMask:
         """Create a pixel mask from the pixel map based on threshold values.
 
@@ -298,6 +301,8 @@ class PixelMap:
             comparator (Callable): A function that compares pixel values against the threshold.
             use_magnitude (bool): If True, apply the threshold to the absolute values of the pixel map.
             fraction_of_max (bool): If True, interpret threshold as a fraction of the maximum value.
+            captures (dict | None):
+                An optional dictionary to capture intermediate results. If None, no captures are made.
 
         Returns:
             PixelMask:
@@ -317,6 +322,8 @@ class PixelMap:
         >>> mask = pm.create_mask_from_threshold(0.5, comparator=np.less)
         PixelMask(mask=array([[ 1., nan, nan]]))
         """
+        capture = make_capture(captures)
+
         if not isinstance(threshold, (float, np.floating, int, np.integer)):
             msg = "`threshold` must be a number."
             raise TypeError(msg)
@@ -340,6 +347,7 @@ class PixelMap:
             actual_threshold = threshold * max_val
         else:
             actual_threshold = threshold
+        capture("actual threshold", actual_threshold)
 
         mask_values = comparator(compare_values, actual_threshold)
         return PixelMask(mask_values)
