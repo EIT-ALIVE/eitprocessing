@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -7,7 +6,7 @@ import pytest
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.pixelmap import PixelMap
 from eitprocessing.datahandling.sequence import Sequence
-from eitprocessing.roi import PixelMask
+from eitprocessing.roi import PixelMask, get_geometric_mask
 from eitprocessing.roi.pixelmaskcollection import PixelMaskCollection
 
 
@@ -331,35 +330,24 @@ def test_apply_unsupported_type():
     assert "Unsupported data type" in str(excinfo.value)
 
 
-def test_apply_to_eitdata_branch():
-    # Create a MagicMock that is recognized as an instance of EITData
-    eit_data_mock = MagicMock(spec=EITData)
-    eit_data_mock.pixel_impedance = np.array([[1.0, 2.0], [3.0, 4.0]])
-
-    # Ensure .apply() on a PixelMask returns an EITData instance (or mock)
-    def mock_apply(
-        _self: "PixelMaskCollection",
-        _data: "EITData | np.ndarray | PixelMap",
-        *,
-        _label: str | None = None,
-        **_kwargs: object,
-    ) -> EITData:
-        """Mock apply method for PixelMaskCollection."""
-        return MagicMock(spec=EITData)
-
-    # Patch PixelMask.apply for this test
-    PixelMask.apply = mock_apply
-
-    pm1 = PixelMask([[True, False], [False, True]], label="mask1")
-    pm2 = PixelMask([[True, True], [False, False]], label="mask2")
+def test_apply_to_eitdata(draeger1: Sequence):
+    eit_data = draeger1.eit_data["raw"]
+    pm1 = get_geometric_mask("ventral")
+    pm2 = get_geometric_mask("dorsal")
 
     collection = PixelMaskCollection([pm1, pm2])
 
-    result = collection.apply(eit_data_mock)
+    result = collection.apply(eit_data)
 
     assert isinstance(result, dict)
-    assert set(result.keys()) == {"mask1", "mask2"}
+    assert set(result.keys()) == {"ventral", "dorsal"}
     assert all(isinstance(v, EITData) for v in result.values())
+
+    assert np.all(np.isnan(result["ventral"].pixel_impedance[:, 16:, :])), "All dorsal pixels should be NaN"
+    assert np.any(~np.isnan(result["ventral"].pixel_impedance[:, :16, :])), "Some venttral pixels should not be NaN"
+
+    assert np.all(np.isnan(result["dorsal"].pixel_impedance[:, :16, :])), "All ventral pixels should be NaN"
+    assert np.any(~np.isnan(result["dorsal"].pixel_impedance[:, 16:, :])), "Some dorsal pixels should not be NaN"
 
 
 def test_empty_collection_behavior():
