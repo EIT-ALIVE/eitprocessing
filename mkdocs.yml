@@ -49,6 +49,7 @@ nav:
       - Example Notebooks:
         - examples/notebooks/test_ratedetection.ipynb
         - examples/notebooks/test_plot_filter_results.ipynb
+        - examples/notebooks/test_watershed.ipynb
   - API Documentation:
       - api/loading.md
       - Data Containers:
@@ -73,6 +74,7 @@ nav:
         - Regions of Interest: api/roi/roi.md
         - FilterROIBySize: api/roi/filterbysize.md
         - PixelMaskCollection: api/roi/pixelmaskcollection.md
+        - Watershed Lungspace: api/roi/watershed.md
       - api/parameters.md
       - api/categories.md
       - api/mixins.md
