@@ -169,6 +169,11 @@ class PixelMask:
         return self.mask
 
     @property
+    def shape(self) -> tuple[int, int]:
+        """Shape of the mask."""
+        return self.mask.shape
+
+    @property
     def plotting(self) -> PixelMapPlotting:
         """Get the plotting configuration for this mask.
 
