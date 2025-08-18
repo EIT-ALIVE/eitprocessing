@@ -29,7 +29,6 @@ Examples:
 
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
 
 import matplotlib as mpl
 import numpy as np
@@ -37,28 +36,32 @@ from frozendict import frozendict
 from matplotlib import colorbar
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
-from matplotlib.colors import CenteredNorm, Colormap, LinearSegmentedColormap, Normalize
+from matplotlib.colors import BoundaryNorm, CenteredNorm, Colormap, LinearSegmentedColormap, ListedColormap, Normalize
 from matplotlib.image import AxesImage
 from matplotlib.ticker import PercentFormatter
 
 from eitprocessing.config import Config
+from eitprocessing.datahandling.pixelmap import PixelMap
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
-
-if TYPE_CHECKING:
-    from eitprocessing.datahandling.pixelmap import PixelMap
+from eitprocessing.roi import PixelMask
 
 ColorType = str | tuple[float, float, float] | tuple[float, float, float, float] | float | Colormap
 
 
 @dataclass
 class PixelMapPlotting:
-    """Utility class for plotting pixel maps."""
+    """Utility class for plotting pixel maps and masks."""
 
-    pixel_map: "PixelMap" = field(compare=False, repr=False)
+    pixel_map: "PixelMap | PixelMask" = field(compare=False, repr=False)
+
+    def __post_init__(self):
+        if not isinstance(self.pixel_map, (PixelMap, PixelMask)):
+            msg = f"Expected pixel_map to be of type PixelMap or PixelMask, got {type(self.pixel_map)}."
+            raise TypeError(msg)
 
     @property
     def config(self) -> "PixelMapPlotConfig":
-        """Plotting configuration for the pixel map."""
+        """Plotting configuration for pixel maps and pixel masks."""
         return self.pixel_map._plot_config  # noqa: SLF001
 
     def imshow(
@@ -72,10 +75,10 @@ class PixelMapPlotting:
         hide_axes: bool | None = None,
         **kwargs,
     ) -> AxesImage:
-        """Display the pixel map using `imshow`.
+        """Display the pixel map or mask using `imshow`.
 
         This method is a wrapper around `matplotlib.pyplot.imshow` that provides convenient defaults and formatting
-        options for displaying pixel maps.
+        options for displaying pixel maps and masks.
 
         Plotting configuration is taken from `plot_config`, unless overridden by explicit arguments. Any additional
         keyword arguments are merged with `plot_config.extra_kwargs` and passed to `matplotlib.pyplot.imshow`.
@@ -156,7 +159,7 @@ class PixelMapPlotting:
     def _create_colorbar(
         self, percentage: bool, absolute: bool, colorbar_kwargs: dict | None, ax: Axes, cm: AxesImage
     ) -> colorbar.Colorbar:
-        """Create a colorbar for the pixel map."""
+        """Create a colorbar for the pixel map or mask."""
         colorbar_kwargs = dict(colorbar_kwargs or {})
 
         if "format" not in colorbar_kwargs:
@@ -345,3 +348,20 @@ class SignedPendelluftMapPlotConfig(PixelMapPlotConfig):
     colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Pendelluft"))
     absolute: bool = True
     norm: Normalize = field(default_factory=_get_centered_norm)
+
+
+@dataclass(frozen=True, kw_only=True)
+class PixelMaskPlotConfig(PixelMapPlotConfig):
+    """Configuration for plotting pixel masks.
+
+    The default configuration uses:
+
+    - A binary colormap (black and white)
+    - A zero-based normalization starting at 0 for no mask
+    - Default colorbar label "Mask"
+    """
+
+    cmap: str | Colormap = field(default_factory=lambda: ListedColormap(["tab:blue"]))
+    norm: str | Normalize = field(default_factory=lambda: BoundaryNorm([0, 2], ncolors=1))
+    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Mask"))
+    colorbar: bool = False

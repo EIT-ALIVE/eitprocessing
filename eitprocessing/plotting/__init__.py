@@ -16,9 +16,11 @@ from eitprocessing.plotting.pixelmap import (
     PendelluftMapPlotConfig,
     PerfusionMapPlotConfig,
     PixelMapPlotConfig,
+    PixelMaskPlotConfig,
     SignedPendelluftMapPlotConfig,
     TIVMapPlotConfig,
 )
+from eitprocessing.roi import PixelMask
 
 
 @runtime_checkable
@@ -37,6 +39,7 @@ _PLOT_CONFIG_REGISTRY: dict[type[HasPlottableConfig], Config] = {
     PerfusionMap: PerfusionMapPlotConfig(),
     PendelluftMap: PendelluftMapPlotConfig(),
     SignedPendelluftMap: SignedPendelluftMapPlotConfig(),
+    PixelMask: PixelMaskPlotConfig(),
 }
 
 

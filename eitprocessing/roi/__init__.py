@@ -21,12 +21,13 @@ vice versa.
 - `LAYER_4_MASK` includes only the last 8 rows.
 """
 
-import dataclasses
+from __future__ import annotations
+
 import sys
 import warnings
 from dataclasses import InitVar, dataclass, field, replace
 from dataclasses import replace as dataclass_replace
-from typing import TypeVar, overload
+from typing import TYPE_CHECKING, TypeVar, overload
 
 import numpy as np
 from typing_extensions import Self
@@ -34,7 +35,10 @@ from typing_extensions import Self
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.pixelmap import PixelMap
 
-T = TypeVar("T", np.ndarray, EITData, PixelMap)
+if TYPE_CHECKING:
+    from eitprocessing.plotting.pixelmap import PixelMapPlotConfig, PixelMapPlotting
+
+T = TypeVar("T", np.ndarray, "EITData", "PixelMap")
 
 
 @dataclass(frozen=True)
@@ -88,11 +92,13 @@ class PixelMask:
     """
 
     mask: np.ndarray
+    plot_config: InitVar[PixelMapPlotConfig]
     label: str | None = None
     keep_zeros: InitVar[bool] = field(default=False, kw_only=True)
     suppress_value_range_error: InitVar[bool] = field(default=False, kw_only=True)
     suppress_zero_conversion_warning: InitVar[bool] = field(default=False, kw_only=True)
     suppress_all_nan_warning: InitVar[bool] = field(default=False, kw_only=True)
+    _plot_config: PixelMapPlotConfig = field(init=False, repr=False)
 
     def __init__(
         self,
@@ -103,6 +109,7 @@ class PixelMask:
         suppress_value_range_error: bool = False,
         suppress_zero_conversion_warning: bool = False,
         suppress_all_nan_warning: bool = False,
+        plot_config: PixelMapPlotConfig | dict | None = None,
     ):
         is_boolean_mask = np.array(mask).dtype == bool
         mask = np.array(mask, dtype=float)
@@ -142,11 +149,51 @@ class PixelMask:
 
             mask[mask == 0] = np.nan
 
+        if plot_config is None:
+            plot_config = {}
+        if isinstance(plot_config, dict):
+            from eitprocessing.plotting import get_plot_config
+
+            default_config = get_plot_config(self)
+            plot_config = default_config.update(**plot_config)
+
+        object.__setattr__(self, "_plot_config", plot_config)
+
         mask.flags["WRITEABLE"] = False
         object.__setattr__(self, "mask", mask)
         object.__setattr__(self, "label", label)
 
-    update = replace
+    @property
+    def plotting(self) -> PixelMapPlotting:
+        """Get the plotting configuration for this mask.
+
+        Returns:
+            PixelMapPlotting: The plotting configuration for this mask.
+        """
+        from eitprocessing.plotting.pixelmap import PixelMapPlotting
+
+        return PixelMapPlotting(self)
+
+    def __replace__(self, /, **changes) -> Self:
+        """Return a copy of the of the PixelMap instance replacing attributes.
+
+        Similar to dataclass.replace(), but with special handling of `plot_config`. When `plot_config` is
+        provided as a dict, it updates the existing `plot_config` instead of replacing them completely.
+
+        Args:
+            **changes: New values for attributes to replace.
+
+        Returns:
+            Self: A new instance with the replaced attributes.
+        """
+        if "plot_config" not in changes:
+            changes["plot_config"] = self._plot_config
+        elif isinstance(changes["plot_config"], dict):
+            changes["plot_config"] = self._plot_config.update(**changes["plot_config"])
+        label = changes.pop("label", None)
+        return replace(self, label=label, **changes)
+
+    update = __replace__
     # TODO: add tests for update
 
     @overload
@@ -156,7 +203,7 @@ class PixelMask:
     def apply(self, data: EITData, **kwargs) -> EITData: ...
 
     @overload
-    def apply(self, data: "PixelMap", **kwargs) -> "PixelMap": ...
+    def apply(self, data: PixelMap, **kwargs) -> PixelMap: ...
 
     def apply(self, data, **kwargs):
         """Apply pixel mask to data, returning a copy of the object with pixel values masked.
@@ -211,7 +258,7 @@ class PixelMask:
 
     def __mul__(self, other: Self) -> Self:
         """Combine masks by multiplying masking values."""
-        return dataclasses.replace(self, mask=self.mask * other.mask)
+        return self.update(mask=self.mask * other.mask, label=None)
 
     def __add__(self, other: Self) -> Self:
         """Combine masks by adding masking values.
@@ -220,11 +267,11 @@ class PixelMask:
         """
         new_mask = np.clip(np.nansum([self.mask, other.mask], axis=0), a_min=None, a_max=1)
         new_mask[new_mask == 0] = np.nan
-        return dataclasses.replace(self, mask=new_mask)
+        return self.update(mask=new_mask, label=None)
 
     def __sub__(self, other: Self) -> Self:
         mask = (np.nan_to_num(self.mask, nan=0) - np.nan_to_num(other.mask, nan=0)).astype(float).clip(min=0)
-        return dataclasses.replace(self, mask=mask, keep_zeros=False)
+        return self.update(mask=mask, keep_zeros=False, label=None)
 
 
 LAYER_1_MASK = PixelMask(np.concat([np.ones((8, 32)), np.full((24, 32), np.nan)], axis=0))
