@@ -154,8 +154,9 @@ class RateDetection:
             set to segment length - 1.
 
         """
-        summed_impedance = eit_data.calculate_global_impedance()
-        len_segment = self.welch_window * eit_data.sample_frequency
+        pixel_impedance = eit_data.pixel_impedance.copy().astype(np.float32)
+        summed_impedance = np.nansum(pixel_impedance, axis=(1, 2))
+        len_segment = int(self.welch_window * eit_data.sample_frequency)
 
         if len(summed_impedance) < len_segment:
             if not suppress_length_warnings:
@@ -167,17 +168,18 @@ class RateDetection:
 
         len_overlap = int(len_segment * self.welch_overlap)
 
+        hann_window = signal.windows.hann(len_segment, sym=False)
         frequencies, total_power = signal.welch(
             summed_impedance,
             eit_data.sample_frequency,
             nperseg=len_segment,
             noverlap=len_overlap,
             detrend="constant",
+            window=hann_window,
         )
 
         normalized_total_power = total_power / np.sum(total_power)
 
-        pixel_impedance = eit_data.pixel_impedance
         pixel_impedance[:, np.all(pixel_impedance == 0, axis=0)] = np.nan
 
         _, pixel_power_spectra = signal.welch(
@@ -187,6 +189,7 @@ class RateDetection:
             noverlap=len_overlap,
             detrend="constant",
             axis=0,
+            window=hann_window,
         )
 
         normalized_power_spectra = np.divide(pixel_power_spectra, np.nansum(pixel_power_spectra, axis=0, keepdims=True))
