@@ -164,6 +164,11 @@ class PixelMask:
         object.__setattr__(self, "label", label)
 
     @property
+    def values(self) -> np.ndarray:
+        """Alias for `mask`."""
+        return self.mask
+
+    @property
     def plotting(self) -> PixelMapPlotting:
         """Get the plotting configuration for this mask.
 
