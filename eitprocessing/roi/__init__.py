@@ -23,6 +23,7 @@ vice versa.
 
 from __future__ import annotations
 
+import re
 import sys
 import warnings
 from dataclasses import InitVar, dataclass, field, replace
@@ -294,18 +295,118 @@ class PixelMask:
         return self.mask.shape == other.mask.shape and np.array_equal(self.mask, other.mask, equal_nan=True)
 
 
-LAYER_1_MASK = PixelMask(np.concat([np.ones((8, 32)), np.full((24, 32), np.nan)], axis=0))
-LAYER_2_MASK = PixelMask(np.concat([np.full((8, 32), np.nan), np.ones((8, 32)), np.full((16, 32), np.nan)], axis=0))
-LAYER_3_MASK = PixelMask(np.concat([np.full((16, 32), np.nan), np.ones((8, 32)), np.full((8, 32), np.nan)], axis=0))
-LAYER_4_MASK = PixelMask(np.concat([np.full((24, 32), np.nan), np.ones((8, 32))], axis=0))
+def get_geometric_mask(mask: str, shape: tuple[int, int] = (32, 32)) -> PixelMask:
+    """Get a geometric mask by name.
 
-VENTRAL_MASK = LAYER_1_MASK + LAYER_2_MASK
-DORSAL_MASK = LAYER_3_MASK + LAYER_4_MASK
+    Masks can be generated for appropriates shapes, provided by the shape` argument, a tuple of two integers
+    representing the number of rows and columns in the EIT image. The shape has to be divisible in the required number
+    of
 
-ANATOMICAL_RIGHT_MASK = PixelMask(np.concat([np.ones((32, 16)), np.full((32, 16), np.nan)], axis=1))
-ANATOMICAL_LEFT_MASK = PixelMask(np.concat([np.full((32, 16), np.nan), np.ones((32, 16))], axis=1))
+    The function accepts both full names (e.g., "layer 1") and abbreviations (e.g., "L1").
 
-QUADRANT_1_MASK = VENTRAL_MASK * ANATOMICAL_RIGHT_MASK
-QUADRANT_2_MASK = VENTRAL_MASK * ANATOMICAL_LEFT_MASK
-QUADRANT_3_MASK = DORSAL_MASK * ANATOMICAL_RIGHT_MASK
-QUADRANT_4_MASK = DORSAL_MASK * ANATOMICAL_LEFT_MASK
+    The following masks are available:
+    - "ventral" or "V": the first half rows of the EIT image.
+    - "dorsal" or "D": the last half rows of the EIT image.
+    - "anatomical right" or "R": the first half columns of the EIT image.
+    - "anatomical left" or "L": the last half columns of the EIT image.
+    - "layer 1" or "L1": the first quarter rows of the EIT image.
+    - "layer 2" or "L2": the second set of quarter rows of the EIT image.
+    - "layer 3" or "L3": the third set of quarter rows of the EIT image.
+    - "layer 4" or "L4": the last quarter rows of the EIT image.
+    - "quadrant 1" or "Q1": the top right quadrant of the EIT image.
+    - "quadrant 2" or "Q2": the top left quadrant of the EIT image.
+    - "quadrant 3" or "Q3": the bottom right quadrant of the EIT image.
+    - "quadrant 4" or "Q4": the bottom left quadrant of the EIT image.
+
+    Args:
+        mask: Name of the geometric mask to retrieve (case-sensitive).
+        shape:
+            Shape of the EIT image, a tuple of two integers representing the number of rows and columns. Defaults to
+            (32, 32).
+
+    Returns:
+        PixelMask: The requested geometric mask.
+
+    Raises:
+        ValueError: If an unknown mask name is provided.
+        ValueError: If the shape is not compatible with the requested mask.
+    """
+
+    def _check_dimensions(
+        name: str, shape: tuple[int, int], *, height_divisor: int | None = None, width_divisor: int | None = None
+    ) -> None:
+        total_height, total_width = shape
+        if isinstance(height_divisor, int) and total_height % height_divisor != 0:
+            msg = (
+                f"Shape {shape} is not compatible with a {name} mask. "
+                "The height must be a multiple of {height_divisor}."
+            )
+            raise ValueError(msg)
+        if isinstance(width_divisor, int) and total_width % width_divisor != 0:
+            msg = (
+                f"Shape {shape} is not compatible with a {name} mask. The width must be a multiple of {width_divisor}."
+            )
+            raise ValueError(msg)
+
+    total_height, total_width = shape
+    n_layers_quadrants = 4
+
+    # Replace short names "Qn" with "quadrant n" and "Ln" with "layer n" for n in 1-4.
+    mask = re.sub(r"^Q([1-4]{1})$", r"quadrant \1", mask)
+    mask = re.sub(r"^L([1-4]{1})$", r"layer \1", mask)
+
+    match mask.split(" "):
+        case ["ventral"] | ["V"]:
+            _check_dimensions("ventral", shape, height_divisor=2)
+            height = total_height // 2
+            return PixelMask(
+                np.concatenate([np.ones((height, total_width)), np.full((height, total_width), np.nan)], axis=0),
+                label="ventral",
+            )
+        case ["dorsal"] | ["D"]:
+            _check_dimensions("dorsal", shape, height_divisor=2)
+
+            # Dorsal mask is flipped version of ventral mask
+            ventral_mask = get_geometric_mask("ventral", shape)
+            return PixelMask(np.flip(ventral_mask.mask, axis=0), label="dorsal")
+
+        case ["anatomical", "right"] | ["R"]:
+            _check_dimensions("anatomical right", shape, width_divisor=2)
+            width = total_width // 2
+            return PixelMask(
+                np.concatenate([np.ones((total_height, width)), np.full((total_height, width), np.nan)], axis=1),
+                label="anatomical right",
+            )
+        case ["anatomical", "left"] | ["L"]:
+            _check_dimensions("anatomical left", shape, width_divisor=2)
+
+            # Left mask is a flipped version of right mask
+            right_mask = get_geometric_mask("anatomical right", shape)
+            return PixelMask(np.flip(right_mask.mask, axis=1), label="anatomical left")
+
+        case ["layer", num_str] if num_str.isdigit() and 1 <= int(num_str) <= n_layers_quadrants:
+            num = int(num_str)
+            _check_dimensions("layer", shape, height_divisor=4)
+            height = total_height // n_layers_quadrants
+            return PixelMask(
+                np.concatenate(
+                    [
+                        *[np.full((height, total_width), np.nan)] * (num - 1),
+                        np.ones((height, total_width)),
+                        *[np.full((height, total_width), np.nan)] * (n_layers_quadrants - num),
+                    ]
+                ),
+                label=mask,
+            )
+
+        case ["quadrant", num_str] if num_str.isdigit() and 1 <= int(num_str) <= n_layers_quadrants:
+            _check_dimensions("quadrant", shape, height_divisor=2, width_divisor=2)
+
+            # Quadrant masks are where a lateral and ventral/dorsal mask intersect.
+            lateral = "anatomical right" if num_str in ["1", "3"] else "anatomical left"
+            ventral_dorsal = "ventral" if num_str in ["1", "2"] else "dorsal"
+            return (get_geometric_mask(ventral_dorsal, shape) * get_geometric_mask(lateral, shape)).update(label=mask)
+
+        case _:
+            msg = f"Unknown mask name: {mask}."
+            raise ValueError(msg)
