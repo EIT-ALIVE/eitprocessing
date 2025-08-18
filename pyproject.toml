@@ -46,6 +46,7 @@ dependencies = [
     "pyyaml",
     "frozendict>=2.4.6",
     "mkdocs-jupyter>=0.25.1",
+    "scikit-image>=0.25.2",
 ]
 
 [project.optional-dependencies]
