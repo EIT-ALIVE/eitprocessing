@@ -185,14 +185,14 @@ def mock_compute_pixel_parameter(mean: int):
 
 
 def test_deprecated():
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`breath_detection_kwargs` is deprecated and will be removed soon."):
         _ = PixelBreath(breath_detection_kwargs={})
 
     with pytest.raises(TypeError):
         _ = PixelBreath(breath_detection=BreathDetection(), breath_detection_kwargs={})
 
     bd_kwargs = {"minimum_duration": 10, "averaging_window_duration": 100.0}
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`breath_detection_kwargs` is deprecated and will be removed soon."):
         assert PixelBreath(breath_detection_kwargs=bd_kwargs).breath_detection == BreathDetection(**bd_kwargs)
 
 

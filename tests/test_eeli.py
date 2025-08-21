@@ -86,7 +86,7 @@ def test_eeli_values(repeat_n: int):  # noqa: ARG001
         values=data,
         sample_frequency=sample_frequency,
     )
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`breath_detection_kwargs` is deprecated and will be removed soon."):
         eeli = EELI(breath_detection_kwargs={"minimum_duration": 0})
     eeli_values = eeli.compute_parameter(cd).values
 
@@ -95,11 +95,11 @@ def test_eeli_values(repeat_n: int):  # noqa: ARG001
 
 
 def test_bd_init():
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`breath_detection_kwargs` is deprecated and will be removed soon."):
         assert EELI(breath_detection_kwargs={"minimum_duration": 0}) == EELI(
             breath_detection=BreathDetection(minimum_duration=0)
         )
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`breath_detection_kwargs` is deprecated and will be removed soon."):
         EELI(breath_detection_kwargs={"minimum_duration": 0})
     with pytest.raises(TypeError):
         EELI(breath_detection_kwargs={"minimum_duration": 0}, breath_detection=BreathDetection(minimum_duration=0))

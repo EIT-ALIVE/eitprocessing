@@ -28,13 +28,13 @@ def test_select_by_time(draeger2: Sequence):
     pytest.skip("selecting by time not finalized yet")
 
     # test illegal
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="No starting or end timepoints was selected"):
         _ = draeger2.select_by_time()
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="No starting or end timepoints was selected"):
         _ = draeger2.select_by_time(None, None)
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="No starting or end timepoints was selected"):
         _ = draeger2.select_by_time(None)
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="No starting or end timepoints was selected"):
         _ = draeger2.select_by_time(end_time=None)
 
     # TODO (#82): this function is kinda ugly. Would be nice to refactor it
