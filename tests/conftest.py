@@ -22,6 +22,23 @@ timpel_file = data_directory / "Timpel_test.txt"
 dummy_file = data_directory / "not_a_file.dummy"
 
 
+def pytest_addoption(parser: pytest.Parser):
+    parser.addoption("--runslow", action="store_true", default=False, help="run tests marked as slow")
+
+
+def pytest_configure(config: pytest.Config):
+    config.addinivalue_line("markers", "slow: mark test as slow to run")
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]):
+    if config.getoption("--runslow"):
+        return
+    skip_slow = pytest.mark.skip(reason="need --runslow option to run")
+    for item in items:
+        if "slow" in item.keywords:
+            item.add_marker(skip_slow)
+
+
 @pytest.fixture(scope="session")
 def draeger1() -> Sequence:
     return load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20, label="draeger1")
