@@ -237,6 +237,4 @@ class MDNFilter(TimeDomainFilter):
     @property
     def plotting(self) -> FilterPlotting:
         """Return the plotting class for this filter."""
-        from eitprocessing.plotting.filter import FilterPlotting
-
         return FilterPlotting()

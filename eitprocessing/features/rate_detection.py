@@ -1,14 +1,12 @@
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Final, Literal
+from typing import Final, Literal
 
 import numpy as np
 from scipy import signal
 
 from eitprocessing.datahandling.eitdata import EITData
-
-if TYPE_CHECKING:
-    from eitprocessing.plotting.rate_detection import RateDetectionPlotting
+from eitprocessing.plotting.rate_detection import RateDetectionPlotting
 
 MINUTE: Final = 60
 MIN_WELCH_WINDOW_LENGTH: Final = 10
@@ -270,8 +268,6 @@ class RateDetection:
         ```
 
         """
-        from eitprocessing.plotting.rate_detection import RateDetectionPlotting
-
         return RateDetectionPlotting(self)
 
 
