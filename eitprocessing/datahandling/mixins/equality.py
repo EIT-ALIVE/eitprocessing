@@ -10,7 +10,8 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
-class Equivalence:
+# TODO: implement __hash__ functions for all equivalent classes
+class Equivalence:  # noqa: PLW1641
     """Mixin class that adds an equality and equivalence check."""
 
     # inspired by: https://stackoverflow.com/a/51743960/5170442
