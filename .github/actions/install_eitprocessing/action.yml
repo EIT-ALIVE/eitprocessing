@@ -38,11 +38,11 @@ runs:
         image: ghcr.io/eit-alive/eittestdata:latest
         destination: ${{ inputs.data-directory }}
         path: /eitprocessing/.
-    - uses: actions/cache@v4
-      id: cache-python-env
+    - name: Install uv and set the python version
+      uses: astral-sh/setup-uv@v6
       with:
-        path: ~/.cache/pip
-        key: ${{ inputs.python-version }}-${{ hashFiles('pyproject.toml') }}-[${{ inputs.dependencies }}]
-    - name: Install eitprocessing with [${{ inputs.dependencies }}] dependencies
-      run: python3 -m pip install ".[${{ inputs.dependencies }}]"
+        enable-cache: true
+    - name: Install the project
+      run: uv sync ${{ inputs.dependencies }}
       shell: bash
+
