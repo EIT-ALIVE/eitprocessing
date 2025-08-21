@@ -96,7 +96,7 @@ jobs:
         run: pytest -v --runslow
 
       - name: Install additional dependencies for building
-        run: python3 -m pip install --upgrade ".[publishing]"
+        run: uv sync --extra publishing
 
       - name: Build eitprocessing
         run: python3 -m build
@@ -134,11 +134,16 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
       - name: Install bump-my-version
         shell: bash
         run: |
-          python3 -m pip install pyproject-deplister
-          pyproject-deplister --extra dev --path pyproject.toml | grep bump-my-version | sed 's/ //g' | xargs -I{} python3 -m pip install "{}"
+          uv pip install pyproject-deplister
+          pyproject-deplister --extra dev --path pyproject.toml | grep bump-my-version | sed 's/ //g' | xargs -I{} uv pip install "{}"
 
       - name: Pass Inputs to Shell
         id: bump
