@@ -250,7 +250,7 @@ class PixelMapPlotting:
         """Add markers to an integer map plot.
 
         This methods adds text labels at the center of all pixels with the same label, assuming continuous regions where
-        the center of mass is inside the region itself. If the regions is not continuous, the label is placed in the
+        the center of mass is inside the region itself. If the regions are not continuous, the label is placed in the
         largest region. If the center of mass of the region is outside the region, the label position is determined by
         repeatedly eroding the region (using `scipy.ndimage.erosion`).
 

@@ -75,7 +75,7 @@ def test_watershed_init_threshold_outside_range(threshold: float):
 
 
 @pytest.mark.parametrize("threshold", ["0.2", True, None])
-def test_watershed_init_thresolde_wrong_type(threshold: object):
+def test_watershed_init_threshold_wrong_type(threshold: object):
     with pytest.raises(TypeError, match="Threshold must be a float."):
         _ = WatershedLungspace(threshold_fraction=threshold)
 

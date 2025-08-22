@@ -24,9 +24,9 @@ class WatershedLungspace:
     using the pixel amplitude instead of the TIV results in overinclusion of pixels.
 
     In this method, the (inverse) watershed method is applied to the pixel amplitude. This results in distinct regions
-    with high values for more central pixels, and low values for edge values. Regions where the highest value falls
-    within the TIV-based functional lung space definition are included in the mask. Other regions are exluded. Pixels
-    that fall outside the amplitude based functional lung space definiton are excluded.
+    with high values for more central pixels, and low values for edge pixels. Regions where the highest value falls
+    within the TIV-based functional lung space definition are included in the mask. Other regions are excluded. Pixels
+    that fall outside the amplitude based functional lung space definition are excluded.
 
     Example usage:
     ```python
@@ -64,7 +64,7 @@ class WatershedLungspace:
 
         Local peaks in the amplitude map are found using `skimage.feature.peak_local_max`. These peaks are used to find
         the (inverse) watershed regions in the amplitude map. Regions whose peaks fall inside the functional TIV mask
-        are included, the others are exluded. The final watershed mask is the intersection of the functional amplitude
+        are included, the others are excluded. The final watershed mask is the intersection of the functional amplitude
         mask and the remaining included watershed regions.
 
         Watershed regions:
@@ -158,8 +158,8 @@ class WatershedLungspace:
             image=-mean_amplitude.values, markers=marker_map.to_integer_array()
         )
 
-        # Only include regions whose' markers are inside the functional TIV mask. This combines the included regions
-        # into a single region.
+        # Only include regions whose markers are inside the functional TIV mask. This combines the included regions into
+        # a single region.
         included_region = PixelMask(np.isin(watershed_regions, markers_inside_tiv_mask))
         capture("included region", included_region)
 

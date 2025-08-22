@@ -75,8 +75,8 @@ class PixelMask:
         all pixels that are in either mask. For non-weighted masks this is similar to a union of sets. Weighted pixels
         are added and clipped at 1.
 
-        Subtracting masks results in the pixels that are part of the second masks being
-        removed from the first mask. For non-weighted masks this is similar to a set difference.
+        Subtracting masks results in the pixels that are part of the second mask being removed from the first mask. For
+        non-weighted masks this is similar to a set difference. For weighted masks, pixel values are clipped at 0.
 
         Multiplying masks
         results in a mask that includes only pixels that are in both masks. For non-weighted masks this is similar to an
