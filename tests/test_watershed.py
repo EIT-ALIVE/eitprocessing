@@ -134,3 +134,20 @@ def test_watershed_timing_data(draeger1: Sequence):
     watershed_mask = WatershedLungspace().apply(eit_data)
 
     assert watershed_mask_w_timing == watershed_mask, "The timing data should be the same in this case"
+
+
+def test_watershed_no_amplitude():
+    eit_data = EITData(
+        pixel_impedance=np.ones((100, 32, 32)),
+        path="",
+        nframes=100,
+        time=np.arange(100) / 20,
+        sample_frequency=20,
+        vendor=Vendor.SIMULATED,
+        label="simulated",
+        description="Simulated EIT data with no amplitude",
+        name="",
+        suppress_simulated_warning=True,
+    )
+    with pytest.raises(ValueError, match="No breaths found in TIV or amplitude data"):
+        _ = WatershedLungspace().apply(eit_data)
