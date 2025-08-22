@@ -94,6 +94,7 @@ class PixelMap:
     plot_config: InitVar[PixelMapPlotConfig]
     _plot_config: PixelMapPlotConfig = field(init=False, repr=False)
     allow_negative_values: ClassVar[bool] = True
+    dtype: ClassVar[np.dtype] = np.dtype(float)
 
     def __init__(
         self,
@@ -104,7 +105,22 @@ class PixelMap:
         suppress_all_nan_warning: bool = False,
         plot_config: PixelMapPlotConfig | dict | None = None,
     ):
-        values = np.asarray(values, dtype=float)
+        # Checks whether values are convertible to the specified type without losing information.
+
+        try:
+            values = np.asarray(values)
+            cast_values = np.asarray(values, dtype=self.dtype)
+            if not np.array_equal(cast_values, values, equal_nan=True):
+                # Raise within try block to catch together with exceptions from previous lines
+                msg = "Values are not losslessly convertible to the specified dtype."
+                raise ValueError(msg)  # noqa: TRY301
+
+        except ValueError as e:
+            msg = f"Values must be convertible to {self.dtype}."
+            raise TypeError(msg) from e
+
+        values = cast_values
+
         if values.ndim != 2:  # noqa: PLR2004, ignore hardcoded value
             msg = f"`values` should have 2 dimensions, not {values.ndim}."
             raise ValueError(msg)
@@ -621,12 +637,7 @@ class IntegerMap(PixelMap):
     represent labels or discrete values.
     """
 
-    def __init__(self, values: npt.ArrayLike, **kwargs):
-        values_ = np.asarray(values, dtype=int)
-        super().__init__(values=values_, **kwargs)
-        values_ = values_.astype(int)
-        values_.flags.writeable = False  # Make the values array immutable
-        object.__setattr__(self, "values", values_)
+    dtype: ClassVar[np.dtype] = np.dtype(int)
 
     def normalize(self, *args, **kwargs) -> NoReturn:
         """Normalization is not supported for IntegerPixelMap."""
