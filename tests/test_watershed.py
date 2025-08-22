@@ -136,6 +136,30 @@ def test_watershed_timing_data(draeger1: Sequence):
     assert watershed_mask_w_timing == watershed_mask, "The timing data should be the same in this case"
 
 
+def test_watershed_captures(draeger1: Sequence):
+    eit_data = draeger1.eit_data["raw"]
+
+    with pytest.raises(TypeError):
+        _ = WatershedLungspace().apply(eit_data, captures=(captures := []))
+
+    _ = WatershedLungspace().apply(eit_data, captures=(captures := {}))
+    assert captures, "captures should have values after runnning apply"
+    for key in [
+        "mean tiv",
+        "functional tiv mask",
+        "mean amplitude",
+        "functional amplitude mask",
+        "local peaks",
+        "included marker indices",
+        "included region",
+        "watershed regions",
+        "included peaks",
+        "excluded peaks",
+        "included watershed regions",
+    ]:
+        assert key in captures, f"captures should have a '{key}' entry"
+
+
 def test_watershed_no_amplitude():
     eit_data = EITData(
         pixel_impedance=np.ones((100, 32, 32)),
