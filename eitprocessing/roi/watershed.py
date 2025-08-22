@@ -104,9 +104,17 @@ class WatershedLungspace:
 
         # The amplitude normally has less breaths; to prevent averaging over different breaths, only include breaths
         # that are in both sets
+        if len(tiv) == 0 or len(amplitude) == 0:
+            msg = "No breaths found in TIV or amplitude data. No functional lung space can be defined."
+            raise ValueError(msg)
+
         included_breaths = (~np.all(np.isnan(tiv.values), axis=(1, 2))) & (
             ~np.all(np.isnan(amplitude.values), axis=(1, 2))
         )
+
+        if len(included_breaths) == 0 or not np.any(included_breaths):
+            msg = "No breaths with both TIV and amplitude found. No functional lung space can be defined."
+            raise ValueError(msg)
 
         # Compute mean pixel TIV and associated threshold mask
         mean_tiv = TIVMap.from_aggregate(
