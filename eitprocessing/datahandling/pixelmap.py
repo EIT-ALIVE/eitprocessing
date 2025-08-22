@@ -538,15 +538,20 @@ class PixelMap:
         aggregated_values = aggregator(stacked, axis=0)
         return cls(values=aggregated_values, **return_attrs)
 
-    def to_boolean_array(self) -> np.ndarray:
+    def to_boolean_array(self, *, zero: bool = False) -> np.ndarray:
         """Convert the pixel map values to a boolean array.
 
-        NaN values are replaced with False, and the resulting array is cast to boolean.
+        NaN values are replaced with False, and the resulting array is cast to boolean. 0-values are converted to False
+        by default. Provided `zero=True` in case you want to treat 0-values as True.
 
         Returns:
             np.ndarray: A 2D numpy array of booleans, where NaN values are replaced with False.
         """
-        return self.to_nan_nan_array(0, bool)
+        values = self.values.copy()
+        if zero is True:
+            values[values == 0] = 1
+        np.nan_to_num(values, nan=0, copy=False)
+        return values.astype(bool)
 
     def to_integer_array(self) -> np.ndarray:
         """Convert the pixel map values to an integer array.
@@ -556,19 +561,19 @@ class PixelMap:
         Returns:
             np.ndarray: A 2D numpy array of integers, where NaN values are replaced with 0.
         """
-        return self.to_non_nan_array(0, int)
+        return self.to_non_nan_array(nan=0, dtype=int)
 
-    def to_non_nan_array(self, fill_value: float = 0.0, dtype: type | np.dtype = float) -> np.ndarray:
+    def to_non_nan_array(self, *, nan: float = 0.0, dtype: type | np.dtype = float) -> np.ndarray:
         """Convert the pixel map values to a numpy array, replacing NaN with a fill value.
 
         Args:
-            fill_value (float): The value to replace NaN values with. Defaults to 0.0.
+            nan (float): The value to replace NaN values with. Defaults to 0.0.
             dtype (type | np.dtype): The data type of the resulting array. Defaults to float.
 
         Returns:
-            np.ndarray: A 2D numpy array with NaN values replaced by `fill_value` and cast to the specified `dtype`.
+            np.ndarray: A 2D numpy array with NaN values replaced by `nan` and cast to the specified `dtype`.
         """
-        return np.nan_to_num(self.values, nan=fill_value).astype(dtype)
+        return np.nan_to_num(self.values, nan=nan).astype(dtype)
 
 
 @dataclass(frozen=True, init=False)
@@ -640,6 +645,6 @@ class IntegerMap(PixelMap):
     dtype: ClassVar[np.dtype] = np.dtype(int)
 
     def normalize(self, *args, **kwargs) -> NoReturn:
-        """Normalization is not supported for IntegerPixelMap."""
-        msg = "Normalization is not supported for IntegerPixelMap."
+        """Normalization is not supported for IntegerMap."""
+        msg = "Normalization is not supported for IntegerMap."
         raise NotImplementedError(msg)
