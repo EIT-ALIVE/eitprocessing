@@ -140,6 +140,9 @@ class WatershedLungspace:
         # Find markers that overlap with TIV mask
         masked_marker_map = tiv_functional_mask.apply(marker_map)
         markers_inside_tiv_mask = masked_marker_map.values[~np.isnan(masked_marker_map.values)]
+        if not len(markers_inside_tiv_mask):
+            msg = "No markers found inside the functional TIV mask. No functional lung space can be defined."
+            raise ValueError(msg)
         capture("included marker indices", markers_inside_tiv_mask)
 
         # Find the watershed regions
