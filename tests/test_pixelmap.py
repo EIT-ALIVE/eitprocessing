@@ -175,6 +175,24 @@ def test_create_threshold_mask():
     mask = pm.create_mask_from_threshold(1, comparator=np.less)
     assert np.array_equal(mask.mask, [[1.0, 1.0, 1.0, np.nan, np.nan]], equal_nan=True)
 
+    mask = pm.create_mask_from_threshold(0.8, fraction_of_max=True)
+    assert np.array_equal(mask.mask, [[np.nan, np.nan, np.nan, np.nan, 1.0]], equal_nan=True)
+
+
+def test_create_threshold_mask_errors():
+    pm = PixelMap([[-2, -1, 0, 1, 2]])
+
+    with pytest.raises(TypeError, match="`comparator` must be a callable function"):
+        pm.create_mask_from_threshold(1, comparator=">=")
+
+    with pytest.raises(TypeError, match="`threshold` must be a number"):
+        pm.create_mask_from_threshold("foo")
+
+    pm = PixelMap([[np.nan]], suppress_all_nan_warning=True)
+
+    with pytest.raises(ValueError, match="All values in the pixel map are NaN."):
+        pm.create_mask_from_threshold(1, fraction_of_max=True)
+
 
 def test_convert():
     pm0 = PixelMap([[0]])
@@ -625,3 +643,41 @@ def test_dtype():
 
     with pytest.raises(TypeError, match="Values must be convertible to"):
         _ = PixelMap([["a", 1], [2, 3]])
+
+
+def test_convert_to_array():
+    pm = PixelMap([[0, 1], [np.nan, 4]])
+
+    arr1 = pm.to_non_nan_array(nan=-1)
+
+    assert isinstance(arr1, np.ndarray)
+    assert arr1.dtype == np.float64
+    assert np.array_equal(arr1, np.array([[0.0, 1.0], [-1.0, 4.0]]))
+
+    arr2 = pm.to_non_nan_array()
+    assert np.array_equal(arr2, np.array([[0.0, 1.0], [0.0, 4.0]]))
+
+    arr3 = pm.to_non_nan_array(nan=-1, dtype=int)
+    assert arr3.dtype == np.int_
+    assert np.array_equal(arr3, np.array([[0, 1], [-1, 4]]))
+
+    arr4 = pm.to_boolean_array(zero=True)
+    assert arr4.dtype == np.bool_
+    assert np.array_equal(arr4, np.array([[True, True], [False, True]]))
+
+    arr5 = pm.to_boolean_array()
+    assert arr5.dtype == np.bool_
+    assert np.array_equal(arr5, np.array([[False, True], [False, True]]))
+
+    aa6 = pm.to_integer_array()
+    assert aa6.dtype == np.int_
+    assert np.array_equal(aa6, np.array([[0, 1], [0, 4]]))
+
+
+def test_integermap_normalize_not_implemented():
+    pm = IntegerMap([[0, 1], [2, 3]])
+    with pytest.raises(NotImplementedError, match="Normalization is not supported for IntegerMap."):
+        pm.normalize(mode="zero-based")
+
+    with pytest.raises(NotImplementedError, match="Normalization is not supported for IntegerMap."):
+        pm.normalize(mode="symmetric")
