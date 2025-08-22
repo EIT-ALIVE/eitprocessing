@@ -12,6 +12,7 @@ from matplotlib.ticker import PercentFormatter, ScalarFormatter
 
 from eitprocessing.datahandling.pixelmap import (
     DifferenceMap,
+    IntegerMap,
     ODCLMap,
     PendelluftMap,
     PerfusionMap,
@@ -604,3 +605,23 @@ def test_set_pixelmap_plot_parameters():
     pm5 = TIVMap([[0]])
     assert pm4.plotting.config.cmap == "viridis"
     assert pm5.plotting.config.cmap == "Reds"
+
+
+def test_dtype():
+    pm1 = IntegerMap([[0, 1], [2, 3]])
+    assert pm1.values.dtype == np.int_
+
+    pm2 = IntegerMap([[0.0, 1.0], [2.0, 3.0]])
+    assert pm2.values.dtype == np.int_
+
+    pm3 = PixelMap([[0, 1], [2, 3]])
+    assert pm3.values.dtype == np.float64, "integers should be convertable to float64"
+
+    pm3 = PixelMap([[0 + 0j, 1.1], [2, 3]])
+    assert pm3.values.dtype == np.float64, "complex numbers without imaginary part should be convertable to float64"
+
+    with pytest.raises(TypeError, match="Values must be convertible to"):
+        _ = IntegerMap([[0.5, 1], [2, 3]])
+
+    with pytest.raises(TypeError, match="Values must be convertible to"):
+        _ = PixelMap([["a", 1], [2, 3]])
