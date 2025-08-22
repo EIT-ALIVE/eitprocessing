@@ -521,9 +521,9 @@ class IntegerMapPlotConfig(PixelMapPlotConfig):
 
     cmap: str | Colormap = "tab20"
     norm: str | Normalize = field(
-        default_factory=lambda: BoundaryNorm(np.arange(-0.5, 19.5, 1), ncolors=20, extend="neither", clip=True)
+        default_factory=lambda: BoundaryNorm(np.arange(-0.5, 20.5, 1), ncolors=20, extend="neither", clip=True)
     )
-    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Integer Map"))
+    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Label", ticks=np.arange(0, 20, 3)))
 
 
 @dataclass(frozen=True, kw_only=True)
