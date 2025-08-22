@@ -39,3 +39,16 @@ jobs:
           data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
       - name: Run pytest
         run: uv run pytest -v
+
+      # Guard: fail on PR to develop if 'ci/uv' is referenced in workflows
+      - name: Ensure 'ci/uv' is not referenced in workflows
+        if: ${{ github.event_name == 'pull_request' && github.base_ref == 'develop' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -R -nE '^[[:space:]]*-[[:space:]]*ci/uv[[:space:]]*$' .github/workflows/*.yml; then
+            echo "::error title=Remove 'ci/uv' from workflow triggers::Found 'ci/uv' branch listed under on.push.branches in workflow(s). Remove it before merging into 'develop'."
+            exit 1
+          fi
+          echo "::error title=Remove guard from workflow::This guard is only needed until 'ci/uv' is removed from workflows. Remove this step after that."
+          exit 1
