@@ -1,11 +1,15 @@
-from typing import overload
+from __future__ import annotations
 
-import numpy as np
+from typing import TYPE_CHECKING, overload
+
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure, SubFigure
 from matplotlib.ticker import MaxNLocator
 
-from eitprocessing.features.rate_detection import RateDetection
+if TYPE_CHECKING:
+    import numpy as np
+
+    from eitprocessing.features.rate_detection import RateDetection
 
 MINUTE = 60
 

@@ -55,7 +55,11 @@ def load_eit_data(
     >>> pixel_impedance = sequence.eit_data["raw"].pixel_impedance
     ```
     """
-    from eitprocessing.datahandling.loading import draeger, sentec, timpel  # not in top level to avoid circular import
+    from eitprocessing.datahandling.loading import (  # noqa: PLC0415
+        draeger,
+        sentec,
+        timpel,
+    )
 
     vendor = _ensure_vendor(vendor)
     load_from_single_path = {

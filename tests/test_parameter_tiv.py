@@ -149,7 +149,7 @@ def test_tiv_initialization():
 
 
 def test_deprecated():
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`breath_detection_kwargs` is deprecated and will be removed soon."):
         _ = TIV(breath_detection_kwargs={})
 
     with pytest.raises(TypeError):
@@ -157,7 +157,7 @@ def test_deprecated():
 
     bd_kwargs = {"minimum_duration": 10, "averaging_window_duration": 100.0}
 
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`breath_detection_kwargs` is deprecated and will be removed soon."):
         assert TIV(breath_detection_kwargs=bd_kwargs).breath_detection == BreathDetection(**bd_kwargs)
 
 

@@ -276,3 +276,14 @@ def test_kwargs(draeger1: Sequence):
     filtered_data = mdn_filter.apply(eit_data, label="Filtered EIT Data")
 
     assert filtered_data.label == "Filtered EIT Data"
+
+
+def test_plot_filter_effects(draeger1: Sequence):
+    """This test only checks that the plotting function runs without error."""
+    impedance = draeger1.continuous_data["global_impedance_(raw)"]
+    mdn_filter = MDNFilter(
+        respiratory_rate=10 / MINUTE,
+        heart_rate=80 / MINUTE,
+    )
+    mdn_filter.apply(impedance, captures=(captures := {}))
+    mdn_filter.plotting.plot_results(**captures)

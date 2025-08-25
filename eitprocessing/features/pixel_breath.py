@@ -143,7 +143,7 @@ class PixelBreath:
 
         _, n_rows, n_cols = eit_data.pixel_impedance.shape
 
-        from eitprocessing.parameters.tidal_impedance_variation import TIV
+        from eitprocessing.parameters.tidal_impedance_variation import TIV  # noqa: PLC0415
 
         pixel_tivs = TIV().compute_pixel_parameter(
             eit_data,

@@ -12,7 +12,7 @@ def test_sample_frequency_deprecation_warning():
     time = np.arange(n) / sample_frequency
     values = np.arange(n)
 
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`sample_frequency` is set to `None`"):
         ContinuousData(
             "label",
             "name",
@@ -22,7 +22,7 @@ def test_sample_frequency_deprecation_warning():
             values=values,
         )
 
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`sample_frequency` is set to `None`"):
         ContinuousData(
             "label",
             "name",
@@ -33,8 +33,7 @@ def test_sample_frequency_deprecation_warning():
             sample_frequency=None,
         )
 
-    with warnings.catch_warnings():
-        warnings.simplefilter("error")  # upgrades DeprecationWarning to raised exception
+    with warnings.catch_warnings(record=True) as w:
         ContinuousData(
             "label",
             "name",
@@ -44,3 +43,4 @@ def test_sample_frequency_deprecation_warning():
             values=values,
             sample_frequency=sample_frequency,
         )
+        assert len(w) == 0, "No warnings should be raised when sample_frequency is provided"

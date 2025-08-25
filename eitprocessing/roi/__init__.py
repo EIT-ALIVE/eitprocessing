@@ -43,7 +43,7 @@ T = TypeVar("T", np.ndarray, "EITData", "PixelMap")
 
 
 @dataclass(frozen=True)
-class PixelMask:
+class PixelMask:  # noqa: PLW1641
     """Mask pixels by selecting or weighing them individually.
 
     A mask is a 2D array with a value for each pixel. Most often, this value is NaN (`np.nan`, 'not a number') or 1, and
@@ -153,7 +153,7 @@ class PixelMask:
         if plot_config is None:
             plot_config = {}
         if isinstance(plot_config, dict):
-            from eitprocessing.plotting import get_plot_config
+            from eitprocessing.plotting import get_plot_config  # noqa: PLC0415
 
             default_config = get_plot_config(self)
             plot_config = default_config.update(**plot_config)
@@ -181,7 +181,7 @@ class PixelMask:
         Returns:
             PixelMapPlotting: The plotting configuration for this mask.
         """
-        from eitprocessing.plotting.pixelmap import PixelMapPlotting
+        from eitprocessing.plotting.pixelmap import PixelMapPlotting  # noqa: PLC0415
 
         return PixelMapPlotting(self)
 

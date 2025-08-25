@@ -149,7 +149,7 @@ class PixelMap:
         if plot_config is None:
             plot_config = {}
         if isinstance(plot_config, dict):
-            from eitprocessing.plotting import get_plot_config
+            from eitprocessing.plotting import get_plot_config  # noqa: PLC0415
 
             default_config = get_plot_config(self)
             plot_config = default_config.update(**plot_config)
@@ -352,7 +352,7 @@ class PixelMap:
             msg = "`comparator` must be a callable function."
             raise TypeError(msg)
 
-        from eitprocessing.roi import PixelMask
+        from eitprocessing.roi import PixelMask  # noqa: PLC0415
 
         compare_values = np.abs(self.values) if use_magnitude else self.values
 
@@ -375,7 +375,7 @@ class PixelMap:
     @property
     def plotting(self) -> PixelMapPlotting:
         """A utility class for plotting the pixel map with the specified configuration."""
-        from eitprocessing.plotting.pixelmap import PixelMapPlotting
+        from eitprocessing.plotting.pixelmap import PixelMapPlotting  # noqa: PLC0415
 
         return PixelMapPlotting(self)
 
