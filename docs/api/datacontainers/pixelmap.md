@@ -4,8 +4,10 @@
         - PixelMap
         - DifferenceMap
         - TIVMap
+        - AmplitudeMap
         - ODCLMap
         - PerfusionMap
         - PendelluftMap
         - SignedPendelluftMap
+        - IntegerMap
         - PlotParameters
