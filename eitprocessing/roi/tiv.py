@@ -77,6 +77,7 @@ class TIVLungspace:
             raise ValueError(msg)
 
         if np.all(np.isnan(tiv_per_breath.values)):
+            # not able to write tests to capture this case, but included for safety
             msg = "No non-nan TIV values were found."
             exc = ValueError(msg)
             if sys.version_info >= (3, 11):
