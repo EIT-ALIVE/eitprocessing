@@ -356,13 +356,13 @@ class PixelMap:
 
         compare_values = np.abs(self.values) if use_magnitude else self.values
 
+        if np.all(np.isnan(compare_values)):
+            msg = "All values in the pixel map are NaN. Cannot create mask based on threshold."
+            raise ValueError(msg)
+
         if fraction_of_max:
             # Convert the threshold to an absolute value
             max_val = np.nanmax(compare_values)
-
-            if np.isnan(max_val):
-                msg = ("All values in the pixel map are NaN. Cannot compute fraction of maximum value.",)
-                raise ValueError(msg)
 
             actual_threshold = threshold * max_val
         else:
