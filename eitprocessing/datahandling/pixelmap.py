@@ -578,7 +578,12 @@ class PixelMap:
 
 @dataclass(frozen=True, init=False)
 class TIVMap(PixelMap):
-    """Pixel map representing the tidal impedance variation or amplitude."""
+    """Pixel map representing the tidal impedance variation."""
+
+
+@dataclass(frozen=True, init=False)
+class AmplitudeMap(PixelMap):
+    """Pixel map representing the amplitude."""
 
     allow_negative_values: ClassVar[bool] = False
 

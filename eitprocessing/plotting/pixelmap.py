@@ -414,6 +414,18 @@ class TIVMapPlotConfig(PixelMapPlotConfig):
 
 
 @dataclass(frozen=True, kw_only=True)
+class AmplitudeMapPlotConfig(TIVMapPlotConfig):
+    """Configuration for plotting amplitude maps.
+
+    The default configuration is similar to TIVMapPlotConfig, but uses:
+
+    - Default colorbar label "Amplitude (a.u.)"
+    """
+
+    colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Amplitude (a.u.)"))
+
+
+@dataclass(frozen=True, kw_only=True)
 class ODCLMapPlotConfig(PixelMapPlotConfig):
     """Configuration for plotting ODCL maps.
 

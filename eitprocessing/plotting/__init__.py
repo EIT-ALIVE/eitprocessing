@@ -1,6 +1,7 @@
 from typing import Protocol, cast, runtime_checkable
 
 from eitprocessing.datahandling.pixelmap import (
+    AmplitudeMap,
     DifferenceMap,
     IntegerMap,
     ODCLMap,
@@ -11,6 +12,7 @@ from eitprocessing.datahandling.pixelmap import (
     TIVMap,
 )
 from eitprocessing.plotting.pixelmap import (
+    AmplitudeMapPlotConfig,
     Config,
     DifferenceMapPlotConfig,
     IntegerMapPlotConfig,
@@ -37,6 +39,7 @@ _PLOT_CONFIG_REGISTRY: dict[type[HasPlottableConfig] | str, Config] = {
     "default": PixelMapPlotConfig(),
     PixelMap: PixelMapPlotConfig(),
     TIVMap: TIVMapPlotConfig(),
+    AmplitudeMap: AmplitudeMapPlotConfig(),
     ODCLMap: ODCLMapPlotConfig(),
     DifferenceMap: DifferenceMapPlotConfig(),
     PerfusionMap: PerfusionMapPlotConfig(),
