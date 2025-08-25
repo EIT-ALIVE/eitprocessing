@@ -17,7 +17,7 @@ class AmplitudeLungspace:
     """Create a pixel mask by thresholding the mean amplitude.
 
     This defines the functional lung space as all pixels with an amplitude of at least the provided fractional threshold
-    of the maximum ampltiude.
+    of the maximum amplitude.
 
     Warning:
         A lung space based on amplitude is not recommended, as it potentially includes reconstruction artifacts. The
