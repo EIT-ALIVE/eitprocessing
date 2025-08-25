@@ -56,7 +56,7 @@ dev = [
     "coverage",
     "pytest-cov",
     "coveralls",
-    "ruff==0.12.9",
+    "ruff==0.12.10",
 ]
 testing = ["pytest >= 7.4.0, < 8.4.0", "pytest-cov", "coveralls"]
 docs = [
