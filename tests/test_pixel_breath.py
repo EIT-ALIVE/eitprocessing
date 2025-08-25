@@ -185,14 +185,14 @@ def mock_compute_pixel_parameter(mean: int):
 
 
 def test_deprecated():
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`breath_detection_kwargs` is deprecated and will be removed soon."):
         _ = PixelBreath(breath_detection_kwargs={})
 
     with pytest.raises(TypeError):
         _ = PixelBreath(breath_detection=BreathDetection(), breath_detection_kwargs={})
 
     bd_kwargs = {"minimum_duration": 10, "averaging_window_duration": 100.0}
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="`breath_detection_kwargs` is deprecated and will be removed soon."):
         assert PixelBreath(breath_detection_kwargs=bd_kwargs).breath_detection == BreathDetection(**bd_kwargs)
 
 
@@ -387,7 +387,7 @@ def test_phase_modes(draeger1: Sequence, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
-    ssequence = draeger1
+    ssequence = copy.deepcopy(draeger1)
     eit_data = ssequence.eit_data["raw"]
 
     # reduce the pixel set to middly 'well-behaved' pixels with positive TIV

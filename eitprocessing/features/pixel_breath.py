@@ -78,6 +78,7 @@ class PixelBreath:
                 "`breath_detection_kwargs` is deprecated and will be removed soon. "
                 "Replace with `breath_detection=BreathDetection(**breath_detection_kwargs)`.",
                 DeprecationWarning,
+                stacklevel=2,
             )
 
     def find_pixel_breaths(  # noqa: C901, PLR0912, PLR0915
@@ -142,7 +143,7 @@ class PixelBreath:
 
         _, n_rows, n_cols = eit_data.pixel_impedance.shape
 
-        from eitprocessing.parameters.tidal_impedance_variation import TIV
+        from eitprocessing.parameters.tidal_impedance_variation import TIV  # noqa: PLC0415
 
         pixel_tivs = TIV().compute_pixel_parameter(
             eit_data,
@@ -255,7 +256,9 @@ class PixelBreath:
             if len(starts) > len(skip) > len(starts) * ALLOW_FRACTION_BREATHS_SKIPPED:
                 warnings.warn(
                     f"Skipping pixel ({row}, {col}) because more than half ({len(skip) / len(starts):.0%}) "
-                    "of breaths skipped."
+                    "of breaths skipped.",
+                    RuntimeWarning,
+                    stacklevel=2,
                 )
                 continue
 

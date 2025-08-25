@@ -29,8 +29,8 @@ def check_filter_attributes(filter_, kwargs):  # noqa: ANN001
     for key, value in kwargs.items():
         assert getattr(filter_, key) == value
 
-    assert hasattr(filter_, "apply_filter")
-    assert callable(filter_.apply_filter)
+    assert hasattr(filter_, "apply")
+    assert callable(filter_.apply)
     assert filter_.available_in_gui
 
 
@@ -185,6 +185,12 @@ def test_specified_butterworth_equivalence(filter_arguments: dict):
     assert filter7 == filter8
 
 
+def test_apply_filter_warns(filter_arguments: dict):
+    filter_ = ButterworthFilter(**filter_arguments)
+    with pytest.warns(DeprecationWarning, match="The `apply_filter` method is deprecated. Use `apply` instead."):
+        _ = filter_.apply_filter(np.random.default_rng().random(1000))
+
+
 def test_butterworth_functionality():
     """Tests the functionality of the Butterworth filters.
 
@@ -247,8 +253,8 @@ def test_butterworth_functionality():
             order=order,
             sample_frequency=sample_frequency,
         )
-        result1 = filter1.apply_filter(data, axis=axis)
-        result2 = filter2.apply_filter(data, axis=axis)
+        result1 = filter1.apply(data, axis=axis)
+        result2 = filter2.apply(data, axis=axis)
         assert np.array_equal(result1, result2)
 
         sos = signal.butter(
@@ -286,3 +292,14 @@ def test_butterworth_functionality():
             signal_,
             axis,
         )
+
+
+def test_nan_values(filter_arguments: dict):
+    filter_ = ButterworthFilter(**filter_arguments)
+    data = np.random.default_rng().random(1000)
+
+    _ = filter_.apply(data)
+
+    data[100] = np.nan
+    with pytest.raises(ValueError):
+        _ = filter_.apply(data)

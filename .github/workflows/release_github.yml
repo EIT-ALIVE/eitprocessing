@@ -93,7 +93,7 @@ jobs:
           data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
 
       - name: Run pytest
-        run: pytest -v
+        run: pytest -v --runslow
 
       - name: Install additional dependencies for building
         run: python3 -m pip install --upgrade ".[publishing]"

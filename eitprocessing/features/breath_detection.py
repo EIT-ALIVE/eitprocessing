@@ -176,6 +176,9 @@ class BreathDetection:
         peak_indices = self._find_extrema(data, moving_average, sample_frequency)
         valley_indices = self._find_extrema(data, moving_average, sample_frequency, invert=True)
 
+        if len(valley_indices) < 2 or len(peak_indices) < 1:  # noqa: PLR2004
+            return np.array([], dtype=int), np.array([], dtype=int)
+
         peak_indices, valley_indices = self._remove_edge_cases(data, peak_indices, valley_indices, moving_average)
         peak_indices, valley_indices = self._remove_doubles(data, peak_indices, valley_indices)
         peak_indices, valley_indices = self._remove_low_amplitudes(data, peak_indices, valley_indices)

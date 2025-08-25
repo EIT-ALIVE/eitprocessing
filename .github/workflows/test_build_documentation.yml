@@ -28,7 +28,9 @@ jobs:
           extract-data: false
           python-version: "3.10"
       - name: Build documentation
-        run: mkdocs build
+        run: |
+          ln -s ../../notebooks docs/examples
+          mkdocs build
       - name: Deploy documentation
-        if: ${{ github.event.action == 'push' && github.action_ref == 'main' }}
-        run: mkdocs gh-deploy
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: mike deploy --push --update-aliases $(git describe --tags --abbrev=0 | sed -E 's/^([vV]?[0-9]+\.[0-9]+).*/\1/') latest

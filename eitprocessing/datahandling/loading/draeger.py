@@ -68,7 +68,7 @@ def load_from_single_path(
             f"the first frame selected ({first_frame}, total frames: "
             f"{total_frames}).\n {n_frames} frames will be loaded."
         )
-        warnings.warn(msg)
+        warnings.warn(msg, RuntimeWarning, stacklevel=2)
 
     # We need to load 1 frame before first actual frame to check if there is an event marker. Data for the pre-first
     # (dummy) frame will be removed from self at the end of this function.
@@ -194,7 +194,7 @@ def _estimate_sample_frequency(time: np.ndarray, sample_frequency: float | None)
             f"Provided sample frequency ({sample_frequency}) does not match "
             f"the estimated sample frequency ({estimated_sample_frequency})."
         )
-        warnings.warn(msg, RuntimeWarning)
+        warnings.warn(msg, RuntimeWarning, stacklevel=2)
 
     return sample_frequency
 
@@ -274,7 +274,7 @@ def _read_frame(
     if ((previous_marker is not None) and (event_marker > previous_marker)) or (index == 0 and event_text):
         events.append((frame_time, Event(event_marker, event_text)))
     if timing_error:
-        warnings.warn("A timing error was encountered during loading.")
+        warnings.warn("A timing error was encountered during loading.", RuntimeWarning, stacklevel=2)
         # TODO: expand on what timing errors are in some documentation.
     if min_max_flag in (1, -1):
         phases.append((frame_time, min_max_flag))
