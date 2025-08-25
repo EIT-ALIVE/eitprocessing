@@ -282,7 +282,7 @@ class PixelMask:
 
     def __sub__(self, other: Self) -> Self:
         mask = (np.nan_to_num(self.mask, nan=0) - np.nan_to_num(other.mask, nan=0)).astype(float).clip(min=0)
-        return self.update(mask=mask, keep_zeros=False, label=None)
+        return self.update(mask=mask, keep_zeros=False, label=None, suppress_zero_conversion_warning=True)
 
     def __eq__(self, other: object) -> bool:
         """Check if two masks are equal.
