@@ -493,7 +493,7 @@ class PixelMap:
     def from_aggregate(
         cls,
         maps: Sequence[npt.ArrayLike | PixelMap],
-        aggregator: Callable[[np.ndarray, int], np.ndarray],
+        aggregator: Callable[..., np.ndarray],
         **return_attrs,
     ) -> Self:
         """Get a pixel map by aggregating several pixel maps with a specified function.
@@ -535,7 +535,11 @@ class PixelMap:
             return map_
 
         stacked = np.stack([_get_values(map_) for map_ in maps])
-        aggregated_values = aggregator(stacked, axis=0)
+
+        included_pixels = ~np.all(np.isnan(stacked), axis=0)
+        aggregated_values = np.full(stacked.shape[1:], np.nan)
+        aggregated_values[included_pixels] = aggregator(stacked[:, included_pixels], axis=0)
+
         return cls(values=aggregated_values, **return_attrs)
 
     def to_boolean_array(self, *, zero: bool = False) -> np.ndarray:
