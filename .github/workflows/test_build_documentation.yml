@@ -33,4 +33,6 @@ jobs:
           mkdocs build
       - name: Deploy documentation
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-        run: mike deploy --push --update-aliases $(git describe --tags --abbrev=0 | sed -E 's/^([vV]?[0-9]+\.[0-9]+).*/\1/') latest
+        run: |
+          GIT_COMMITTER_NAME=ci-bot GIT_COMMITTER_EMAIL=ci-bot@github.com \
+          mike deploy --push --update-aliases $(git describe --tags --abbrev=0 | sed -E 's/^([vV]?[0-9]+\.[0-9]+).*/\1/') latest
