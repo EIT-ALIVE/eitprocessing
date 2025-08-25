@@ -238,6 +238,10 @@ class PixelMap:
                 raise TypeError(msg)
             self._check_normalization_reference(reference)
 
+        if np.all(np.isnan(self.values)):
+            msg = "Cannot normalize a PixelMap with all NaN values."
+            raise ValueError(msg)
+
         reference_: float
         match mode:
             case "symmetric":
