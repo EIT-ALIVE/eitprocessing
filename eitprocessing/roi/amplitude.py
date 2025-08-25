@@ -19,6 +19,10 @@ class AmplitudeLungspace:
     This defines the functional lung space as all pixels with an amplitude of at least the provided fractional threshold
     of the maximum ampltiude.
 
+    Warning:
+        A lung space based on amplitude is not recommended, as it potentially includes reconstruction artifacts. The
+        option is provided for completeness and use in other algorithms, namely WatershedLungspace.
+
     Example usage:
     ```python
     >>> mask = AmplitudeLungspace(threshold=0.15).apply(eit_data)
