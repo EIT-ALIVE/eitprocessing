@@ -29,8 +29,8 @@ def check_filter_attributes(filter_, kwargs):  # noqa: ANN001
     for key, value in kwargs.items():
         assert getattr(filter_, key) == value
 
-    assert hasattr(filter_, "apply_filter")
-    assert callable(filter_.apply_filter)
+    assert hasattr(filter_, "apply")
+    assert callable(filter_.apply)
     assert filter_.available_in_gui
 
 
@@ -298,8 +298,8 @@ def test_nan_values(filter_arguments: dict):
     filter_ = ButterworthFilter(**filter_arguments)
     data = np.random.default_rng().random(1000)
 
-    _ = filter_.apply_filter(data)
+    _ = filter_.apply(data)
 
     data[100] = np.nan
     with pytest.raises(ValueError):
-        _ = filter_.apply_filter(data)
+        _ = filter_.apply(data)
