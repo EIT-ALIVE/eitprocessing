@@ -74,6 +74,7 @@ nav:
         - Regions of Interest: api/roi/roi.md
         - FilterROIBySize: api/roi/filterbysize.md
         - PixelMaskCollection: api/roi/pixelmaskcollection.md
+        - TIVLungspace: api/roi/tivlunspace.md
         - Watershed Lungspace: api/roi/watershed.md
       - api/parameters.md
       - api/categories.md
