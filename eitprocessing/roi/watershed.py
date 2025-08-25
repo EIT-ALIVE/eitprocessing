@@ -9,6 +9,7 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.pixelmap import IntegerMap, PixelMap, TIVMap
 from eitprocessing.roi import PixelMask
+from eitprocessing.roi.amplitude import AmplitudeLungspace
 from eitprocessing.roi.tiv import TIVLungspace
 from eitprocessing.utils import make_capture
 
@@ -88,18 +89,18 @@ class WatershedLungspace:
             timing_data = eit_data.get_summed_impedance()
 
         try:
-            _ = TIVLungspace(threshold=self.threshold_fraction, mode="TIV").apply(
+            _ = TIVLungspace(threshold=self.threshold_fraction).apply(
                 eit_data=eit_data, timing_data=timing_data, captures=(capture_tiv_lungspace := {})
             )
-            _ = TIVLungspace(threshold=self.threshold_fraction, mode="amplitude").apply(
+            _ = AmplitudeLungspace(threshold=self.threshold_fraction).apply(
                 eit_data=eit_data, timing_data=timing_data, captures=(capture_amplitude_lungspace := {})
             )
         except ValueError as e:
             msg = "No breaths found in TIV or amplitude data. No functional lung space can be defined."
             raise ValueError(msg) from e
 
-        tiv = capture_tiv_lungspace["TIV values"]
-        amplitude = capture_amplitude_lungspace["amplitude values"]
+        tiv = capture_tiv_lungspace["TIV per breath"]
+        amplitude = capture_amplitude_lungspace["amplitude per breath"]
 
         # The amplitude normally has less breaths; to prevent averaging over different breaths, only include breaths
         # that are in both sets
