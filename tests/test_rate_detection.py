@@ -339,7 +339,9 @@ def test_with_data(sequence: Sequence, slice_: slice, expected_rr: float, expect
     """Test the RateDetection algorithm with real EIT data."""
     rd = RateDetection("adult")
     eit_data: EITData = sequence.eit_data["raw"]
-    sub_data = eit_data.t[slice_]
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning, message="No starting or end timepoint was selected.")
+        sub_data = eit_data.t[slice_]
 
     rr, hr = rd.apply(sub_data)
 

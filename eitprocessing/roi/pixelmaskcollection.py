@@ -172,6 +172,7 @@ class PixelMaskCollection:
             warnings.warn(
                 "Cannot overwrite existing masks in an anonymous collection. All masks with be added instead.",
                 UserWarning,
+                stacklevel=2,
             )
         if kwargs:
             msg = "Cannot mix labelled and anonymous masks in a collection."

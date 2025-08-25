@@ -74,6 +74,8 @@ def load_from_single_path(
                 f"than the available number ({data.shape[0]}) of frames after "
                 f"the first frame selected ({first_frame}).\n"
                 f"{data.shape[0]} frames have been loaded.",
+                RuntimeWarning,
+                stacklevel=2,
             )
         nframes = data.shape[0]
 

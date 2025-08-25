@@ -48,11 +48,13 @@ from __future__ import annotations
 import sys
 import warnings
 from dataclasses import KW_ONLY, InitVar, asdict, dataclass, field, replace
-from typing import TYPE_CHECKING, ClassVar, Literal, TypeVar, cast
+from typing import TYPE_CHECKING, ClassVar, Literal, NoReturn, TypeVar, cast
 
 import numpy as np
 from numpy import typing as npt
 from typing_extensions import Self
+
+from eitprocessing.utils import make_capture
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -64,7 +66,7 @@ if TYPE_CHECKING:
 PixelMapT = TypeVar("PixelMapT", bound="PixelMap")
 
 
-@dataclass(frozen=True, init=False)
+@dataclass(frozen=True)
 class PixelMap:
     """Map representing a single value for each pixel.
 
@@ -92,6 +94,7 @@ class PixelMap:
     plot_config: InitVar[PixelMapPlotConfig]
     _plot_config: PixelMapPlotConfig = field(init=False, repr=False)
     allow_negative_values: ClassVar[bool] = True
+    dtype: ClassVar[np.dtype] = np.dtype(float)
 
     def __init__(
         self,
@@ -102,7 +105,22 @@ class PixelMap:
         suppress_all_nan_warning: bool = False,
         plot_config: PixelMapPlotConfig | dict | None = None,
     ):
-        values = np.asarray(values, dtype=float)
+        # Checks whether values are convertible to the specified type without losing information.
+
+        try:
+            values = np.asarray(values)
+            cast_values = np.asarray(values, dtype=self.dtype)
+            if not np.array_equal(cast_values, values, equal_nan=True):
+                # Raise within try block to catch together with exceptions from previous lines
+                msg = "Values are not losslessly convertible to the specified dtype."
+                raise ValueError(msg)  # noqa: TRY301
+
+        except ValueError as e:
+            msg = f"Values must be convertible to {self.dtype}."
+            raise TypeError(msg) from e
+
+        values = cast_values
+
         if values.ndim != 2:  # noqa: PLR2004, ignore hardcoded value
             msg = f"`values` should have 2 dimensions, not {values.ndim}."
             raise ValueError(msg)
@@ -112,6 +130,7 @@ class PixelMap:
                 f"{self.__class__.__name__} initialized with all NaN values. "
                 "This may lead to unexpected behavior in plotting or analysis.",
                 UserWarning,
+                stacklevel=2,
             )
 
         if not self.allow_negative_values and not suppress_negative_warning and np.any(values < 0):
@@ -119,6 +138,7 @@ class PixelMap:
                 f"{self.__class__.__name__} initialized with negative values, but `allow_negative_values` is False. "
                 "This may lead to unexpected behavior in plotting or analysis.",
                 UserWarning,
+                stacklevel=2,
             )
 
         values.flags.writeable = False  # Make the values array immutable
@@ -218,6 +238,10 @@ class PixelMap:
                 raise TypeError(msg)
             self._check_normalization_reference(reference)
 
+        if np.all(np.isnan(self.values)):
+            msg = "Cannot normalize a PixelMap with all NaN values."
+            raise ValueError(msg)
+
         reference_: float
         match mode:
             case "symmetric":
@@ -263,14 +287,18 @@ class PixelMap:
                 )
             raise exc
         if reference_ < 0:
-            warnings.warn("Normalization by a negative number may lead to unexpected results.", UserWarning)
+            warnings.warn(
+                "Normalization by a negative number may lead to unexpected results.", UserWarning, stacklevel=2
+            )
 
     def create_mask_from_threshold(
         self,
         threshold: float,
         *,
         comparator: Callable = np.greater_equal,
-        absolute: bool = False,
+        use_magnitude: bool = False,
+        fraction_of_max: bool = False,
+        captures: dict | None = None,
     ) -> PixelMask:
         """Create a pixel mask from the pixel map based on threshold values.
 
@@ -280,14 +308,21 @@ class PixelMap:
         the `operator` module or custom function which takes pixel map values array and threshold as arguments, and
         returns a boolean array with the same shape as the array.
 
-        If `absolute` is True, absolute values are compared to the threshold.
+        If `use_magnitude` is True, absolute values are compared to the threshold.
+
+        If `fraction_of_max` is True, the threshold is interpreted as a fraction of the maximum value in the map. For
+        example, a threshold of 0.2 with `fraction_of_max=True` will create a mask where values are at least 20% of the
+        maximum value.
 
         The shape of the pixel mask is the same as the shape of the pixel map.
 
         Args:
-            threshold (float): The threshold value.
+            threshold (float): The threshold value or fraction, depending on `fraction_of_max` argument.
             comparator (Callable): A function that compares pixel values against the threshold.
-            absolute (bool): If True, apply the threshold to the absolute values of the pixel map.
+            use_magnitude (bool): If True, apply the threshold to the absolute values of the pixel map.
+            fraction_of_max (bool): If True, interpret threshold as a fraction of the maximum value.
+            captures (dict | None):
+                An optional dictionary to capture intermediate results. If None, no captures are made.
 
         Returns:
             PixelMask:
@@ -298,14 +333,17 @@ class PixelMap:
 
         Examples:
         >>> pm = PixelMap([[0.1, 0.5, 0.9]])
-        >>> mask = pm.create_mask_from_threshold(0.5)
+        >>> mask = pm.create_mask_from_threshold(0.5)  # Absolute threshold of 0.5
         PixelMask(mask=array([[nan,  1.,  1.]]))
-        >>> mask.apply(pm)
-        PixelMap(values=array([[nan, 0.5, 0.9]]), ...)
+
+        >>> mask = pm.create_mask_from_threshold(0.5, fraction_of_max=True)  # 50% of max value (=0.45)
+        PixelMask(mask=array([[nan,  1.,  1.]]))
 
         >>> mask = pm.create_mask_from_threshold(0.5, comparator=np.less)
         PixelMask(mask=array([[ 1., nan, nan]]))
         """
+        capture = make_capture(captures)
+
         if not isinstance(threshold, (float, np.floating, int, np.integer)):
             msg = "`threshold` must be a number."
             raise TypeError(msg)
@@ -316,8 +354,22 @@ class PixelMap:
 
         from eitprocessing.roi import PixelMask
 
-        compare_values = np.abs(self.values) if absolute else self.values
-        mask_values = comparator(compare_values, threshold)
+        compare_values = np.abs(self.values) if use_magnitude else self.values
+
+        if np.all(np.isnan(compare_values)):
+            msg = "All values in the pixel map are NaN. Cannot create mask based on threshold."
+            raise ValueError(msg)
+
+        if fraction_of_max:
+            # Convert the threshold to an absolute value
+            max_val = np.nanmax(compare_values)
+
+            actual_threshold = threshold * max_val
+        else:
+            actual_threshold = threshold
+        capture("actual threshold", actual_threshold)
+
+        mask_values = comparator(compare_values, actual_threshold)
         return PixelMask(mask_values)
 
     @property
@@ -419,7 +471,7 @@ class PixelMap:
     def __truediv__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
         other_values = self._validate_other(other)
         if isinstance(other_values, np.ndarray) and 0 in other_values:
-            warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning)
+            warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning, stacklevel=2)
 
         invalid = np.isnan(self.values) | np.isnan(other_values) | (other_values == 0)
         new_values = np.divide(self.values, other_values, where=~invalid)
@@ -431,7 +483,7 @@ class PixelMap:
     def __rtruediv__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
         other_values = self._validate_other(other)
         if 0 in self.values:
-            warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning)
+            warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning, stacklevel=2)
         invalid = np.isnan(self.values) | np.isnan(other_values) | (self.values == 0)
         new_values = np.divide(other_values, self.values, where=~invalid)
         new_values[invalid] = np.nan
@@ -445,7 +497,7 @@ class PixelMap:
     def from_aggregate(
         cls,
         maps: Sequence[npt.ArrayLike | PixelMap],
-        aggregator: Callable[[np.ndarray, int], np.ndarray],
+        aggregator: Callable[..., np.ndarray],
         **return_attrs,
     ) -> Self:
         """Get a pixel map by aggregating several pixel maps with a specified function.
@@ -487,13 +539,59 @@ class PixelMap:
             return map_
 
         stacked = np.stack([_get_values(map_) for map_ in maps])
-        aggregated_values = aggregator(stacked, axis=0)
+
+        included_pixels = ~np.all(np.isnan(stacked), axis=0)
+        aggregated_values = np.full(stacked.shape[1:], np.nan)
+        aggregated_values[included_pixels] = aggregator(stacked[:, included_pixels], axis=0)
+
         return cls(values=aggregated_values, **return_attrs)
+
+    def to_boolean_array(self, *, zero: bool = False) -> np.ndarray:
+        """Convert the pixel map values to a boolean array.
+
+        NaN values are replaced with False, and the resulting array is cast to boolean. 0-values are converted to False
+        by default. Provided `zero=True` in case you want to treat 0-values as True.
+
+        Returns:
+            np.ndarray: A 2D numpy array of booleans, where NaN values are replaced with False.
+        """
+        values = self.values.copy()
+        if zero is True:
+            values[values == 0] = 1
+        np.nan_to_num(values, nan=0, copy=False)
+        return values.astype(bool)
+
+    def to_integer_array(self) -> np.ndarray:
+        """Convert the pixel map values to an integer array.
+
+        NaN values are replaced with 0, and the resulting array is cast to integers.
+
+        Returns:
+            np.ndarray: A 2D numpy array of integers, where NaN values are replaced with 0.
+        """
+        return self.to_non_nan_array(nan=0, dtype=int)
+
+    def to_non_nan_array(self, *, nan: float = 0.0, dtype: type | np.dtype = float) -> np.ndarray:
+        """Convert the pixel map values to a numpy array, replacing NaN with a fill value.
+
+        Args:
+            nan (float): The value to replace NaN values with. Defaults to 0.0.
+            dtype (type | np.dtype): The data type of the resulting array. Defaults to float.
+
+        Returns:
+            np.ndarray: A 2D numpy array with NaN values replaced by `nan` and cast to the specified `dtype`.
+        """
+        return np.nan_to_num(self.values, nan=nan).astype(dtype)
 
 
 @dataclass(frozen=True, init=False)
 class TIVMap(PixelMap):
-    """Pixel map representing the tidal impedance variation or amplitude."""
+    """Pixel map representing the tidal impedance variation."""
+
+
+@dataclass(frozen=True, init=False)
+class AmplitudeMap(PixelMap):
+    """Pixel map representing the amplitude."""
 
     allow_negative_values: ClassVar[bool] = False
 
@@ -547,3 +645,19 @@ class SignedPendelluftMap(PixelMap):
     inflation starts), while negative values indicate pixels that have late inflation (after the global inflation
     starts).
     """
+
+
+@dataclass(frozen=True, init=False)
+class IntegerMap(PixelMap):
+    """Pixel map with integer values.
+
+    This class is a wrapper around PixelMap that ensures the values are integers. It is useful for pixel maps that
+    represent labels or discrete values.
+    """
+
+    dtype: ClassVar[np.dtype] = np.dtype(int)
+
+    def normalize(self, *args, **kwargs) -> NoReturn:
+        """Normalization is not supported for IntegerMap."""
+        msg = "Normalization is not supported for IntegerMap."
+        raise NotImplementedError(msg)

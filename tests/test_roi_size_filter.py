@@ -64,7 +64,7 @@ def test_custom_connectivity():
 
 def test_empty_mask_raises():
     arr = np.full((4, 4), np.nan)
-    mask = PixelMask(arr)
+    mask = PixelMask(arr, suppress_all_nan_warning=True)
     selector = FilterROIBySize(min_region_size=1, connectivity=1)
     with pytest.raises(RuntimeError, match="No regions found above min_region_size threshold"):
         selector.apply(mask)

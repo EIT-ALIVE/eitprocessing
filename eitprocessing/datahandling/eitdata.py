@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import warnings
-from dataclasses import dataclass, field
+from dataclasses import InitVar, dataclass, field
 from enum import auto
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import numpy as np
-from strenum import LowercaseStrEnum
+from strenum import LowercaseStrEnum  # TODO: EOL 3.10: replace with native StrEnum
 
 from eitprocessing.datahandling import DataContainer
+from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 
 if TYPE_CHECKING:
@@ -49,8 +50,9 @@ class EITData(DataContainer, SelectByTime):
     description: str = field(default="", compare=False, repr=False)
     name: str | None = field(default=None, compare=False, repr=False)
     pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
+    suppress_simulated_warning: InitVar[bool] = False
 
-    def __post_init__(self):
+    def __post_init__(self, suppress_simulated_warning: bool) -> None:
         if not self.label:
             self.label = f"{self.__class__.__name__}_{id(self)}"
 
@@ -64,12 +66,21 @@ class EITData(DataContainer, SelectByTime):
             msg = f"The number of time points ({lt}) does not match the number of pixel impedance values ({lv})."
             raise ValueError(msg)
 
+        if not suppress_simulated_warning and self.vendor == Vendor.SIMULATED:
+            warnings.warn(
+                "The simulated vendor is used for testing purposes. "
+                "It is not a real vendor and should not be used in production code.",
+                UserWarning,
+                stacklevel=2,
+            )
+
     @property
     def framerate(self) -> float:
         """Deprecated alias to `sample_frequency`."""
         warnings.warn(
             "The `framerate` attribute has been deprecated. Use `sample_frequency` instead.",
             DeprecationWarning,
+            stacklevel=2,
         )
         return self.sample_frequency
 
@@ -135,6 +146,28 @@ class EITData(DataContainer, SelectByTime):
     def __len__(self):
         return self.pixel_impedance.shape[0]
 
+    def get_summed_impedance(self, *, return_label: str | None = None, **return_kwargs) -> ContinuousData:
+        """Return a ContinuousData-object with the same time axis and summed pixel values over time.
+
+        Args:
+            return_label: The label of the returned object; defaults to 'summed <label>' where '<label>' is the label of
+            the current object.
+            **return_kwargs: Keyword arguments for the creation of the returned object.
+        """
+        summed_impedance = np.nansum(self.pixel_impedance, axis=(1, 2))
+
+        if return_label is None:
+            return_label = f"summed {self.label}"
+
+        return_kwargs_: dict[str, Any] = {
+            "name": return_label,
+            "unit": "AU",
+            "category": "impedance",
+            "sample_frequency": self.sample_frequency,
+        } | return_kwargs
+
+        return ContinuousData(label=return_label, time=np.copy(self.time), values=summed_impedance, **return_kwargs_)
+
     def calculate_global_impedance(self) -> np.ndarray:
         """Return the global impedance, i.e. the sum of all included pixels at each frame."""
         return np.nansum(self.pixel_impedance, axis=(1, 2))
@@ -148,3 +181,4 @@ class Vendor(LowercaseStrEnum):
     SENTEC = auto()
     DRAGER = DRAEGER
     DRÄGER = DRAEGER  # noqa: PLC2401
+    SIMULATED = auto()

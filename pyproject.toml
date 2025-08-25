@@ -46,19 +46,20 @@ dependencies = [
     "pyyaml",
     "frozendict>=2.4.6",
     "mkdocs-jupyter>=0.25.1",
+    "scikit-image>=0.25.2",
 ]
 
 [project.optional-dependencies]
 # development dependency groups
 dev = [
-    "pytest >= 7.4.0",
+    "pytest >= 7.4.0,< 8.4.0",
     "bump-my-version==0.28.1",
     "coverage",
     "pytest-cov",
     "coveralls",
     "ruff==0.11.7",
 ]
-testing = ["pytest >= 7.4.0", "pytest-cov", "coveralls"]
+testing = ["pytest >= 7.4.0, < 8.4.0", "pytest-cov", "coveralls"]
 docs = [
     "mkdocs",
     "mkdocs-material",

@@ -58,7 +58,7 @@ class ContinuousData(DataContainer, SelectByTime):
                 "`sample_frequency` is set to `None`. This will not be supported in future versions. "
                 "Provide a sample frequency when creating a ContinuousData object."
             )
-            warnings.warn(msg, DeprecationWarning)
+            warnings.warn(msg, DeprecationWarning, stacklevel=2)
 
         if (lv := len(self.values)) != (lt := len(self.time)):
             msg = f"The number of time points ({lt}) does not match the number of values ({lv})."

@@ -9,9 +9,11 @@ import pytest
 from matplotlib import pyplot as plt
 from matplotlib.colors import CenteredNorm, Colormap, Normalize
 from matplotlib.ticker import PercentFormatter, ScalarFormatter
+from numpy.exceptions import ComplexWarning
 
 from eitprocessing.datahandling.pixelmap import (
     DifferenceMap,
+    IntegerMap,
     ODCLMap,
     PendelluftMap,
     PerfusionMap,
@@ -168,11 +170,29 @@ def test_create_threshold_mask():
     mask = pm.create_mask_from_threshold(1, comparator=np.greater)
     assert np.array_equal(mask.mask, [[np.nan, np.nan, np.nan, np.nan, 1.0]], equal_nan=True)
 
-    mask = pm.create_mask_from_threshold(1, absolute=True)
+    mask = pm.create_mask_from_threshold(1, use_magnitude=True)
     assert np.array_equal(mask.mask, [[1.0, 1.0, np.nan, 1.0, 1.0]], equal_nan=True)
 
     mask = pm.create_mask_from_threshold(1, comparator=np.less)
     assert np.array_equal(mask.mask, [[1.0, 1.0, 1.0, np.nan, np.nan]], equal_nan=True)
+
+    mask = pm.create_mask_from_threshold(0.8, fraction_of_max=True)
+    assert np.array_equal(mask.mask, [[np.nan, np.nan, np.nan, np.nan, 1.0]], equal_nan=True)
+
+
+def test_create_threshold_mask_errors():
+    pm = PixelMap([[-2, -1, 0, 1, 2]])
+
+    with pytest.raises(TypeError, match="`comparator` must be a callable function"):
+        pm.create_mask_from_threshold(1, comparator=">=")
+
+    with pytest.raises(TypeError, match="`threshold` must be a number"):
+        pm.create_mask_from_threshold("foo")
+
+    pm = PixelMap([[np.nan]], suppress_all_nan_warning=True)
+
+    with pytest.raises(ValueError, match="All values in the pixel map are NaN."):
+        pm.create_mask_from_threshold(1, fraction_of_max=True)
 
 
 def test_convert():
@@ -302,8 +322,8 @@ def test_normalize_values_errors():
     with pytest.raises(ValueError, match="Normalization by NaN is not allowed"):
         _ = pm.normalize(mode="reference", reference=np.nan)
 
-    with pytest.raises(ValueError, match="Normalization by NaN is not allowed"):
-        _ = PixelMap([[np.nan]]).normalize()
+    with pytest.raises(ValueError, match="Cannot normalize a PixelMap with all NaN values."):
+        _ = PixelMap([[np.nan]], suppress_all_nan_warning=True).normalize()
 
     with pytest.warns(UserWarning, match="Normalization by a negative number"):
         _ = pm.normalize(mode="reference", reference=-1)
@@ -418,7 +438,10 @@ def test_add():
 
 def test_sub():
     pm1 = PerfusionMap([[0, 1, 2, 3]], plot_config={"absolute": True})
-    pm1_sub = pm1 - 3
+    with pytest.warns(
+        UserWarning, match="PerfusionMap initialized with negative values, but `allow_negative_values` is False."
+    ):
+        pm1_sub = pm1 - 3
     assert np.array_equal(pm1_sub.values, np.array([[-3, -2, -1, 0]]))
     assert isinstance(pm1_sub, PerfusionMap)
     assert pm1_sub.plotting.config == pm1.plotting.config
@@ -542,64 +565,127 @@ def test_mean():
 
 def test_replace_defaults():
     """Test that replacing PixelMapPlotParameters defaults works as expected."""
-    pm0 = PixelMap([[0]])
+    pm0 = PixelMap([[1]])
     assert pm0.plotting.config.cmap == "viridis"
 
     _PLOT_CONFIG_REGISTRY[PixelMap] = PixelMapPlotConfig(cmap="plasma")
 
-    pm1 = PixelMap([[0]])
+    pm1 = PixelMap([[1]])
     assert pm0.plotting.config.cmap == "viridis"
     assert pm1.plotting.config.cmap == "plasma"
 
-    pm2 = TIVMap([[0]])
+    pm2 = TIVMap([[1]])
     assert isinstance(pm2.plotting.config.cmap, Colormap)
     assert pm2.plotting.config.cmap.name == "Blues_r"
 
     _PLOT_CONFIG_REGISTRY[TIVMap] = _PLOT_CONFIG_REGISTRY[TIVMap].update(cmap="Greens")
 
-    pm3 = TIVMap([[0]])
+    pm3 = TIVMap([[1]])
     assert pm3.plotting.config.cmap == "Greens"
     assert pm3.plotting.config.colorbar
 
     _PLOT_CONFIG_REGISTRY[TIVMap] = _PLOT_CONFIG_REGISTRY[TIVMap].update(colorbar=False)
 
-    pm4 = TIVMap([[0]])
+    pm4 = TIVMap([[1]])
     assert pm4.plotting.config.cmap == "Greens"
     assert not pm4.plotting.config.colorbar
 
     reset_plot_config()
-    pm0 = PixelMap([[0]])
+    pm0 = PixelMap([[1]])
     assert pm0.plotting.config.cmap == "viridis"
 
 
 def test_set_pixelmap_plot_parameters():
     """Test that set_pixelmap_plot_parameters works as expected."""
-    pm0 = PixelMap([[0]])
+    pm0 = PixelMap([[1]])
     assert pm0.plotting.config.cmap == "viridis"
 
     set_plot_config_parameters(PixelMap, cmap="plasma")
 
-    pm1 = PixelMap([[0]])
+    pm1 = PixelMap([[1]])
     assert pm1.plotting.config.cmap == "plasma"
 
-    pm2 = TIVMap([[0]])
+    pm2 = TIVMap([[1]])
     assert isinstance(pm2.plotting.config.cmap, Colormap)
     assert pm2.plotting.config.cmap.name == "Blues_r"
 
     set_plot_config_parameters(TIVMap, cmap="Greens")
 
-    pm3 = TIVMap([[0]])
+    pm3 = TIVMap([[1]])
     assert pm3.plotting.config.cmap == "Greens"
 
     set_plot_config_parameters(cmap="Reds", colorbar=False)
     assert all(
-        cls([[0]]).plotting.config.cmap == "Reds" and not cls([[0]]).plotting.config.colorbar
+        cls([[1]]).plotting.config.cmap == "Reds" and not cls([[1]]).plotting.config.colorbar
         for cls in _PLOT_CONFIG_REGISTRY
+        if not isinstance(cls, str)
     )
 
     reset_plot_config(PixelMap)
 
-    pm4 = PixelMap([[0]])
-    pm5 = TIVMap([[0]])
+    pm4 = PixelMap([[1]])
+    pm5 = TIVMap([[1]])
     assert pm4.plotting.config.cmap == "viridis"
     assert pm5.plotting.config.cmap == "Reds"
+
+
+def test_dtype():
+    pm1 = IntegerMap([[0, 1], [2, 3]])
+    assert pm1.values.dtype == np.int_
+
+    pm2 = IntegerMap([[0.0, 1.0], [2.0, 3.0]])
+    assert pm2.values.dtype == np.int_
+
+    pm3 = PixelMap([[0, 1], [2, 3]])
+    assert pm3.values.dtype == np.float64, "integers should be convertable to float64"
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore", category=ComplexWarning, message="Casting complex values to real discards the imaginary part"
+        )
+        pm3 = PixelMap([[0 + 0j, 1.1], [2, 3]])
+    assert pm3.values.dtype == np.float64, "complex numbers without imaginary part should be convertable to float64"
+
+    with pytest.raises(TypeError, match="Values must be convertible to"):
+        _ = IntegerMap([[0.5, 1], [2, 3]])
+
+    with pytest.raises(TypeError, match="Values must be convertible to"):
+        _ = PixelMap([["a", 1], [2, 3]])
+
+
+def test_convert_to_array():
+    pm = PixelMap([[0, 1], [np.nan, 4]])
+
+    arr1 = pm.to_non_nan_array(nan=-1)
+
+    assert isinstance(arr1, np.ndarray)
+    assert arr1.dtype == np.float64
+    assert np.array_equal(arr1, np.array([[0.0, 1.0], [-1.0, 4.0]]))
+
+    arr2 = pm.to_non_nan_array()
+    assert np.array_equal(arr2, np.array([[0.0, 1.0], [0.0, 4.0]]))
+
+    arr3 = pm.to_non_nan_array(nan=-1, dtype=int)
+    assert arr3.dtype == np.int_
+    assert np.array_equal(arr3, np.array([[0, 1], [-1, 4]]))
+
+    arr4 = pm.to_boolean_array(zero=True)
+    assert arr4.dtype == np.bool_
+    assert np.array_equal(arr4, np.array([[True, True], [False, True]]))
+
+    arr5 = pm.to_boolean_array()
+    assert arr5.dtype == np.bool_
+    assert np.array_equal(arr5, np.array([[False, True], [False, True]]))
+
+    aa6 = pm.to_integer_array()
+    assert aa6.dtype == np.int_
+    assert np.array_equal(aa6, np.array([[0, 1], [0, 4]]))
+
+
+def test_integermap_normalize_not_implemented():
+    pm = IntegerMap([[0, 1], [2, 3]])
+    with pytest.raises(NotImplementedError, match="Normalization is not supported for IntegerMap."):
+        pm.normalize(mode="zero-based")
+
+    with pytest.raises(NotImplementedError, match="Normalization is not supported for IntegerMap."):
+        pm.normalize(mode="symmetric")

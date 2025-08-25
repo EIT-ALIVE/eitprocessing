@@ -90,7 +90,7 @@ def load_from_single_path(  # noqa: C901, PLR0912
                         "Sample frequency value found in file. "
                         f"The sample frequency value will be set to {sample_frequency:.2f}"
                     )
-                    warnings.warn(msg)
+                    warnings.warn(msg, RuntimeWarning, stacklevel=2)
 
                 else:
                     fh.seek(payload_size, os.SEEK_CUR)
@@ -108,7 +108,7 @@ def load_from_single_path(  # noqa: C901, PLR0912
             f"the first frame selected ({first_frame}, total frames: "
             f"{index}).\n {n_frames} frames will be loaded."
         )
-        warnings.warn(msg)
+        warnings.warn(msg, RuntimeWarning, stacklevel=2)
 
     if not sample_frequency:
         sample_frequency = SENTEC_SAMPLE_FREQUENCY

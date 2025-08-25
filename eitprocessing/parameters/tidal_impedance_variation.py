@@ -60,6 +60,7 @@ class TIV(ParameterCalculation):
                 "`breath_detection_kwargs` is deprecated and will be removed soon. "
                 "Replace with `breath_detection=BreathDetection(**breath_detection_kwargs)`.",
                 DeprecationWarning,
+                stacklevel=2,
             )
 
         if self.pixel_breath is _SENTINEL_PIXEL_BREATH:

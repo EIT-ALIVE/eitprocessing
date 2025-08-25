@@ -52,7 +52,7 @@ class SelectByIndex(ABC):
         object is attached.
         """
         if start is None and end is None:
-            warnings.warn("No starting or end timepoint was selected.")
+            warnings.warn("No starting or end timepoint was selected.", UserWarning, stacklevel=2)
             return self
 
         start = start if start is not None else 0
@@ -144,7 +144,7 @@ class SelectByTime(SelectByIndex, HasTimeIndexer):
             return copy.deepcopy(self)
 
         if start_time is None and end_time is None:
-            warnings.warn("No starting or end timepoint was selected.")
+            warnings.warn("No starting or end timepoint was selected.", UserWarning, stacklevel=2)
             return self
 
         if not np.all(np.sort(self.time) == self.time):
