@@ -54,13 +54,12 @@ import numpy as np
 from numpy import typing as npt
 from typing_extensions import Self
 
-from eitprocessing.plotting.pixelmap import PixelMapPlotting
 from eitprocessing.utils import make_capture
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from eitprocessing.plotting.pixelmap import PixelMapPlotConfig
+    from eitprocessing.plotting.pixelmap import PixelMapPlotConfig, PixelMapPlotting
     from eitprocessing.roi import PixelMask
 
 
@@ -376,6 +375,8 @@ class PixelMap:
     @property
     def plotting(self) -> PixelMapPlotting:
         """A utility class for plotting the pixel map with the specified configuration."""
+        from eitprocessing.plotting.pixelmap import PixelMapPlotting  # noqa: PLC0415
+
         return PixelMapPlotting(self)
 
     def convert_to(self, target_type: type[PixelMapT], *, keep_attrs: bool = False, **kwargs: dict) -> PixelMapT:
