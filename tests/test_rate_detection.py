@@ -179,6 +179,7 @@ low_power_frequencies = np.linspace(
 duration = np.linspace(10, 60, 5)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     ("high_power_frequency", "low_power_frequency", "duration"),
     list(itertools.product(high_power_frequencies, low_power_frequencies, duration)),
@@ -212,6 +213,7 @@ def test_frequencies(
     assert np.isclose(non_refined_hr, low_power_frequency, rtol=0.2, atol=1 / MINUTE)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     ("high_power_frequency", "harmonic_multiplier", "duration"),
     list(itertools.product(high_power_frequencies, range(2, 5), duration)),
@@ -247,6 +249,7 @@ def test_harmonic_heart_rate(
     assert np.isclose(hr, low_power_frequency, rtol=0.05, atol=0.5 / MINUTE)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     ("high_power_frequency", "low_power_frequency", "frequency_multipliers"),
     list(itertools.product(high_power_frequencies, low_power_frequencies, [(1, 1.3), (1, 1.4)])),
@@ -291,6 +294,7 @@ def test_multiple_frequencies(
 scale_factors = (0.8, 0.9, 1.0, 1.1, 1.2)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     ("high_power_frequency", "low_power_frequency", "high_frequency_scale_factor", "low_frequency_scale_factor"),
     list(itertools.product(high_power_frequencies, low_power_frequencies, scale_factors, scale_factors)),
