@@ -1,7 +1,7 @@
+from dataclasses import dataclass
 from typing import TypeVar
 
 import numpy as np
-from attr import dataclass
 from matplotlib import axes, figure
 from matplotlib import pyplot as plt
 from scipy import signal
