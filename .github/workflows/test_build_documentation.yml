@@ -16,6 +16,8 @@ jobs:
     if: github.event.pull_request.draft == false
     name: Build documentation
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
     strategy:
       fail-fast: false
     steps:
