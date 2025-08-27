@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - develop
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
@@ -16,25 +15,24 @@ jobs:
     if: github.event.pull_request.draft == false
     name: Build documentation
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-    strategy:
-      fail-fast: false
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
       - uses: ./.github/actions/install_eitprocessing
         with:
           dependencies: docs
           extract-data: false
           python-version: "3.10"
+      - name: Link notebooks
+        run: ln -s ../../notebooks docs/examples
       - name: Build documentation
-        run: |
-          ln -s ../../notebooks docs/examples
-          mkdocs build
-      - name: Deploy documentation
+        if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/main') }}
+        run: mkdocs build
+      - name: Build and deploy documentation
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
-          GIT_COMMITTER_NAME=ci-bot GIT_COMMITTER_EMAIL=ci-bot@github.com \
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           mike deploy --push --update-aliases $(git describe --tags --abbrev=0 | sed -E 's/^([vV]?[0-9]+\.[0-9]+).*/\1/') latest
