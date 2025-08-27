@@ -11,6 +11,9 @@ on:
       - main
       - develop
 
+permissions:
+  pages: write
+
 jobs:
   build-docs:
     if: github.event.pull_request.draft == false
@@ -30,11 +33,14 @@ jobs:
           extract-data: false
           python-version: "3.10"
       - name: Build documentation
+        if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/main') }}
         run: |
           ln -s ../../notebooks docs/examples
           mkdocs build
       - name: Deploy documentation
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
-          GIT_COMMITTER_NAME=ci-bot GIT_COMMITTER_EMAIL=ci-bot@github.com \
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${GITHUB_REPOSITORY}.git
           mike deploy --push --update-aliases $(git describe --tags --abbrev=0 | sed -E 's/^([vV]?[0-9]+\.[0-9]+).*/\1/') latest
