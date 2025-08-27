@@ -3,8 +3,8 @@ from typing import TypeVar
 
 import numpy as np
 
+from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
-from tests.test_breath_detection import ContinuousData
 
 T = TypeVar("T", bound=np.ndarray | ContinuousData | EITData)
 
