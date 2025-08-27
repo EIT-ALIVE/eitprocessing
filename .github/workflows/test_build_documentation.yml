@@ -24,10 +24,10 @@ jobs:
           dependencies: docs
           extract-data: false
           python-version: "3.10"
+      - name: Link notebooks
+        run: ln -s ../../notebooks docs/examples
       - name: Build documentation
-        run: |
-          ln -s ../../notebooks docs/examples
-          mkdocs build
+        run: mkdocs build
       - name: Deploy documentation
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
