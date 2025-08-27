@@ -27,6 +27,7 @@ jobs:
       - name: Link notebooks
         run: ln -s ../../notebooks docs/examples
       - name: Build documentation
+        if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/main') }}
         run: mkdocs build
       - name: Deploy documentation
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
