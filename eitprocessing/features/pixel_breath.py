@@ -208,7 +208,7 @@ class PixelBreath:
 
                 cd = np.copy(continuous_data.values)
                 cd = signal.detrend(cd, type="linear")
-                pi = np.copy(pixel_impedance[:, row, col])
+
                 if not np.all(np.isnan(pi)):
                     pi = signal.detrend(pi, type="linear")
 
