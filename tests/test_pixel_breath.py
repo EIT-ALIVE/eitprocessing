@@ -169,16 +169,23 @@ def none_sequence():
 
 def mock_compute_pixel_parameter(mean: int):
     def _mock(*_args, **_kwargs) -> SparseData:
+        n_breaths = 3
+        n_rows, n_cols = 2, 2
+        values = [np.full((n_rows, n_cols), mean, dtype=float) for _ in range(n_breaths)]
+
+        # Time must have the same length as values
+        time = np.linspace(0, 10, n_breaths)
+
         return SparseData(
             label="mock_sparse_data",
             name="Tidal impedance variation",
             unit=None,
             category="impedance difference",
-            time=np.linspace(0, 100, 100),
+            time=time,
             description="Mock tidal impedance variation",
             parameters={},
             derived_from=[],
-            values=np.full(100, np.sign(mean)),
+            values=values,
         )
 
     return _mock
@@ -351,6 +358,7 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
         ssequence = sequence
         pi = PixelBreath()
         eit_data = ssequence.eit_data["raw"]
+        eit_data.pixel_impedance[:, 0, 0] = np.nan  # set one pixel to NaN to test handling of NaNs
         cd = ssequence.continuous_data["global_impedance_(raw)"]
         pixel_breaths = pi.find_pixel_breaths(eit_data, cd)
         test_result = np.stack(pixel_breaths.values)
