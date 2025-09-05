@@ -169,16 +169,23 @@ def none_sequence():
 
 def mock_compute_pixel_parameter(mean: int):
     def _mock(*_args, **_kwargs) -> SparseData:
+        n_breaths = 3
+        n_rows, n_cols = 2, 2
+        values = [np.full((n_rows, n_cols), mean, dtype=float) for _ in range(n_breaths)]
+
+        # Time must have the same length as values
+        time = np.linspace(0, 10, n_breaths)
+
         return SparseData(
             label="mock_sparse_data",
             name="Tidal impedance variation",
             unit=None,
             category="impedance difference",
-            time=np.linspace(0, 100, 100),
+            time=time,
             description="Mock tidal impedance variation",
             parameters={},
             derived_from=[],
-            values=np.full(100, np.sign(mean)),
+            values=values,
         )
 
     return _mock
