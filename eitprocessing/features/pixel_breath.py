@@ -20,7 +20,7 @@ ALLOW_FRACTION_BREATHS_SKIPPED = 0.25
 
 
 def _return_sentinel_breath_detection() -> BreathDetection:
-    # Returns a sential of a BreathDetection, which only exists to signal that the default value for breath_detection
+    # Returns a sentinel of a BreathDetection, which only exists to signal that the default value for breath_detection
     # was used.
     return _SENTINEL_BREATH_DETECTION
 
@@ -190,9 +190,13 @@ class PixelBreath:
                 raise ValueError(msg)
 
         for row, col in itertools.product(range(n_rows), range(n_cols)):
+            if all_nan_mask[row, col]:
+                # pixel has no amplitude
+                continue
             mean_tiv = mean_tiv_pixel[row, col]
 
-            if np.std(pixel_impedance[:, row, col]) == 0:
+            pi = np.copy(pixel_impedance[:, row, col])  # TODO: check whether copying is necessary
+            if np.std(pi) == 0:
                 # pixel has no amplitude
                 continue
 
@@ -204,7 +208,7 @@ class PixelBreath:
 
                 cd = np.copy(continuous_data.values)
                 cd = signal.detrend(cd, type="linear")
-                pi = np.copy(pixel_impedance[:, row, col])
+
                 if not np.all(np.isnan(pi)):
                     pi = signal.detrend(pi, type="linear")
 
