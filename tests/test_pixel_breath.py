@@ -358,6 +358,7 @@ def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.C
         ssequence = sequence
         pi = PixelBreath()
         eit_data = ssequence.eit_data["raw"]
+        eit_data.pixel_impedance[:, 0, 0] = np.nan  # set one pixel to NaN to test handling of NaNs
         cd = ssequence.continuous_data["global_impedance_(raw)"]
         pixel_breaths = pi.find_pixel_breaths(eit_data, cd)
         test_result = np.stack(pixel_breaths.values)
