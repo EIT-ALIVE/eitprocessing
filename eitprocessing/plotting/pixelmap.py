@@ -492,7 +492,7 @@ class PendelluftMapPlotConfig(PixelMapPlotConfig):
     """
 
     cmap: str | Colormap = field(
-        default_factory=lambda: LinearSegmentedColormap.from_list("Pendelluft", ["black", "forestgreen"])
+        default_factory=lambda: LinearSegmentedColormap.from_list("Pendelluft", ["black", "forestgreen", "white"])
     )
     norm: Normalize = field(default_factory=_get_zero_norm)
     colorbar_kwargs: frozendict = field(default_factory=lambda: frozendict(label="Pendelluft"))
