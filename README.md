@@ -1,6 +1,6 @@
 # EITprocessing <!-- omit in toc -->
 
-## Introduction
+## IntroAduction
 
 [Electrical Impedance Tomography](https://en.wikipedia.org/wiki/Electrical_impedance_tomography) (EIT) is a noninvasive
 and radiation-free continuous imaging tool for monitoring respiratory mechanics. eitprocessing aims to provide a

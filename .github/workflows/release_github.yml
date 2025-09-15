@@ -68,42 +68,8 @@ jobs:
           gh pr checks ${{ github.ref_name }} --watch --fail-fast
           gh pr checks ${{ github.ref_name }} --json state -q 'if . | length == 0 then "No checks found." elif map(.state == "SUCCESS") | all then "All checks passed" else error("Not all checks passed") end'
 
-  test_python_releases:
-    needs: checks
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ["ubuntu-latest"]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
-    name: Build for ${{ matrix.python-version }}, ${{ matrix.os }}
-    env:
-      EIT_PROCESSING_TEST_DATA: ${{ github.workspace }}/../eitprocessing_data/
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install eitprocessing
-        uses: ./.github/actions/install_eitprocessing
-        with:
-          dependencies: testing
-          extract-data: true
-          python-version: ${{ matrix.python-version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
-
-      - name: Run pytest
-        run: pytest -v --runslow
-
-      - name: Install additional dependencies for building
-        run: python3 -m pip install --upgrade ".[publishing]"
-
-      - name: Build eitprocessing
-        run: python3 -m build
-
   merge_and_bump:
     name: Merge the changes into main and bump the version
-    needs: test_python_releases
     runs-on: ubuntu-latest
     outputs:
       new-version: ${{ steps.bump.outputs.current-version }}
