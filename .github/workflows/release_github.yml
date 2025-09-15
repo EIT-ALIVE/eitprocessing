@@ -70,6 +70,7 @@ jobs:
 
   merge_and_bump:
     name: Merge the changes into main and bump the version
+    needs: checks
     runs-on: ubuntu-latest
     outputs:
       new-version: ${{ steps.bump.outputs.current-version }}
@@ -110,7 +111,7 @@ jobs:
         id: temp_bump
         shell: bash
         run: |
-          bump-my-version bump ${{ inputs.version_level }} --commit --tag
+          bump-my-version bump ${{ inputs.version_level }} --commit --no-tag
           ([[ $? -gt 0 ]] && echo "bumped=false" || echo "bumped=true") >> $GITHUB_OUTPUT
 
       - name: Fail if bumping failes
@@ -119,6 +120,13 @@ jobs:
           echo "Bumping failed on temp branch."
           git reset --hard HEAD^
           exit 1
+
+      - name: Fail if bumping failes
+        if: steps.temp_bump.outputs.bumped == 'true'
+        run: |
+          echo "Version would be bumped to $(bump-my-version show current_version)!"
+
+          git reset --hard HEAD^
 
       - name: Get current main commit hash
         id: premerge
@@ -215,21 +223,3 @@ jobs:
               --title="Release v${{ needs.merge_and_bump.outputs.new-version }}" \
               --generate-notes \
               --draft
-
-  remove_branch:
-    name: Remove PR branch
-    needs: github_release
-    if: ${{ github.ref_name != 'develop' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: develop
-          fetch-depth: 0
-
-      - name: Remove PR branch
-        uses: dawidd6/action-delete-branch@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branches: ${{ github.ref_name }}
