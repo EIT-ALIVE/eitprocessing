@@ -174,7 +174,7 @@ jobs:
 
       - name: Merge PR
         run: |
-          gh pr merge ${{ github.ref_name }} --merge --delete-branch --squash=false
+          gh pr merge ${{ github.ref_name }} --merge --delete-branch --squash=false --admin
 
       - name: Wait for main to update
         id: waitmain
