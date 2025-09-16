@@ -101,11 +101,16 @@ jobs:
           python3 -m pip install pyproject-deplister
           pyproject-deplister --extra dev --path pyproject.toml | grep bump-my-version | sed 's/ //g' | xargs -I{} python3 -m pip install "{}"
 
-      - name: Merge branch into temp branch
+      - name: Test merging PR into main, and main into develop
         run: |
-          git checkout -B temp_${{github.ref_name}}_${{github.run_id}} origin/main
+          git fetch origin main
+          git checkout -B temp_main_${{github.ref_name}}_${{github.run_id}} origin/main
           git branch -f ${{ github.ref_name }} origin/${{ github.ref_name }}
           git merge ${{ github.ref_name }} --no-ff --no-edit
+
+          git fetch origin develop
+          git checkout -B temp_develop_${{github.ref_name}}_${{github.run_id}} origin/develop
+          git merge temp_main_${{github.ref_name}}_${{github.run_id}}
 
       - name: Bump version
         id: temp_bump
@@ -121,11 +126,10 @@ jobs:
           git reset --hard HEAD^
           exit 1
 
-      - name: Fail if bumping failes
+      - name: Succeed if version is bumped
         if: steps.temp_bump.outputs.bumped == 'true'
         run: |
           echo "Version would be bumped to $(bump-my-version show current_version)!"
-
           git reset --hard HEAD^
 
       - name: Get current main commit hash
