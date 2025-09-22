@@ -89,8 +89,12 @@ findings and clinical implementation. The current limitations of EIT analysis st
 between physicians, clinical researchers and engineers in order to identify clinical needs, to
 develop and validate new algorithms, and to facilitate clinical implementation [@Scaramuzzo2024-ob].
 
+Currently, some open source EIT software packages are available [@liu2018pyeit;@EIDORS2005]. These, however, all focus on reconstruction of
+voltage data to images, bypassing the clinically used reconstruction algorithms implemented in CE-approved devices, and
+don't include tools for the analysis of reconstructed EIT image data.
+
 `eitprocessing` offers a standardized, open, and highly expandable library of tools for loading,
-filtering, segmentation and analysis of EIT data as well as related waveform or sparse data.
+filtering, segmentation and analysis of reconstructed EIT data as well as related waveform or sparse data.
 `eitprocessing` is compatible with data from the three most-used clinically available EIT devices, as well as
 from related data sources, such as mechanical ventilators and dedicated pressure devices. It includes commonly used methods for filtering and segmentation. The
 authors continuously develop and implement further algorithms for analysis. The
