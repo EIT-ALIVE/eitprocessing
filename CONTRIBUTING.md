@@ -31,4 +31,4 @@ The sections below outline the steps in each case.
 We welcome all contributions to this open-source project, as long as they follow our
 [code of conduct](https://github.com/EIT-ALIVE/eitprocessing/blob/main/CODE_OF_CONDUCT.md).
 
-Please read out [developers documentation](README.dev.md) if you are interested in contributing to the code base
+Please read out [developers documentation](https://github.com/EIT-ALIVE/eitprocessing/blob/main/README.dev.md) if you are interested in contributing to the code base
