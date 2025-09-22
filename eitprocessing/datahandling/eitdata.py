@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import InitVar, dataclass, field
-from enum import auto
+from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
 import numpy as np
-from strenum import LowercaseStrEnum  # TODO: EOL 3.10: replace with native StrEnum
 
 from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.continuousdata import ContinuousData
@@ -173,12 +172,28 @@ class EITData(DataContainer, SelectByTime):
         return np.nansum(self.pixel_impedance, axis=(1, 2))
 
 
-class Vendor(LowercaseStrEnum):
-    """Enum indicating the vendor (manufacturer) of the source EIT device."""
+class Vendor(Enum):
+    """Enum indicating the vendor (manufacturer) of the source EIT device.
 
-    DRAEGER = auto()
-    TIMPEL = auto()
-    SENTEC = auto()
+    The enum values are all lowercase strings. For some manufacturers, multiple ways of wrinting are provided mapping to
+    the same value, to prevent confusion over conversion of special characters. The "simulated" vendor is provided to
+    indicate simulated data.
+    """
+
+    DRAEGER = "draeger"
+    """Dräger (PulmoVista V500)"""
+
+    TIMPEL = "timpel"
+    """Timpel (Enlight 2100)"""
+
+    SENTEC = "sentec"
+    """Sentec (Lumon)"""
+
     DRAGER = DRAEGER
-    DRÄGER = DRAEGER  # noqa: PLC2401
-    SIMULATED = auto()
+    """Synonym of DREAGER"""
+
+    DRÄGER = DRAEGER  # noqa: PIE796, PLC2401
+    """Synonym of DREAGER"""
+
+    SIMULATED = "simulated"
+    """Simulated data"""
