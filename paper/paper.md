@@ -79,8 +79,8 @@ The perspective that EIT will become an important standard monitoring technique 
 international experts [@Frerichs2016;@Wisse2024-sl]. Both @Frerichs2016 and @Wisse2024-sl emphasize
 the importance of standardized techniques, terminology, and consensus regarding the application of
 EIT.
-Validated methods to implement EIT information in routine care are
-still lacking. Standardized implementation of EIT information is further limited
+Validated methods to implement EIT-based parameters in routine care are
+still lacking. Standardized implementation of EIT-based parameters is further limited
 as the availability of both bedside and offline analysis tools depends on the type of EIT device used. Advanced
 image and signal analysis could overcome certain challenges but also requires complex
 post-processing (including detection/removal of common artifacts) that is time-consuming and requires specific technical expertise
