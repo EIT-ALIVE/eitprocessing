@@ -168,7 +168,7 @@ class WatershedLungspace:
 
             included_marker_indices = np.isin(peaks_loc_int, markers_inside_tiv_mask)
             included_peaks = np.argwhere(included_marker_indices)
-            excluded_peaks = np.argwhere(~included_marker_indices)
+            excluded_peaks = np.argwhere(peaks_loc_bool & ~included_marker_indices)
 
             included_watershed_regions = np.where(included_region, watershed_regions, np.nan)
 
