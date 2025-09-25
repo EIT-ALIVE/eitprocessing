@@ -159,6 +159,8 @@ def test_watershed_captures(draeger1: Sequence):
     ]:
         assert key in captures, f"captures should have a '{key}' entry"
 
+    assert len(captures["local peaks"]) == len(captures["included peaks"]) + len(captures["excluded peaks"])
+
 
 def test_watershed_no_amplitude():
     eit_data = EITData(
