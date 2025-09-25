@@ -190,10 +190,10 @@ class Vendor(Enum):
     """Sentec (Lumon)"""
 
     DRAGER = DRAEGER
-    """Synonym of DREAGER"""
+    """Synonym of DRAEGER"""
 
     DRÄGER = DRAEGER  # noqa: PIE796, PLC2401
-    """Synonym of DREAGER"""
+    """Synonym of DRAEGER"""
 
     SIMULATED = "simulated"
     """Simulated data"""
