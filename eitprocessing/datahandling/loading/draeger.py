@@ -184,7 +184,7 @@ def load_from_single_path(
 
 def _estimate_sample_frequency(time: np.ndarray, sample_frequency: float | None) -> float:
     """Estimate the sample frequency from the time axis, and check with provided sample frequency."""
-    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 4)
+    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 3)
 
     if sample_frequency is None:
         return estimated_sample_frequency
