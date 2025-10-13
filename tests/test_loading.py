@@ -22,15 +22,6 @@ def test_loading_draeger(
     assert len(draeger_pp.continuous_data) == 10 + 1
 
 
-def test_sample_frequency_draeger():
-    with_sf = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20)
-    without_sf = load_eit_data(draeger_file1, vendor="draeger")
-    assert with_sf.eit_data["raw"].sample_frequency == without_sf.eit_data["raw"].sample_frequency
-
-    with pytest.warns(RuntimeWarning):
-        _ = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=50)
-
-
 def test_loading_timpel(
     draeger1: Sequence,
     timpel1: Sequence,

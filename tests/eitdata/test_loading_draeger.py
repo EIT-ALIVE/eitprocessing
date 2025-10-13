@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from eitprocessing.datahandling.eitdata import EITData
@@ -50,3 +52,19 @@ def test_draeger_porcine_1_and_2(
     assert len(draeger_porcine_1_and_2) == len(draeger_porcine_1) + len(draeger_porcine_2), (
         "Combined data length should equal sum of individual lengths"
     )
+
+
+@pytest.mark.parametrize(
+    "data_path_fixture_name",
+    ["draeger_porcine_1_path", "draeger_porcine_2_path"],
+)
+def test_draeger_sample_frequency(request: pytest.FixtureRequest, data_path_fixture_name: str):
+    data_path = request.getfixturevalue(data_path_fixture_name)
+    with_sf = load_eit_data(data_path, vendor="draeger", sample_frequency=20)
+    without_sf = load_eit_data(data_path, vendor="draeger")
+    assert with_sf.eit_data["raw"].sample_frequency == without_sf.eit_data["raw"].sample_frequency
+
+
+def test_draeger_sample_frequency_mismatch_warning(draeger_porcine_1_path: Path):
+    with pytest.warns(RuntimeWarning, match="Provided sample frequency"):
+        _ = load_eit_data(draeger_porcine_1_path, vendor="draeger", sample_frequency=25)
