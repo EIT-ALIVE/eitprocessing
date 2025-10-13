@@ -21,6 +21,11 @@ draeger_file_pp = data_directory / "Draeger_PP_data.bin"
 timpel_file = data_directory / "Timpel_test.txt"
 dummy_file = data_directory / "not_a_file.dummy"
 
+data_directory = Path(environment) / "testdata"  # overwrite for new style tests
+pytest_plugins = [
+    "tests.fixtures.eitdata",  # load fixtures from different modules as 'plugins' as workaround
+]
+
 
 def pytest_addoption(parser: pytest.Parser):
     parser.addoption("--runslow", action="store_true", default=False, help="run tests marked as slow")
