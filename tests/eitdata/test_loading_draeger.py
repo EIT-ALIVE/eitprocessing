@@ -55,12 +55,12 @@ def test_draeger_porcine_1_and_2(
 
 
 @pytest.mark.parametrize(
-    "data_path_fixture_name",
-    ["draeger_porcine_1_path", "draeger_porcine_2_path"],
+    ("data_path_fixture_name", "sample_frequency"),
+    [("draeger_porcine_1_path", 20), ("draeger_porcine_2_path", 20)],
 )
-def test_draeger_sample_frequency(request: pytest.FixtureRequest, data_path_fixture_name: str):
+def test_draeger_sample_frequency(request: pytest.FixtureRequest, data_path_fixture_name: str, sample_frequency: int):
     data_path = request.getfixturevalue(data_path_fixture_name)
-    with_sf = load_eit_data(data_path, vendor="draeger", sample_frequency=20)
+    with_sf = load_eit_data(data_path, vendor="draeger", sample_frequency=sample_frequency)
     without_sf = load_eit_data(data_path, vendor="draeger")
     assert with_sf.eit_data["raw"].sample_frequency == without_sf.eit_data["raw"].sample_frequency
 
