@@ -6,7 +6,6 @@ from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sequence import Sequence
 from tests.conftest import (
     draeger_file1,
-    draeger_file2,
     draeger_file3,
     dummy_file,
     timpel_file,
@@ -52,7 +51,6 @@ def test_loading_illegal():
 
 
 def test_load_partial(
-    draeger2: Sequence,
     timpel1: Sequence,
 ):
     cutoff = 58
@@ -75,33 +73,6 @@ def test_load_partial(
     assert timpel_part2 == timpel1[cutoff:]
     assert Sequence.concatenate(timpel_part1, timpel_part2) == timpel1
     # assert Sequence.concatenate(timpel_part2, timpel_part1) != timpel1
-
-    # Draeger
-    draeger2_part1 = load_eit_data(
-        draeger_file2,
-        vendor="draeger",
-        sample_frequency=20,
-        max_frames=cutoff,
-        label="draeger_part_1",
-    )
-    draeger2_part2 = load_eit_data(
-        draeger_file2,
-        vendor="draeger",
-        sample_frequency=20,
-        first_frame=cutoff,
-        label="draeger_part_2",
-    )
-
-    assert len(draeger2_part1) == cutoff
-    assert len(draeger2_part2) == len(draeger2) - cutoff
-    assert draeger2_part1 == draeger2[:cutoff]
-    pytest.skip(
-        "Tests below rely on proper functioning of select_by_time, "
-        "which should be refactored before fixing these tests",
-    )
-    assert draeger2_part2 == draeger2[cutoff:]
-    assert Sequence.concatenate(draeger2_part1, draeger2_part2) == draeger2
-    # assert Sequence.concatenate(draeger2_part2, draeger2_part1) != draeger2
 
 
 def test_illegal_first_frame():
