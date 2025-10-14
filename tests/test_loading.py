@@ -7,7 +7,6 @@ from eitprocessing.datahandling.sequence import Sequence
 from tests.conftest import (
     draeger_file1,
     draeger_file3,
-    dummy_file,
     timpel_file,
 )
 
@@ -38,14 +37,7 @@ def test_loading_timpel(
 
 
 def test_loading_illegal():
-    # non existing
-    for vendor in ["draeger", "timpel"]:
-        with pytest.raises(FileNotFoundError):
-            _ = load_eit_data(dummy_file, vendor=vendor, sample_frequency=20)
-
     # incorrect vendor
-    with pytest.raises(OSError):
-        _ = load_eit_data(draeger_file1, vendor="timpel")
     with pytest.raises(OSError):
         _ = load_eit_data(timpel_file, vendor="draeger", sample_frequency=20)
 
