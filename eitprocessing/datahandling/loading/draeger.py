@@ -106,6 +106,10 @@ def load_from_single_path(
     # time wraps around the number of seconds in a day
     time = np.unwrap(time, period=24 * 60 * 60)
 
+    if not np.all(np.diff(time) > 0):
+        msg = "The time axis is not strictly monotonically increasing."
+        raise ValueError(msg)
+
     sample_frequency = _estimate_sample_frequency(time, sample_frequency)
 
     eit_data = EITData(
