@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import mmap
 import sys
 import warnings
@@ -7,6 +8,7 @@ from functools import partial
 from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
+import scipy as sp
 
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
@@ -24,6 +26,7 @@ if TYPE_CHECKING:
 
 load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
 NAN_VALUE_INDICATOR = -1e30
+SAMPLE_FREQUENCY_ESTIMATION_PRECISION = 4
 
 
 def load_from_single_path(
@@ -184,15 +187,27 @@ def load_from_single_path(
 
 def _estimate_sample_frequency(time: np.ndarray, sample_frequency: float | None) -> float:
     """Estimate the sample frequency from the time axis, and check with provided sample frequency."""
-    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 4)
+    unrounded_estimated_sample_frequency = 1 / sp.stats.linregress(np.arange(len(time)), time).slope
+
+    # Rounds to the number of digits, rather than the number of decimals
+    estimated_sample_frequency = round(
+        unrounded_estimated_sample_frequency,
+        -math.ceil(np.log10(abs(unrounded_estimated_sample_frequency))) + SAMPLE_FREQUENCY_ESTIMATION_PRECISION,
+    )
 
     if sample_frequency is None:
         return estimated_sample_frequency
 
-    if sample_frequency != estimated_sample_frequency:
+    if not np.isclose(
+        sample_frequency, unrounded_estimated_sample_frequency, rtol=10**-SAMPLE_FREQUENCY_ESTIMATION_PRECISION, atol=0
+    ):
         msg = (
-            f"Provided sample frequency ({sample_frequency}) does not match "
-            f"the estimated sample frequency ({estimated_sample_frequency})."
+            "Provided sample frequency "
+            f"({sample_frequency:.{SAMPLE_FREQUENCY_ESTIMATION_PRECISION + 2}f} Hz) "
+            "does not match the estimated sample frequency "
+            f"({unrounded_estimated_sample_frequency:.{SAMPLE_FREQUENCY_ESTIMATION_PRECISION + 2}f} Hz) "
+            f"within {SAMPLE_FREQUENCY_ESTIMATION_PRECISION} digits. "
+            "Note that the estimate might not be as accurate for very short signals."
         )
         warnings.warn(msg, RuntimeWarning, stacklevel=2)
 
@@ -249,7 +264,7 @@ def _read_frame(
     index is non-negative. When the index is negative, no data is saved. In
     any case, the event marker is returned.
     """
-    frame_time = round(reader.float64() * 24 * 60 * 60, 3)
+    frame_time = reader.float64() * 24 * 60 * 60
     _ = reader.float32()
     frame_pixel_impedance = reader.npfloat32(length=1024)
     frame_pixel_impedance = np.reshape(frame_pixel_impedance, (32, 32), "C")
