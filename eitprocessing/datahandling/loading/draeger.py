@@ -63,7 +63,7 @@ def load_from_single_path(
         msg = f"Invalid input: `first_frame` ({f0}) is larger than the total number of frames in the file ({fn})."
         raise ValueError(msg)
 
-    n_frames = min(total_frames - first_frame, max_frames or sys.maxsize)
+    n_frames = min(total_frames - first_frame, max_frames if max_frames is not None else sys.maxsize)
 
     if max_frames and max_frames != n_frames:
         msg = (
