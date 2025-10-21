@@ -6,6 +6,7 @@ import sys
 import warnings
 from functools import partial
 from typing import TYPE_CHECKING, NamedTuple
+from warnings import catch_warnings
 
 import numpy as np
 import scipy as sp
@@ -191,7 +192,20 @@ def load_from_single_path(
 
 def _estimate_sample_frequency(time: np.ndarray, sample_frequency: float | None) -> float:
     """Estimate the sample frequency from the time axis, and check with provided sample frequency."""
-    unrounded_estimated_sample_frequency = 1 / sp.stats.linregress(np.arange(len(time)), time).slope
+    with catch_warnings():
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+        unrounded_estimated_sample_frequency = 1 / sp.stats.linregress(np.arange(len(time)), time).slope
+
+    if np.isnan(unrounded_estimated_sample_frequency):
+        msg = (
+            "Could not estimate sample frequency from time axis, "
+            f"which could be due to too few data points ({len(time)})."
+        )
+        if sample_frequency is not None:
+            warnings.warn(msg, RuntimeWarning, stacklevel=2)
+            return float(sample_frequency)
+
+        raise ValueError(msg)
 
     # Rounds to the number of digits, rather than the number of decimals
     estimated_sample_frequency = round(
