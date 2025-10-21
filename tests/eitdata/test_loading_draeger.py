@@ -7,23 +7,25 @@ from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sequence import Sequence
 
 
+# TODO: create/find data with 6 continuous data channels
 @pytest.mark.parametrize(
-    ("sequence_fixture_name", "data_path_fixture_name", "length", "n_continuous_channels", "sample_frequency"),
+    ("sequence_fixture_name", "length", "n_continuous_channels", "sample_frequency"),
     [
-        ("draeger_20hz_healthy_volunteer", "draeger_20hz_healthy_volunteer_path", 6920, 10, 20),
-        ("draeger_20hz_healthy_volunteer_fixed_rr", "draeger_20hz_healthy_volunteer_fixed_rr_path", 7340, 10, 20),
+        ("draeger_20hz_healthy_volunteer", 6920, 10, 20),
+        ("draeger_20hz_healthy_volunteer_fixed_rr", 7340, 10, 20),
+        ("draeger_20hz_healthy_volunteer_pressure_pod", 1320, 10, 20),
+        ("draeger_50hz_healthy_volunteer_pressure_pod", 3700, 10, 50),
     ],
 )
 def test_load_draeger_porcine(
     request: pytest.FixtureRequest,
     sequence_fixture_name: str,
-    data_path_fixture_name: str,
     length: int,
     n_continuous_channels: int,
     sample_frequency: float,
 ):
     sequence = request.getfixturevalue(sequence_fixture_name)
-    data_path = request.getfixturevalue(data_path_fixture_name)
+    data_path = request.getfixturevalue(f"{sequence_fixture_name}_path")
 
     assert isinstance(sequence, Sequence), "Loaded object should be a Sequence"
     assert isinstance(sequence.eit_data["raw"], EITData), "Sequence should contain EITData with 'raw' key"
