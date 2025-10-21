@@ -1,9 +1,12 @@
+import tempfile
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.loading import load_eit_data
+from eitprocessing.datahandling.loading.draeger import _bin_file_formats
 from eitprocessing.datahandling.sequence import Sequence
 
 
@@ -119,3 +122,51 @@ def test_skipping_frames(draeger_20hz_healthy_volunteer: Sequence):
 
     with pytest.raises(ValueError, match="No frames to load with"):
         _ = load_eit_data(draeger_20hz_healthy_volunteer.eit_data["raw"].path, vendor="draeger", max_frames=0)
+
+
+def test_events(draeger_20hz_healthy_volunteer: Sequence):
+    events = draeger_20hz_healthy_volunteer.sparse_data["events_(draeger)"]
+    assert len(events) == 1, "There should be 1 event in the draeger_20hz_healthy_volunteer data"
+    assert events.values[0].text == "bed inflating", "Event text should match expected value"
+
+
+def test_event_on_first_frame(draeger_20hz_healthy_volunteer: Sequence):
+    """Tests loading a sequence where there is an event on the first frame.
+
+    There are two ways this can occur. The first is when the frame occurs later in the file, but we skip all frames
+    before the first frame with an event. This is tested by loading with first_frame set to the index of the first event
+    (`seq_first_frame_is_event_index`). The second way this can happen is if the data file has an event on the first
+    frame. We test this by creating a temporary copy of the data file, where the initial frames before the event file
+    are removed.
+    """
+    event_index = np.searchsorted(
+        draeger_20hz_healthy_volunteer.time,
+        draeger_20hz_healthy_volunteer.sparse_data["events_(draeger)"].time[0],
+    )
+
+    seq_first_frame_is_event_index = load_eit_data(
+        draeger_20hz_healthy_volunteer.eit_data["raw"].path, vendor="draeger", first_frame=event_index
+    )
+    assert (
+        np.searchsorted(
+            seq_first_frame_is_event_index.time,
+            seq_first_frame_is_event_index.data["events_(draeger)"].time[0],
+        )
+        == 0
+    ), "The event should be on the first frame when loading from its timepoint."
+
+    frame_size = _bin_file_formats["pressure_pod"]["frame_size"]
+    ignore_bytes = event_index * frame_size  # number of bytes to ignore at start of file
+
+    with tempfile.NamedTemporaryFile(delete_on_close=False) as temporary_file:
+        # Create a temporary file, that is removed after the context manager is closed
+        tempfile_path = Path(temporary_file.name)
+        with draeger_20hz_healthy_volunteer.eit_data["raw"].path.open("rb") as original_file:
+            original_file.seek(ignore_bytes)  # skip frames before the event
+            temporary_file.write(original_file.read())  # write remaining data to temp file
+
+        seq_trimmed_file = load_eit_data(tempfile_path, vendor="draeger")
+
+    assert seq_first_frame_is_event_index == seq_trimmed_file, (
+        "Loading from temp file should match loading from original file skipping frames."
+    )
