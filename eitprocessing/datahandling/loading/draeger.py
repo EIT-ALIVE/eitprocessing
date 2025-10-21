@@ -200,7 +200,10 @@ def _estimate_sample_frequency(time: np.ndarray, sample_frequency: float | None)
     )
 
     if sample_frequency is None:
-        return estimated_sample_frequency
+        return float(estimated_sample_frequency)
+    if not isinstance(sample_frequency, (int, float)):
+        msg = f"Provided sample frequency has invalid type {type(sample_frequency)}; should be int or float."
+        raise TypeError(msg)
 
     if not np.isclose(
         sample_frequency, unrounded_estimated_sample_frequency, rtol=10**-SAMPLE_FREQUENCY_ESTIMATION_PRECISION, atol=0
@@ -215,7 +218,7 @@ def _estimate_sample_frequency(time: np.ndarray, sample_frequency: float | None)
         )
         warnings.warn(msg, RuntimeWarning, stacklevel=2)
 
-    return sample_frequency
+    return float(sample_frequency)
 
 
 def _convert_medibus_data(
