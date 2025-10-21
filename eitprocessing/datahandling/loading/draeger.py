@@ -30,7 +30,7 @@ NAN_VALUE_INDICATOR = -1e30
 SAMPLE_FREQUENCY_ESTIMATION_PRECISION = 4
 
 
-def load_from_single_path(
+def load_from_single_path(  # noqa: PLR0915
     path: Path,
     sample_frequency: float | None = None,
     first_frame: int = 0,
@@ -64,6 +64,9 @@ def load_from_single_path(
         raise ValueError(msg)
 
     n_frames = min(total_frames - first_frame, max_frames if max_frames is not None else sys.maxsize)
+    if n_frames < 1:
+        msg = f"No frames to load with `{first_frame=}` and `{max_frames=}`."
+        raise ValueError(msg)
 
     if max_frames and max_frames != n_frames:
         msg = (
