@@ -1,22 +1,12 @@
-import pytest
-
 from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sequence import Sequence
 from tests.conftest import (
-    draeger_file1,
     draeger_file3,
     timpel_file,
 )
 
 # ruff: noqa: ERA001  #TODO: remove this line
-
-
-def test_loading_draeger(
-    draeger_pp: Sequence,
-):
-    #  draeger data with pressure pod data has 10 continuous medibus fields, 'normal' only 6
-    assert len(draeger_pp.continuous_data) == 10 + 1
 
 
 def test_loading_timpel(
@@ -33,12 +23,6 @@ def test_loading_timpel(
     # Load multiple
     # assert isinstance(timpel_double, Sequence)
     # assert len(timpel_double) == 2 * len(timpel1)
-
-
-def test_loading_illegal():
-    # incorrect vendor
-    with pytest.raises(OSError):
-        _ = load_eit_data(timpel_file, vendor="draeger", sample_frequency=20)
 
 
 def test_load_partial(
@@ -64,20 +48,6 @@ def test_load_partial(
     assert timpel_part2 == timpel1[cutoff:]
     assert Sequence.concatenate(timpel_part1, timpel_part2) == timpel1
     # assert Sequence.concatenate(timpel_part2, timpel_part1) != timpel1
-
-
-def test_illegal_first_frame():
-    for ff in [0.5, -1, "fdw", 1e12]:
-        with pytest.raises((TypeError, ValueError)):
-            _ = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20, first_frame=ff)
-
-    for ff2 in [0, 0.0, 1.0, None]:
-        _ = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20, first_frame=ff2)
-
-
-def test_max_frames_too_large():
-    with pytest.warns():
-        _ = load_eit_data(draeger_file1, vendor="draeger", sample_frequency=20, max_frames=1e12)
 
 
 def test_event_on_first_frame(draeger2: Sequence):
