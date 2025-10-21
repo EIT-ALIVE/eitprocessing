@@ -8,30 +8,42 @@ from tests.conftest import data_directory
 
 
 @pytest.fixture
-def draeger_porcine_1_path() -> Path:
-    return data_directory / "draeger_porcine_1.bin"
+def draeger_20hz_healthy_volunteer_path() -> Path:
+    return data_directory / "draeger_20Hz_healthy_volunteer.bin"
 
 
 @pytest.fixture
-def draeger_porcine_2_path() -> Path:
-    return data_directory / "draeger_porcine_2.bin"
+def draeger_20hz_healthy_volunteer_fixed_rr_path() -> Path:
+    return data_directory / "draeger_20Hz_healthy_volunteer_fixed_rr.bin"
 
 
 @pytest.fixture
-def draeger_porcine_1(draeger_porcine_1_path: Path) -> Sequence:
-    return load_eit_data(draeger_porcine_1_path, vendor="draeger", sample_frequency=20, label="draeger_porcine_1")
-
-
-@pytest.fixture
-def draeger_porcine_2(draeger_porcine_2_path: Path) -> Sequence:
-    return load_eit_data(draeger_porcine_2_path, vendor="draeger", sample_frequency=20, label="draeger_porcine_2")
-
-
-@pytest.fixture
-def draeger_porcine_1_and_2(draeger_porcine_1_path: Path, draeger_porcine_2_path: Path) -> Sequence:
+def draeger_20hz_healthy_volunteer(draeger_20hz_healthy_volunteer_path: Path) -> Sequence:
     return load_eit_data(
-        [draeger_porcine_1_path, draeger_porcine_2_path],
+        draeger_20hz_healthy_volunteer_path,
         vendor="draeger",
         sample_frequency=20,
-        label="draeger_porcine_1_and_2",
+        label="draeger_20hz_healthy_volunteer",
+    )
+
+
+@pytest.fixture
+def draeger_20hz_healthy_volunteer_fixed_rr(draeger_20hz_healthy_volunteer_fixed_rr_path: Path) -> Sequence:
+    return load_eit_data(
+        draeger_20hz_healthy_volunteer_fixed_rr_path,
+        vendor="draeger",
+        sample_frequency=20,
+        label="draeger_20hz_healthy_volunteer_fixed_rr",
+    )
+
+
+@pytest.fixture
+def draeger_20hz_healthy_volunteer_and_fixed_rr(
+    draeger_20hz_healthy_volunteer_path: Path, draeger_20hz_healthy_volunteer_fixed_rr_path: Path
+) -> Sequence:
+    return load_eit_data(
+        [draeger_20hz_healthy_volunteer_path, draeger_20hz_healthy_volunteer_fixed_rr_path],
+        vendor="draeger",
+        sample_frequency=20,
+        label="draeger_20hz_healthy_volunteer_and_fixed_rr",
     )

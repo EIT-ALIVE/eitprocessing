@@ -7,7 +7,7 @@ from eitprocessing.datahandling.loading import load_eit_data
 # TODO: add dataset with events, and test loading from the frame at or just after the event
 @pytest.mark.parametrize(
     ("data_path_fixture_name", "sequence_fixture_name", "split_frame", "vendor", "sample_frequency"),
-    [("draeger_porcine_1_path", "draeger_porcine_1", 100, "draeger", 20)],
+    [("draeger_20hz_healthy_volunteer_path", "draeger_20hz_healthy_volunteer", 100, "draeger", 20)],
 )
 def test_load_partial(
     data_path_fixture_name: str,
