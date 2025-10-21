@@ -72,17 +72,18 @@ def test_draeger_20hz_healthy_volunteer_and_fixed_rr(
     ), "Combined data length should equal sum of individual lengths"
 
 
-@pytest.mark.parametrize(
-    ("data_path_fixture_name", "sample_frequency"),
-    [("draeger_20hz_healthy_volunteer_path", 20), ("draeger_20hz_healthy_volunteer_fixed_rr_path", 20)],
-)
-def test_draeger_sample_frequency(request: pytest.FixtureRequest, data_path_fixture_name: str, sample_frequency: int):
-    data_path = request.getfixturevalue(data_path_fixture_name)
-    with_sf = load_eit_data(data_path, vendor="draeger", sample_frequency=sample_frequency)
-    without_sf = load_eit_data(data_path, vendor="draeger")
-    assert with_sf.eit_data["raw"].sample_frequency == without_sf.eit_data["raw"].sample_frequency
-
-
 def test_draeger_sample_frequency_mismatch_warning(draeger_20hz_healthy_volunteer_path: Path):
     with pytest.warns(RuntimeWarning, match="Provided sample frequency"):
         _ = load_eit_data(draeger_20hz_healthy_volunteer_path, vendor="draeger", sample_frequency=25)
+
+
+def test_estimate_sample_frequency_few_points(draeger_20hz_healthy_volunteer_path: Path):
+    with pytest.raises(ValueError, match="Could not estimate sample frequency from time axis"):
+        _ = load_eit_data(draeger_20hz_healthy_volunteer_path, vendor="draeger", max_frames=1)
+
+    with pytest.warns(RuntimeWarning, match="Could not estimate sample frequency from time axis"):
+        _ = load_eit_data(draeger_20hz_healthy_volunteer_path, vendor="draeger", max_frames=1, sample_frequency=20)
+
+    without_sf = load_eit_data(draeger_20hz_healthy_volunteer_path, vendor="draeger", max_frames=2)
+    with_sf = load_eit_data(draeger_20hz_healthy_volunteer_path, vendor="draeger", sample_frequency=20, max_frames=2)
+    assert without_sf == with_sf, "Loading without provided sample frequency should work with few data points"
