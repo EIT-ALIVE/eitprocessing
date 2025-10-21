@@ -87,3 +87,35 @@ def test_estimate_sample_frequency_few_points(draeger_20hz_healthy_volunteer_pat
     without_sf = load_eit_data(draeger_20hz_healthy_volunteer_path, vendor="draeger", max_frames=2)
     with_sf = load_eit_data(draeger_20hz_healthy_volunteer_path, vendor="draeger", sample_frequency=20, max_frames=2)
     assert without_sf == with_sf, "Loading without provided sample frequency should work with few data points"
+
+
+def test_skipping_frames(draeger_20hz_healthy_volunteer: Sequence):
+    n_frames = len(draeger_20hz_healthy_volunteer)
+
+    assert draeger_20hz_healthy_volunteer == load_eit_data(
+        draeger_20hz_healthy_volunteer.eit_data["raw"].path, vendor="draeger", first_frame=0
+    )
+    assert draeger_20hz_healthy_volunteer == load_eit_data(
+        draeger_20hz_healthy_volunteer.eit_data["raw"].path, vendor="draeger", max_frames=n_frames
+    )
+
+    short_sequence_1 = load_eit_data(
+        draeger_20hz_healthy_volunteer.eit_data["raw"].path, vendor="draeger", first_frame=n_frames - 2
+    )
+    assert len(short_sequence_1) == 2, "Loading from near end should yield 2 frames"
+
+    short_sequence_2 = load_eit_data(
+        draeger_20hz_healthy_volunteer.eit_data["raw"].path, vendor="draeger", max_frames=2
+    )
+    assert len(short_sequence_2) == 2, "Loading with max_frames=2 should yield 2 frames"
+
+    with pytest.warns(
+        RuntimeWarning,
+        match=r"The number of frames requested \(\d+\) is larger than the available number \(\d+\) of frames.",
+    ):
+        _ = load_eit_data(
+            draeger_20hz_healthy_volunteer.eit_data["raw"].path, vendor="draeger", max_frames=n_frames + 1
+        )
+
+    with pytest.raises(ValueError, match="No frames to load with"):
+        _ = load_eit_data(draeger_20hz_healthy_volunteer.eit_data["raw"].path, vendor="draeger", max_frames=0)
