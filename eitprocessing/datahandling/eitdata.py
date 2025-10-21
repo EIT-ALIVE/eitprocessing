@@ -60,6 +60,15 @@ class EITData(DataContainer, SelectByTime):
             self.path = self.path[0]
 
         self.name = self.name or self.label
+        old_sample_frequency = self.sample_frequency
+        self.sample_frequency = float(self.sample_frequency)
+        if self.sample_frequency != old_sample_frequency:
+            msg = (
+                "Sample frequency could not be correctly converted from "
+                f"{old_sample_frequency} ({type(old_sample_frequency)}) to "
+                f"{self.sample_frequency:.1f} (float)."
+            )
+            raise TypeError(msg)
 
         if (lv := len(self.pixel_impedance)) != (lt := len(self.time)):
             msg = f"The number of time points ({lt}) does not match the number of pixel impedance values ({lv})."
