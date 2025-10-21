@@ -11,6 +11,7 @@ def test_loading_illegal_path():
             _ = load_eit_data("non-existing-path", vendor=vendor, sample_frequency=20)
 
 
+# TODO: add timpel/sentec data
 def test_loading_illegal_vendor(draeger_20hz_healthy_volunteer_path: Path):
     with pytest.raises(OSError):
         # wrong vendor for the file
