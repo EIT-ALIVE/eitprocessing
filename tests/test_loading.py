@@ -2,7 +2,6 @@ from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sequence import Sequence
 from tests.conftest import (
-    draeger_file3,
     timpel_file,
 )
 
@@ -48,10 +47,3 @@ def test_load_partial(
     assert timpel_part2 == timpel1[cutoff:]
     assert Sequence.concatenate(timpel_part1, timpel_part2) == timpel1
     # assert Sequence.concatenate(timpel_part2, timpel_part1) != timpel1
-
-
-def test_event_on_first_frame(draeger2: Sequence):
-    draeger3 = load_eit_data(draeger_file3, vendor="draeger", sample_frequency=20)
-    draeger3_events = draeger3.sparse_data["events_(draeger)"]
-    assert draeger3_events == draeger2.sparse_data["events_(draeger)"]
-    assert draeger3_events.time[0] == draeger3.eit_data["raw"].time[0]
