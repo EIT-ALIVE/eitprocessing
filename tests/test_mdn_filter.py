@@ -110,8 +110,8 @@ def test_respiratory_rate_higher_than_heart_rate():
         )
 
 
-def test_with_continuous_data(draeger1: Sequence):
-    continuous_data = draeger1.continuous_data["global_impedance_(raw)"]
+def test_with_continuous_data(draeger_20hz_healthy_volunteer: Sequence):
+    continuous_data = draeger_20hz_healthy_volunteer.continuous_data["global_impedance_(raw)"]
     mdn_filter = MDNFilter(
         respiratory_rate=10 / MINUTE,
         heart_rate=80 / MINUTE,
@@ -125,8 +125,8 @@ def test_with_continuous_data(draeger1: Sequence):
     assert np.allclose(filtered_data.values, filtered_signal)
 
 
-def test_with_eit_data(draeger1: Sequence):
-    eit_data = draeger1.eit_data["raw"]
+def test_with_eit_data(draeger_20hz_healthy_volunteer: Sequence):
+    eit_data = draeger_20hz_healthy_volunteer.eit_data["raw"]
     mdn_filter = MDNFilter(
         respiratory_rate=10 / MINUTE,
         heart_rate=80 / MINUTE,
@@ -244,9 +244,9 @@ def test_wrong_input_type_raises():
         mdn_filter.apply(12345)
 
 
-def test_provide_sample_frequency_axis_with_datacontainers_raises(draeger1: Sequence):
-    eit_data = draeger1.eit_data["raw"]
-    continuous_data = draeger1.continuous_data["global_impedance_(raw)"]
+def test_provide_sample_frequency_axis_with_datacontainers_raises(draeger_20hz_healthy_volunteer: Sequence):
+    eit_data = draeger_20hz_healthy_volunteer.eit_data["raw"]
+    continuous_data = draeger_20hz_healthy_volunteer.continuous_data["global_impedance_(raw)"]
     mdn_filter = MDNFilter(
         respiratory_rate=10 / MINUTE,
         heart_rate=80 / MINUTE,
@@ -265,8 +265,8 @@ def test_provide_sample_frequency_axis_with_datacontainers_raises(draeger1: Sequ
         mdn_filter.apply(eit_data, axis=0)
 
 
-def test_kwargs(draeger1: Sequence):
-    eit_data = draeger1.eit_data["raw"]
+def test_kwargs(draeger_20hz_healthy_volunteer: Sequence):
+    eit_data = draeger_20hz_healthy_volunteer.eit_data["raw"]
     mdn_filter = MDNFilter(
         respiratory_rate=10 / MINUTE,
         heart_rate=80 / MINUTE,
@@ -278,9 +278,9 @@ def test_kwargs(draeger1: Sequence):
     assert filtered_data.label == "Filtered EIT Data"
 
 
-def test_plot_filter_effects(draeger1: Sequence):
+def test_plot_filter_effects(draeger_20hz_healthy_volunteer: Sequence):
     """This test only checks that the plotting function runs without error."""
-    impedance = draeger1.continuous_data["global_impedance_(raw)"]
+    impedance = draeger_20hz_healthy_volunteer.continuous_data["global_impedance_(raw)"]
     mdn_filter = MDNFilter(
         respiratory_rate=10 / MINUTE,
         heart_rate=80 / MINUTE,

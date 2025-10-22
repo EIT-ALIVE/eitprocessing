@@ -151,8 +151,8 @@ def test_pixelmask_apply_numpy_array_higher_dimensions():
     assert np.array_equal(result, np.array([[[np.nan, 2], [3, np.nan]], [[np.nan, 6], [7, np.nan]]]), equal_nan=True)
 
 
-def test_pixelmask_apply_eitdata(draeger1: Sequence):
-    eit_data = draeger1.eit_data["raw"]
+def test_pixelmask_apply_eitdata(draeger_20hz_healthy_volunteer: Sequence):
+    eit_data = draeger_20hz_healthy_volunteer.eit_data["raw"]
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message="All-NaN slice encountered", category=RuntimeWarning)
         mask = PixelMask(np.full((32, 32), np.nan), suppress_all_nan_warning=True)
