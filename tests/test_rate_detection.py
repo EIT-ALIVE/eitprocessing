@@ -333,8 +333,10 @@ def test_changing_frequency(
 @pytest.mark.parametrize(
     ("sequence", "slice_", "expected_rr", "expected_hr"),
     [
-        ("draeger1", slice(None, None), 0.124, 1.121),
-        ("draeger2", slice(56650, 56760), 0.416, 1.183),
+        ("draeger_20hz_healthy_volunteer_pressure_pod", slice(None, None), 0.140, 1.18),
+        ("draeger_50hz_healthy_volunteer_pressure_pod", slice(None, None), 0.188, 1.23),
+        ("draeger_20hz_healthy_volunteer_fixed_rr", slice(None, 47398), 0.167, 1.27),
+        ("draeger_20hz_healthy_volunteer_fixed_rr", slice(47522, None), 0.25, 1.33),
         ("timpel1", slice(None, None), 0.329, 2.196),
     ],
     indirect=["sequence"],
