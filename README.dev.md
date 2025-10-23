@@ -98,6 +98,18 @@ the CI.
 Make sure you have developer options installed as described in the [README](README.md)
 (otherwise run: `pip install -e .[dev]` on the repository folder in your environment)
 
+##### Downloading test data
+Some tests require access to test data. We are currently in the process of migrating tests from proprietary test data to
+open test data. Not all test data is available yet.
+
+You can download the available test data from Zenodo via the button below.
+
+[![](https://zenodo.org/badge/DOI/10.5281/zenodo.17423608.svg)](https://doi.org/10.5281/zenodo.17423608)
+
+Test data should reside in the `test_data/` folder in the root of the repository.
+
+##### Running tests
+
 For testing all you need to do is run:
 
 ```shell
@@ -120,7 +132,9 @@ coverage report
 
 We use [ruff](https://docs.astral.sh/ruff/) for linting, sorting imports and formatting of python (notebook) files. The configurations of `ruff` are set in [pyproject.toml](pyproject.toml) file.
 
-If you are using VS code, please install and activate the [Ruff extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) to automatically format and check linting.
+If you are using VS code, please install and activate the [Ruff
+extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) to automatically format and check
+linting. Make sure to use the ruff version installed in your environment.
 
 Otherwise, please ensure check both linting (`ruff fix .`) and formatting (`ruff format .`) before requesting a review.
 
