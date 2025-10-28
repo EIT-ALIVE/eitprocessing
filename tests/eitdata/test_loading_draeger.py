@@ -12,27 +12,37 @@ from eitprocessing.datahandling.sequence import Sequence
 
 # TODO: create/find data with 6 continuous data channels
 @pytest.mark.parametrize(
-    ("sequence_fixture_name", "length", "n_continuous_channels", "sample_frequency"),
+    ("sequence", "sequence_path", "length", "n_continuous_channels", "sample_frequency"),
     [
-        ("draeger_20hz_healthy_volunteer", 6920, 10, 20),
-        ("draeger_20hz_healthy_volunteer_fixed_rr", 7340, 10, 20),
-        ("draeger_20hz_healthy_volunteer_pressure_pod", 1320, 10, 20),
-        ("draeger_50hz_healthy_volunteer_pressure_pod", 3700, 10, 50),
+        ("draeger_20hz_healthy_volunteer", "draeger_20hz_healthy_volunteer_path", 6920, 10, 20),
+        ("draeger_20hz_healthy_volunteer_fixed_rr", "draeger_20hz_healthy_volunteer_fixed_rr_path", 7340, 10, 20),
+        (
+            "draeger_20hz_healthy_volunteer_pressure_pod",
+            "draeger_20hz_healthy_volunteer_pressure_pod_path",
+            1320,
+            10,
+            20,
+        ),
+        (
+            "draeger_50hz_healthy_volunteer_pressure_pod",
+            "draeger_50hz_healthy_volunteer_pressure_pod_path",
+            3700,
+            10,
+            50,
+        ),
     ],
+    indirect=["sequence", "sequence_path"],
 )
 def test_load_draeger_porcine(
-    request: pytest.FixtureRequest,
-    sequence_fixture_name: str,
+    sequence: Sequence,
+    sequence_path: Path,
     length: int,
     n_continuous_channels: int,
     sample_frequency: float,
 ):
-    sequence = request.getfixturevalue(sequence_fixture_name)
-    data_path = request.getfixturevalue(f"{sequence_fixture_name}_path")
-
     assert isinstance(sequence, Sequence), "Loaded object should be a Sequence"
     assert isinstance(sequence.eit_data["raw"], EITData), "Sequence should contain EITData with 'raw' key"
-    assert sequence.eit_data["raw"].path == data_path
+    assert sequence.eit_data["raw"].path == sequence_path
     assert sequence.eit_data["raw"].sample_frequency == sample_frequency, (
         f"Sample frequency should be {sample_frequency:.1f} Hz"
     )
@@ -46,12 +56,12 @@ def test_load_draeger_porcine(
     )
 
     assert sequence == load_eit_data(
-        data_path, vendor="draeger", sample_frequency=sample_frequency, label=sequence.label
+        sequence_path, vendor="draeger", sample_frequency=sample_frequency, label=sequence.label
     ), "Loading with same parameters should yield same data"
     assert sequence == load_eit_data(
-        data_path, vendor="draeger", sample_frequency=sample_frequency, label="something_else"
+        sequence_path, vendor="draeger", sample_frequency=sample_frequency, label="something_else"
     ), "Loading with different label should yield same data"
-    assert sequence == load_eit_data(data_path, vendor="draeger"), (
+    assert sequence == load_eit_data(sequence_path, vendor="draeger"), (
         "Loading without sample frequency should yield the same data"
     )
 
