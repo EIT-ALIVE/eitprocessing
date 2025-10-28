@@ -19,8 +19,6 @@ environment = Path(
     ),
 )
 data_directory = environment / "tests" / "test_data"
-draeger_file1 = data_directory / "Draeger_Test3.bin"
-draeger_file2 = data_directory / "Draeger_Test.bin"
 timpel_file = data_directory / "Timpel_Test.txt"
 
 
@@ -296,61 +294,63 @@ def test_pass_invalid(obj: Any):  # noqa: ANN401
         bd.find_breaths(obj)
 
 
-def test_pass_continuousdata(draeger1: Sequence):
-    draeger1 = copy.deepcopy(draeger1)  # prevents writing results to original file
-    cd = draeger1.continuous_data["global_impedance_(raw)"]
+def test_pass_continuousdata(draeger_20hz_healthy_volunteer_pressure_pod: Sequence):
+    sequence = copy.deepcopy(draeger_20hz_healthy_volunteer_pressure_pod)  # prevents writing results to original file
+    cd = sequence.continuous_data["global_impedance_(raw)"]
     bd = BreathDetection()
 
     breaths_container = bd.find_breaths(cd)
     assert isinstance(breaths_container, IntervalData)
     # results are not stored
-    assert "breaths" not in draeger1.interval_data
+    assert "breaths" not in sequence.interval_data
 
-    bd.find_breaths(cd, sequence=draeger1)
+    bd.find_breaths(cd, sequence=sequence)
     # results are now stored
-    assert "breaths" in draeger1.interval_data
-    assert draeger1.interval_data["breaths"] == breaths_container
-    assert draeger1.interval_data["breaths"] is not breaths_container
+    assert "breaths" in sequence.interval_data
+    assert sequence.interval_data["breaths"] == breaths_container
+    assert sequence.interval_data["breaths"] is not breaths_container
 
 
-def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
+@pytest.mark.parametrize(
+    "sequence",
+    ["draeger_20hz_healthy_volunteer_pressure_pod", "draeger_50hz_healthy_volunteer_pressure_pod", "timpel1"],
+    indirect=True,
+)
+def test_with_data(sequence: Sequence, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
-    draeger1 = copy.deepcopy(draeger1)
-    draeger2 = copy.deepcopy(draeger2)
-    timpel1 = copy.deepcopy(timpel1)
-    for sequence in draeger1, draeger2, timpel1:
-        bd = BreathDetection()
+    sequence = copy.deepcopy(sequence)  # prevents writing results to original file
+    bd = BreathDetection()
 
-        cd = sequence.continuous_data["global_impedance_(raw)"]
-        breaths = bd.find_breaths(cd)
+    cd = sequence.continuous_data["global_impedance_(raw)"]
+    breaths = bd.find_breaths(cd)
 
-        for breath in breaths.values:
-            # Test whether the indices are in the proper order within a breath
-            assert breath.start_time < breath.middle_time < breath.end_time
+    for breath in breaths.values:
+        # Test whether the indices are in the proper order within a breath
+        assert breath.start_time < breath.middle_time < breath.end_time
 
-            # Test whether the peak values are larger than valley values
-            assert cd.t[breath.middle_time].values[0] > cd.t[breath.start_time].values[0]
-            assert cd.t[breath.middle_time].values[0] > cd.t[breath.end_time].values[0]
+        # Test whether the peak values are larger than valley values
+        assert cd.t[breath.middle_time].values[0] > cd.t[breath.start_time].values[0]
+        assert cd.t[breath.middle_time].values[0] > cd.t[breath.end_time].values[0]
 
-        start_indices, middle_indices, end_indices = (list(x) for x in zip(*breaths.values, strict=True))
+    start_indices, middle_indices, end_indices = (list(x) for x in zip(*breaths.values, strict=True))
 
-        # Test whether breaths are sorted properly
-        assert start_indices == sorted(start_indices)
-        assert middle_indices == sorted(middle_indices)
-        assert end_indices == sorted(end_indices)
+    # Test whether breaths are sorted properly
+    assert start_indices == sorted(start_indices)
+    assert middle_indices == sorted(middle_indices)
+    assert end_indices == sorted(end_indices)
 
-        # Test whether indices are unique. `set` removes non-unique values,
-        # `sorted(list(...))` converts the set to a sorted list again.
-        assert list(start_indices) == sorted(set(start_indices))
-        assert list(middle_indices) == sorted(set(middle_indices))
-        assert list(end_indices) == sorted(set(end_indices))
+    # Test whether indices are unique. `set` removes non-unique values,
+    # `sorted(list(...))` converts the set to a sorted list again.
+    assert list(start_indices) == sorted(set(start_indices))
+    assert list(middle_indices) == sorted(set(middle_indices))
+    assert list(end_indices) == sorted(set(end_indices))
 
-        # Test whether the start of the next breath is on/after the previous breath
-        assert all(
-            start_index >= end_index for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
-        )
+    # Test whether the start of the next breath is on/after the previous breath
+    assert all(
+        start_index >= end_index for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
+    )
 
 
 def test_create_breaths_from_peak_valley_data():

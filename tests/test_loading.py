@@ -25,14 +25,6 @@ def test_load_partial(
     timpel1: Sequence,
 ):
     cutoff = 58
-    # Keep cutoff at 58 for draeger2 as there is an event mark at this
-    # timepoint. Starting the load specifically at the timepoint of an event
-    # marker was tricky to implement, so keeping this cutoff will ensure that
-    # code keeps working for this fringe situation.
-
-    # TODO (#81): test what happens if a file has an actual event marker on the very
-    # first frame. I suspect this will not be loaded, but I don't have a test
-    # file for this situation.
 
     # Timpel
     timpel_part1 = load_eit_data(timpel_file, vendor="timpel", max_frames=cutoff, label="timpel_part_1")
