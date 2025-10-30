@@ -33,7 +33,7 @@ from eitprocessing.datahandling.sequence import Sequence
     ],
     indirect=["sequence", "sequence_path"],
 )
-def test_load_draeger_porcine(
+def test_load_draeger(
     sequence: Sequence,
     sequence_path: Path,
     length: int,
