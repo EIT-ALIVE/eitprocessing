@@ -135,9 +135,6 @@ def _read_data_field(
 
             index += 1
 
-        case Domain.MEASUREMENT, _:
-            fh.seek(payload_size, os.SEEK_CUR)
-
         case Domain.CONFIGURATION, ConfigurationDataID.SAMPLE_FREQUENCY:
             # read the sample frequency from the file, if present
             # (domain 64 = configuration, data 5 = sample frequency)
