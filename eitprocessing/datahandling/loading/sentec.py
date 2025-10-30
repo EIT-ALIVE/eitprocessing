@@ -136,9 +136,6 @@ def _read_data_field(
             index += 1
 
         case Domain.CONFIGURATION, ConfigurationDataID.SAMPLE_FREQUENCY:
-            # read the sample frequency from the file, if present
-            # (domain 64 = configuration, data 5 = sample frequency)
-
             loaded_sample_frequency = np.round(reader.float32(), 4)
             if sample_frequency and not np.isclose(loaded_sample_frequency, sample_frequency):
                 msg = (
