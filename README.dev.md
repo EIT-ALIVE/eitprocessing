@@ -12,7 +12,7 @@ Please follow these steps:
 
 1. (**important**) announce your plan to the rest of the community _before you start working_. This announcement should be in the form of a (new) issue;
 1. (**important**) wait until some kind of consensus is reached about your idea being a good idea;
-1. if needed, fork the repository to your own Github profile and create your own feature branch off of the latest master commit. While working on your feature branch, make sure to stay up to date with the master branch by pulling in changes, possibly from the 'upstream' repository (follow the instructions [here](https://help.github.com/articles/configuring-a-remote-for-a-fork/) and [here](https://help.github.com/articles/syncing-a-fork/));
+1. if needed, fork the repository to your own GitHub profile and create your own feature branch off of the latest master commit. While working on your feature branch, make sure to stay up to date with the master branch by pulling in changes, possibly from the 'upstream' repository (follow the instructions [here](https://help.github.com/articles/configuring-a-remote-for-a-fork/) and [here](https://help.github.com/articles/syncing-a-fork/));
 1. make sure the existing tests still work by running `pytest` (see also [here](#testing-locally));
 1. add your own tests (if necessary);
 1. update or expand the documentation;
@@ -49,7 +49,7 @@ place to start. This extension is currently in preview, but seems to work more r
 #### Branch naming convention
 
 Please try to adhere to the following branch naming convention:
-<github-issue-number>_<brief-description>_<username>.
+`<github-issue-number>_<brief-description>_<username>`.
 E.g., `042_life_universe_everything_douglasadams`.
 
 This allows, at a single glance, to see in the issue that you're
