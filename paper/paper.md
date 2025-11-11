@@ -134,11 +134,14 @@ for the first part of a measurement and prone for the second part.
 
 `eitprocessing` currently has implementations for the following pre-processing steps:
 
+- high-pass, low-pass, band-pass or band-stop Butterworth filters, as well as a Multiple Digital Notch filter @Wisse2024-wi;
 - calculation of the global or regional impedance as the sum of the impedance of all or a subset of pixels;
-- high-pass, low-pass, band-pass or band-stop Butterworth filters;
 - a moving averager using convolution with a given window;
+- region of interest selection using predefined or custom masks;
+- functional lung space detection using the tidal impedance variation, amplitude, or the Watershed method;
 - automatic detection of the start, middle (end-inspiration) and end of breaths on a
-  global/regional and pixel level.
+  global/regional and pixel level;
+- automatic detection of the respiratory and heart rate from pixel impedance values.
 
 ### Analysis
 
@@ -147,6 +150,13 @@ for the first part of a measurement and prone for the second part.
 - end-expiratory lung impedance on a global/regional and pixel level;
 - tidal impedance variation on a global/regional and pixel level.
 
+## Visualization
+
+`eitprocessing` includes several visualization methods to simplify and standardize visual output. Examples are:
+
+- showing pixel maps, e.g., tidal impedance variation, changes in EELI, pendelluft, etc.;
+- show the effect of filtering methods in the frequency domain.
+
 ## Future perspective
 
 `eitprocessing` is ready for use in offline analysis of EIT and respiratory related data. Our team
@@ -154,9 +164,11 @@ is actively working on expanding the features of the software.
 
 Several features are in active development. Examples are:
 
-- more advanced filtering methods, using a combination of Butterworth filters, empirical mode
+- provenance tracking of data processing steps;
+- more advanced filtering methods, e.g., empirical mode
   decomposition or wavelet transforms;
-- automatic detection of respiratory and heart rate from pixel impedance values.
+- quantification of pendelluft;
+- expansion of visualization methods.
 
 Moreover, we plan to extend `eitprocessing` with standardized workflows to summarize and report
 analysis results.
