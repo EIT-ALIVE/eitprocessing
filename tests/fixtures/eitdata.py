@@ -28,6 +28,16 @@ def draeger_50hz_healthy_volunteer_pressure_pod_path() -> Path:
 
 
 @pytest.fixture
+def draeger_20hz_healthy_volunteer_time_wrap_v120_path() -> Path:
+    return data_directory / "draeger_20Hz_healthy_volunteer_time_wrap_v120.bin"
+
+
+@pytest.fixture
+def draeger_20hz_healthy_volunteer_time_wrap_v130_path() -> Path:
+    return data_directory / "draeger_20Hz_healthy_volunteer_time_wrap_v130.bin"
+
+
+@pytest.fixture
 def sentec_healthy_volunteer_1a_path() -> Path:
     return data_directory / "sentec_healthy_volunteer_1a.zri"
 
@@ -45,6 +55,16 @@ def sentec_healthy_volunteer_2a_path() -> Path:
 @pytest.fixture
 def sentec_healthy_volunteer_2b_path() -> Path:
     return data_directory / "sentec_healthy_volunteer_2b.zri"
+
+
+@pytest.fixture
+def timpel_healthy_volunteer_1_path() -> Path:
+    return data_directory / "timpel_healthy_volunteer_1.txt"
+
+
+@pytest.fixture
+def timpel_healthy_volunteer_2_path() -> Path:
+    return data_directory / "timpel_healthy_volunteer_2.txt"
 
 
 @pytest.fixture
@@ -96,6 +116,24 @@ def draeger_20hz_healthy_volunteer_and_fixed_rr(
         vendor="draeger",
         sample_frequency=20,
         label="draeger_20hz_healthy_volunteer_and_fixed_rr",
+    )
+
+
+@pytest.fixture
+def draeger_20hz_healthy_volunteer_time_wrap_v120(draeger_20hz_healthy_volunteer_time_wrap_v120_path: Path) -> Sequence:
+    return load_eit_data(
+        draeger_20hz_healthy_volunteer_time_wrap_v120_path,
+        vendor="draeger",
+        label="draeger_20hz_healthy_volunteer_time_wrap_v120",
+    )
+
+
+@pytest.fixture
+def draeger_20hz_healthy_volunteer_time_wrap_v130(draeger_20hz_healthy_volunteer_time_wrap_v130_path: Path) -> Sequence:
+    return load_eit_data(
+        draeger_20hz_healthy_volunteer_time_wrap_v130_path,
+        vendor="draeger",
+        label="draeger_20hz_healthy_volunteer_time_wrap_v130",
     )
 
 
@@ -154,4 +192,22 @@ def sentec_healthy_volunteer_2(
         [sentec_healthy_volunteer_2a_path, sentec_healthy_volunteer_2b_path],
         vendor="sentec",
         label="sentec_healthy_volunteer_2",
+    )
+
+
+@pytest.fixture
+def timpel_healthy_volunteer_1(timpel_healthy_volunteer_1_path: Path) -> Sequence:
+    return load_eit_data(
+        timpel_healthy_volunteer_1_path,
+        vendor="timpel",
+        label="timpel_healthy_volunteer_1",
+    )
+
+
+@pytest.fixture
+def timpel_healthy_volunteer_2(timpel_healthy_volunteer_2_path: Path) -> Sequence:
+    return load_eit_data(
+        timpel_healthy_volunteer_2_path,
+        vendor="timpel",
+        label="timpel_healthy_volunteer_2",
     )
