@@ -15,6 +15,10 @@ inputs:
   token:
     description: "GitHub TOKEN"
     required: true
+  zenodo-record-id:
+    description: "Zenodo record ID for test dataset"
+    required: false
+    default: "17423607"
 
 runs:
   using: "composite"
@@ -33,14 +37,22 @@ runs:
       uses: actions/cache@v4
       with:
         path: ${{ steps.set-path.outputs.data_dir }}
-        key: testdata-zenodo-10.5281/zenodo.17423608
+        key: eitprocessing-testdata-zenodo.${{ inputs.zenodo-record-id }}
+    - name: Install zenodo-get
+      if: ${{ inputs.extract-data == 'true' && steps.cache.outputs.cache-hit != 'true' }}
+      run: python3 -m pip install zenodo-get
+      shell: bash
     - name: Download test dataset
       shell: bash
       if: inputs.extract-data == 'true' && steps.cache.outputs.cache-hit != 'true'
       run: |
         mkdir -p ${{ steps.set-path.outputs.data_dir }}
-        wget -q -O ${{ steps.set-path.outputs.data_dir }}/eitprocessing_test_data.zip https://zenodo.org/api/records/17423608/files-archive?download=1
-        unzip ${{ steps.set-path.outputs.data_dir }}/eitprocessing_test_data.zip -d ${{ steps.set-path.outputs.data_dir }}
+        cd ${{ steps.set-path.outputs.data_dir }}
+        zenodo_get ${{ inputs.zenodo-record-id }}
+    - name: Uninstall zenodo-get
+      if: ${{ inputs.extract-data == 'true' && steps.cache.outputs.cache-hit != 'true' }}
+      run: python3 -m pip uninstall zenodo-get
+      shell: bash
     - uses: actions/cache@v4
       id: cache-python-env
       with:
