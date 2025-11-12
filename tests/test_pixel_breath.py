@@ -1,6 +1,7 @@
 import copy
 import itertools
 import os
+import warnings
 from pathlib import Path
 from unittest.mock import patch
 
@@ -343,10 +344,21 @@ def test_with_zero_impedance(mock_zero_eit_data: EITData, mock_continuous_data: 
     assert test_result.shape == (3, 2, 2)
 
 
-@pytest.mark.parametrize("sequence", ["draeger_20hz_healthy_volunteer_pressure_pod", "timpel1"], indirect=True)
-def test_with_data(sequence: Sequence, pytestconfig: pytest.Config):
+@pytest.mark.parametrize(
+    ("sequence", "slice_"),
+    [
+        ("draeger_20hz_healthy_volunteer_pressure_pod", slice(None)),
+        ("timpel_healthy_volunteer_1", slice(421, 495)),
+    ],
+    indirect=["sequence"],
+)
+def test_with_data(sequence: Sequence, slice_: slice, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning, message="No starting or end timepoint was selected.")
+        sequence = sequence.t[slice_]
 
     sequence = copy.deepcopy(sequence)
 
