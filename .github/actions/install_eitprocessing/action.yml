@@ -15,10 +15,6 @@ inputs:
   token:
     description: "GitHub TOKEN"
     required: true
-  data-directory:
-    description: "Directory where to store eitprocessing data"
-    required: false
-    default: ${{ github.workspace }}/../eitprocessing_data/
 
 runs:
   using: "composite"
@@ -26,18 +22,25 @@ runs:
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
-    - uses: docker/login-action@v3
+    - name: Set data dir
+      shell: bash
       if: ${{ inputs.extract-data == 'true' }}
-      with:
-        registry: ghcr.io
-        username: psomhorst
-        password: ${{ inputs.token }}
-    - uses: shrink/actions-docker-extract@v3
+      id: set-path
+      run: echo "data_dir=$GITHUB_WORKSPACE/test_data" >> "$GITHUB_OUTPUT"
+    - name: Restore dataset cache
       if: ${{ inputs.extract-data == 'true' }}
+      id: cache
+      uses: actions/cache@v4
       with:
-        image: ghcr.io/eit-alive/eittestdata:latest
-        destination: ${{ inputs.data-directory }}
-        path: /eitprocessing/.
+        path: ${{ steps.set-path.outputs.data_dir }}
+        key: testdata-zenodo-10.5281/zenodo.17423608
+    - name: Download test dataset
+      shell: bash
+      if: ${{ steps.cache.outputs.cache-hit != 'true' }} && ${{ inputs.extract-data == 'true' }}
+      run: |
+        mkdir -p ${{ steps.set-path.outputs.data_dir }}
+        wget -O ${{ steps.set-path.outputs.data_dir }}/eitprocessing_test_data.zip https://zenodo.org/api/records/17423608/files-archive?download=1
+        unzip ${{ steps.set-path.outputs.data_dir }}/eitprocessing_test_data.zip -d ${{ steps.set-path.outputs.data_dir }}
     - uses: actions/cache@v4
       id: cache-python-env
       with:
