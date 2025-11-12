@@ -1,5 +1,4 @@
 name: Draft GitHub Release
-
 on:
   workflow_dispatch:
     inputs:
@@ -25,6 +24,7 @@ permissions:
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_PAGER: cat
+  ZENODO_RECORD_ID: 17423608
 
 jobs:
   checks:

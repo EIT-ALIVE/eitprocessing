@@ -1,5 +1,6 @@
 name: Build and Test
-
+env:
+  ZENODO_RECORD_ID: 17423608
 on:
   push:
     branches:
