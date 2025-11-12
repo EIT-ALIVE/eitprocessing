@@ -41,7 +41,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.set-path.outputs.data_dir }}
-          key: eitprocessing-testdata-zenodo.$ZENODO_RECORD_ID
+          key: eitprocessing-testdata-zenodo.${{ env.ZENODO_RECORD_ID }}
       - name: Install zenodo-get
         if: steps.cache.outputs.cache-hit != 'true'
         run: python3 -m pip install zenodo-get
