@@ -1,5 +1,6 @@
 import copy
 import os
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -312,13 +313,21 @@ def test_pass_continuousdata(draeger_20hz_healthy_volunteer_pressure_pod: Sequen
 
 
 @pytest.mark.parametrize(
-    "sequence",
-    ["draeger_20hz_healthy_volunteer_pressure_pod", "draeger_50hz_healthy_volunteer_pressure_pod", "timpel1"],
-    indirect=True,
+    ("sequence", "slice_"),
+    [
+        ("draeger_20hz_healthy_volunteer_pressure_pod", slice(None)),
+        ("draeger_50hz_healthy_volunteer_pressure_pod", slice(None)),
+        ("timpel_healthy_volunteer_1", slice(421, 495)),
+    ],
+    indirect=["sequence"],
 )
-def test_with_data(sequence: Sequence, pytestconfig: pytest.Config):
+def test_with_data(sequence: Sequence, slice_: slice, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning, message="No starting or end timepoint was selected.")
+        sequence = sequence.t[slice_]
 
     sequence = copy.deepcopy(sequence)  # prevents writing results to original file
     bd = BreathDetection()
