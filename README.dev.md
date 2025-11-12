@@ -105,6 +105,28 @@ Some tests require access to test data. You can download the test data from Zeno
 
 Test data should reside in the `test_data/` folder in the root of the repository.
 
+Alternatively, use zenodo-get to download the data directly into the `test_data/` folder:
+
+Using `uv`:
+
+```shell
+mkdir -p test_data
+cd test_data
+uv tool run zenodo_get 17423608
+cd -
+```
+
+Using `pip`:
+
+```shell
+pip install zenodo-get
+mkdir -p test_data
+cd test_data
+zenodo_get 17423608
+cd -
+```
+
+
 ##### Running tests
 
 For testing all you need to do is run:
