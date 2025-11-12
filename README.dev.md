@@ -99,10 +99,7 @@ Make sure you have developer options installed as described in the [README](READ
 (otherwise run: `pip install -e .[dev]` on the repository folder in your environment)
 
 ##### Downloading test data
-Some tests require access to test data. We are currently in the process of migrating tests from proprietary test data to
-open test data. Not all test data is available yet.
-
-You can download the available test data from Zenodo via the button below.
+Some tests require access to test data. You can download the test data from Zenodo via the button below.
 
 [![](https://zenodo.org/badge/DOI/10.5281/zenodo.17423608.svg)](https://doi.org/10.5281/zenodo.17423608)
 
