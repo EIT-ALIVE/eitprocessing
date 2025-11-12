@@ -80,27 +80,25 @@ class Sequence(Equivalence, SelectByTime):
         return len(self.time)
 
     def __add__(self, other: Sequence) -> Sequence:
-        return self.concatenate(self, other)
+        return self.concatenate(other)
 
-    @classmethod  # TODO: why is this a class method? In other cases it's instance method
     def concatenate(
-        cls,
-        a: Sequence,
-        b: Sequence,
+        self: Sequence,
+        other: Sequence,
         newlabel: str | None = None,
     ) -> Sequence:
         """Create a merge of two Sequence objects."""
         # TODO: rewrite
 
-        concat_eit = a.eit_data.concatenate(b.eit_data)
-        concat_continuous = a.continuous_data.concatenate(b.continuous_data)
-        concat_sparse = a.sparse_data.concatenate(b.sparse_data)
-        concat_interval = a.interval_data.concatenate(b.interval_data)
+        concat_eit = self.eit_data.concatenate(other.eit_data)
+        concat_continuous = self.continuous_data.concatenate(other.continuous_data)
+        concat_sparse = self.sparse_data.concatenate(other.sparse_data)
+        concat_interval = self.interval_data.concatenate(other.interval_data)
 
-        newlabel = newlabel or a.label
+        newlabel = newlabel or self.label
         # TODO: add concatenation of other attached objects
 
-        return a.__class__(
+        return self.__class__(
             eit_data=concat_eit,
             continuous_data=concat_continuous,
             sparse_data=concat_sparse,

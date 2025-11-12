@@ -1,7 +1,6 @@
 import copy
 import itertools
-import os
-from pathlib import Path
+import warnings
 from unittest.mock import patch
 
 import numpy as np
@@ -14,18 +13,8 @@ from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
+from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.features.pixel_breath import PixelBreath
-from tests.test_breath_detection import BreathDetection
-
-environment = Path(
-    os.environ.get(
-        "EIT_PROCESSING_TEST_DATA",
-        Path(__file__).parent.parent.resolve(),
-    ),
-)
-data_directory = environment / "tests" / "test_data"
-draeger_file1 = data_directory / "Draeger_Test3.bin"
-timpel_file = data_directory / "Timpel_Test.txt"
 
 
 # @pytest.fixture()
@@ -249,24 +238,22 @@ def test__find_extreme_indices(mock_only_pixel_impedance: tuple):
 
 
 @pytest.mark.parametrize(
-    ("store_input", "sequence_fixture", "expected_exception"),
+    ("store_input", "sequence", "expected_exception"),
     [
         (True, "not_a_sequence", ValueError),  # Expect ValueError because an empty list is not a Sequence
         (True, "none_sequence", RuntimeError),  # Expect RuntimeError because store=True but no Sequence is provided
     ],
+    indirect=["sequence"],
 )
 def test_store_result_with_errors(
     mock_eit_data: EITData,
     mock_continuous_data: ContinuousData,
-    request: pytest.FixtureRequest,
     store_input: bool,
-    sequence_fixture: str,
+    sequence: Sequence,
     expected_exception: type[ValueError | RuntimeError],
 ):
     """Test storing results when errors are expected."""
     pi = PixelBreath(breath_detection=BreathDetection(minimum_duration=0.01))  # Ensure that breaths are detected
-
-    sequence = request.getfixturevalue(sequence_fixture)
 
     # Expect a specific exception (either ValueError or RuntimeError)
     with pytest.raises(expected_exception):
@@ -274,7 +261,7 @@ def test_store_result_with_errors(
 
 
 @pytest.mark.parametrize(
-    ("store_input", "sequence_fixture"),
+    ("store_input", "sequence"),
     [
         (True, "mock_sequence"),  # Result should be stored
         (False, "mock_sequence"),  # No result should be stored
@@ -282,18 +269,16 @@ def test_store_result_with_errors(
         (None, "mock_sequence"),  # Result should be stored
         (None, "none_sequence"),  # No result stored, no sequence provided
     ],
+    indirect=["sequence"],
 )
 def test_store_result_success(
     mock_eit_data: EITData,
     mock_continuous_data: ContinuousData,
-    request: pytest.FixtureRequest,
     store_input: bool,
-    sequence_fixture: str,
+    sequence: Sequence,
 ):
     """Test storing results when no errors are expected."""
     pi = PixelBreath(breath_detection=BreathDetection(minimum_duration=0.01))  # Ensure that breaths are detected
-
-    sequence = request.getfixturevalue(sequence_fixture)
 
     # Run pixel breath detection and check the result
     result = pi.find_pixel_breaths(mock_eit_data, mock_continuous_data, sequence, store=store_input)
@@ -348,63 +333,73 @@ def test_with_zero_impedance(mock_zero_eit_data: EITData, mock_continuous_data: 
     assert test_result.shape == (3, 2, 2)
 
 
-def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
+@pytest.mark.parametrize(
+    ("sequence", "slice_"),
+    [
+        ("draeger_20hz_healthy_volunteer_pressure_pod", slice(None)),
+        ("timpel_healthy_volunteer_1", slice(421, 495)),
+    ],
+    indirect=["sequence"],
+)
+def test_with_data(sequence: Sequence, slice_: slice, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
-    draeger1 = copy.deepcopy(draeger1)
-    timpel1 = copy.deepcopy(timpel1)
-    for sequence in draeger1, timpel1:
-        ssequence = sequence
-        pi = PixelBreath()
-        eit_data = ssequence.eit_data["raw"]
-        eit_data.pixel_impedance[:, 0, 0] = np.nan  # set one pixel to NaN to test handling of NaNs
-        cd = ssequence.continuous_data["global_impedance_(raw)"]
-        pixel_breaths = pi.find_pixel_breaths(eit_data, cd)
-        test_result = np.stack(pixel_breaths.values)
-        assert not np.all(test_result == None)  # noqa: E711
-        _, n_rows, n_cols = test_result.shape
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning, message="No starting or end timepoint was selected.")
+        sequence = sequence.t[slice_]
 
-        for row, col in itertools.product(range(n_rows), range(n_cols)):
-            filtered_values = [val for val in test_result[:, row, col] if val is not None]
-            if not filtered_values:
-                return
-            start_indices, middle_indices, end_indices = (list(x) for x in zip(*filtered_values, strict=True))
-            # Test whether pixel breaths are sorted properly
-            assert start_indices == sorted(start_indices)
-            assert middle_indices == sorted(middle_indices)
-            assert end_indices == sorted(end_indices)
+    sequence = copy.deepcopy(sequence)
 
-            # Test whether indices are unique. `set` removes non-unique values,
-            # `sorted(list(...))` converts the set to a sorted list again.
-            assert list(start_indices) == sorted(set(start_indices))
-            assert list(middle_indices) == sorted(set(middle_indices))
-            assert list(end_indices) == sorted(set(end_indices))
+    pi = PixelBreath()
+    eit_data = sequence.eit_data["raw"]
+    eit_data.pixel_impedance[:, 0, 0] = np.nan  # set one pixel to NaN to test handling of NaNs
+    cd = sequence.continuous_data["global_impedance_(raw)"]
+    pixel_breaths = pi.find_pixel_breaths(eit_data, cd)
+    test_result = np.stack(pixel_breaths.values)
+    assert not np.all(test_result == None)  # noqa: E711
+    _, n_rows, n_cols = test_result.shape
 
-            # Test whether the start of the next breath is on/after the previous breath
-            assert all(
-                start_index >= end_index
-                for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
-            )
-            for breath in filtered_values:
-                # Test whether the indices are in the proper order within a breath
-                assert breath.start_time < breath.middle_time < breath.end_time
+    for row, col in itertools.product(range(n_rows), range(n_cols)):
+        filtered_values = [val for val in test_result[:, row, col] if val is not None]
+        if not filtered_values:
+            return
+        start_indices, middle_indices, end_indices = (list(x) for x in zip(*filtered_values, strict=True))
+        # Test whether pixel breaths are sorted properly
+        assert start_indices == sorted(start_indices)
+        assert middle_indices == sorted(middle_indices)
+        assert end_indices == sorted(end_indices)
+
+        # Test whether indices are unique. `set` removes non-unique values,
+        # `sorted(list(...))` converts the set to a sorted list again.
+        assert list(start_indices) == sorted(set(start_indices))
+        assert list(middle_indices) == sorted(set(middle_indices))
+        assert list(end_indices) == sorted(set(end_indices))
+
+        # Test whether the start of the next breath is on/after the previous breath
+        assert all(
+            start_index >= end_index for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
+        )
+        for breath in filtered_values:
+            # Test whether the indices are in the proper order within a breath
+            assert breath.start_time < breath.middle_time < breath.end_time
 
 
-def test_phase_modes(draeger1: Sequence, pytestconfig: pytest.Config):
+def test_phase_modes(draeger_50hz_healthy_volunteer_pressure_pod: Sequence, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
-    ssequence = copy.deepcopy(draeger1)
-    eit_data = ssequence.eit_data["raw"]
+    sequence = copy.deepcopy(draeger_50hz_healthy_volunteer_pressure_pod)
+    eit_data = sequence.eit_data["raw"]
 
-    # reduce the pixel set to middly 'well-behaved' pixels with positive TIV
-    eit_data.pixel_impedance = eit_data.pixel_impedance[:, 10:23, 10:23]
+    # reduce the pixel set to some 'well-behaved' pixels with positive TIV
+    eit_data.pixel_impedance = eit_data.pixel_impedance[:, 14:20, 14:20]
 
     # flip a single pixel, so the differences between algorithms becomes predictable
-    eit_data.pixel_impedance[:, 6, 6] = -eit_data.pixel_impedance[:, 6, 6]
+    flip_row, flip_col = 5, 5
+    eit_data.pixel_impedance[:, flip_row, flip_col] = -eit_data.pixel_impedance[:, flip_row, flip_col]
 
-    cd = ssequence.continuous_data["global_impedance_(raw)"]
+    cd = sequence.continuous_data["global_impedance_(raw)"]
 
     # replace the 'global' data with the sum of the middly pixels
     cd.values = np.sum(eit_data.pixel_impedance, axis=(1, 2))
@@ -412,9 +407,9 @@ def test_phase_modes(draeger1: Sequence, pytestconfig: pytest.Config):
     pb_negative_amplitude = PixelBreath(phase_correction_mode="negative amplitude").find_pixel_breaths(eit_data, cd)
     pb_phase_shift = PixelBreath(phase_correction_mode="phase shift").find_pixel_breaths(eit_data, cd)
 
+    with pytest.warns(RuntimeWarning, match=r"Skipping pixel \(.+\) because more than half \(.+\) of breaths skipped."):
+        pb_none = PixelBreath(phase_correction_mode="none").find_pixel_breaths(eit_data, cd)
     # results are not compared, other than for length; just make sure it runs
-    pb_none = PixelBreath(phase_correction_mode="none").find_pixel_breaths(eit_data, cd)
-
     assert len(pb_negative_amplitude) == len(pb_phase_shift) == len(pb_none)
 
     # all breaths, except for the first and last,  should have been detected
@@ -423,10 +418,10 @@ def test_phase_modes(draeger1: Sequence, pytestconfig: pytest.Config):
 
     same_pixel_timing = np.array(pb_negative_amplitude.values) == np.array(pb_phase_shift.values)
     assert not np.all(same_pixel_timing)
-    assert not np.any(same_pixel_timing[1:-1, 6, 6])  # the single flipped pixel
-    assert np.all(same_pixel_timing[1:-1, :6, :])  # all pixels in the rows above match
-    assert np.all(same_pixel_timing[1:-1, 7:, :])  # all pixels in the rows below match
-    assert np.all(same_pixel_timing[1:-1, :, :6])  # all pixels in the columns to the left match
-    assert np.all(same_pixel_timing[1:-1, :, 7:])  # all pixels in the columns to the right match
+    assert not np.any(same_pixel_timing[1:-1, flip_row, flip_col])  # the single flipped pixel
+    assert np.all(same_pixel_timing[1:-1, :flip_row, :])  # all pixels in the rows above match
+    assert np.all(same_pixel_timing[1:-1, flip_row + 1 :, :])  # all pixels in the rows below match
+    assert np.all(same_pixel_timing[1:-1, :, :flip_col])  # all pixels in the columns to the left match
+    assert np.all(same_pixel_timing[1:-1, :, flip_col + 1 :])  # all pixels in the columns to the right match
     assert np.all(same_pixel_timing[0, :, :])  # all first values match, because they are all None
     assert np.all(same_pixel_timing[-1, :, :])  # all last values match, because they are all None

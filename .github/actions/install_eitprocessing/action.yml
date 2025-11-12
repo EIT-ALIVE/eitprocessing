@@ -8,17 +8,13 @@ inputs:
   dependencies:
     description: "The optional dependencies of eitprocessing to install"
     required: false
-  extract-data:
-    description: "Whether to extract testing data"
-    required: false
-    default: "false"
   token:
     description: "GitHub TOKEN"
     required: true
-  data-directory:
-    description: "Directory where to store eitprocessing data"
+  zenodo-record-id:
+    description: "Zenodo record ID for test dataset"
     required: false
-    default: ${{ github.workspace }}/../eitprocessing_data/
+    default: "17423608"
 
 runs:
   using: "composite"
@@ -26,18 +22,6 @@ runs:
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
-    - uses: docker/login-action@v3
-      if: ${{ inputs.extract-data == 'true' }}
-      with:
-        registry: ghcr.io
-        username: psomhorst
-        password: ${{ inputs.token }}
-    - uses: shrink/actions-docker-extract@v3
-      if: ${{ inputs.extract-data == 'true' }}
-      with:
-        image: ghcr.io/eit-alive/eittestdata:latest
-        destination: ${{ inputs.data-directory }}
-        path: /eitprocessing/.
     - uses: actions/cache@v4
       id: cache-python-env
       with:

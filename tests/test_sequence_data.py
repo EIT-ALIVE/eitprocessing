@@ -3,9 +3,9 @@ from collections.abc import Callable
 import numpy as np
 import pytest
 
+from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence, _DataAccess
-from tests.test_breath_detection import ContinuousData
 
 
 @pytest.fixture

@@ -12,7 +12,7 @@ Please follow these steps:
 
 1. (**important**) announce your plan to the rest of the community _before you start working_. This announcement should be in the form of a (new) issue;
 1. (**important**) wait until some kind of consensus is reached about your idea being a good idea;
-1. if needed, fork the repository to your own Github profile and create your own feature branch off of the latest master commit. While working on your feature branch, make sure to stay up to date with the master branch by pulling in changes, possibly from the 'upstream' repository (follow the instructions [here](https://help.github.com/articles/configuring-a-remote-for-a-fork/) and [here](https://help.github.com/articles/syncing-a-fork/));
+1. if needed, fork the repository to your own GitHub profile and create your own feature branch off of the latest master commit. While working on your feature branch, make sure to stay up to date with the master branch by pulling in changes, possibly from the 'upstream' repository (follow the instructions [here](https://help.github.com/articles/configuring-a-remote-for-a-fork/) and [here](https://help.github.com/articles/syncing-a-fork/));
 1. make sure the existing tests still work by running `pytest` (see also [here](#testing-locally));
 1. add your own tests (if necessary);
 1. update or expand the documentation;
@@ -31,7 +31,7 @@ readibility or simplicity is more important than absolute correctness.
 It is hard to define the precise balance we are looking for, so instead we will refer
 to the [Zen of python](https://peps.python.org/pep-0020/).
 
-Note that all contrubtions to this project will be published under our [Apache 2.0 licence]
+Note that all contributions to this project will be published under our [Apache 2.0 licence]
 (<https://github.com/EIT-ALIVE/eitprocessing/blob/main/LICENSE>).
 
 #### Docstrings
@@ -49,7 +49,7 @@ place to start. This extension is currently in preview, but seems to work more r
 #### Branch naming convention
 
 Please try to adhere to the following branch naming convention:
-<github-issue-number>_<brief-description>_<username>.
+`<github-issue-number>_<brief-description>_<username>`.
 E.g., `042_life_universe_everything_douglasadams`.
 
 This allows, at a single glance, to see in the issue that you're
@@ -98,6 +98,38 @@ the CI.
 Make sure you have developer options installed as described in the [README](README.md)
 (otherwise run: `pip install -e .[dev]` on the repository folder in your environment)
 
+##### Downloading test data
+Some tests require access to test data. You can download the test data from Zenodo via the button below. Note that for
+some reason downloading all files at ones results in a corrupted zip file. Please download the files one by one.
+
+[![](https://zenodo.org/badge/DOI/10.5281/zenodo.17423608.svg)](https://doi.org/10.5281/zenodo.17423608)
+
+Test data should reside in the `test_data/` folder in the root of the repository.
+
+Alternatively, use zenodo-get to download the data directly into the `test_data/` folder:
+
+Using `uv`:
+
+```shell
+mkdir -p test_data
+cd test_data
+uv tool run zenodo_get 17423608
+cd -
+```
+
+Using `pip`:
+
+```shell
+pip install zenodo-get
+mkdir -p test_data
+cd test_data
+zenodo_get 17423608
+cd -
+```
+
+
+##### Running tests
+
 For testing all you need to do is run:
 
 ```shell
@@ -120,7 +152,9 @@ coverage report
 
 We use [ruff](https://docs.astral.sh/ruff/) for linting, sorting imports and formatting of python (notebook) files. The configurations of `ruff` are set in [pyproject.toml](pyproject.toml) file.
 
-If you are using VS code, please install and activate the [Ruff extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) to automatically format and check linting.
+If you are using VS code, please install and activate the [Ruff
+extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) to automatically format and check
+linting. Make sure to use the ruff version installed in your environment.
 
 Otherwise, please ensure check both linting (`ruff fix .`) and formatting (`ruff format .`) before requesting a review.
 

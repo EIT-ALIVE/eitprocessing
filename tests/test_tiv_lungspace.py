@@ -96,6 +96,15 @@ def test_tiv_lungspace_with_timing_data(create_signal: Callable):
     _ = TIVLungspace(threshold=0.2).apply(signal, timing_data=timing_data)
 
 
-def test_tiv_lungpsace_with_real_data(draeger1: Sequence):
-    eit_data = draeger1.eit_data["raw"]
+@pytest.mark.parametrize(
+    "sequence",
+    [
+        "draeger_20hz_healthy_volunteer_pressure_pod",
+        "draeger_20hz_healthy_volunteer",
+        "draeger_50hz_healthy_volunteer_pressure_pod",
+    ],
+    indirect=True,
+)
+def test_tiv_lungpsace_with_real_data(sequence: Sequence):
+    eit_data = sequence.eit_data["raw"]
     _ = TIVLungspace(threshold=0.2).apply(eit_data)

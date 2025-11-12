@@ -105,11 +105,11 @@ def test_bd_init():
         EELI(breath_detection_kwargs={"minimum_duration": 0}, breath_detection=BreathDetection(minimum_duration=0))
 
 
-def test_with_data(draeger1: Sequence, pytestconfig: pytest.Config):
+def test_with_data(draeger_20hz_healthy_volunteer_pressure_pod: Sequence, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
-    cd = draeger1.continuous_data["global_impedance_(raw)"]
+    cd = draeger_20hz_healthy_volunteer_pressure_pod.continuous_data["global_impedance_(raw)"]
     eeli_values = EELI().compute_parameter(cd).values
 
     breaths = BreathDetection().find_breaths(cd)
@@ -117,14 +117,14 @@ def test_with_data(draeger1: Sequence, pytestconfig: pytest.Config):
     assert len(eeli_values) == len(breaths)
 
 
-def test_non_impedance_data(draeger1: Sequence) -> None:
-    cd = draeger1.continuous_data["global_impedance_(raw)"]
+def test_non_impedance_data(draeger_20hz_healthy_volunteer_pressure_pod: Sequence) -> None:
+    cd = draeger_20hz_healthy_volunteer_pressure_pod.continuous_data["global_impedance_(raw)"]
     original_category = cd.category
 
     _ = EELI().compute_parameter(cd)
 
     cd.category = "foo"
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="This method will only work on 'impedance' data, not 'foo'."):
         _ = EELI().compute_parameter(cd)
 
     cd.category = original_category
