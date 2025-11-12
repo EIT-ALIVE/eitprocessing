@@ -1,6 +1,4 @@
 import copy
-import os
-from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
@@ -12,17 +10,8 @@ from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
-from eitprocessing.parameters.breath_detection import BreathDetection
+from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.parameters.tidal_impedance_variation import TIV
-
-environment = Path(
-    os.environ.get(
-        "EIT_PROCESSING_TEST_DATA",
-        Path(__file__).parent.parent.resolve(),
-    ),
-)
-data_directory = environment / "tests" / "test_data"
-timpel_file = data_directory / "Timpel_Test.txt"
 
 
 def create_result_array(value: float):

@@ -1,17 +1,10 @@
-import os
 from pathlib import Path
 
 import pytest
 
 from eitprocessing.datahandling.sequence import Sequence
 
-environment = os.environ.get(
-    "EIT_PROCESSING_TEST_DATA",
-    Path.resolve(Path(__file__).parent.parent),
-)
-data_directory = Path(environment) / "tests" / "test_data"
-draeger_wrapped_time_axis_file = data_directory / "Draeger_wrapped_time_axis.bin"
-
+environment = Path(__file__).resolve().parent.parent
 data_directory = Path(environment) / "test_data"  # overwrite for new style tests
 pytest_plugins = [
     "tests.fixtures.eitdata",  # load fixtures from different modules as 'plugins' as workaround
