@@ -81,8 +81,8 @@ def test_watershed_init_threshold_wrong_type(threshold: object):
 
 
 @pytest.mark.parametrize("threshold", [0.1, 0.15, 0.2, 0.25, 0.3])
-def test_watershed_with_real_data(draeger1: Sequence, threshold: float):
-    eit_data = draeger1.eit_data["raw"]
+def test_watershed_with_real_data(draeger_50hz_healthy_volunteer_pressure_pod: Sequence, threshold: float):
+    eit_data = draeger_50hz_healthy_volunteer_pressure_pod.eit_data["raw"]
     watershed_mask = WatershedLungspace(threshold_fraction=threshold).apply(eit_data, captures=(captures := {}))
 
     assert captures, "captures should have values after runnning apply"
@@ -127,17 +127,17 @@ def test_watershed_with_simulated_data(simulated_eit_data: Callable[..., EITData
     assert np.all(captures["mean tiv"].values <= captures["mean amplitude"].values, where=included_pixels)
 
 
-def test_watershed_timing_data(draeger1: Sequence):
-    eit_data = draeger1.eit_data["raw"]
-    timing_data = draeger1.continuous_data["global_impedance_(raw)"]
+def test_watershed_timing_data(draeger_50hz_healthy_volunteer_pressure_pod: Sequence):
+    eit_data = draeger_50hz_healthy_volunteer_pressure_pod.eit_data["raw"]
+    timing_data = draeger_50hz_healthy_volunteer_pressure_pod.continuous_data["global_impedance_(raw)"]
     watershed_mask_w_timing = WatershedLungspace().apply(eit_data, timing_data=timing_data)
     watershed_mask = WatershedLungspace().apply(eit_data)
 
     assert watershed_mask_w_timing == watershed_mask, "The timing data should be the same in this case"
 
 
-def test_watershed_captures(draeger1: Sequence):
-    eit_data = draeger1.eit_data["raw"]
+def test_watershed_captures(draeger_50hz_healthy_volunteer_pressure_pod: Sequence):
+    eit_data = draeger_50hz_healthy_volunteer_pressure_pod.eit_data["raw"]
 
     with pytest.raises(TypeError):
         _ = WatershedLungspace().apply(eit_data, captures=(captures := []))

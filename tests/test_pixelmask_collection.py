@@ -216,8 +216,8 @@ def test_apply_to_numpy_data_label_format(anonymous_boolean_mask: Callable, nump
         _ = collection.apply(data, label_format="masked_{mask_label}")
 
 
-def test_apply_to_eitdata_labelled(draeger1: Sequence, labelled_boolean_mask: Callable):
-    eit_data = draeger1.eit_data["raw"][:100]
+def test_apply_to_eitdata_labelled(draeger_20hz_healthy_volunteer: Sequence, labelled_boolean_mask: Callable):
+    eit_data = draeger_20hz_healthy_volunteer.eit_data["raw"][:100]
 
     pm1 = labelled_boolean_mask("mask1")
     pm2 = labelled_boolean_mask("mask2")
@@ -291,7 +291,7 @@ def test_apply_with_invalid_label_format_raises(pixel_map: Callable, labelled_bo
         _ = collection.apply(pixel_map_instance, label_format="{mask_label} {something_else}")
 
 
-def test_apply_with_invalid_data_type_raises(labelled_boolean_mask: Callable, draeger1: Sequence):
+def test_apply_with_invalid_data_type_raises(labelled_boolean_mask: Callable, draeger_20hz_healthy_volunteer: Sequence):
     collection = PixelMaskCollection([labelled_boolean_mask("mask1"), labelled_boolean_mask("mask2")])
 
     with pytest.raises(TypeError, match="Unsupported data type:"):
@@ -301,7 +301,7 @@ def test_apply_with_invalid_data_type_raises(labelled_boolean_mask: Callable, dr
         _ = collection.apply([[1, 2]])
 
     with pytest.raises(TypeError, match="Unsupported data type:"):
-        _ = collection.apply(draeger1)
+        _ = collection.apply(draeger_20hz_healthy_volunteer)
 
 
 def test_apply_with_label_keyword_raises(labelled_boolean_mask: Callable, pixel_map: Callable):
@@ -330,8 +330,8 @@ def test_apply_unsupported_type():
     assert "Unsupported data type" in str(excinfo.value)
 
 
-def test_apply_to_eitdata(draeger1: Sequence):
-    eit_data = draeger1.eit_data["raw"]
+def test_apply_to_eitdata(draeger_20hz_healthy_volunteer: Sequence):
+    eit_data = draeger_20hz_healthy_volunteer.eit_data["raw"]
     pm1 = get_geometric_mask("ventral")
     pm2 = get_geometric_mask("dorsal")
 

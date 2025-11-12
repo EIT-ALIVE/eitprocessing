@@ -16,21 +16,45 @@ jobs:
         os: ["ubuntu-latest"]
         python-version: ["3.10"]
     env:
-      EIT_PROCESSING_TEST_DATA: ${{ github.workspace }}/../eitprocessing_data/
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       COVERALLS_FLAG_NAME: python-${{ matrix.python-version }}
+      ZENODO_RECORD_ID: 17423608
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/install_eitprocessing
         with:
           dependencies: testing
-          extract-data: true
           python-version: ${{ matrix.python-version }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          data-directory: ${{ env.EIT_PROCESSING_TEST_DATA }}
+      - name: Set data dir
+        shell: bash
+        id: set-path
+        run: echo "data_dir=$GITHUB_WORKSPACE/test_data" >> "$GITHUB_OUTPUT"
+      - name: Restore dataset cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.set-path.outputs.data_dir }}
+          key: eitprocessing-testdata-zenodo.${{ env.ZENODO_RECORD_ID }}
+      - name: Install zenodo-get
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: python3 -m pip install zenodo-get
+        shell: bash
+      - name: Download test dataset
+        shell: bash
+        if: steps.cache.outputs['cache-hit'] != 'true'
+        run: |
+          mkdir -p ${{ steps.set-path.outputs.data_dir }}
+          cd ${{ steps.set-path.outputs.data_dir }}
+          zenodo_get $ZENODO_RECORD_ID
+          cd -
+      - name: Uninstall zenodo-get
+        if: steps.cache.outputs['cache-hit'] != 'true'
+        run: python3 -m pip uninstall --yes zenodo-get
+        shell: bash
       - name: Run coveralls
         run: |
-          pytest --cov --cov-report xml --cov-report term --cov-report html 
-          git config --global --add safe.directory /ci 
+          pytest --cov --cov-report xml --cov-report term --cov-report html
+          git config --global --add safe.directory /ci
           coveralls --service=github

@@ -1,6 +1,4 @@
 import copy
-import os
-from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
@@ -12,18 +10,8 @@ from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
+from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.parameters.tidal_impedance_variation import TIV
-from tests.test_breath_detection import BreathDetection
-
-environment = Path(
-    os.environ.get(
-        "EIT_PROCESSING_TEST_DATA",
-        Path(__file__).parent.parent.resolve(),
-    ),
-)
-data_directory = environment / "tests" / "test_data"
-draeger_file1 = data_directory / "Draeger_Test3.bin"
-timpel_file = data_directory / "Timpel_Test.txt"
 
 
 def create_result_array(value: float):
@@ -186,39 +174,38 @@ def test_tiv_initialization_with_valid_method():
 
 
 @pytest.mark.parametrize(
-    ("store_input", "sequence_fixture", "expected_exception"),
+    ("store_input", "sequence", "expected_exception"),
     [
         (True, "not_a_sequence", ValueError),  # Expect ValueError because a string is not a valid Sequence
         (True, "none_sequence", RuntimeError),  # Expect RuntimeError because sequence is None and store=True
     ],
+    indirect=["sequence"],
 )
 def test_store_result_with_errors(
     mock_eit_data: EITData,
     mock_continuous_data: ContinuousData,
-    request: pytest.FixtureRequest,
     store_input: bool,
-    sequence_fixture: str,
-    expected_exception: ValueError | RuntimeError,
+    sequence: str,
+    expected_exception: type[Exception],
 ):
     """Test storing results when errors are expected."""
     tiv = TIV()  # Ensure that breaths are detected
 
     # Retrieve the sequence from the fixture
-    test_sequence = request.getfixturevalue(sequence_fixture)
 
     # Expect a specific exception (either ValueError or RuntimeError)
     with pytest.raises(expected_exception):
         tiv.compute_continuous_parameter(
             mock_continuous_data,
             tiv_method="inspiratory",
-            sequence=test_sequence,
+            sequence=sequence,
             store=store_input,
         )
     with pytest.raises(expected_exception):
         tiv.compute_pixel_parameter(
             eit_data=mock_eit_data,
             continuous_data=mock_continuous_data,
-            sequence=test_sequence,
+            sequence=sequence,
             tiv_method="inspiratory",
             tiv_timing="pixel",
             store=store_input,
@@ -227,7 +214,7 @@ def test_store_result_with_errors(
 
 
 @pytest.mark.parametrize(
-    ("store_input", "sequence_fixture"),
+    ("store_input", "sequence"),
     [
         (True, "mock_sequence"),  # Result should be stored
         (False, "mock_sequence"),  # No result should be stored
@@ -235,25 +222,22 @@ def test_store_result_with_errors(
         (None, "mock_sequence"),  # Result should be stored
         (None, "none_sequence"),  # No result stored, no sequence provided
     ],
+    indirect=["sequence"],
 )
 def test_store_result_success(
     mock_eit_data: EITData,
     mock_continuous_data: ContinuousData,
-    request: pytest.FixtureRequest,
     store_input: bool,
-    sequence_fixture: str,
+    sequence: str,
 ):
     """Test storing results when no errors are expected."""
     tiv = TIV()  # Ensure that breaths are detected
-
-    # Retrieve the sequence from the fixture
-    test_sequence = request.getfixturevalue(sequence_fixture)
 
     # Run continuous and pixel tiv computation and check the result
     continuous_result = tiv.compute_continuous_parameter(
         mock_continuous_data,
         tiv_method="inspiratory",
-        sequence=test_sequence,
+        sequence=sequence,
         store=store_input,
         result_label="continuous_tivs",
     )
@@ -261,7 +245,7 @@ def test_store_result_success(
     pixel_result = tiv.compute_pixel_parameter(
         eit_data=mock_eit_data,
         continuous_data=mock_continuous_data,
-        sequence=test_sequence,
+        sequence=sequence,
         tiv_method="inspiratory",
         tiv_timing="pixel",
         store=store_input,
@@ -269,12 +253,12 @@ def test_store_result_success(
     )
 
     # Check that the results are stored correctly based on store_input
-    if store_input in [True, None] and test_sequence is not None:
-        assert len(test_sequence.sparse_data.data) == 2
-        assert test_sequence.sparse_data["continuous_tivs"] == continuous_result
-        assert test_sequence.sparse_data["pixel_tivs"] == pixel_result
-    elif test_sequence is not None:
-        assert len(test_sequence.sparse_data.data) == 0
+    if store_input in [True, None] and sequence is not None:
+        assert len(sequence.sparse_data.data) == 2
+        assert sequence.sparse_data["continuous_tivs"] == continuous_result
+        assert sequence.sparse_data["pixel_tivs"] == pixel_result
+    elif sequence is not None:
+        assert len(sequence.sparse_data.data) == 0
 
 
 @pytest.mark.parametrize(
@@ -482,36 +466,37 @@ def test_tiv_with_no_breaths_pixel(
         assert result.shape == (0, 2, 2)
 
 
-def test_with_data(draeger1: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
+@pytest.mark.parametrize(
+    "sequence",
+    ["draeger_20hz_healthy_volunteer_pressure_pod", "draeger_50hz_healthy_volunteer_pressure_pod"],
+    indirect=True,
+)
+def test_with_data(sequence: Sequence, pytestconfig: pytest.Config):
     # Skip test if '--cov' option is enabled
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
-    # Make deep copies of the data to avoid modifying the original sequences
-    draeger1 = copy.deepcopy(draeger1)
-    timpel1 = copy.deepcopy(timpel1)
+    sequence = copy.deepcopy(sequence)
 
-    # Iterate over both sequences (draeger1 and timpel1)
-    for sequence in draeger1, timpel1:
-        # Initialize the TIV object
-        tiv = TIV()
-        eit_data = sequence.eit_data["raw"]
-        cd = sequence.continuous_data["global_impedance_(raw)"]
+    # Initialize the TIV object
+    tiv = TIV()
+    eit_data = sequence.eit_data["raw"]
+    cd = sequence.continuous_data["global_impedance_(raw)"]
 
-        result_continuous = tiv.compute_continuous_parameter(cd, tiv_method="inspiratory")
-        result_pixel = tiv.compute_pixel_parameter(eit_data, cd, sequence)
+    result_continuous = tiv.compute_continuous_parameter(cd, tiv_method="inspiratory")
+    result_pixel = tiv.compute_pixel_parameter(eit_data, cd, sequence)
 
-        arr_result_continuous = np.stack(result_continuous.values)
-        arr_result_pixel = np.stack(result_pixel.values)
+    arr_result_continuous = np.stack(result_continuous.values)
+    arr_result_pixel = np.stack(result_pixel.values)
 
-        assert result_continuous is not None
-        assert isinstance(result_continuous, SparseData)
-        assert arr_result_continuous.ndim == 1
-        assert np.all(arr_result_continuous > 0)  # values should be positive for continuous data
+    assert result_continuous is not None
+    assert isinstance(result_continuous, SparseData)
+    assert arr_result_continuous.ndim == 1
+    assert np.all(arr_result_continuous > 0)  # values should be positive for continuous data
 
-        assert result_pixel is not None
-        assert isinstance(result_pixel, SparseData)
-        assert arr_result_pixel.ndim == 3
+    assert result_pixel is not None
+    assert isinstance(result_pixel, SparseData)
+    assert arr_result_pixel.ndim == 3
 
 
 @pytest.mark.parametrize(

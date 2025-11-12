@@ -99,6 +99,6 @@ def test_tiv_lungspace_with_timing_data(create_signal: Callable):
     _ = AmplitudeLungspace(threshold=0.2).apply(signal, timing_data=timing_data)
 
 
-def test_tiv_lungpsace_with_real_data(draeger1: Sequence):
-    eit_data = draeger1.eit_data["raw"]
+def test_tiv_lungpsace_with_real_data(draeger_20hz_healthy_volunteer_pressure_pod: Sequence):
+    eit_data = draeger_20hz_healthy_volunteer_pressure_pod.eit_data["raw"]
     _ = AmplitudeLungspace(threshold=0.2).apply(eit_data)

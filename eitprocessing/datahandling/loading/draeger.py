@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import math
 import mmap
 import sys
 import warnings
 from functools import partial
 from typing import TYPE_CHECKING, NamedTuple
+from warnings import catch_warnings
 
 import numpy as np
+import scipy as sp
 
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
@@ -24,9 +27,10 @@ if TYPE_CHECKING:
 
 load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
 NAN_VALUE_INDICATOR = -1e30
+SAMPLE_FREQUENCY_ESTIMATION_PRECISION = 4
 
 
-def load_from_single_path(
+def load_from_single_path(  # noqa: PLR0915
     path: Path,
     sample_frequency: float | None = None,
     first_frame: int = 0,
@@ -59,7 +63,10 @@ def load_from_single_path(
         msg = f"Invalid input: `first_frame` ({f0}) is larger than the total number of frames in the file ({fn})."
         raise ValueError(msg)
 
-    n_frames = min(total_frames - first_frame, max_frames or sys.maxsize)
+    n_frames = min(total_frames - first_frame, max_frames if max_frames is not None else sys.maxsize)
+    if n_frames < 1:
+        msg = f"No frames to load with `{first_frame=}` and `{max_frames=}`."
+        raise ValueError(msg)
 
     if max_frames and max_frames != n_frames:
         msg = (
@@ -102,6 +109,10 @@ def load_from_single_path(
 
     # time wraps around the number of seconds in a day
     time = np.unwrap(time, period=24 * 60 * 60)
+
+    if not np.all(np.diff(time) > 0):
+        msg = "The time axis is not strictly monotonically increasing."
+        raise ValueError(msg)
 
     sample_frequency = _estimate_sample_frequency(time, sample_frequency)
 
@@ -184,19 +195,47 @@ def load_from_single_path(
 
 def _estimate_sample_frequency(time: np.ndarray, sample_frequency: float | None) -> float:
     """Estimate the sample frequency from the time axis, and check with provided sample frequency."""
-    estimated_sample_frequency = round((len(time) - 1) / (time[-1] - time[0]), 4)
+    with catch_warnings():
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+        unrounded_estimated_sample_frequency = 1 / sp.stats.linregress(np.arange(len(time)), time).slope
+
+    if np.isnan(unrounded_estimated_sample_frequency):
+        msg = (
+            "Could not estimate sample frequency from time axis, "
+            f"which could be due to too few data points ({len(time)})."
+        )
+        if sample_frequency is not None:
+            warnings.warn(msg, RuntimeWarning, stacklevel=2)
+            return float(sample_frequency)
+
+        raise ValueError(msg)
+
+    # Rounds to the number of digits, rather than the number of decimals
+    estimated_sample_frequency = round(
+        unrounded_estimated_sample_frequency,
+        -math.ceil(np.log10(abs(unrounded_estimated_sample_frequency))) + SAMPLE_FREQUENCY_ESTIMATION_PRECISION,
+    )
 
     if sample_frequency is None:
-        return estimated_sample_frequency
+        return float(estimated_sample_frequency)
+    if not isinstance(sample_frequency, (int, float)):
+        msg = f"Provided sample frequency has invalid type {type(sample_frequency)}; should be int or float."
+        raise TypeError(msg)
 
-    if sample_frequency != estimated_sample_frequency:
+    if not np.isclose(
+        sample_frequency, unrounded_estimated_sample_frequency, rtol=10**-SAMPLE_FREQUENCY_ESTIMATION_PRECISION, atol=0
+    ):
         msg = (
-            f"Provided sample frequency ({sample_frequency}) does not match "
-            f"the estimated sample frequency ({estimated_sample_frequency})."
+            "Provided sample frequency "
+            f"({sample_frequency:.{SAMPLE_FREQUENCY_ESTIMATION_PRECISION + 2}f} Hz) "
+            "does not match the estimated sample frequency "
+            f"({unrounded_estimated_sample_frequency:.{SAMPLE_FREQUENCY_ESTIMATION_PRECISION + 2}f} Hz) "
+            f"within {SAMPLE_FREQUENCY_ESTIMATION_PRECISION} digits. "
+            "Note that the estimate might not be as accurate for very short signals."
         )
         warnings.warn(msg, RuntimeWarning, stacklevel=2)
 
-    return sample_frequency
+    return float(sample_frequency)
 
 
 def _convert_medibus_data(
@@ -249,7 +288,7 @@ def _read_frame(
     index is non-negative. When the index is negative, no data is saved. In
     any case, the event marker is returned.
     """
-    frame_time = round(reader.float64() * 24 * 60 * 60, 3)
+    frame_time = reader.float64() * 24 * 60 * 60
     _ = reader.float32()
     frame_pixel_impedance = reader.npfloat32(length=1024)
     frame_pixel_impedance = np.reshape(frame_pixel_impedance, (32, 32), "C")

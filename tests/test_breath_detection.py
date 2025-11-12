@@ -1,6 +1,5 @@
 import copy
-import os
-from pathlib import Path
+import warnings
 from typing import Any
 
 import numpy as np
@@ -11,17 +10,6 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
-
-environment = Path(
-    os.environ.get(
-        "EIT_PROCESSING_TEST_DATA",
-        Path(__file__).parent.parent.resolve(),
-    ),
-)
-data_directory = environment / "tests" / "test_data"
-draeger_file1 = data_directory / "Draeger_Test3.bin"
-draeger_file2 = data_directory / "Draeger_Test.bin"
-timpel_file = data_directory / "Timpel_Test.txt"
 
 
 def _make_cosine_wave(sample_frequency: float, length: int, frequency: float) -> tuple[np.ndarray, np.ndarray]:
@@ -296,61 +284,71 @@ def test_pass_invalid(obj: Any):  # noqa: ANN401
         bd.find_breaths(obj)
 
 
-def test_pass_continuousdata(draeger1: Sequence):
-    draeger1 = copy.deepcopy(draeger1)  # prevents writing results to original file
-    cd = draeger1.continuous_data["global_impedance_(raw)"]
+def test_pass_continuousdata(draeger_20hz_healthy_volunteer_pressure_pod: Sequence):
+    sequence = copy.deepcopy(draeger_20hz_healthy_volunteer_pressure_pod)  # prevents writing results to original file
+    cd = sequence.continuous_data["global_impedance_(raw)"]
     bd = BreathDetection()
 
     breaths_container = bd.find_breaths(cd)
     assert isinstance(breaths_container, IntervalData)
     # results are not stored
-    assert "breaths" not in draeger1.interval_data
+    assert "breaths" not in sequence.interval_data
 
-    bd.find_breaths(cd, sequence=draeger1)
+    bd.find_breaths(cd, sequence=sequence)
     # results are now stored
-    assert "breaths" in draeger1.interval_data
-    assert draeger1.interval_data["breaths"] == breaths_container
-    assert draeger1.interval_data["breaths"] is not breaths_container
+    assert "breaths" in sequence.interval_data
+    assert sequence.interval_data["breaths"] == breaths_container
+    assert sequence.interval_data["breaths"] is not breaths_container
 
 
-def test_with_data(draeger1: Sequence, draeger2: Sequence, timpel1: Sequence, pytestconfig: pytest.Config):
+@pytest.mark.parametrize(
+    ("sequence", "slice_"),
+    [
+        ("draeger_20hz_healthy_volunteer_pressure_pod", slice(None)),
+        ("draeger_50hz_healthy_volunteer_pressure_pod", slice(None)),
+        ("timpel_healthy_volunteer_1", slice(421, 495)),
+    ],
+    indirect=["sequence"],
+)
+def test_with_data(sequence: Sequence, slice_: slice, pytestconfig: pytest.Config):
     if pytestconfig.getoption("--cov"):
         pytest.skip("Skip with option '--cov' so other tests can cover 100%.")
 
-    draeger1 = copy.deepcopy(draeger1)
-    draeger2 = copy.deepcopy(draeger2)
-    timpel1 = copy.deepcopy(timpel1)
-    for sequence in draeger1, draeger2, timpel1:
-        bd = BreathDetection()
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning, message="No starting or end timepoint was selected.")
+        sequence = sequence.t[slice_]
 
-        cd = sequence.continuous_data["global_impedance_(raw)"]
-        breaths = bd.find_breaths(cd)
+    sequence = copy.deepcopy(sequence)  # prevents writing results to original file
+    bd = BreathDetection()
 
-        for breath in breaths.values:
-            # Test whether the indices are in the proper order within a breath
-            assert breath.start_time < breath.middle_time < breath.end_time
+    cd = sequence.continuous_data["global_impedance_(raw)"]
+    breaths = bd.find_breaths(cd)
 
-            # Test whether the peak values are larger than valley values
-            assert cd.t[breath.middle_time].values[0] > cd.t[breath.start_time].values[0]
-            assert cd.t[breath.middle_time].values[0] > cd.t[breath.end_time].values[0]
+    for breath in breaths.values:
+        # Test whether the indices are in the proper order within a breath
+        assert breath.start_time < breath.middle_time < breath.end_time
 
-        start_indices, middle_indices, end_indices = (list(x) for x in zip(*breaths.values, strict=True))
+        # Test whether the peak values are larger than valley values
+        assert cd.t[breath.middle_time].values[0] > cd.t[breath.start_time].values[0]
+        assert cd.t[breath.middle_time].values[0] > cd.t[breath.end_time].values[0]
 
-        # Test whether breaths are sorted properly
-        assert start_indices == sorted(start_indices)
-        assert middle_indices == sorted(middle_indices)
-        assert end_indices == sorted(end_indices)
+    start_indices, middle_indices, end_indices = (list(x) for x in zip(*breaths.values, strict=True))
 
-        # Test whether indices are unique. `set` removes non-unique values,
-        # `sorted(list(...))` converts the set to a sorted list again.
-        assert list(start_indices) == sorted(set(start_indices))
-        assert list(middle_indices) == sorted(set(middle_indices))
-        assert list(end_indices) == sorted(set(end_indices))
+    # Test whether breaths are sorted properly
+    assert start_indices == sorted(start_indices)
+    assert middle_indices == sorted(middle_indices)
+    assert end_indices == sorted(end_indices)
 
-        # Test whether the start of the next breath is on/after the previous breath
-        assert all(
-            start_index >= end_index for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
-        )
+    # Test whether indices are unique. `set` removes non-unique values,
+    # `sorted(list(...))` converts the set to a sorted list again.
+    assert list(start_indices) == sorted(set(start_indices))
+    assert list(middle_indices) == sorted(set(middle_indices))
+    assert list(end_indices) == sorted(set(end_indices))
+
+    # Test whether the start of the next breath is on/after the previous breath
+    assert all(
+        start_index >= end_index for start_index, end_index in zip(start_indices[1:], end_indices[:-1], strict=True)
+    )
 
 
 def test_create_breaths_from_peak_valley_data():
@@ -485,7 +483,7 @@ def test_find_breaths():
     cd = ContinuousData(
         label,
         "Generated waveform data",
-        None,
+        "",
         "mock",
         "",
         time=time,
@@ -518,7 +516,7 @@ def test_find_breaths():
     cd = ContinuousData(
         label,
         "Generated waveform data",
-        None,
+        "",
         "mock",
         "",
         time=time,
