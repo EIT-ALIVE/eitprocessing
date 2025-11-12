@@ -180,12 +180,12 @@ def test_concatenate_slicing(timpel1: Sequence):
 
 
 def test_concatenate_different_vendors(
-    timpel1: Sequence,
+    timpel_healthy_volunteer_1: Sequence,
     draeger_20hz_healthy_volunteer: Sequence,
 ):
     # Concatenate different vendors
     with pytest.raises(TypeError):
-        _ = Sequence.concatenate(timpel1, draeger_20hz_healthy_volunteer)
+        _ = Sequence.concatenate(timpel_healthy_volunteer_1, draeger_20hz_healthy_volunteer)
 
 
 def test_concatenate_different_sample_frequency(

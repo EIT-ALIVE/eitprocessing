@@ -4,15 +4,18 @@ import pytest  # TODO: noqa: F401 (needed for fixtures) once the pytest.skip is 
 
 from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sequence import Sequence
-from tests.conftest import timpel_file
 
 
-def test_default_label(draeger_20hz_healthy_volunteer_path: Path, draeger_20hz_healthy_volunteer: Sequence):
+def test_default_label(
+    draeger_20hz_healthy_volunteer_path: Path,
+    draeger_20hz_healthy_volunteer: Sequence,
+    timpel_healthy_volunteer_1_path: Path,
+):
     draeger_default = load_eit_data(draeger_20hz_healthy_volunteer_path, vendor="draeger", sample_frequency=20)
     assert isinstance(draeger_default.label, str)
     assert draeger_default.label == f"Sequence_{id(draeger_default)}"
 
-    timpel_default = load_eit_data(timpel_file, vendor="timpel")
+    timpel_default = load_eit_data(timpel_healthy_volunteer_1_path, vendor="timpel")
     assert isinstance(timpel_default.label, str)
     assert timpel_default.label == f"Sequence_{id(timpel_default)}"
 
@@ -24,7 +27,9 @@ def test_default_label(draeger_20hz_healthy_volunteer_path: Path, draeger_20hz_h
 
 
 def test_relabeling(
-    timpel1: Sequence, draeger_20hz_healthy_volunteer_fixed_rr: Sequence, draeger_20hz_healthy_volunteer: Sequence
+    timpel_healthy_volunteer_1: Sequence,
+    draeger_20hz_healthy_volunteer_fixed_rr: Sequence,
+    draeger_20hz_healthy_volunteer: Sequence,
 ):
     pytest.skip("changing labels is currently bugging")
     # merging
@@ -38,9 +43,9 @@ def test_relabeling(
 
     # slicing
     indices = slice(3, 12)
-    sliced_timpel = timpel1[indices]
-    assert sliced_timpel.label != timpel1.label
-    assert sliced_timpel.label == f"Slice ({indices.start}-{indices.stop}] of <{timpel1.label}>"
+    sliced_timpel = timpel_healthy_volunteer_1[indices]
+    assert sliced_timpel.label != timpel_healthy_volunteer_1.label
+    assert sliced_timpel.label == f"Slice ({indices.start}-{indices.stop}] of <{timpel_healthy_volunteer_1.label}>"
 
     # custom new label:)
     test_label = "test label"
@@ -48,7 +53,9 @@ def test_relabeling(
         draeger_20hz_healthy_volunteer_fixed_rr, draeger_20hz_healthy_volunteer, newlabel=test_label
     )
     assert merged.label == test_label
-    sliced_timpel = Sequence.select_by_index(timpel1, start=indices.start, end=indices.stop, newlabel=test_label)
+    sliced_timpel = Sequence.select_by_index(
+        timpel_healthy_volunteer_1, start=indices.start, end=indices.stop, newlabel=test_label
+    )
     assert sliced_timpel.label == test_label
 
     # selecting by time
