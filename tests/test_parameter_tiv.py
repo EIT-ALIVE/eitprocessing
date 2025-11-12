@@ -12,8 +12,8 @@ from eitprocessing.datahandling.eitdata import EITData, Vendor
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
+from eitprocessing.parameters.breath_detection import BreathDetection
 from eitprocessing.parameters.tidal_impedance_variation import TIV
-from tests.test_breath_detection import BreathDetection
 
 environment = Path(
     os.environ.get(
