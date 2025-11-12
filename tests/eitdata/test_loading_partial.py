@@ -10,7 +10,10 @@ from eitprocessing.datahandling.sequence import Sequence
 # TODO: add dataset with events, and test loading from the frame at or just after the event
 @pytest.mark.parametrize(
     ("sequence_path", "sequence", "split_frame", "vendor", "sample_frequency"),
-    [("draeger_20hz_healthy_volunteer_path", "draeger_20hz_healthy_volunteer", 100, "draeger", 20)],
+    [
+        ("draeger_20hz_healthy_volunteer_path", "draeger_20hz_healthy_volunteer", 100, "draeger", 20),
+        ("timpel_healthy_volunteer_1_path", "timpel_healthy_volunteer_1", 100, "timpel", None),
+    ],
     indirect=["sequence_path", "sequence"],
 )
 def test_load_partial(
