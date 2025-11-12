@@ -8,10 +8,6 @@ inputs:
   dependencies:
     description: "The optional dependencies of eitprocessing to install"
     required: false
-  extract-data:
-    description: "Whether to extract testing data"
-    required: false
-    default: "false"
   token:
     description: "GitHub TOKEN"
     required: true
@@ -26,34 +22,6 @@ runs:
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
-    - name: Set data dir
-      shell: bash
-      if: ${{ inputs.extract-data == 'true' }}
-      id: set-path
-      run: echo "data_dir=$GITHUB_WORKSPACE/test_data" >> "$GITHUB_OUTPUT"
-    - name: Restore dataset cache
-      if: ${{ inputs.extract-data == 'true' }}
-      id: cache
-      uses: actions/cache@v4
-      with:
-        path: ${{ steps.set-path.outputs.data_dir }}
-        key: eitprocessing-testdata-zenodo.${{ inputs.zenodo-record-id }}
-    - name: Install zenodo-get
-      if: ${{ inputs.extract-data == 'true' && steps.cache.outputs.cache-hit != 'true' }}
-      run: python3 -m pip install zenodo-get
-      shell: bash
-    - name: Download test dataset
-      shell: bash
-      if: inputs.extract-data == 'true' && steps.cache.outputs.cache-hit != 'true'
-      run: |
-        mkdir -p ${{ steps.set-path.outputs.data_dir }}
-        cd ${{ steps.set-path.outputs.data_dir }}
-        zenodo_get ${{ inputs.zenodo-record-id }}
-        cd -
-    - name: Uninstall zenodo-get
-      if: ${{ inputs.extract-data == 'true' && steps.cache.outputs.cache-hit != 'true' }}
-      run: python3 -m pip uninstall --yes zenodo-get
-      shell: bash
     - uses: actions/cache@v4
       id: cache-python-env
       with:
