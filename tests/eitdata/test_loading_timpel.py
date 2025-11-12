@@ -24,3 +24,10 @@ def test_loading_timpel(
 
     loaded_using_enum_vendor = load_eit_data(sequence.eit_data["raw"].path, vendor=Vendor.TIMPEL, label="timpel")
     assert sequence == loaded_using_enum_vendor
+
+
+def test_loading_timpel_multiple_files():
+    # TODO: find out whether it is possible to have a single measurements split into multiple files
+    pytest.skip(
+        "Loading multiple Timpel files cannot be tested with unrelated data files, because the time axes will overlap."
+    )
