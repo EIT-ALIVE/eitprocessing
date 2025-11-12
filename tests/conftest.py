@@ -3,10 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sequence import Sequence
-
-# ruff: noqa: ERA001  #TODO: remove this line
 
 environment = os.environ.get(
     "EIT_PROCESSING_TEST_DATA",
@@ -14,13 +11,13 @@ environment = os.environ.get(
 )
 data_directory = Path(environment) / "tests" / "test_data"
 draeger_wrapped_time_axis_file = data_directory / "Draeger_wrapped_time_axis.bin"
-timpel_file = data_directory / "Timpel_test.txt"
-dummy_file = data_directory / "not_a_file.dummy"
 
 data_directory = Path(environment) / "test_data"  # overwrite for new style tests
 pytest_plugins = [
     "tests.fixtures.eitdata",  # load fixtures from different modules as 'plugins' as workaround
 ]
+
+dummy_file = data_directory / "not_a_file.dummy"
 
 
 def pytest_addoption(parser: pytest.Parser):
@@ -38,24 +35,6 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     for item in items:
         if "slow" in item.keywords:
             item.add_marker(skip_slow)
-
-
-@pytest.fixture(scope="session")
-def timpel1() -> Sequence:
-    return load_eit_data(timpel_file, vendor="timpel", label="timpel")
-
-
-# TODO: find replacement for wrapped time axis data
-@pytest.fixture(scope="session")
-def draeger_wrapped_time_axis() -> Sequence:
-    return load_eit_data(
-        draeger_wrapped_time_axis_file, vendor="draeger", sample_frequency=20, label="draeger_wrapped_time_axis"
-    )
-
-
-# @pytest.fixture(scope="session")
-# def timpel_double():
-#     return load_eit_data([timpel_file, timpel_file], vendor="timpel", label="timpel_double")
 
 
 # TODO: Replace request.getfixturevalue() with sequence where possible in other tests
