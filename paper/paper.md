@@ -103,7 +103,7 @@ international community has been invited to use and contribute to the software.
 ## Key features
 
 `eitprocessing` aims to simplify and standardize loading, pre-processing, analysis and reporting
-or respiration-related datasets.
+of respiration-related datasets.
 Notebooks demonstrating these features are available in the repository.
 
 ### Loading
@@ -166,7 +166,7 @@ Several features are in active development. Examples are:
 
 - provenance tracking of data processing steps;
 - more advanced filtering methods, e.g., empirical mode
-  decomposition or wavelet transforms;
+  decomposition and wavelet transforms;
 - quantification of pendelluft;
 - expansion of visualization methods.
 
