@@ -36,10 +36,10 @@ runs:
         key: testdata-zenodo-10.5281/zenodo.17423608
     - name: Download test dataset
       shell: bash
-      if: ${{ steps.cache.outputs.cache-hit != 'true' }} && ${{ inputs.extract-data == 'true' }}
+      if: inputs.extract-data == 'true' && steps.cache.outputs.cache-hit != 'true'
       run: |
         mkdir -p ${{ steps.set-path.outputs.data_dir }}
-        wget -O ${{ steps.set-path.outputs.data_dir }}/eitprocessing_test_data.zip https://zenodo.org/api/records/17423608/files-archive?download=1
+        wget -q -O ${{ steps.set-path.outputs.data_dir }}/eitprocessing_test_data.zip https://zenodo.org/api/records/17423608/files-archive?download=1
         unzip ${{ steps.set-path.outputs.data_dir }}/eitprocessing_test_data.zip -d ${{ steps.set-path.outputs.data_dir }}
     - uses: actions/cache@v4
       id: cache-python-env
