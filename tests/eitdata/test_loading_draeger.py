@@ -1,3 +1,4 @@
+import sys
 import tempfile
 from pathlib import Path
 
@@ -182,7 +183,8 @@ def test_event_on_first_frame(draeger_20hz_healthy_volunteer: Sequence):
     frame_size = _bin_file_formats["pressure_pod"]["frame_size"]
     ignore_bytes = event_index * frame_size  # number of bytes to ignore at start of file
 
-    with tempfile.NamedTemporaryFile(delete_on_close=False) as temporary_file:
+    kwargs = {"delete_on_close": False} if sys.version_info >= (3, 12) else {}
+    with tempfile.NamedTemporaryFile(**kwargs) as temporary_file:
         # Create a temporary file, that is removed after the context manager is closed
         tempfile_path = Path(temporary_file.name)
         with draeger_20hz_healthy_volunteer.eit_data["raw"].path.open("rb") as original_file:
