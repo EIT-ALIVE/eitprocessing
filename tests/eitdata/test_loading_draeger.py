@@ -30,6 +30,20 @@ from eitprocessing.datahandling.sequence import Sequence
             10,
             50,
         ),
+        (
+            "draeger_20hz_healthy_volunteer_time_wrap_v120",
+            "draeger_20hz_healthy_volunteer_time_wrap_v120_path",
+            2460,
+            6,
+            20,
+        ),
+        (
+            "draeger_20hz_healthy_volunteer_time_wrap_v130",
+            "draeger_20hz_healthy_volunteer_time_wrap_v130_path",
+            2460,
+            10,
+            20,
+        ),
     ],
     indirect=["sequence", "sequence_path"],
 )
