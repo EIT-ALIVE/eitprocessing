@@ -1,8 +1,6 @@
 import copy
 import itertools
-import os
 import warnings
-from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
@@ -17,15 +15,6 @@ from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
 from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.features.pixel_breath import PixelBreath
-
-environment = Path(
-    os.environ.get(
-        "EIT_PROCESSING_TEST_DATA",
-        Path(__file__).parent.parent.resolve(),
-    ),
-)
-data_directory = environment / "tests" / "test_data"
-timpel_file = data_directory / "Timpel_Test.txt"
 
 
 # @pytest.fixture()

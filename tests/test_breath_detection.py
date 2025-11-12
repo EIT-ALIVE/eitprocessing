@@ -1,7 +1,5 @@
 import copy
-import os
 import warnings
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -12,15 +10,6 @@ from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.features.breath_detection import BreathDetection
-
-environment = Path(
-    os.environ.get(
-        "EIT_PROCESSING_TEST_DATA",
-        Path(__file__).parent.parent.resolve(),
-    ),
-)
-data_directory = environment / "tests" / "test_data"
-timpel_file = data_directory / "Timpel_Test.txt"
 
 
 def _make_cosine_wave(sample_frequency: float, length: int, frequency: float) -> tuple[np.ndarray, np.ndarray]:
@@ -494,7 +483,7 @@ def test_find_breaths():
     cd = ContinuousData(
         label,
         "Generated waveform data",
-        None,
+        "",
         "mock",
         "",
         time=time,
@@ -527,7 +516,7 @@ def test_find_breaths():
     cd = ContinuousData(
         label,
         "Generated waveform data",
-        None,
+        "",
         "mock",
         "",
         time=time,
