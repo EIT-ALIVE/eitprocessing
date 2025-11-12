@@ -1,7 +1,7 @@
 import pytest
 
+from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sequence import Sequence
-from tests.conftest import load_eit_data
 
 
 @pytest.mark.parametrize(
