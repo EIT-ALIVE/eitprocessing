@@ -66,7 +66,7 @@ def test_load_draeger(
     assert len(sequence.eit_data["raw"].time) == length, f"{sequence.label} should contain 14140 frames"
 
     assert len(sequence.continuous_data) == n_continuous_channels + 1, (
-        "Draeger data should have 6 continuous medibus fields + the calculated global impedance"
+        f"Draeger data should have {n_continuous_channels} continuous medibus fields + the calculated global impedance"
     )
 
     assert sequence == load_eit_data(
