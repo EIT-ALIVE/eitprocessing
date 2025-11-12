@@ -52,7 +52,7 @@ runs:
         cd -
     - name: Uninstall zenodo-get
       if: ${{ inputs.extract-data == 'true' && steps.cache.outputs.cache-hit != 'true' }}
-      run: python3 -m pip uninstall zenodo-get
+      run: python3 -m pip uninstall --yes zenodo-get
       shell: bash
     - uses: actions/cache@v4
       id: cache-python-env
