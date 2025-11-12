@@ -18,7 +18,7 @@ inputs:
   zenodo-record-id:
     description: "Zenodo record ID for test dataset"
     required: false
-    default: "17423607"
+    default: "17423608"
 
 runs:
   using: "composite"
@@ -49,6 +49,7 @@ runs:
         mkdir -p ${{ steps.set-path.outputs.data_dir }}
         cd ${{ steps.set-path.outputs.data_dir }}
         zenodo_get ${{ inputs.zenodo-record-id }}
+        cd -
     - name: Uninstall zenodo-get
       if: ${{ inputs.extract-data == 'true' && steps.cache.outputs.cache-hit != 'true' }}
       run: python3 -m pip uninstall zenodo-get
