@@ -31,7 +31,7 @@ readibility or simplicity is more important than absolute correctness.
 It is hard to define the precise balance we are looking for, so instead we will refer
 to the [Zen of python](https://peps.python.org/pep-0020/).
 
-Note that all contrubtions to this project will be published under our [Apache 2.0 licence]
+Note that all contributions to this project will be published under our [Apache 2.0 licence]
 (<https://github.com/EIT-ALIVE/eitprocessing/blob/main/LICENSE>).
 
 #### Docstrings
@@ -99,7 +99,8 @@ Make sure you have developer options installed as described in the [README](READ
 (otherwise run: `pip install -e .[dev]` on the repository folder in your environment)
 
 ##### Downloading test data
-Some tests require access to test data. You can download the test data from Zenodo via the button below.
+Some tests require access to test data. You can download the test data from Zenodo via the button below. Note that for
+some reason downloading all files at ones results in a corrupted zip file. Please download the files one by one.
 
 [![](https://zenodo.org/badge/DOI/10.5281/zenodo.17423608.svg)](https://doi.org/10.5281/zenodo.17423608)
 
