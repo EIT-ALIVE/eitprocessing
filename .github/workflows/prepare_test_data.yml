@@ -24,6 +24,8 @@ jobs:
     build-and-release:
         name: Download and publish test data
         runs-on: ubuntu-latest
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         steps:
             - uses: actions/checkout@v4
             - name: Check if release exists
