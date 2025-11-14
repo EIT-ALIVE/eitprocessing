@@ -2,7 +2,15 @@ name: Prepare test data release
 
 on:
     workflow_dispatch:
+        inputs:
+            zenodo_record_id:
+                description: "Zenodo record ID to download the dataset from"
+                type: string
     workflow_call:
+        inputs:
+            zenodo_record_id:
+                description: "Zenodo record ID to download the dataset from"
+                type: string
     # pull_request:
     #     types: [opened, synchronize, reopened, ready_for_review]
     #     paths:
@@ -21,7 +29,7 @@ jobs:
             - name: Check if release exists
               id: check-release
               run: |
-                  if gh release view ${{ env.RELEASE_TAG_TEMPLATE }}${{ env.ZENODO_RECORD_ID }} >/dev/null 2>&1; then
+                  if gh release view ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} >/dev/null 2>&1; then
                       echo "release_exists=true" >> $GITHUB_OUTPUT
                   else
                       echo "release_exists=false" >> $GITHUB_OUTPUT
@@ -60,9 +68,9 @@ jobs:
               if: steps.check_release.outputs.release_exists != 'true'
               run: |
                   gh release create \
-                      ${{ env.RELEASE_TAG_TEMPLATE }}${{ env.ZENODO_RECORD_ID }} \
+                      ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} \
                       --prerelease \
-                      --title ${{ env.RELEASE_TAG_TEMPLATE }}${{ env.ZENODO_RECORD_ID }} \
+                      --title ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} \
                       --notes "Automated test data release for Zenodo record ID $ZENODO_RECORD_ID" \
                       ${{ env.ARCHIVE_NAME }}
               env:

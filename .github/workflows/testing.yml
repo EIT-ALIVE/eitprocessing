@@ -1,6 +1,7 @@
 name: Build and Test
 env:
   ZENODO_RECORD_ID: 17423608
+
 on:
   push:
     branches:
@@ -15,10 +16,13 @@ on:
     branches:
       - main
       - develop
+
 jobs:
   prepare_test_data:
     uses: ./.github/workflows/prepare_test_data.yml
     secrets: inherit
+    with:
+      zenodo_record_id: ${{ env.ZENODO_RECORD_ID }}
 
   test_and_build:
     needs: prepare_test_data
