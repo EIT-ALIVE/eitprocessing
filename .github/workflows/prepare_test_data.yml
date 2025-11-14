@@ -9,7 +9,7 @@ on:
 
 env:
     ZENODO_RECORD_ID: 17423608
-    RELEASE_TAG: testdata-zenodo.17423608
+    RELEASE_TAG_TEMPLATE: testdata-zenodo.
     ARCHIVE_NAME: test_data.tar.zst
 
 jobs:
@@ -44,8 +44,8 @@ jobs:
             - name: Publish Release asset (creates or updates a prerelease)
               uses: softprops/action-gh-release@v2
               with:
-                  tag_name: ${{ env.RELEASE_TAG }}
-                  name: ${{ env.RELEASE_TAG }}
+                  tag_name: ${{ env.RELEASE_TAG_TEMPLATE }}${{ env.ZENODO_RECORD_ID}}
+                  name: ${{ env.RELEASE_TAG_TEMPLATE }}${{ env.ZENODO_RECORD_ID}}
                   prerelease: true
                   files: ${{ env.ARCHIVE_NAME }}
               env:
