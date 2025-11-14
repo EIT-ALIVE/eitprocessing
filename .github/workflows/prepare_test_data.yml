@@ -29,7 +29,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - name: Check if release exists
-              id: check-release
+              id: checkrelease
               run: |
                   gh release view ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }}
                   if gh release view ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} >/dev/null 2>&1; then
@@ -38,16 +38,16 @@ jobs:
                       echo "release_exists=false" >> $GITHUB_OUTPUT
                   fi
             - name: Release already exists, skipping
-              if: steps.check_release.outputs.release_exists == 'true'
+              if: steps.checkrelease.outputs.release_exists == 'true'
               run: echo "Release $RELEASE_TAG already exists. Skipping workflow."
 
             - uses: actions/setup-python@v5
-              if: steps.check_release.outputs.release_exists != 'true'
+              if: steps.checkrelease.outputs.release_exists != 'true'
               with:
                   python-version: "3.10"
 
             - name: Install tools
-              if: steps.check_release.outputs.release_exists != 'true'
+              if: steps.checkrelease.outputs.release_exists != 'true'
               run: |
                   python -m pip install --upgrade pip
                   python -m pip install zenodo-get
@@ -55,7 +55,7 @@ jobs:
                   sudo apt-get install -y zstd
 
             - name: Download dataset from Zenodo
-              if: steps.check_release.outputs.release_exists != 'true'
+              if: steps.checkrelease.outputs.release_exists != 'true'
               run: |
                   mkdir -p test_data
                   cd test_data
@@ -63,12 +63,12 @@ jobs:
                   cd -
 
             - name: Create compressed archive
-              if: steps.check_release.outputs.release_exists != 'true'
+              if: steps.checkrelease.outputs.release_exists != 'true'
               run: |
                   tar -I zstd -cf "${ARCHIVE_NAME}" test_data/
 
             - name: Publish Release asset (creates or updates a prerelease)
-              if: steps.check_release.outputs.release_exists != 'true'
+              if: steps.checkrelease.outputs.release_exists != 'true'
               run: |
                   gh release create \
                       ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} \
