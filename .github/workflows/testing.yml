@@ -27,7 +27,7 @@ jobs:
     uses: ./.github/workflows/prepare_test_data.yml
     secrets: inherit
     with:
-      zenodo_record_id: ${{ needs.constants.outputs.ZENODO_RECORD_ID }}
+      zenodo_record_id: 17423608
 
   test_and_build:
     needs: prepare_test_data
