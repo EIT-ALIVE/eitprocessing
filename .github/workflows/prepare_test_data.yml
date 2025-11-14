@@ -74,4 +74,4 @@ jobs:
                       --notes "Automated test data release for Zenodo record ID ${{ inputs.zenodo_record_id }}" \
                       ${{ env.ARCHIVE_NAME }}
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
