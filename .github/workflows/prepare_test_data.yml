@@ -42,11 +42,12 @@ jobs:
                   tar -I zstd -cf "${ARCHIVE_NAME}" test_data/
 
             - name: Publish Release asset (creates or updates a prerelease)
-              uses: softprops/action-gh-release@v2
-              with:
-                  tag_name: ${{ env.RELEASE_TAG_TEMPLATE }}${{ env.ZENODO_RECORD_ID}}
-                  name: ${{ env.RELEASE_TAG_TEMPLATE }}${{ env.ZENODO_RECORD_ID}}
-                  prerelease: true
-                  files: ${{ env.ARCHIVE_NAME }}
+              run: |
+                  gh release create \
+                      ${{ env.RELEASE_TAG_TEMPLATE }}${{ env.ZENODO_RECORD_ID }} \
+                      --prerelease \
+                      --title ${{ env.RELEASE_TAG_TEMPLATE }}${{ env.ZENODO_RECORD_ID }} \
+                      --notes "Automated test data release for Zenodo record ID $ZENODO_RECORD_ID" \
+                      ${{ env.ARCHIVE_NAME }}
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
