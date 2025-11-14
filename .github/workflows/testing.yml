@@ -20,14 +20,17 @@ on:
 jobs:
   constants:
     runs-on: ubuntu-latest
+    outputs:
+      ZENODO_RECORD_ID: ${{ steps.output_env.outputs.ZENODO_RECORD_ID }}
     steps:
-      - run: echo "ZENODO_RECORD_ID=${{ env.ZENODO_RECORD_ID }}" >> $GITHUB_OUTPUT
+      - id: output_env
+        run: echo "ZENODO_RECORD_ID=${{ env.ZENODO_RECORD_ID }}" >> $GITHUB_OUTPUT
   prepare_test_data:
     needs: constants
     uses: ./.github/workflows/prepare_test_data.yml
     secrets: inherit
     with:
-      zenodo_record_id: 17423608
+      zenodo_record_id: ${{ needs.constants.outputs.ZENODO_RECORD_ID }}
 
   test_and_build:
     needs: prepare_test_data
