@@ -1,0 +1,52 @@
+name: Prepare test data release
+
+on:
+    workflow_dispatch:
+    pull_request:
+        types: [opened, synchronize, reopened, ready_for_review]
+        paths:
+            - .github/workflows/prepare_test_data.yml
+
+env:
+    ZENODO_RECORD_ID: 17423608
+    RELEASE_TAG: testdata-zenodo.17423608
+    ARCHIVE_NAME: test_data.tar.zst
+
+jobs:
+    build-and-release:
+        name: Download and publish test data
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: "3.10"
+
+            - name: Install tools
+              run: |
+                  python -m pip install --upgrade pip
+                  python -m pip install zenodo-get
+                  sudo apt-get update
+                  sudo apt-get install -y zstd
+
+            - name: Download dataset from Zenodo
+              run: |
+                  mkdir -p test_data
+                  cd test_data
+                  zenodo_get $ZENODO_RECORD_ID
+                  cd -
+
+            - name: Create compressed archive
+              run: |
+                  tar -I zstd -cf "${ARCHIVE_NAME}" test_data/
+
+            - name: Publish Release asset (creates or updates a prerelease)
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ env.RELEASE_TAG }}
+                  name: ${{ env.RELEASE_TAG }}
+                  prerelease: true
+                  files: ${{ env.ARCHIVE_NAME }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
