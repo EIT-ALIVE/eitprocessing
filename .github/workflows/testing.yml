@@ -16,7 +16,12 @@ on:
       - main
       - develop
 jobs:
+  prepare_test_data:
+    uses: ./.github/workflows/prepare_test_data.yml
+    secrets: inherit
+
   test_and_build:
+    needs: prepare_test_data
     if: github.event.pull_request.draft == false
     runs-on: ${{ matrix.os }}
     strategy:
