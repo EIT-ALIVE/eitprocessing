@@ -39,7 +39,7 @@ jobs:
                   fi
             - name: Release already exists, skipping
               if: steps.checkrelease.outputs.release_exists == 'true'
-              run: echo "Release $RELEASE_TAG already exists. Skipping workflow."
+              run: echo "Release ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} already exists. Skipping workflow."
 
             - uses: actions/setup-python@v5
               if: steps.checkrelease.outputs.release_exists != 'true'
