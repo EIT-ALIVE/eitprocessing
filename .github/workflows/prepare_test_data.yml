@@ -17,7 +17,7 @@ on:
     #         - .github/workflows/prepare_test_data.yml
 
 env:
-    RELEASE_TAG_TEMPLATE: testdata-zenodo.
+    RELEASE_TAG_TEMPLATE: testdata_zenodo.
     ARCHIVE_NAME: test_data.tar.zst
 
 jobs:
