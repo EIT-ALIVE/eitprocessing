@@ -37,6 +37,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Download test data archive from release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release download testdata-zenodo.${{ env.ZENODO_RECORD_ID }} --pattern "test_data.tar.zst"
       - name: Extract test data
