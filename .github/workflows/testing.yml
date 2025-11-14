@@ -40,7 +40,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download testdata-zenodo.${{ env.ZENODO_RECORD_ID }} --pattern "test_data.tar.zst"
+          gh release download testdata_zenodo.${{ env.ZENODO_RECORD_ID }} --pattern "test_data.tar.zst"
       - name: Extract test data
         run: |
           tar -x -f test_data.tar.zst
