@@ -56,7 +56,7 @@ jobs:
               run: |
                   mkdir -p test_data
                   cd test_data
-                  zenodo_get $ZENODO_RECORD_ID
+                  zenodo_get ${{ inputs.zenodo_record_id }}
                   cd -
 
             - name: Create compressed archive
@@ -71,7 +71,7 @@ jobs:
                       ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} \
                       --prerelease \
                       --title ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} \
-                      --notes "Automated test data release for Zenodo record ID $ZENODO_RECORD_ID" \
+                      --notes "Automated test data release for Zenodo record ID ${{ inputs.zenodo_record_id }}" \
                       ${{ env.ARCHIVE_NAME }}
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
