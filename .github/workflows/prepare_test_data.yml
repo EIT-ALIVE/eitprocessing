@@ -31,7 +31,6 @@ jobs:
             - name: Check if release exists
               id: checkrelease
               run: |
-                  gh release view ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }}
                   if gh release view ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} >/dev/null 2>&1; then
                       echo "release_exists=true" >> $GITHUB_OUTPUT
                   else
