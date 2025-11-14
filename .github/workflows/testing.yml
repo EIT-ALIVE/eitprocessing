@@ -37,12 +37,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Download test data archive from release
-        uses: robinraju/release-downloader@v1.11
-        with:
-          repository: ${{ github.repository }}
-          tag: testdata-zenodo.${{ env.ZENODO_RECORD_ID }}
-          fileName: test_data.tar.zst
-          out-file-path: ${{ github.workspace }}
+        run: |
+          gh release download testdata-zenodo.${{ env.ZENODO_RECORD_ID }} --pattern "test_data.tar.zst"
       - name: Extract test data
         run: |
           tar -x -f test_data.tar.zst
