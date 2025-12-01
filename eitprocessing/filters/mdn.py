@@ -182,12 +182,8 @@ class MDNFilter(TimeDomainFilter):
                 msg = "Axis should not be provided when using ContinuousData or EITData."
                 raise ValueError(msg)
 
-        if isinstance(input_data, ContinuousData):
+        if isinstance(input_data, (ContinuousData, EITData)):
             data = input_data.values
-            sample_frequency_ = cast("float", input_data.sample_frequency)
-            axis_ = 0
-        elif isinstance(input_data, EITData):
-            data = input_data.pixel_impedance
             sample_frequency_ = cast("float", input_data.sample_frequency)
             axis_ = 0
         elif isinstance(input_data, np.ndarray):

@@ -52,7 +52,7 @@ def load_eit_data(
     ...     vendor="sentec",
     ...     label="initial_measurement"
     ... )
-    >>> pixel_impedance = sequence.eit_data["raw"].pixel_impedance
+    >>> pixel_impedance = sequence.eit_data["raw"].values
     ```
     """
     from eitprocessing.datahandling.loading import (  # noqa: PLC0415

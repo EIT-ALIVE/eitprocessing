@@ -158,19 +158,19 @@ def test_pixelmask_apply_eitdata(draeger_20hz_healthy_volunteer: Sequence):
         mask = PixelMask(np.full((32, 32), np.nan), suppress_all_nan_warning=True)
     masked_eit_data = mask.apply(eit_data)
 
-    assert masked_eit_data.pixel_impedance.shape == eit_data.pixel_impedance.shape
-    assert np.all(np.isnan(masked_eit_data.pixel_impedance))
+    assert masked_eit_data.values.shape == eit_data.values.shape
+    assert np.all(np.isnan(masked_eit_data.values))
 
     mask_values = np.full((32, 32), np.nan)
     mask_values[10:23, 10:23] = 1.0  # let center pixels pass
     mask = PixelMask(mask_values)
     masked_eit_data = mask.apply(eit_data)
 
-    assert np.array_equal(masked_eit_data.pixel_impedance[:, 10:23, 10:23], eit_data.pixel_impedance[:, 10:23, 10:23])
-    assert np.all(np.isnan(masked_eit_data.pixel_impedance[:, :10, :]))
-    assert np.all(np.isnan(masked_eit_data.pixel_impedance[:, 23:, :]))
-    assert np.all(np.isnan(masked_eit_data.pixel_impedance[:, :, :10]))
-    assert np.all(np.isnan(masked_eit_data.pixel_impedance[:, :, 23:]))
+    assert np.array_equal(masked_eit_data.values[:, 10:23, 10:23], eit_data.values[:, 10:23, 10:23])
+    assert np.all(np.isnan(masked_eit_data.values[:, :10, :]))
+    assert np.all(np.isnan(masked_eit_data.values[:, 23:, :]))
+    assert np.all(np.isnan(masked_eit_data.values[:, :, :10]))
+    assert np.all(np.isnan(masked_eit_data.values[:, :, 23:]))
 
 
 def test_pixelmask_apply_pixelmap():

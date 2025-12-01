@@ -133,9 +133,9 @@ def test_with_eit_data(draeger_20hz_healthy_volunteer: Sequence):
     )
 
     filtered_data = mdn_filter.apply(eit_data)
-    filtered_signal = mdn_filter.apply(eit_data.pixel_impedance, sample_frequency=eit_data.sample_frequency, axis=0)
+    filtered_signal = mdn_filter.apply(eit_data.values, sample_frequency=eit_data.sample_frequency, axis=0)
 
-    assert np.allclose(filtered_data.pixel_impedance, filtered_signal)
+    assert np.allclose(filtered_data.values, filtered_signal)
 
 
 @pytest.mark.parametrize(

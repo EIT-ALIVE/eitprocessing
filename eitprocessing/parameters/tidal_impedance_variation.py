@@ -203,7 +203,7 @@ class TIV(ParameterCalculation):
             msg = f"Invalid {tiv_timing}. The tiv_timing must be either 'continuous' or 'pixel'."
             raise ValueError(msg)
 
-        data = eit_data.pixel_impedance
+        data = eit_data.values
         _, n_rows, n_cols = data.shape
 
         if tiv_timing == "pixel":

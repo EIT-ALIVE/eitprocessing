@@ -316,7 +316,7 @@ def test_with_custom_mean_pixel_tiv(
         for row, col in itertools.product(range(2), range(2)):
             time_point = test_result[1, row, col].middle_time
             index = np.where(mock_eit_data.time == time_point)[0]
-            value_at_time = mock_eit_data.pixel_impedance[index[0], row, col]
+            value_at_time = mock_eit_data.values[index[0], row, col]
             if mean == -1:
                 assert np.isclose(value_at_time, -1, atol=0.01)
             elif mean == 1:
@@ -391,19 +391,18 @@ def test_phase_modes(draeger_50hz_healthy_volunteer_pressure_pod: Sequence, pyte
     eit_data = sequence.eit_data["raw"]
 
     # reduce the pixel set to some 'well-behaved' pixels with positive TIV
-    eit_data = eit_data.update(values=eit_data.pixel_impedance[:, 14:20, 14:20])
-    np.savetxt("v_before_new.txt", eit_data.values[0])
+    eit_data = eit_data.update(values=eit_data.values[:, 14:20, 14:20])
 
     # flip a single pixel, so the differences between algorithms becomes predictable
     flip_row, flip_col = 5, 5
-    new_values = eit_data.pixel_impedance.copy()
+    new_values = eit_data.values.copy()
     new_values[:, flip_row, flip_col] = -new_values[:, flip_row, flip_col]
-    eit_data = eit_data.update(pixel_impedance=new_values)
+    eit_data = eit_data.update(values=new_values)
 
     cd = sequence.continuous_data["global_impedance_(raw)"]
 
     # replace the 'global' data with the sum of the middly pixels
-    cd.values = np.sum(eit_data.pixel_impedance, axis=(1, 2))
+    cd.values = np.sum(eit_data.values, axis=(1, 2))
 
     pb_negative_amplitude = PixelBreath(phase_correction_mode="negative amplitude").find_pixel_breaths(eit_data, cd)
     pb_phase_shift = PixelBreath(phase_correction_mode="phase shift").find_pixel_breaths(eit_data, cd)

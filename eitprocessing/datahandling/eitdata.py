@@ -142,7 +142,7 @@ class EITData(FrozenDataContainer, SelectByTime):
     def nframes(self) -> int:
         """Number of frames in the data."""
         warnings.warn("`nframes` is deprecated. Use `len(eitdata)` instead.", DeprecationWarning, stacklevel=2)
-        return self.pixel_impedance.shape[0]
+        return self.values.shape[0]
 
     @property
     def framerate(self) -> float:
@@ -190,7 +190,7 @@ class EITData(FrozenDataContainer, SelectByTime):
             label=self.label,  # TODO: using newlabel leads to errors
             sample_frequency=self.sample_frequency,
             time=np.concatenate((self.time, other.time)),
-            pixel_impedance=np.concatenate((self.pixel_impedance, other.pixel_impedance), axis=0),
+            values=np.concatenate((self.values, other.values), axis=0),
         )
 
     def _sliced_copy(
@@ -201,11 +201,11 @@ class EITData(FrozenDataContainer, SelectByTime):
     ) -> Self:
         return self.update(
             time=self.time[start_index:end_index],
-            values=self.pixel_impedance[start_index:end_index, :, :],
+            values=self.values[start_index:end_index, :, :],
         )
 
     def __len__(self):
-        return self.pixel_impedance.shape[0]
+        return self.values.shape[0]
 
     def get_summed_impedance(self, *, return_label: str | None = None, **return_kwargs) -> ContinuousData:
         """Return a ContinuousData-object with the same time axis and summed pixel values over time.
@@ -215,7 +215,7 @@ class EITData(FrozenDataContainer, SelectByTime):
             the current object.
             **return_kwargs: Keyword arguments for the creation of the returned object.
         """
-        summed_impedance = np.nansum(self.pixel_impedance, axis=(1, 2))
+        summed_impedance = np.nansum(self.values, axis=(1, 2))
 
         if return_label is None:
             return_label = f"summed {self.label}"
@@ -231,7 +231,7 @@ class EITData(FrozenDataContainer, SelectByTime):
 
     def calculate_global_impedance(self) -> np.ndarray:
         """Return the global impedance, i.e. the sum of all included pixels at each frame."""
-        return np.nansum(self.pixel_impedance, axis=(1, 2))
+        return np.nansum(self.values, axis=(1, 2))
 
     def update(self, **kwargs) -> Self:
         """Return a copy of the object with specified fields replaced.

@@ -141,7 +141,7 @@ class PixelBreath:
             [breath.middle_time for breath in continuous_breaths.values],
         )
 
-        _, n_rows, n_cols = eit_data.pixel_impedance.shape
+        _, n_rows, n_cols = eit_data.values.shape
 
         from eitprocessing.parameters.tidal_impedance_variation import TIV  # noqa: PLC0415
 
@@ -169,7 +169,7 @@ class PixelBreath:
             mean_tiv_pixel[~all_nan_mask] = np.nanmean(pixel_tiv_with_continuous_data_timing[:, ~all_nan_mask], axis=0)
 
         time = eit_data.time
-        pixel_impedance = eit_data.pixel_impedance
+        pixel_impedance = eit_data.values
 
         pixel_breaths = np.full((len(continuous_breaths), n_rows, n_cols), None, dtype=object)
 
