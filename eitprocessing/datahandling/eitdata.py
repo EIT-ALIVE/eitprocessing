@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from dataclasses import InitVar, dataclass, field
+from dataclasses import KW_ONLY, InitVar, dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -31,58 +31,42 @@ class EITData(FrozenDataContainer, SelectByTime):
     disk.
 
     Args:
-        path: The path of list of paths of the source from which data was derived.
-        nframes: Number of frames.
         time: The time of each frame (since start measurement).
+        values: Impedance values for each pixel at each frame.
         sample_frequency: The (average) frequency at which the frames are collected, in Hz.
         vendor: The vendor of the device the data was collected with.
+        path: The path of list of paths of the source from which data was derived.
         label: Computer readable label identifying this dataset.
         name: Human readable name for the data.
-        pixel_impedance: Impedance values for each pixel at each frame.
+        description: Human readable description of the data.
     """  # TODO: fix docstring
 
-    path: str | Path | list[Path | str] = field(compare=False, repr=False)
     time: np.ndarray = field(repr=False)
+    values: np.ndarray = field(repr=False)
+    _: KW_ONLY
     sample_frequency: float = field(metadata={"check_equivalence": True}, repr=False)
     vendor: Vendor = field(metadata={"check_equivalence": True}, repr=False)
+    path: str | Path | list[Path | str] | None = field(compare=False, repr=False, default=None)
     label: str | None = field(default=None, compare=False, metadata={"check_equivalence": True})
     description: str | None = field(default=None, compare=False, repr=False)
     name: str | None = field(default=None, compare=False, repr=False)
-    values: np.ndarray = field(repr=False, kw_only=True)
     suppress_simulated_warning: InitVar[bool] = False
 
     def __init__(
         self,
-        *,
         time: np.ndarray,
+        values: np.ndarray | None = None,
+        *,
         sample_frequency: float,
         vendor: Vendor | str,
-        path: str | Path | list[Path | str],
-        values: np.ndarray | None = None,
+        path: str | Path | list[Path | str] | None = None,
         label: str | None = None,
         description: str | None = None,
         name: str | None = None,
         suppress_simulated_warning: bool = False,
         **kwargs,
     ):
-        if "pixel_impedance" in kwargs:
-            if values is not None:
-                msg = "Cannot provide both 'pixel_impedance' and 'values'."
-                raise ValueError(msg)
-            warnings.warn("`pixel_impedance` has been replaced by `values`.", DeprecationWarning, stacklevel=2)
-            values = kwargs.pop("pixel_impedance")
-
-        if "nframes" in kwargs:
-            warnings.warn(
-                "`nframes` is no longer a constructor argument. Use `len(eitdata)` instead.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            _ = kwargs.pop("nframes")
-
-        if kwargs:
-            msg = f"Unexpected keyword arguments: {', '.join(kwargs.keys())}."
-            raise TypeError(msg)
+        values = self._parse_kwargs(values, kwargs)
 
         if not isinstance(values, np.ndarray):
             msg = f"'values' must be a numpy ndarray, not {type(values)}."
@@ -93,11 +77,14 @@ class EITData(FrozenDataContainer, SelectByTime):
         object.__setattr__(self, "name", name)
         object.__setattr__(self, "description", description)
 
-        path_list = self.ensure_path_list(path)
-        if len(path_list) == 1:
-            object.__setattr__(self, "path", path_list[0])
+        if path is None:
+            object.__setattr__(self, "path", None)
         else:
-            object.__setattr__(self, "path", path_list)
+            path_list = self.ensure_path_list(path)
+            if len(path_list) == 1:
+                object.__setattr__(self, "path", path_list[0])
+            else:
+                object.__setattr__(self, "path", path_list)
 
         object.__setattr__(self, "sample_frequency", float(sample_frequency))
         if self.sample_frequency != sample_frequency:
@@ -124,6 +111,27 @@ class EITData(FrozenDataContainer, SelectByTime):
                 stacklevel=2,
             )
         object.__setattr__(self, "vendor", vendor)
+
+    def _parse_kwargs(self, values: np.ndarray | None, kwargs: dict[str, Any]) -> np.ndarray | None:
+        if "pixel_impedance" in kwargs:
+            if values is not None:
+                msg = "Cannot provide both 'pixel_impedance' and 'values'."
+                raise ValueError(msg)
+            warnings.warn("`pixel_impedance` has been replaced by `values`.", DeprecationWarning, stacklevel=2)
+            values = kwargs.pop("pixel_impedance")
+
+        if "nframes" in kwargs:
+            warnings.warn(
+                "`nframes` is no longer a constructor argument. Use `len(eitdata)` instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            _ = kwargs.pop("nframes")
+
+        if kwargs:
+            msg = f"Unexpected keyword arguments: {', '.join(kwargs.keys())}."
+            raise TypeError(msg)
+        return values
 
     @property
     def pixel_impedance(self) -> np.ndarray:
@@ -169,16 +177,18 @@ class EITData(FrozenDataContainer, SelectByTime):
             msg = f"Concatenation failed. Second dataset ({other.name}) may not start before first ({self.name}) ends."
             raise ValueError(msg)
 
-        self_path = self.ensure_path_list(self.path)
-        other_path = self.ensure_path_list(other.path)
+        self_path = [] if self.path is None else self.ensure_path_list(self.path)
+        other_path = [] if other.path is None else self.ensure_path_list(other.path)
+        concat_path = [*self_path, *other_path]
+        if not concat_path:
+            concat_path = None
         newlabel = newlabel or f"Merge of <{self.label}> and <{other.label}>"
 
         return self.__class__(
             vendor=self.vendor,
-            path=[*self_path, *other_path],
+            path=concat_path,
             label=self.label,  # TODO: using newlabel leads to errors
             sample_frequency=self.sample_frequency,
-            nframes=self.nframes + other.nframes,
             time=np.concatenate((self.time, other.time)),
             pixel_impedance=np.concatenate((self.pixel_impedance, other.pixel_impedance), axis=0),
         )

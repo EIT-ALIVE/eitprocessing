@@ -86,13 +86,12 @@ def mock_eit_data():
     """Fixture to provide an instance of EITData."""
     return EITData(
         path="",
-        nframes=2000,
         time=np.linspace(0, 18, (18 * 1000), endpoint=False),
         sample_frequency=1000,
         vendor=Vendor.DRAEGER,
         label="mock_eit_data",
         name="mock_eit_data",
-        pixel_impedance=mock_pixel_impedance(),
+        values=mock_pixel_impedance(),
     )
 
 

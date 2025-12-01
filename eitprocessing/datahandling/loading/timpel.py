@@ -96,10 +96,9 @@ def load_from_single_path(
         vendor=Vendor.TIMPEL,
         label="raw",
         path=path,
-        nframes=nframes,
         time=time,
         sample_frequency=sample_frequency,
-        pixel_impedance=pixel_impedance,
+        values=pixel_impedance,
     )
     eitdata_collection = DataCollection(EITData, raw=eit_data)
 

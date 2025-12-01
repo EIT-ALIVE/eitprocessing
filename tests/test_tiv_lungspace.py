@@ -26,15 +26,12 @@ def create_signal():
         sine = np.sin(t * 2 * np.pi / 5)  # 5 second period
         signal = amplitudes[None, :, :] * (sine[:, None, None] + 0.5)
         return EITData(
-            pixel_impedance=signal,
-            path="",
-            nframes=len(t),
+            values=signal,
             time=t,
             sample_frequency=sample_frequency,
             vendor=Vendor.SIMULATED,
             label="simulated",
             description="Simulated EIT data for testing purposes",
-            name="",
             suppress_simulated_warning=True,
         )
 

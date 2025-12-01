@@ -107,12 +107,11 @@ def signal_factory() -> Callable[..., EITData]:
 
         return EITData(
             path=".",
-            nframes=nframes,
             time=time,
             sample_frequency=sample_frequency,
             vendor="draeger",
             label="test_signal",
-            pixel_impedance=pixel_impedance,
+            values=pixel_impedance,
         )
 
     return factory

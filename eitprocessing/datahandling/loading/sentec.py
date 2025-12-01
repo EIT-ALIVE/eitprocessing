@@ -86,10 +86,9 @@ def load_from_single_path(
             vendor=Vendor.SENTEC,
             path=path,
             sample_frequency=sample_frequency,
-            nframes=n_frames,
             time=time_array,
             label="raw",
-            pixel_impedance=image,
+            values=image,
         ),
     )
 

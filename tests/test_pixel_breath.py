@@ -75,13 +75,12 @@ def mock_eit_data():
     """Fixture to provide an instance of EITData."""
     return EITData(
         path="",
-        nframes=400,
         time=np.linspace(0, 2 * np.pi, 400),
         sample_frequency=399 / 2 * np.pi,
         vendor=Vendor.DRAEGER,
         label="mock_eit_data",
         name="mock_eit_data",
-        pixel_impedance=mock_pixel_impedance(),
+        values=mock_pixel_impedance(),
     )
 
 
@@ -113,13 +112,12 @@ def mock_zero_eit_data():
     """Fixture to provide an instance of EITData with one element set to zero."""
     return EITData(
         path="",
-        nframes=400,
         time=np.linspace(0, 2 * np.pi, 400),
         sample_frequency=399 / 2 * np.pi,
         vendor=Vendor.DRAEGER,
         label="mock_eit_data",
         name="mock_eit_data",
-        pixel_impedance=mock_pixel_impedance_one_zero(),
+        values=mock_pixel_impedance_one_zero(),
     )
 
 

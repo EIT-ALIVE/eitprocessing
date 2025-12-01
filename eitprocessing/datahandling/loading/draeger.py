@@ -120,10 +120,9 @@ def load_from_single_path(  # noqa: PLR0915
         vendor=Vendor.DRAEGER,
         path=path,
         sample_frequency=sample_frequency,
-        nframes=n_frames,
         time=time,
         label="raw",
-        pixel_impedance=pixel_impedance,
+        values=pixel_impedance,
     )
     eitdata_collection = DataCollection(EITData, raw=eit_data)
 
