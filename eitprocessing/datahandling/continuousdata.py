@@ -6,8 +6,9 @@ from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 
-from eitprocessing.datahandling import DataContainer
+from eitprocessing.datahandling import FrozenDataContainer
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
+from eitprocessing.utils.frozen_array import freeze_array
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -17,8 +18,8 @@ if TYPE_CHECKING:
 T = TypeVar("T", bound="ContinuousData")
 
 
-@dataclass(eq=False)
-class ContinuousData(DataContainer, SelectByTime):
+@dataclass(eq=False, frozen=True)
+class ContinuousData(FrozenDataContainer, SelectByTime):
     """Container for data with a continuous time axis.
 
     Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and
@@ -56,48 +57,8 @@ class ContinuousData(DataContainer, SelectByTime):
             msg = f"The number of time points ({lt}) does not match the number of values ({lv})."
             raise ValueError(msg)
 
-    def __setattr__(self, attr: str, value: Any):  # noqa: ANN401
-        try:
-            old_value = getattr(self, attr)
-        except AttributeError:
-            pass
-        else:
-            if isinstance(old_value, np.ndarray) and old_value.flags["WRITEABLE"] is False:
-                msg = f"Attribute '{attr}' is locked and can't be overwritten."
-                raise AttributeError(msg)
-        super().__setattr__(attr, value)
-
-    def copy(
-        self,
-        label: str,
-        *,
-        name: str | None = None,
-        unit: str | None = None,
-        description: str | None = None,
-        parameters: dict | None = None,
-    ) -> Self:
-        """Create a copy.
-
-        Whenever data is altered, it should probably be copied first. The alterations should then be made in the copy.
-        """
-        obj = self.__class__(
-            label=label,
-            name=name or label,
-            unit=unit or self.unit,
-            description=description or f"Derived from {self.name}",
-            parameters=self.parameters | (parameters or {}),
-            derived_from=[*self.derived_from, self],
-            category=self.category,
-            # copying data can become inefficient with large datasets if the
-            # data is not directly edited afer copying but overridden instead;
-            # consider creating a view and locking it, requiring the user to
-            # make a copy if they want to edit the data directly
-            time=np.copy(self.time),
-            values=np.copy(self.values),
-            sample_frequency=self.sample_frequency,
-        )
-        obj.unlock()
-        return obj
+        object.__setattr__(self, "time", freeze_array(self.time))
+        object.__setattr__(self, "values", freeze_array(self.values))
 
     def __add__(self: Self, other: Self) -> Self:
         return self.concatenate(other)
@@ -179,19 +140,7 @@ class ContinuousData(DataContainer, SelectByTime):
         newlabel: str,  # noqa: ARG002
     ) -> Self:
         # TODO: check correct implementation
-        cls = self.__class__
-        time = np.copy(self.time[start_index:end_index])
-        values = np.copy(self.values[start_index:end_index])
-        description = f"Slice ({start_index}-{end_index}) of <{self.description}>"
+        time = self.time[start_index:end_index]
+        values = self.values[start_index:end_index]
 
-        return cls(
-            label=self.label,  # TODO: newlabel gives errors
-            name=self.name,
-            unit=self.unit,
-            category=self.category,
-            description=description,
-            derived_from=[*self.derived_from, self],
-            time=time,
-            values=values,
-            sample_frequency=self.sample_frequency,
-        )
+        return self.update(time=time, values=values)

@@ -398,7 +398,7 @@ def test_phase_modes(draeger_50hz_healthy_volunteer_pressure_pod: Sequence, pyte
     cd = sequence.continuous_data["global_impedance_(raw)"]
 
     # replace the 'global' data with the sum of the middly pixels
-    cd.values = np.sum(eit_data.values, axis=(1, 2))
+    cd = cd.update(values=np.sum(eit_data.values, axis=(1, 2)))
 
     pb_negative_amplitude = PixelBreath(phase_correction_mode="negative amplitude").find_pixel_breaths(eit_data, cd)
     pb_phase_shift = PixelBreath(phase_correction_mode="phase shift").find_pixel_breaths(eit_data, cd)
