@@ -18,10 +18,10 @@ def create_continuous_data_object():
     def internal(sample_frequency: float, duration: float, frequency: float) -> ContinuousData:
         time, values = _make_cosine_wave(sample_frequency, duration, frequency)
         return ContinuousData(
-            "label",
-            "name",
-            "unit",
-            "impedance",
+            label="label",
+            name="name",
+            unit="unit",
+            category="impedance",
             time=time,
             values=values,
             sample_frequency=sample_frequency,

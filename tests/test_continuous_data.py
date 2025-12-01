@@ -14,20 +14,12 @@ def test_sample_frequency_deprecation_warning():
 
     with pytest.warns(DeprecationWarning, match="`sample_frequency` is set to `None`"):
         ContinuousData(
-            "label",
-            "name",
-            "unit",
-            "category",
             time=time,
             values=values,
         )
 
     with pytest.warns(DeprecationWarning, match="`sample_frequency` is set to `None`"):
         ContinuousData(
-            "label",
-            "name",
-            "unit",
-            "category",
             time=time,
             values=values,
             sample_frequency=None,
@@ -35,10 +27,6 @@ def test_sample_frequency_deprecation_warning():
 
     with warnings.catch_warnings(record=True) as w:
         ContinuousData(
-            "label",
-            "name",
-            "unit",
-            "category",
             time=time,
             values=values,
             sample_frequency=sample_frequency,

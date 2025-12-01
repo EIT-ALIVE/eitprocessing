@@ -481,13 +481,9 @@ def test_find_breaths():
 
     label = "waveform_data"
     cd = ContinuousData(
-        label,
-        "Generated waveform data",
-        "",
-        "mock",
-        "",
         time=time,
         values=y,
+        label=label,
         sample_frequency=sample_frequency,
     )
     seq = Sequence("sequence_label")
@@ -514,13 +510,9 @@ def test_find_breaths():
     y_copy = np.copy(y)
     y_copy[438] = -100  # single timepoint around the peak of the 4th breath
     cd = ContinuousData(
-        label,
-        "Generated waveform data",
-        "",
-        "mock",
-        "",
         time=time,
         values=y_copy,
+        label=label,
         sample_frequency=sample_frequency,
     )
     seq.continuous_data.add(cd, overwrite=True)

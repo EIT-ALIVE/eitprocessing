@@ -108,13 +108,13 @@ def load_from_single_path(
     continuousdata_collection = DataCollection(ContinuousData)
     continuousdata_collection.add(
         ContinuousData(
-            "global_impedance_(raw)",
-            "Global impedance",
-            "a.u.",
-            "global_impedance",
-            "Global impedance calculated from raw EIT data",
             time=time,
             values=eit_data.calculate_global_impedance(),
+            label="global_impedance_(raw)",
+            name="Global impedance",
+            unit="a.u.",
+            category="global_impedance",
+            description="Global impedance calculated from raw EIT data",
             sample_frequency=sample_frequency,
         ),
     )

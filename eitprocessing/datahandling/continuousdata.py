@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from dataclasses import dataclass, field
+from dataclasses import KW_ONLY, dataclass, field
 from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
@@ -36,13 +36,14 @@ class ContinuousData(FrozenDataContainer, SelectByTime):
         values: Data points.
     """
 
-    label: str = field(compare=False)
-    name: str = field(compare=False, repr=False)
-    unit: str = field(metadata={"check_equivalence": True}, repr=False)
-    category: str = field(metadata={"check_equivalence": True}, repr=False)
-    description: str = field(default="", compare=False, repr=False)
-    time: np.ndarray = field(kw_only=True, repr=False)
-    values: np.ndarray = field(kw_only=True, repr=False)
+    time: np.ndarray = field(repr=False)
+    values: np.ndarray = field(repr=False)
+    _: KW_ONLY
+    label: str | None = field(compare=False, default=None)
+    name: str | None = field(compare=False, repr=False, default=None)
+    description: str | None = field(compare=False, repr=False, default=None)
+    unit: str | None = field(metadata={"check_equivalence": True}, repr=False, default=None)
+    category: str | None = field(metadata={"check_equivalence": True}, repr=False, default=None)
     sample_frequency: float | None = field(kw_only=True, repr=False, metadata={"check_equivalence": True}, default=None)
 
     def __post_init__(self) -> None:
