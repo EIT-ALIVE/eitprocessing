@@ -393,11 +393,14 @@ def test_phase_modes(draeger_50hz_healthy_volunteer_pressure_pod: Sequence, pyte
     eit_data = sequence.eit_data["raw"]
 
     # reduce the pixel set to some 'well-behaved' pixels with positive TIV
-    eit_data.pixel_impedance = eit_data.pixel_impedance[:, 14:20, 14:20]
+    eit_data = eit_data.update(values=eit_data.pixel_impedance[:, 14:20, 14:20])
+    np.savetxt("v_before_new.txt", eit_data.values[0])
 
     # flip a single pixel, so the differences between algorithms becomes predictable
     flip_row, flip_col = 5, 5
-    eit_data.pixel_impedance[:, flip_row, flip_col] = -eit_data.pixel_impedance[:, flip_row, flip_col]
+    new_values = eit_data.pixel_impedance.copy()
+    new_values[:, flip_row, flip_col] = -new_values[:, flip_row, flip_col]
+    eit_data = eit_data.update(pixel_impedance=new_values)
 
     cd = sequence.continuous_data["global_impedance_(raw)"]
 
