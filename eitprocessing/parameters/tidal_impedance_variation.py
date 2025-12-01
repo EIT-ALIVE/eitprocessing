@@ -142,7 +142,6 @@ class TIV(ParameterCalculation):
             category="impedance difference",
             time=[breath.middle_time for breath in breaths.values if breath is not None],
             description="Tidal impedance variation determined on continuous data",
-            derived_from=[continuous_data],
             values=tiv_values,
         )
         if store:
@@ -253,7 +252,6 @@ class TIV(ParameterCalculation):
             category="impedance difference",
             time=list(all_pixels_breath_timings),
             description="Tidal impedance variation determined on pixel impedance",
-            derived_from=[eit_data],
             values=list(all_pixels_tiv_values.astype(float)),
         )
 

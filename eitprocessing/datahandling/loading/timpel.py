@@ -167,7 +167,6 @@ def load_from_single_path(
             name="Minimum values detected by Timpel device.",
             unit=None,
             category="minvalue",
-            derived_from=[eit_data],
             time=time[min_indices],
         ),
     )
@@ -179,7 +178,6 @@ def load_from_single_path(
             name="Maximum values detected by Timpel device.",
             unit=None,
             category="maxvalue",
-            derived_from=[eit_data],
             time=time[max_indices],
         ),
     )
@@ -207,7 +205,6 @@ def load_from_single_path(
             name="QRS complexes detected by Timpel device",
             unit=None,
             category="qrs_complex",
-            derived_from=[eit_data],
             time=time[qrs_indices],
         ),
     )

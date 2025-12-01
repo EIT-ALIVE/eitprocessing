@@ -16,7 +16,6 @@ from eitprocessing.datahandling.sparsedata import SparseData
 def create_data_object() -> Callable[[str, list | None], ContinuousData]:
     def internal(
         label: str,
-        derived_from: list | None = None,
         time: np.ndarray | None = None,
         values: np.ndarray | None = None,
     ) -> ContinuousData:
@@ -28,7 +27,6 @@ def create_data_object() -> Callable[[str, list | None], ContinuousData]:
             time=time if isinstance(time, np.ndarray) else np.array([]),
             sample_frequency=0,
             values=values if isinstance(values, np.ndarray) else np.array([]),
-            derived_from=derived_from if isinstance(derived_from, list) else [],
         )
 
     return internal
@@ -121,9 +119,9 @@ def test_set_item(create_data_object: Callable[[str], ContinuousData]):
 def test_loaded_derived_data(create_data_object: Callable):
     data_object_loaded_1 = create_data_object("label 1")
     data_object_loaded_2 = create_data_object("label 2")
-    data_object_derived_1_a = create_data_object("label 1 der a", derived_from=[data_object_loaded_1])
-    data_object_derived_1_b = create_data_object("label 1 der b", derived_from=[data_object_loaded_1])
-    data_object_derived_2_a = create_data_object("label 2 der a", derived_from=[data_object_loaded_2])
+    data_object_derived_1_a = create_data_object("label 1 der a")
+    data_object_derived_1_b = create_data_object("label 1 der b")
+    data_object_derived_2_a = create_data_object("label 2 der a")
 
     dc = DataCollection(ContinuousData)
     dc.add(
@@ -133,23 +131,6 @@ def test_loaded_derived_data(create_data_object: Callable):
         data_object_derived_1_b,
         data_object_derived_2_a,
     )
-
-    assert dc.get_loaded_data() == {
-        "label 1": data_object_loaded_1,
-        "label 2": data_object_loaded_2,
-    }
-    assert dc.get_derived_data() == {
-        "label 1 der a": data_object_derived_1_a,
-        "label 1 der b": data_object_derived_1_b,
-        "label 2 der a": data_object_derived_2_a,
-    }
-    assert dc.get_data_derived_from(data_object_loaded_1) == {
-        "label 1 der a": data_object_derived_1_a,
-        "label 1 der b": data_object_derived_1_b,
-    }
-    assert dc.get_data_derived_from(data_object_loaded_2) == {
-        "label 2 der a": data_object_derived_2_a,
-    }
 
 
 def test_concatenate(create_data_object: Callable):

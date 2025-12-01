@@ -140,7 +140,6 @@ def load_from_single_path(  # noqa: PLR0915
             name="Global impedance (raw)",
             unit="a.u.",
             category="impedance",
-            derived_from=[eit_data],
             time=eit_data.time,
             values=eit_data.calculate_global_impedance(),
             sample_frequency=sample_frequency,
@@ -152,7 +151,6 @@ def load_from_single_path(  # noqa: PLR0915
             name="Minimum values detected by Draeger device.",
             unit=None,
             category="minvalue",
-            derived_from=[eit_data],
             time=np.array([t for t, d in phases if d == -1]),
         ),
     )
@@ -162,7 +160,6 @@ def load_from_single_path(  # noqa: PLR0915
             name="Maximum values detected by Draeger device.",
             unit=None,
             category="maxvalue",
-            derived_from=[eit_data],
             time=np.array([t for t, d in phases if d == 1]),
         ),
     )
@@ -178,7 +175,6 @@ def load_from_single_path(  # noqa: PLR0915
             name="Events loaded from Draeger data",
             unit=None,
             category="event",
-            derived_from=[eit_data],
             time=time,
             values=events,
         ),

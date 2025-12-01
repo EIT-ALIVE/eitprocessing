@@ -12,7 +12,7 @@ from eitprocessing.datahandling.mixins.slicing import SelectByTime
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from typing_extensions import Any, Self
+    from typing_extensions import Self
 
 T = TypeVar("T", bound="ContinuousData")
 
@@ -32,8 +32,6 @@ class ContinuousData(DataContainer, SelectByTime):
         unit: Unit of the data, if applicable.
         category: Category the data falls into, e.g. 'airway pressure'.
         description: Human readable extended description of the data.
-        parameters: Parameters used to derive this data.
-        derived_from: Traceback of intermediates from which the current data was derived.
         values: Data points.
     """
 
@@ -42,8 +40,6 @@ class ContinuousData(DataContainer, SelectByTime):
     unit: str = field(metadata={"check_equivalence": True}, repr=False)
     category: str = field(metadata={"check_equivalence": True}, repr=False)
     description: str = field(default="", compare=False, repr=False)
-    parameters: dict[str, Any] = field(default_factory=dict, repr=False, metadata={"check_equivalence": True})
-    derived_from: Any | list[Any] = field(default_factory=list, repr=False, compare=False)
     time: np.ndarray = field(kw_only=True, repr=False)
     values: np.ndarray = field(kw_only=True, repr=False)
     sample_frequency: float | None = field(kw_only=True, repr=False, metadata={"check_equivalence": True}, default=None)
@@ -128,7 +124,6 @@ class ContinuousData(DataContainer, SelectByTime):
             category=self.category,
             time=np.concatenate((self.time, other.time)),
             values=np.concatenate((self.values, other.values)),
-            derived_from=[*self.derived_from, *other.derived_from, self, other],
             sample_frequency=self.sample_frequency,
         )
 

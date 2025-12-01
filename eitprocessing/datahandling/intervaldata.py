@@ -43,8 +43,6 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
         category: Category the data falls into, e.g. 'breath'.
         intervals: A list of intervals (tuples containing a start time and end time).
         values: An optional list of values associated with each interval.
-        parameters: Parameters used to derive the data.
-        derived_from: Traceback of intermediates from which the current data was derived.
         description: Extended human readible description of the data.
         default_partial_inclusion: Whether to include a trimmed version of an interval when selecting data
     """
@@ -55,8 +53,6 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
     category: str = field(metadata={"check_equivalence": True}, repr=False)
     intervals: list[Interval | tuple[float, float]] = field(repr=False)
     values: list[Any] | None = field(repr=False, default=None)
-    parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True}, repr=False)
-    derived_from: list[Any] = field(default_factory=list, compare=False, repr=False)
     description: str = field(compare=False, default="", repr=False)
     default_partial_inclusion: bool = field(repr=False, default=False)
 
@@ -92,7 +88,6 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
             unit=self.unit,
             category=self.category,
             description=description,
-            derived_from=[*self.derived_from, self],
             intervals=intervals,
             values=values,
         )
@@ -130,7 +125,6 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
 
         if start_time is None and end_time is None:
             copy_ = copy.deepcopy(self)
-            copy_.derived_from.append(self)
             copy_.label = newlabel
             return copy_
 
@@ -157,7 +151,6 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
             name=self.name,
             unit=self.unit,
             category=self.category,
-            derived_from=[*self.derived_from, self],
             intervals=list(filtered_intervals),
             values=values,
         )
@@ -228,7 +221,6 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
             unit=self.unit,
             category=self.category,
             description=self.description,
-            derived_from=[*self.derived_from, *other.derived_from, self, other],
             intervals=self.intervals + other.intervals,
             values=new_values,
         )

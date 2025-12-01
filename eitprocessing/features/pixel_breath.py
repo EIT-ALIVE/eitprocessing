@@ -291,7 +291,6 @@ class PixelBreath:
             values=list(
                 pixel_breaths,
             ),  ## TODO: change back to pixel_breaths array when IntervalData works with 3D array
-            derived_from=[eit_data],
         )
         if store:
             sequence.interval_data.add(pixel_breaths_container)

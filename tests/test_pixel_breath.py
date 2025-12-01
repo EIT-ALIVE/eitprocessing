@@ -62,8 +62,6 @@ def mock_continuous_data():
         unit="au",
         category="relative impedance",
         description="Global impedance created for testing pixel breath feature",
-        parameters={},
-        derived_from="mock_eit_data",
         time=np.linspace(0, 2 * np.pi, 400),
         values=mock_global_impedance(),
         sample_frequency=399 / 2 * np.pi,
@@ -170,8 +168,6 @@ def mock_compute_pixel_parameter(mean: int):
             category="impedance difference",
             time=time,
             description="Mock tidal impedance variation",
-            parameters={},
-            derived_from=[],
             values=values,
         )
 
