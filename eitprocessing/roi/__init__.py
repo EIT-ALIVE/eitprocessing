@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 import sys
 import warnings
-from dataclasses import InitVar, dataclass, field, replace
+from dataclasses import InitVar, dataclass, field
 from dataclasses import replace as dataclass_replace
 from typing import TYPE_CHECKING, TypeVar, overload
 
@@ -189,7 +189,7 @@ class PixelMask:  # noqa: PLW1641
         elif isinstance(changes["plot_config"], dict):
             changes["plot_config"] = self._plot_config.update(**changes["plot_config"])
         label = changes.pop("label", None)
-        return replace(self, label=label, **changes)
+        return dataclass_replace(self, label=label, **changes)
 
     update = __replace__
     # TODO: add tests for update
@@ -242,7 +242,7 @@ class PixelMask:  # noqa: PLW1641
             case np.ndarray():
                 return transform_and_mask(data)
             case EITData():
-                return dataclass_replace(data, pixel_impedance=transform_and_mask(data.pixel_impedance), **kwargs)
+                return data.update(pixel_impedance=transform_and_mask(data.pixel_impedance), **kwargs)
             case PixelMap():
                 return data.update(values=transform_and_mask(data.values), **kwargs)
             case _:
