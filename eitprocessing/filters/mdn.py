@@ -1,7 +1,7 @@
-import copy
 import math
 import warnings
 from dataclasses import dataclass
+from dataclasses import replace as dataclass_replace
 from typing import TypeVar, cast, overload
 
 import numpy as np
@@ -155,17 +155,17 @@ class MDNFilter(TimeDomainFilter):
             return new_data
 
         # TODO: Replace with input_data.update(...) when implemented
-        return_object = copy.deepcopy(input_data)
-        for attr, value in kwargs.items():
-            setattr(return_object, attr, value)
 
-        if isinstance(return_object, ContinuousData):
-            return_object.values = new_data
-        elif isinstance(return_object, EITData):
-            return_object.pixel_impedance = new_data
+        kwargs["values"] = new_data
 
-        capture("filtered_data", return_object)
-        return return_object
+        if isinstance(input_data, ContinuousData):
+            filtered_data: T = dataclass_replace(input_data, **kwargs)
+        elif isinstance(input_data, EITData):
+            filtered_data: T = input_data.update(**kwargs)
+
+        capture("filtered_data", filtered_data)
+
+        return filtered_data
 
     def _validate_arguments(
         self,
