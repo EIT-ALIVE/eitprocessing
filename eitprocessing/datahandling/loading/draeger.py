@@ -255,7 +255,6 @@ def _convert_medibus_data(
                 category=field_info.signal_name,
                 sample_frequency=sample_frequency,
             )
-            continuous_data.lock()
             continuousdata_collection.add(continuous_data)
 
         else:
