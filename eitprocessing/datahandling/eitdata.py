@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from collections.abc import Sequence as SequenceType
 from dataclasses import KW_ONLY, InitVar, dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -46,7 +47,7 @@ class EITData(FrozenDataContainer, SelectByTime):
     _: KW_ONLY
     sample_frequency: float = field(metadata={"check_equivalence": True}, repr=False)
     vendor: Vendor = field(metadata={"check_equivalence": True}, repr=False)
-    path: str | Path | list[Path | str] | None = field(compare=False, repr=False, default=None)
+    path: tuple[Path] | None = field(compare=False, repr=False, default=None)
     label: str | None = field(default=None, compare=False, metadata={"check_equivalence": True})
     description: str | None = field(default=None, compare=False, repr=False)
     name: str | None = field(default=None, compare=False, repr=False)
@@ -59,7 +60,7 @@ class EITData(FrozenDataContainer, SelectByTime):
         *,
         sample_frequency: float,
         vendor: Vendor | str,
-        path: str | Path | list[Path | str] | None = None,
+        path: str | Path | SequenceType[Path | str] | None = None,
         label: str | None = None,
         description: str | None = None,
         name: str | None = None,
@@ -80,7 +81,7 @@ class EITData(FrozenDataContainer, SelectByTime):
         if path is None:
             object.__setattr__(self, "path", None)
         else:
-            path_list = self.ensure_path_list(path)
+            path_list = self.ensure_path_tuple(path)
             if len(path_list) == 1:
                 object.__setattr__(self, "path", path_list[0])
             else:
@@ -155,17 +156,17 @@ class EITData(FrozenDataContainer, SelectByTime):
         return self.sample_frequency
 
     @staticmethod
-    def ensure_path_list(
-        path: str | Path | list[str | Path],
-    ) -> list[Path]:
+    def ensure_path_tuple(
+        path: str | Path | SequenceType[str | Path],
+    ) -> tuple[Path, ...]:
         """Return the path or paths as a list.
 
         The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
         list of Path objects given either a str/Path or list of str/Paths.
         """
-        if isinstance(path, list):
-            return [Path(p) for p in path]
-        return [Path(path)]
+        if isinstance(path, SequenceType):
+            return tuple(Path(p) for p in path)
+        return (Path(path),)
 
     def __add__(self: Self, other: Self) -> Self:
         return self.concatenate(other)
@@ -177,9 +178,9 @@ class EITData(FrozenDataContainer, SelectByTime):
             msg = f"Concatenation failed. Second dataset ({other.name}) may not start before first ({self.name}) ends."
             raise ValueError(msg)
 
-        self_path = [] if self.path is None else self.ensure_path_list(self.path)
-        other_path = [] if other.path is None else self.ensure_path_list(other.path)
-        concat_path = [*self_path, *other_path]
+        self_path = () if self.path is None else self.ensure_path_tuple(self.path)
+        other_path = () if other.path is None else self.ensure_path_tuple(other.path)
+        concat_path = (*self_path, *other_path)
         if not concat_path:
             concat_path = None
         newlabel = newlabel or f"Merge of <{self.label}> and <{other.label}>"

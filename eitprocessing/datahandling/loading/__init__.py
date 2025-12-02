@@ -1,3 +1,4 @@
+from collections.abc import Sequence as SequenceType
 from functools import reduce
 from pathlib import Path
 
@@ -7,7 +8,7 @@ from eitprocessing.datahandling.sequence import Sequence
 
 
 def load_eit_data(
-    path: str | Path | list[str | Path],
+    path: str | Path | SequenceType[str | Path],
     vendor: Vendor | str,
     label: str | None = None,
     name: str | None = None,
@@ -70,7 +71,7 @@ def load_eit_data(
 
     first_frame = _check_first_frame(first_frame)
 
-    paths = EITData.ensure_path_list(path)
+    paths = EITData.ensure_path_tuple(path)
 
     eit_datasets: list[DataCollection] = []
     continuous_datasets: list[DataCollection] = []
