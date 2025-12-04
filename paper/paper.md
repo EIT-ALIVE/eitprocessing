@@ -95,6 +95,7 @@ don't include tools for the analysis of reconstructed EIT image data.
 
 `eitprocessing` offers a standardized, open, and highly expandable library of tools for loading,
 filtering, segmentation and analysis of reconstructed EIT data as well as related waveform or sparse data.
+The package is written in Python to ensure accessibility without the requirement for commercial software.
 `eitprocessing` is compatible with data from the three most-used clinically available EIT devices, as well as
 from related data sources, such as mechanical ventilators and dedicated pressure devices. It includes commonly used methods for filtering and segmentation. The
 authors continuously develop and implement further algorithms for analysis. The
