@@ -108,9 +108,9 @@ Notebooks demonstrating these features are available in the repository.
 
 ### Loading
 
-`eitprocessing` supports the loading of EIT data exported from the Dräger Pulmovista (`.bin`
-files), Timpel Enlight (`.txt` files) and Sentec LuMon (`.zri` files) devices. Non-EIT data saved
-in the data files are also loaded.
+`eitprocessing` supports the loading of EIT data exported from the Dräger Pulmovista (`.bin` files), Timpel Enlight
+(`.txt` files) and Sentec LuMon (`.zri` files) devices. Non-EIT data --- such as pressure, flow and volume --- saved in
+the data files are also loaded.
 
 ### Data containers
 
