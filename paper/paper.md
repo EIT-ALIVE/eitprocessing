@@ -64,7 +64,7 @@ beneficial and harmful effects of adaptations in mechanical ventilator support [
 A very promising technology to change clinical practice in ICU patients is EIT [@Frerichs2016]. EIT is gaining worldwide popularity as a bedside non-invasive
 radiation-free tool for lung imaging. Using a belt fitted with electrodes placed around the chest, it
 continuously visualizes real-time changes in lung volume. These changes reflect tidal ventilation,
-changes in lung volume due to ventilator settings, and adaptations due variations in lung
+changes in lung volume due to ventilator settings, and adaptations due to variations in lung
 characteristics caused by improved or worsening lung mechanics. In contrast to static anatomical imaging techniques such as computed tomography
 scan, EIT
 provides dynamic information on lung ventilation. As such, EIT can monitor at the bedside the
@@ -134,7 +134,7 @@ for the first part of a measurement and prone for the second part.
 
 `eitprocessing` currently has implementations for the following pre-processing steps:
 
-- high-pass, low-pass, band-pass or band-stop Butterworth filters, as well as a Multiple Digital Notch filter @Wisse2024-wi;
+- high-pass, low-pass, band-pass or band-stop Butterworth filters, as well as a Multiple Digital Notch filter [@Wisse2024-wi];
 - calculation of the global or regional impedance as the sum of the impedance of all or a subset of pixels;
 - a moving averager using convolution with a given window;
 - region of interest selection using predefined or custom masks;
