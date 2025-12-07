@@ -225,6 +225,14 @@ class PixelBreath:
                     # find the closest peak to zero lag
                     peak_lags = lags[lag_range][peaks]
                     peak_distances = np.abs(peak_lags)
+                    if len(peak_distances) == 0:
+                        # no peaks found, skip pixel
+                        warnings.warn(
+                            f"Skipping pixel ({row}, {col}) because no cross correlation peak found.",
+                            RuntimeWarning,
+                            stacklevel=2,
+                        )
+                        continue
                     min_peak_distance = np.min(peak_distances)
                     candidates = peak_lags[peak_distances == min_peak_distance]
 
