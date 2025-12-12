@@ -228,7 +228,11 @@ class PixelBreath:
                     if len(peak_distances) == 0:
                         # no peaks found, skip pixel
                         warnings.warn(
-                            f"Skipping pixel ({row}, {col}) because no cross correlation peak found.",
+                            (
+                                f"Skipping pixel ({row}, {col}) because no cross correlation peak found. "
+                                "This may be due to unstable (pixel) impedance. "
+                                "This algorithm does not handle unstable impedance data well."
+                            ),
                             RuntimeWarning,
                             stacklevel=2,
                         )
