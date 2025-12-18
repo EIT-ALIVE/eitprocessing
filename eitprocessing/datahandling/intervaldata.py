@@ -7,6 +7,7 @@ from typing_extensions import Self
 
 from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer, SelectByIndex
+from eitprocessing.datahandling.namedtuple_array import NamedTupleArray, Nested
 
 T = TypeVar("T", bound="IntervalData")
 
@@ -16,6 +17,11 @@ class Interval(NamedTuple):
 
     start_time: float
     end_time: float
+
+    @property
+    def duration(self) -> float:
+        """Duration of the interval."""
+        return self.end_time - self.start_time
 
 
 @dataclass(eq=False)
@@ -51,17 +57,41 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
     name: str = field(compare=False, repr=False)
     unit: str | None = field(metadata={"check_equivalence": True}, repr=False)
     category: str = field(metadata={"check_equivalence": True}, repr=False)
-    intervals: list[Interval | tuple[float, float]] = field(repr=False)
+    intervals: NamedTupleArray[Interval] = field(repr=False)
     values: list[Any] | None = field(repr=False, default=None)
     description: str = field(compare=False, default="", repr=False)
     default_partial_inclusion: bool = field(repr=False, default=False)
 
     def __post_init__(self) -> None:
-        self.intervals = [Interval._make(interval) for interval in self.intervals]
+        self.intervals = self._parse_intervals(self.intervals)
 
         if self.has_values and (lv := len(self.values)) != (lt := len(self.intervals)):
             msg = f"The number of time points ({lt}) does not match the number of values ({lv})."
             raise ValueError(msg)
+
+    @staticmethod
+    def _parse_intervals(
+        intervals: list[Interval] | Nested[Interval] | np.ndarray | NamedTupleArray[Interval],
+    ) -> NamedTupleArray[Interval]:
+        """Parse intervals into a NamedTupleArray of Interval."""
+        if isinstance(intervals, NamedTupleArray):
+            if intervals.dtype is not Interval:
+                msg = f"Expected intervals of type 'Interval', got '{intervals.dtype.__name__}'"
+                raise TypeError(msg)
+            return intervals
+
+        if isinstance(intervals, np.ndarray):
+            try:
+                return NamedTupleArray.from_numpy_array(intervals, Interval)
+            except ValueError as e:
+                msg = f"Could not parse intervals from numpy array with dtype '{intervals.dtype}'"
+                raise TypeError(msg) from e
+
+        try:
+            return NamedTupleArray.from_nested(intervals, Interval)
+        except Exception as e:
+            msg = "Could not parse intervals from given input."
+            raise TypeError(msg) from e
 
     def __len__(self) -> int:
         return len(self.intervals)
