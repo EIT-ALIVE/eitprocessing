@@ -190,3 +190,6 @@ replace = 'version: "{new_version}"'
 filename = "eitprocessing/__init__.py"
 search = '__version__ = "{current_version}"'
 replace = '__version__ = "{new_version}"'
+
+
+[tool.pyrefly]
