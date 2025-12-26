@@ -1,0 +1,77 @@
+name: Prepare test data release
+
+on:
+    workflow_dispatch:
+        inputs:
+            zenodo_record_id:
+                description: "Zenodo record ID to download the dataset from"
+                type: string
+    workflow_call:
+        inputs:
+            zenodo_record_id:
+                description: "Zenodo record ID to download the dataset from"
+                type: string
+    # pull_request:
+    #     types: [opened, synchronize, reopened, ready_for_review]
+    #     paths:
+    #         - .github/workflows/prepare_test_data.yml
+
+env:
+    RELEASE_TAG_TEMPLATE: testdata_zenodo.
+    ARCHIVE_NAME: test_data.tar.zst
+
+jobs:
+    build-and-release:
+        name: Download and publish test data
+        runs-on: ubuntu-latest
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - uses: actions/checkout@v4
+            - name: Check if release exists
+              id: checkrelease
+              run: |
+                  if gh release view ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} >/dev/null 2>&1; then
+                      echo "release_exists=true" >> $GITHUB_OUTPUT
+                  else
+                      echo "release_exists=false" >> $GITHUB_OUTPUT
+                  fi
+            - name: Release already exists, skipping
+              if: steps.checkrelease.outputs.release_exists == 'true'
+              run: echo "Release ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} already exists. Skipping workflow."
+
+            - uses: actions/setup-python@v5
+              if: steps.checkrelease.outputs.release_exists != 'true'
+              with:
+                  python-version: "3.10"
+
+            - name: Install tools
+              if: steps.checkrelease.outputs.release_exists != 'true'
+              run: |
+                  python -m pip install --upgrade pip
+                  python -m pip install zenodo-get
+
+            - name: Download dataset from Zenodo
+              if: steps.checkrelease.outputs.release_exists != 'true'
+              run: |
+                  mkdir -p test_data
+                  cd test_data
+                  zenodo_get ${{ inputs.zenodo_record_id }}
+                  cd -
+
+            - name: Create compressed archive
+              if: steps.checkrelease.outputs.release_exists != 'true'
+              run: |
+                  tar -I zstd -cf "${ARCHIVE_NAME}" test_data/
+
+            - name: Publish Release asset (creates or updates a prerelease)
+              if: steps.checkrelease.outputs.release_exists != 'true'
+              run: |
+                  gh release create \
+                      ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} \
+                      --prerelease \
+                      --title ${{ env.RELEASE_TAG_TEMPLATE }}${{ inputs.zenodo_record_id }} \
+                      --notes "Automated test data release for Zenodo record ID ${{ inputs.zenodo_record_id }}" \
+                      ${{ env.ARCHIVE_NAME }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
