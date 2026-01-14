@@ -4,21 +4,8 @@ This module contains tools for the selection of regions of interest and masking 
 module is `PixelMask`. Any type of region of interest selection results in a `PixelMask` object. A mask can be applied
 to any pixel dataset (EITData, PixelMap) with the same shape.
 
-Several default masks have been predefined. NB: the right side of the patient is to the left side of the EIT image and
-vice versa.
-
-- `VENTRAL_MASK` includes only the first 16 rows;
-- `DORSAL_MASK` includes only the last 16 rows;
-- `ANATOMICAL_RIGHT_MASK` includes only the first 16 columns;
-- `ANATOMICAL_LEFT_MASK` includes only the last 16 columns;
-- `QUADRANT_1_MASK` includes the top right quadrant;
-- `QUADRANT_2_MASK` includes the top left quadrant;
-- `QUADRANT_3_MASK` includes the bottom right quadrant;
-- `QUADRANT_4_MASK` includes the bottom left quadrant;
-- `LAYER_1_MASK` includes only the first 8 rows;
-- `LAYER_2_MASK` includes only the second set of 8 rows;
-- `LAYER_3_MASK` includes only the third set of 8 rows;
-- `LAYER_4_MASK` includes only the last 8 rows.
+Predefined default masks can be created using `get_geometric_mask()`. These masks are based on common anatomical regions
+of interest.
 """
 
 from __future__ import annotations
