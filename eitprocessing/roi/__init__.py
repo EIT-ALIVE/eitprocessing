@@ -295,7 +295,7 @@ class PixelMask:  # noqa: PLW1641
         return self.mask.shape == other.mask.shape and np.array_equal(self.mask, other.mask, equal_nan=True)
 
 
-def get_geometric_mask(mask: str, shape: tuple[int, int] = (32, 32)) -> PixelMask:
+def get_geometric_mask(mask: str, shape: tuple[int, int] = (32, 32)) -> PixelMask:  # noqa: PLR0911
     """Get a geometric mask by name.
 
     Masks can be generated for appropriates shapes, provided by the shape` argument, a tuple of two integers
@@ -305,6 +305,7 @@ def get_geometric_mask(mask: str, shape: tuple[int, int] = (32, 32)) -> PixelMas
     The function accepts both full names (e.g., "layer 1") and abbreviations (e.g., "L1").
 
     The following masks are available:
+    - "global" or "G": all pixels in the EIT image.
     - "ventral" or "V": the first half rows of the EIT image.
     - "dorsal" or "D": the last half rows of the EIT image.
     - "anatomical right" or "R": the first half columns of the EIT image.
@@ -331,23 +332,6 @@ def get_geometric_mask(mask: str, shape: tuple[int, int] = (32, 32)) -> PixelMas
         ValueError: If an unknown mask name is provided.
         ValueError: If the shape is not compatible with the requested mask.
     """
-
-    def _check_dimensions(
-        name: str, shape: tuple[int, int], *, height_divisor: int | None = None, width_divisor: int | None = None
-    ) -> None:
-        total_height, total_width = shape
-        if isinstance(height_divisor, int) and total_height % height_divisor != 0:
-            msg = (
-                f"Shape {shape} is not compatible with a {name} mask. "
-                "The height must be a multiple of {height_divisor}."
-            )
-            raise ValueError(msg)
-        if isinstance(width_divisor, int) and total_width % width_divisor != 0:
-            msg = (
-                f"Shape {shape} is not compatible with a {name} mask. The width must be a multiple of {width_divisor}."
-            )
-            raise ValueError(msg)
-
     total_height, total_width = shape
     n_layers_quadrants = 4
 
@@ -356,6 +340,8 @@ def get_geometric_mask(mask: str, shape: tuple[int, int] = (32, 32)) -> PixelMas
     mask = re.sub(r"^L([1-4]{1})$", r"layer \1", mask)
 
     match mask.split(" "):
+        case ["global"] | ["G"]:
+            return PixelMask(np.ones(shape), label="global")
         case ["ventral"] | ["V"]:
             _check_dimensions("ventral", shape, height_divisor=2)
             height = total_height // 2
@@ -386,7 +372,7 @@ def get_geometric_mask(mask: str, shape: tuple[int, int] = (32, 32)) -> PixelMas
 
         case ["layer", num_str] if num_str.isdigit() and 1 <= int(num_str) <= n_layers_quadrants:
             num = int(num_str)
-            _check_dimensions("layer", shape, height_divisor=4)
+            _check_dimensions("layer", shape, height_divisor=n_layers_quadrants)
             height = total_height // n_layers_quadrants
             return PixelMask(
                 np.concatenate(
@@ -410,3 +396,17 @@ def get_geometric_mask(mask: str, shape: tuple[int, int] = (32, 32)) -> PixelMas
         case _:
             msg = f"Unknown mask name: {mask}."
             raise ValueError(msg)
+
+
+def _check_dimensions(
+    name: str, shape: tuple[int, int], *, height_divisor: int | None = None, width_divisor: int | None = None
+) -> None:
+    total_height, total_width = shape
+    if isinstance(height_divisor, int) and total_height % height_divisor != 0:
+        msg = (
+            f"Shape {shape} is not compatible with a {name} mask. The height must be a multiple of {{height_divisor}}."
+        )
+        raise ValueError(msg)
+    if isinstance(width_divisor, int) and total_width % width_divisor != 0:
+        msg = f"Shape {shape} is not compatible with a {name} mask. The width must be a multiple of {width_divisor}."
+        raise ValueError(msg)
