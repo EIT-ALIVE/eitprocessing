@@ -221,6 +221,14 @@ def test_pixelmask_subtract():
 
 
 @pytest.mark.parametrize("shape", [(32, 1), (64, 1), (16, 1), (100, 1), (4, 1)])
+def test_predefined_global_mask(shape: tuple[int, int]):
+    global_mask = get_geometric_mask("global", shape)
+    assert global_mask.label == "global"
+    assert global_mask.shape == shape
+    assert np.all(global_mask.mask == 1.0)
+
+
+@pytest.mark.parametrize("shape", [(32, 1), (64, 1), (16, 1), (100, 1), (4, 1)])
 def test_predefined_layer_masks(shape: tuple[int, int]):
     quarter_height = shape[0] // 4
     first = slice(None, quarter_height)
