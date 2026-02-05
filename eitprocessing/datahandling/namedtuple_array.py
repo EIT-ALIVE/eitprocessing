@@ -79,7 +79,7 @@ if TYPE_CHECKING:
     from numpy._core.multiarray import flagsobj
 
 
-T = TypeVar("T", bound=NamedTuple)
+T = TypeVar("T", bound=tuple)
 NonStringSeq: TypeAlias = tuple[T, ...] | list[T]
 Nested = T | NonStringSeq
 
@@ -143,32 +143,43 @@ class NamedTupleArray(Generic[T]):
     array([1. , 1.1])
     """
 
-    _type: type[T]
+    namedtuple_type: type[T]
     __items: np.ndarray
 
-    def __init__(self, items: NonStringSeq[T] | np.ndarray | Nested[T], frozen: bool = False):
+    def __init__(
+        self,
+        items: NonStringSeq[T] | np.ndarray | Nested[T],
+        namedtuple_type: type[T] | None = None,
+        frozen: bool = True,
+    ):
         """Initialize a NamedTupleArray from a sequence or nested sequence of NamedTuple items.
 
         Args:
             items: A sequence (or nested sequence) of NamedTuple instances, or a numpy ndarray containing them.
-            frozen: If True, makes the underlying array immutable.
+            namedtuple_type:
+                Optional explicit type of the NamedTuple items. If not provided, it will be inferred from the first leaf
+                item.
+            frozen: If True (default), makes the underlying array immutable.
         """
-        if isinstance(items, np.ndarray) and items.size == 0:
-            msg = "Cannot infer type from empty array."
-            raise ValueError(msg)
-        if not isinstance(items, np.ndarray) and not items:
-            msg = "Cannot infer type from empty sequence."
-            raise ValueError(msg)
+        if namedtuple_type is not None:
+            self.namedtuple_type = namedtuple_type
+        else:
+            if isinstance(items, np.ndarray) and items.size == 0:
+                msg = "Cannot infer type from empty array."
+                raise ValueError(msg)
+            if not isinstance(items, np.ndarray) and not items:
+                msg = "Cannot infer type from empty sequence."
+                raise ValueError(msg)
 
-        # Infer NT type from first leaf element
-        leaf = _first_leaf(items)
-        self._type = type(leaf)  # type: ignore[assignment]
+            # Infer NT type from first leaf element
+            leaf = _first_leaf(items)
+            self.namedtuple_type = type(leaf)  # type: ignore[assignment]
 
         # Validate homogeneity
-        _check_homogeneous(items, self._type)
+        _check_homogeneous(items, self.namedtuple_type)
 
         # Build structured dtype and array with same shape
-        dt = _get_tuple_dtype(self._type)
+        dt = _get_tuple_dtype(self.namedtuple_type)
         self.__items = np.asarray(items, dtype=dt)
 
         if frozen:
@@ -178,22 +189,22 @@ class NamedTupleArray(Generic[T]):
 
     def _freeze(self) -> None:
         """Make the underlying array immutable."""
-        dt = _get_tuple_dtype(self._type)
+        dt = _get_tuple_dtype(self.namedtuple_type)
         freeze_method = "flag" if dt.hasobject else "memoryview"
         self.__items = freeze_array(self.__items, method=freeze_method)
 
     def __setattr__(self, name: str, value: object) -> None:
-        """Allow setting _type and __items only during initialization; block modification after."""
+        """Allow setting type and __items only during initialization; block modification after."""
         # Check if initialization is complete (use object.__getattribute__ to bypass our __getattr__)
         try:
             initialized = object.__getattribute__(self, "_initialized")
         except AttributeError:
             initialized = False
 
-        # Allow setting _type and __items only during initialization
-        if not initialized and name in ("_type", "_NamedTupleArray__items"):
+        # Allow setting type and __items only during initialization
+        if not initialized and name in ("namedtuple_type", "_NamedTupleArray__items"):
             super().__setattr__(name, value)
-        elif initialized and name in ("_type", "_NamedTupleArray__items"):
+        elif initialized and name in ("namedtuple_type", "_NamedTupleArray__items"):
             msg = f"{type(self).__name__!r} object is immutable; cannot modify {name!r} after initialization."
             raise AttributeError(msg)
         else:
@@ -201,9 +212,10 @@ class NamedTupleArray(Generic[T]):
             raise AttributeError(msg)
 
     @classmethod
-    def from_ndarray(cls, arr: np.ndarray, namedtuple_type: type[T], frozen: bool = False) -> NamedTupleArray[T]:
-        """Build a NamedTupleArray from an unstructured numpy array.
+    def from_array(cls, arr: np.ndarray | Nested, namedtuple_type: type[T], frozen: bool = True) -> NamedTupleArray[T]:
+        """Build a NamedTupleArray from an unstructured numpy array or nested list.
 
+        The list must be convertible to a numpy array. The last axis of the array is mapped to the fields.
         The length of the last axis must equal to the number of fields in the given NamedTuple type.
 
         Example:
@@ -211,13 +223,16 @@ class NamedTupleArray(Generic[T]):
             start_time, middle_time, end_time.
 
             ```python
-            assert breath_data.shape == (10, 32, 32, 3)
+            breath_data = load_breath_data()  # shape (10, 32, 32, 3)
             breaths = NamedTupleArray.from_ndarray(breath_data, Breath)
             ```
 
             This is equivalent to a list of 10 nested lists, each containing 32 lists (rows) of 32 (columns) Breath
             objects.
         """
+        if not isinstance(arr, np.ndarray):
+            arr = np.array(arr)
+
         if arr.ndim < 1:
             msg = "arr must have at least 1 dimension."
             raise ValueError(msg)
@@ -239,7 +254,7 @@ class NamedTupleArray(Generic[T]):
             out[name] = arr[..., i].astype(target_dt, copy=False)
 
         inst = cls.__new__(cls)
-        inst._type = namedtuple_type  # noqa: SLF001
+        inst.namedtuple_type = namedtuple_type
         inst._NamedTupleArray__items = out  # noqa: SLF001
 
         if frozen:
@@ -281,6 +296,36 @@ class NamedTupleArray(Generic[T]):
         """
         return self.__items.flags
 
+    def to_array(self) -> np.ndarray:
+        """Convert to an unstructured numpy array.
+
+        Returns a 2D array where each column corresponds to a field of the NamedTuple,
+        in the order of the NamedTuple fields. This allows convenient slicing by
+        column indices like `arr[:, [0, 2]]`.
+
+        Returns:
+            A 2D unstructured numpy array of shape (n_items, n_fields).
+
+        Example:
+            >>> class Point(NamedTuple):
+            ...     x: float
+            ...     y: float
+            ...     z: float
+            >>> nta = NamedTupleArray([Point(1.0, 2.0, 3.0), Point(4.0, 5.0, 6.0)])
+            >>> arr = nta.to_array()
+            >>> arr.shape
+            (2, 3)
+            >>> arr[:, [0, 2]]  # Get x and z columns
+            array([[1., 3.],
+                   [4., 6.]])
+        """
+        # Stack each field as a column to create unstructured array
+        if not self.__items.dtype.names:
+            # No fields, return empty array
+            return np.empty((self.shape[0], 0))
+
+        return np.column_stack([self.__items[name] for name in self.__items.dtype.names])
+
     def __getattr__(self, attr: str):
         """Block access to the private array.
 
@@ -296,12 +341,12 @@ class NamedTupleArray(Generic[T]):
     def __iter__(self) -> Generator[T | NamedTupleArray[T], None, None]:
         if self.ndim == 1:
             for item in self.__items:
-                yield self._type(*item)  # type: ignore[call-arg]
+                yield self.namedtuple_type(*item)  # type: ignore[call-arg]
         else:
             # yield structured subarrays along axis 0
             for i in range(self.__items.shape[0]):
                 out = NamedTupleArray.__new__(NamedTupleArray)
-                out._type = self._type  # noqa: SLF001
+                out.namedtuple_type = self.namedtuple_type
                 out._NamedTupleArray__items = self.__items[i]  # noqa: SLF001
                 yield out
 
@@ -309,7 +354,42 @@ class NamedTupleArray(Generic[T]):
         return self.__items.shape[0] if self.__items.ndim > 0 else 0
 
     def __repr__(self) -> str:
-        return f"NamedTupleArray[{self._type.__name__}]{repr(self.__items).removeprefix('array')}"
+        return f"NamedTupleArray[{self.namedtuple_type.__name__}]{repr(self.__items).removeprefix('array')}"
+
+    def __eq__(self, other: object) -> bool:
+        """Compare two NamedTupleArray instances for equality.
+
+        Two NamedTupleArray instances are equal if:
+        - They are both NamedTupleArray instances
+        - They have the same NamedTuple type
+        - Their underlying arrays are equal (including NaN equality for floats)
+        """
+        if not isinstance(other, NamedTupleArray):
+            return False
+
+        if self.namedtuple_type is not other.namedtuple_type:
+            return False
+
+        # Compare shapes
+        if self.__items.shape != other.__items.shape:
+            return False
+
+        # Compare dtypes
+        if self.__items.dtype != other.__items.dtype:
+            return False
+
+        # For structured arrays, compare field by field to handle NaN values properly
+        for name in self.__items.dtype.names or []:
+            self_field = self.__items[name]
+            other_field = other.__items[name]
+
+            # Use array_equal with equal_nan for each field
+            if not np.array_equal(self_field, other_field, equal_nan=True):
+                return False
+
+        return True
+
+    __hash__ = None  # type: ignore[assignment]
 
     @overload
     def __getitem__(self, index: str) -> np.ndarray: ...
@@ -342,17 +422,17 @@ class NamedTupleArray(Generic[T]):
         # Structured scalar (np.void) → return NamedTuple
         if isinstance(result, np.void):
             # For structured np.void, convert to NamedTuple
-            return self._type(*result.tolist())  # type: ignore[call-arg]
+            return self.namedtuple_type(*result.tolist())  # type: ignore[call-arg]
 
         # Zero-d structured ndarray (shape == ()) → convert to NamedTuple
         if isinstance(result, np.ndarray) and result.dtype.fields is not None and result.ndim == 0:
             scalar = result.item()  # np.void
-            return self._type(*scalar.tolist())  # type: ignore[call-arg]
+            return self.namedtuple_type(*scalar.tolist())  # type: ignore[call-arg]
 
         # Structured ndarray → wrap
         if isinstance(result, np.ndarray) and result.dtype.fields is not None:
             out: NamedTupleArray[T] = type(self).__new__(type(self))
-            out._type = self._type
+            out.namedtuple_type = self.namedtuple_type
             out._NamedTupleArray__items = result
             return out
 
@@ -362,7 +442,7 @@ class NamedTupleArray(Generic[T]):
     def _compute_property(self, attr: str) -> np.ndarray:
         """Compute a property or attribute across all items, preserving the array shape."""
         # Verify attribute exists on the NT instance
-        sample = self._type(*self.__items.flat[0].tolist())  # type: ignore[call-arg]
+        sample = self.namedtuple_type(*self.__items.flat[0].tolist())  # type: ignore[call-arg]
         if not hasattr(sample, attr):
             msg = f"Field or property '{attr}' not found in NamedTuple."
             raise KeyError(msg)
@@ -370,12 +450,12 @@ class NamedTupleArray(Generic[T]):
         # Collect values (single pass using flat indexing)
         out_obj = np.empty(self.shape, dtype=object)
         for i, rec in enumerate(self.__items.reshape(-1)):
-            nt = self._type(*rec.tolist())  # type: ignore[call-arg]
+            nt = self.namedtuple_type(*rec.tolist())  # type: ignore[call-arg]
             out_obj.reshape(-1)[i] = getattr(nt, attr)
 
         # Determine target dtype from property annotation if available (handles postponed annotations)
         target_dtype: np.dtype | None = None
-        attr_member = getattr(self._type, attr, None)
+        attr_member = getattr(self.namedtuple_type, attr, None)
         if isinstance(attr_member, property) and attr_member.fget is not None:
             with contextlib.suppress(Exception):
                 hints = get_type_hints(attr_member.fget)
@@ -416,6 +496,7 @@ def _first_leaf(
             msg = "Cannot infer type from empty nested sequence."
             raise ValueError(msg)
         return _first_leaf(seq[0])
+
     msg = "Items must be NamedTuple or nested sequences thereof."
     raise TypeError(msg)
 
@@ -469,7 +550,7 @@ def _is_namedtuple_type(item: object) -> TypeGuard[type[NamedTuple]]:
     return isinstance(item, type) and issubclass(item, tuple) and hasattr(item, "_fields")
 
 
-def _get_tuple_dtype(item: NamedTuple | type[NamedTuple]) -> np.dtype:
+def _get_tuple_dtype(item: NamedTuple | type[tuple]) -> np.dtype:
     """Generate a NumPy structured dtype from a NamedTuple type."""
     if _is_namedtuple_instance(item):
         item = type(item)

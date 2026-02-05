@@ -106,7 +106,7 @@ def test_3d_from_ndarray_and_indexing():
         ],
         dtype=float,
     )
-    nta = NamedTupleArray.from_ndarray(arr, Simple)
+    nta = NamedTupleArray.from_array(arr, Simple)
     assert nta.shape == (2, 2, 2)
 
     # random 3D scalar access
@@ -118,7 +118,7 @@ def test_3d_from_ndarray_and_indexing():
 
 def test_field_views_readonly_and_shape_preserved():
     items = [Simple(1, 2.0), Simple(3, 4.0)]
-    nta = NamedTupleArray(items)
+    nta = NamedTupleArray(items, frozen=False)
     assert nta.flags.writeable is True
     vx = nta["x"]
     assert vx.flags.writeable is False
@@ -342,13 +342,13 @@ def test_ndarray_last_axis_mismatch():
     # Simple has 2 fields, but array has 3 columns
     arr = np.array([[1, 2.0, 3.0], [4, 5.0, 6.0]])
     with pytest.raises(ValueError):
-        NamedTupleArray.from_ndarray(arr, Simple)
+        NamedTupleArray.from_array(arr, Simple)
 
 
 def test_frozen_from_ndarray():
     """Test that from_ndarray with frozen=True works correctly."""
     arr = np.array([[1, 2.0], [3, 4.0]])
-    nta = NamedTupleArray.from_ndarray(arr, Simple, frozen=True)
+    nta = NamedTupleArray.from_array(arr, Simple, frozen=True)
 
     assert nta.shape == (2,)
     assert nta.items.flags.writeable is False
@@ -497,7 +497,7 @@ def test_from_ndarray_0d_array():
     """Test that from_ndarray with 0D array raises error."""
     arr = np.array(2.0)
     with pytest.raises(ValueError, match="at least 1 dimension"):
-        NamedTupleArray.from_ndarray(arr, Simple)
+        NamedTupleArray.from_array(arr, Simple)
 
 
 def test_multidimensional_iteration():
@@ -599,7 +599,7 @@ def test_from_ndarray_empty_fields():
     # Just verify the function is defined and doesn't break in normal usage
     # The empty fields check is hard to trigger naturally
     arr = np.array([[1, 2.0], [3, 4.0]])
-    nta = NamedTupleArray.from_ndarray(arr, Simple)
+    nta = NamedTupleArray.from_array(arr, Simple)
     assert nta.shape == (2,)
 
 
@@ -631,7 +631,7 @@ def test_property_with_exception_in_heuristic():
 def test_from_ndarray_3d_array():
     """Test from_ndarray with 3D array."""
     arr = np.array([[[1, 2.0], [3, 4.0]], [[5, 6.0], [7, 8.0]]], dtype=float)
-    nta = NamedTupleArray.from_ndarray(arr, Simple)
+    nta = NamedTupleArray.from_array(arr, Simple)
 
     assert nta.shape == (2, 2)
     assert nta[0, 1] == Simple(3, 4.0)
@@ -656,4 +656,123 @@ def test_from_ndarray_empty_namedtuple():
 
     arr = np.array([], dtype=float)
     with pytest.raises(RuntimeError, match="no fields"):
-        NamedTupleArray.from_ndarray(arr, Empty)
+        NamedTupleArray.from_array(arr, Empty)
+
+
+def test_equality_identical_arrays():
+    """Test that two NamedTupleArray instances with identical data are equal."""
+    items1 = [Simple(1, 2.0), Simple(3, 4.5)]
+    items2 = [Simple(1, 2.0), Simple(3, 4.5)]
+
+    arr1 = NamedTupleArray(items1)
+    arr2 = NamedTupleArray(items2)
+
+    assert arr1 == arr2
+    assert arr2 == arr1  # Test equality is symmetric
+
+
+def test_equality_different_values():
+    """Test that NamedTupleArray instances with different values are not equal."""
+    items1 = [Simple(1, 2.0), Simple(3, 4.5)]
+    items2 = [Simple(1, 2.0), Simple(3, 5.0)]
+
+    arr1 = NamedTupleArray(items1)
+    arr2 = NamedTupleArray(items2)
+
+    assert arr1 != arr2
+
+
+def test_equality_different_lengths():
+    """Test that NamedTupleArray instances with different lengths are not equal."""
+    items1 = [Simple(1, 2.0), Simple(3, 4.5)]
+    items2 = [Simple(1, 2.0), Simple(3, 4.5), Simple(5, 6.0)]
+
+    arr1 = NamedTupleArray(items1)
+    arr2 = NamedTupleArray(items2)
+
+    assert arr1 != arr2
+
+
+def test_equality_different_types():
+    """Test that NamedTupleArray instances with different NamedTuple types are not equal."""
+    simple_items = [Simple(1, 2.0), Simple(3, 4.5)]
+    breath_items = [Breath(1.0, 2.0, 3.0), Breath(3.0, 4.0, 5.0)]
+
+    arr1 = NamedTupleArray(simple_items)
+    arr2 = NamedTupleArray(breath_items)
+
+    assert arr1 != arr2
+
+
+def test_equality_with_nan_values():
+    """Test that NamedTupleArray instances with NaN values can be compared correctly."""
+    items1 = [Simple(1, np.nan), Simple(3, 4.5)]
+    items2 = [Simple(1, np.nan), Simple(3, 4.5)]
+
+    arr1 = NamedTupleArray(items1)
+    arr2 = NamedTupleArray(items2)
+
+    # NaN values should be considered equal in this comparison
+    assert arr1 == arr2
+
+
+def test_equality_with_nan_different_positions():
+    """Test that NamedTupleArray with NaN in different positions are not equal."""
+    items1 = [Simple(1, np.nan), Simple(3, 4.5)]
+    items2 = [Simple(1, 2.0), Simple(3, np.nan)]
+
+    arr1 = NamedTupleArray(items1)
+    arr2 = NamedTupleArray(items2)
+
+    assert arr1 != arr2
+
+
+def test_equality_2d_arrays():
+    """Test equality comparison for 2D NamedTupleArray instances."""
+    nested1 = [[Simple(i + j, float(i * j)) for j in range(3)] for i in range(2)]
+    nested2 = [[Simple(i + j, float(i * j)) for j in range(3)] for i in range(2)]
+
+    arr1 = NamedTupleArray(nested1)
+    arr2 = NamedTupleArray(nested2)
+
+    assert arr1 == arr2
+
+
+def test_equality_2d_arrays_different():
+    """Test inequality for 2D NamedTupleArray instances with different values."""
+    nested1 = [[Simple(i + j, float(i * j)) for j in range(3)] for i in range(2)]
+    nested2 = [[Simple(i + j + 1, float(i * j)) for j in range(3)] for i in range(2)]
+
+    arr1 = NamedTupleArray(nested1)
+    arr2 = NamedTupleArray(nested2)
+
+    assert arr1 != arr2
+
+
+def test_equality_not_equal_to_non_namedtuplearray():
+    """Test that NamedTupleArray is not equal to other types."""
+    items = [Simple(1, 2.0), Simple(3, 4.5)]
+    arr = NamedTupleArray(items)
+
+    # Test inequality with list
+    assert arr != items
+
+    # Test inequality with numpy array
+    assert arr != np.array([(1, 2.0), (3, 4.5)])
+
+    # Test inequality with None
+    assert arr is not None
+
+    # Test inequality with string
+    assert arr != "not an array"
+
+
+def test_equality_frozen_and_unfrozen():
+    """Test that frozen and unfrozen arrays with same data are equal."""
+    items1 = [Simple(1, 2.0), Simple(3, 4.5)]
+    items2 = [Simple(1, 2.0), Simple(3, 4.5)]
+
+    arr_frozen = NamedTupleArray(items1, frozen=True)
+    arr_unfrozen = NamedTupleArray(items2, frozen=False)
+
+    assert arr_frozen == arr_unfrozen
