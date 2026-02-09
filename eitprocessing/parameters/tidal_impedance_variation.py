@@ -3,7 +3,7 @@ import sys
 import warnings
 from dataclasses import InitVar, dataclass, field
 from functools import singledispatchmethod
-from typing import Final, Literal, NoReturn
+from typing import Final, Literal
 
 import numpy as np
 
@@ -13,6 +13,7 @@ from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
+from eitprocessing.datahandling.structured_array import StructuredArray
 from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.features.pixel_breath import PixelBreath
 from eitprocessing.parameters import ParameterCalculation
@@ -73,7 +74,7 @@ class TIV(ParameterCalculation):
     def compute_parameter(
         self,
         data: ContinuousData | EITData,
-    ) -> NoReturn:
+    ) -> SparseData:
         """Compute the tidal impedance variation per breath on either ContinuousData or EITData, depending on the input.
 
         Args:
@@ -282,12 +283,12 @@ class TIV(ParameterCalculation):
         self,
         data: np.ndarray,
         time: np.ndarray,
-        breaths: list[Breath],
+        breaths: StructuredArray[Breath],
         tiv_method: str,
         tiv_timing: str,  # noqa: ARG002 # remove when restructuring
     ) -> list:
         # Filter out None breaths
-        breaths = np.array(breaths)
+
         valid_breath_indices = np.flatnonzero([breath is not None for breath in breaths])
         valid_breaths = breaths[valid_breath_indices]
 
