@@ -360,16 +360,16 @@ def test_create_breaths_from_peak_valley_data():
     breaths = bd._create_breaths_from_peak_valley_data(time, peak_indices, valley_indices)
     assert len(breaths) == 5
     assert all(isinstance(breath, Breath) for breath in breaths)
-    assert np.array_equal(np.array([breath.start_time for breath in breaths]), time[valley_indices[:-1]])
-    assert np.array_equal(np.array([breath.middle_time for breath in breaths]), time[peak_indices])
-    assert np.array_equal(np.array([breath.end_time for breath in breaths]), time[valley_indices[1:]])
+    assert np.array_equal(breaths["start_time"], time[valley_indices[:-1]])
+    assert np.array_equal(breaths["middle_time"], time[peak_indices])
+    assert np.array_equal(breaths["end_time"], time[valley_indices[1:]])
 
     fewer_valley_indices = valley_indices[:-1]
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="all the input array dimensions .* must match exactly"):
         bd._create_breaths_from_peak_valley_data(time, peak_indices, fewer_valley_indices)
 
     fewer_peak_indices = peak_indices[:-1]
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="all the input array dimensions .* must match exactly"):
         bd._create_breaths_from_peak_valley_data(time, fewer_peak_indices, valley_indices)
 
     peaks_out_of_order = np.concatenate([peak_indices[3:], peak_indices[:3]])

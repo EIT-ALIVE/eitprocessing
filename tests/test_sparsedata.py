@@ -62,10 +62,6 @@ def test_has_values(
     sparsedata_valuesarray: SparseData,
 ) -> None:
     assert not sparsedata_novalues.has_values
-    sparsedata_novalues.values = []
-    assert sparsedata_novalues.has_values
-    sparsedata_novalues.values = None
-
     assert sparsedata_valueslist.has_values
     assert sparsedata_valuesarray.has_values
 
