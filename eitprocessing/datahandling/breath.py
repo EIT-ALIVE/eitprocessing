@@ -1,8 +1,13 @@
-from collections.abc import Iterator
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
-@dataclass
+@dataclass(frozen=True)
 class Breath:
     """Represents a breath with a start, middle and end time."""
 
@@ -14,7 +19,7 @@ class Breath:
         if self.start_time >= self.middle_time or self.middle_time >= self.end_time:
             msg = (
                 "Start, middle and end should be consecutive, not "
-                "{self.start_time:.2f}, {self.middle_time:.2f} and {self.end_time:.2f}"
+                f"{self.start_time:.2f}, {self.middle_time:.2f} and {self.end_time:.2f}"
             )
             raise ValueError(msg)
 

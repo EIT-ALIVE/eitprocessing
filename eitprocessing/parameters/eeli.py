@@ -109,8 +109,6 @@ class EELI(ParameterCalculation):
             category="impedance",
             time=time,
             description="End-expiratory lung impedance (EELI) determined on continuous data",
-            parameters=self.breath_detection_kwargs,
-            derived_from=[continuous_data],
             values=values,
         )
         if store:

@@ -62,8 +62,6 @@ def mock_continuous_data():
         unit="au",
         category="relative impedance",
         description="Global impedance created for testing pixel breath feature",
-        parameters={},
-        derived_from="mock_eit_data",
         time=np.linspace(0, 2 * np.pi, 400),
         values=mock_global_impedance(),
         sample_frequency=399 / 2 * np.pi,
@@ -75,13 +73,12 @@ def mock_eit_data():
     """Fixture to provide an instance of EITData."""
     return EITData(
         path="",
-        nframes=400,
         time=np.linspace(0, 2 * np.pi, 400),
         sample_frequency=399 / 2 * np.pi,
         vendor=Vendor.DRAEGER,
         label="mock_eit_data",
         name="mock_eit_data",
-        pixel_impedance=mock_pixel_impedance(),
+        values=mock_pixel_impedance(),
     )
 
 
@@ -113,13 +110,12 @@ def mock_zero_eit_data():
     """Fixture to provide an instance of EITData with one element set to zero."""
     return EITData(
         path="",
-        nframes=400,
         time=np.linspace(0, 2 * np.pi, 400),
         sample_frequency=399 / 2 * np.pi,
         vendor=Vendor.DRAEGER,
         label="mock_eit_data",
         name="mock_eit_data",
-        pixel_impedance=mock_pixel_impedance_one_zero(),
+        values=mock_pixel_impedance_one_zero(),
     )
 
 
@@ -172,8 +168,6 @@ def mock_compute_pixel_parameter(mean: int):
             category="impedance difference",
             time=time,
             description="Mock tidal impedance variation",
-            parameters={},
-            derived_from=[],
             values=values,
         )
 
@@ -318,7 +312,7 @@ def test_with_custom_mean_pixel_tiv(
         for row, col in itertools.product(range(2), range(2)):
             time_point = test_result[1, row, col].middle_time
             index = np.where(mock_eit_data.time == time_point)[0]
-            value_at_time = mock_eit_data.pixel_impedance[index[0], row, col]
+            value_at_time = mock_eit_data.values[index[0], row, col]
             if mean == -1:
                 assert np.isclose(value_at_time, -1, atol=0.01)
             elif mean == 1:
@@ -393,16 +387,18 @@ def test_phase_modes(draeger_50hz_healthy_volunteer_pressure_pod: Sequence, pyte
     eit_data = sequence.eit_data["raw"]
 
     # reduce the pixel set to some 'well-behaved' pixels with positive TIV
-    eit_data.pixel_impedance = eit_data.pixel_impedance[:, 14:20, 14:20]
+    eit_data = eit_data.update(values=eit_data.values[:, 14:20, 14:20])
 
     # flip a single pixel, so the differences between algorithms becomes predictable
     flip_row, flip_col = 5, 5
-    eit_data.pixel_impedance[:, flip_row, flip_col] = -eit_data.pixel_impedance[:, flip_row, flip_col]
+    new_values = eit_data.values.copy()
+    new_values[:, flip_row, flip_col] = -new_values[:, flip_row, flip_col]
+    eit_data = eit_data.update(values=new_values)
 
     cd = sequence.continuous_data["global_impedance_(raw)"]
 
     # replace the 'global' data with the sum of the middly pixels
-    cd.values = np.sum(eit_data.pixel_impedance, axis=(1, 2))
+    cd = cd.update(values=np.sum(eit_data.values, axis=(1, 2)))
 
     pb_negative_amplitude = PixelBreath(phase_correction_mode="negative amplitude").find_pixel_breaths(eit_data, cd)
     pb_phase_shift = PixelBreath(phase_correction_mode="phase shift").find_pixel_breaths(eit_data, cd)

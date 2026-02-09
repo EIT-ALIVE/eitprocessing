@@ -48,15 +48,12 @@ def simulated_eit_data():
 
         pixel_impedance = sinusoid_shape * amplitude + end_expiratory_value
         return EITData(
-            pixel_impedance=pixel_impedance,
-            path="",
-            nframes=len(time),
+            values=pixel_impedance,
             time=time,
             sample_frequency=sample_frequency,
             vendor=Vendor.SIMULATED,
             label="simulated",
             description="Simulated EIT data for testing purposes",
-            name="",
             suppress_simulated_warning=True,
         )
 
@@ -164,15 +161,12 @@ def test_watershed_captures(draeger_50hz_healthy_volunteer_pressure_pod: Sequenc
 
 def test_watershed_no_amplitude():
     eit_data = EITData(
-        pixel_impedance=np.ones((100, 32, 32)),
-        path="",
-        nframes=100,
+        values=np.ones((100, 32, 32)),
         time=np.arange(100) / 20,
         sample_frequency=20,
         vendor=Vendor.SIMULATED,
         label="simulated",
         description="Simulated EIT data with no amplitude",
-        name="",
         suppress_simulated_warning=True,
     )
     with pytest.raises(ValueError, match="No breaths found in TIV or amplitude data"):

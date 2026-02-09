@@ -11,7 +11,7 @@ from eitprocessing.datahandling.mixins.slicing import SelectByTime
 T = TypeVar("T", bound="SparseData")
 
 
-@dataclass(eq=False)
+@dataclass(eq=False, frozen=True)
 class SparseData(DataContainer, SelectByTime):
     """Container for data related to individual time points.
 
@@ -30,8 +30,6 @@ class SparseData(DataContainer, SelectByTime):
         unit: Unit of the data, if applicable.
         category: Category the data falls into, e.g. 'detected r peak'.
         description: Human readable extended description of the data.
-        parameters: Parameters used to derive the data.
-        derived_from: Traceback of intermediates from which the current data was derived.
         values: List or array of values. These van be numeric data, text or Python objects.
     """
 
@@ -41,8 +39,6 @@ class SparseData(DataContainer, SelectByTime):
     category: str = field(metadata={"check_equivalence": True}, repr=False)
     time: np.ndarray = field(repr=False)
     description: str = field(compare=False, default="", repr=False)
-    parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True}, repr=False)
-    derived_from: list[Any] = field(default_factory=list, compare=False, repr=False)
     values: Any | None = None
 
     def __repr__(self) -> str:
@@ -78,7 +74,6 @@ class SparseData(DataContainer, SelectByTime):
             unit=self.unit,
             category=self.category,
             description=description,
-            derived_from=[*self.derived_from, self],
             time=time,
             values=values,
         )
@@ -122,7 +117,6 @@ class SparseData(DataContainer, SelectByTime):
             unit=self.unit,
             category=self.category,
             description=self.description,
-            derived_from=[*self.derived_from, *other.derived_from, self, other],
             time=np.concatenate((self.time, other.time)),
             values=new_values,
         )

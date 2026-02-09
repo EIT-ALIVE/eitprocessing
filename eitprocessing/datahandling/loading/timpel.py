@@ -10,9 +10,10 @@ from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
-from eitprocessing.datahandling.intervaldata import IntervalData
+from eitprocessing.datahandling.intervaldata import Interval, IntervalData
 from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sparsedata import SparseData
+from eitprocessing.datahandling.structured_array import StructuredArray
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -96,10 +97,9 @@ def load_from_single_path(
         vendor=Vendor.TIMPEL,
         label="raw",
         path=path,
-        nframes=nframes,
         time=time,
         sample_frequency=sample_frequency,
-        pixel_impedance=pixel_impedance,
+        values=pixel_impedance,
     )
     eitdata_collection = DataCollection(EITData, raw=eit_data)
 
@@ -109,13 +109,13 @@ def load_from_single_path(
     continuousdata_collection = DataCollection(ContinuousData)
     continuousdata_collection.add(
         ContinuousData(
-            "global_impedance_(raw)",
-            "Global impedance",
-            "a.u.",
-            "global_impedance",
-            "Global impedance calculated from raw EIT data",
             time=time,
             values=eit_data.calculate_global_impedance(),
+            label="global_impedance_(raw)",
+            name="Global impedance",
+            unit="a.u.",
+            category="global_impedance",
+            description="Global impedance calculated from raw EIT data",
             sample_frequency=sample_frequency,
         ),
     )
@@ -168,7 +168,6 @@ def load_from_single_path(
             name="Minimum values detected by Timpel device.",
             unit=None,
             category="minvalue",
-            derived_from=[eit_data],
             time=time[min_indices],
         ),
     )
@@ -180,14 +179,13 @@ def load_from_single_path(
             name="Maximum values detected by Timpel device.",
             unit=None,
             category="maxvalue",
-            derived_from=[eit_data],
             time=time[max_indices],
         ),
     )
 
     gi = continuousdata_collection["global_impedance_(raw)"].values
 
-    time_ranges, breaths = _make_breaths(time, min_indices, max_indices, gi)
+    intervals, breaths = _make_breaths(time, min_indices, max_indices, gi)
     intervaldata_collection = DataCollection(IntervalData)
     intervaldata_collection.add(
         IntervalData(
@@ -195,7 +193,7 @@ def load_from_single_path(
             name="Breaths (Timpel)",
             unit=None,
             category="breaths",
-            intervals=time_ranges,
+            intervals=intervals,
             values=breaths,
             default_partial_inclusion=False,
         ),
@@ -208,7 +206,6 @@ def load_from_single_path(
             name="QRS complexes detected by Timpel device",
             unit=None,
             category="qrs_complex",
-            derived_from=[eit_data],
             time=time[qrs_indices],
         ),
     )
@@ -226,12 +223,12 @@ def _make_breaths(
     min_indices: np.ndarray,
     max_indices: np.ndarray,
     gi: np.ndarray,
-) -> tuple[list[tuple[float, float]], list[Breath]]:
+) -> tuple[StructuredArray[Interval], StructuredArray[Breath]]:
     # TODO: replace section with BreathDetection._remove_doubles() and BreathDetection._remove_edge_cases() from
     # 41_breath_detection_psomhorst; this code was directly copied from b59ac54
 
     if len(min_indices) < 2 or len(max_indices) < 1:  # noqa: PLR2004
-        return [], []
+        return StructuredArray([], Interval), StructuredArray([], Breath)
 
     valley_indices = min_indices.copy()
     peak_indices = max_indices.copy()
@@ -276,9 +273,8 @@ def _make_breaths(
 
         current_valley_index += 1
 
-    breaths = []
-    for start, end, middle in zip(valley_indices[:-1], valley_indices[1:], peak_indices, strict=True):
-        breaths.append(((time[start], time[end]), Breath(time[start], time[middle], time[end])))
+    times = time[np.column_stack([valley_indices[:-1], peak_indices, valley_indices[1:]])]
+    breaths = StructuredArray.from_array(times, Breath)
+    intervals = StructuredArray.from_array(times[:, [0, 2]], Interval)
 
-    time_ranges, values = zip(*breaths, strict=True)
-    return list(time_ranges), list(values)
+    return intervals, breaths

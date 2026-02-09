@@ -152,7 +152,7 @@ class RateDetection:
             set to segment length - 1.
 
         """
-        pixel_impedance = eit_data.pixel_impedance.copy().astype(np.float32)
+        pixel_impedance = eit_data.values.copy().astype(np.float32)
         summed_impedance = np.nansum(pixel_impedance, axis=(1, 2))
         len_segment = int(self.welch_window * eit_data.sample_frequency)
 

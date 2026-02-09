@@ -73,8 +73,6 @@ def mock_continuous_data():
         unit="au",
         category="relative impedance",
         description="Global impedance created for testing TIV parameter",
-        parameters={},
-        derived_from="mock_eit_data",
         time=np.linspace(0, 18, (18 * 1000), endpoint=False),
         values=mock_global_impedance(),
         sample_frequency=1000,
@@ -86,13 +84,12 @@ def mock_eit_data():
     """Fixture to provide an instance of EITData."""
     return EITData(
         path="",
-        nframes=2000,
         time=np.linspace(0, 18, (18 * 1000), endpoint=False),
         sample_frequency=1000,
         vendor=Vendor.DRAEGER,
         label="mock_eit_data",
         name="mock_eit_data",
-        pixel_impedance=mock_pixel_impedance(),
+        values=mock_pixel_impedance(),
     )
 
 
@@ -421,8 +418,6 @@ def test_tiv_with_no_breaths_continuous(mock_continuous_data: ContinuousData):
                 category="breath",
                 intervals=[],
                 values=[],
-                parameters={},
-                derived_from=[],
             ),
         ),
         patch.object(tiv, "_calculate_tiv_values", return_value=[]),
@@ -449,8 +444,6 @@ def test_tiv_with_no_breaths_pixel(
                 category="breath",
                 intervals=[],
                 values=np.empty((0, 2, 2), dtype=object),
-                parameters={},
-                derived_from=[],
             ),
         ),
         patch.object(tiv, "_calculate_tiv_values", return_value=[]),

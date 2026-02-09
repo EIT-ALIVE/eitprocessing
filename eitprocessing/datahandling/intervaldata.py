@@ -1,24 +1,39 @@
+import contextlib
 import copy
+import itertools
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Any, NamedTuple, TypeVar
+from typing import Any, TypeVar
 
 import numpy as np
 from typing_extensions import Self
 
 from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer, SelectByIndex
+from eitprocessing.datahandling.structured_array import StructuredArray
 
 T = TypeVar("T", bound="IntervalData")
 
 
-class Interval(NamedTuple):
+@dataclass(frozen=True)
+class Interval:
     """A tuple containing the start time and end time of an interval."""
 
     start_time: float
     end_time: float
 
+    def __post_init__(self):
+        if self.start_time >= self.end_time:
+            msg = f"Interval start time ({self.start_time:.2f}) must be less than end time ({self.end_time:.2f})."
+            raise ValueError(msg)
 
-@dataclass(eq=False)
+    @property
+    def duration(self) -> float:
+        """Duration of the interval."""
+        return self.end_time - self.start_time
+
+
+@dataclass(eq=False, frozen=True)
 class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
     """Container for interval data existing over a period of time.
 
@@ -43,8 +58,6 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
         category: Category the data falls into, e.g. 'breath'.
         intervals: A list of intervals (tuples containing a start time and end time).
         values: An optional list of values associated with each interval.
-        parameters: Parameters used to derive the data.
-        derived_from: Traceback of intermediates from which the current data was derived.
         description: Extended human readible description of the data.
         default_partial_inclusion: Whether to include a trimmed version of an interval when selecting data
     """
@@ -53,19 +66,77 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
     name: str = field(compare=False, repr=False)
     unit: str | None = field(metadata={"check_equivalence": True}, repr=False)
     category: str = field(metadata={"check_equivalence": True}, repr=False)
-    intervals: list[Interval | tuple[float, float]] = field(repr=False)
-    values: list[Any] | None = field(repr=False, default=None)
-    parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True}, repr=False)
-    derived_from: list[Any] = field(default_factory=list, compare=False, repr=False)
+    intervals: StructuredArray[Interval] = field(repr=False)
+    values: list[Any] | np.ndarray | None | StructuredArray = field(repr=False, default=None)
     description: str = field(compare=False, default="", repr=False)
     default_partial_inclusion: bool = field(repr=False, default=False)
 
     def __post_init__(self) -> None:
-        self.intervals = [Interval._make(interval) for interval in self.intervals]
+        object.__setattr__(self, "intervals", self._parse_intervals(self.intervals))
 
-        if self.has_values and (lv := len(self.values)) != (lt := len(self.intervals)):
+        if self.values is not None and len(self.values) == 0:
+            object.__setattr__(self, "values", None)
+
+        if self.values is not None and (lv := len(self.values)) != (lt := len(self.intervals)):
             msg = f"The number of time points ({lt}) does not match the number of values ({lv})."
             raise ValueError(msg)
+
+        if isinstance(self.values, list):
+            try:
+                object.__setattr__(self, "values", StructuredArray(self.values))
+            except TypeError:
+                object.__setattr__(self, "values", np.array(self.values))
+
+    def __iter__(self) -> Iterator[tuple[Interval, Any | None]]:
+        if self.values is not None:
+            return iter(zip(self.intervals, self.values, strict=True))
+
+        return iter(zip(self.intervals, itertools.repeat(None), strict=False))
+
+    @staticmethod
+    def _parse_intervals(
+        intervals: list[Interval] | np.ndarray | StructuredArray[Interval],
+    ) -> StructuredArray[Interval]:
+        """Parse intervals into a StructuredArray of Interval."""
+        if isinstance(intervals, StructuredArray):
+            if intervals.item_type is not Interval:
+                msg = f"Expected intervals of type 'Interval', got '{intervals.dtype}'"
+                raise TypeError(msg)
+            if intervals.items.ndim != 2 or intervals.items.shape[1] != 2:  # noqa: PLR2004
+                msg = f"Intervals should be a 1D array of Interval, got {intervals.items.ndim + 1}D array."
+            return intervals
+
+        if isinstance(intervals, np.ndarray):
+            if intervals.ndim != 2 or intervals.shape[1] != 2:  # noqa: PLR2004
+                msg = f"Intervals should be a 2D array (1D array of Interval data), got {intervals.ndim}D array."
+                raise ValueError(msg)
+            try:
+                return StructuredArray.from_array(intervals, item_type=Interval)
+            except ValueError as e:
+                msg = f"Could not parse intervals from numpy array with dtype '{intervals.dtype}'"
+                raise TypeError(msg) from e
+
+        if isinstance(intervals, list | tuple):
+            with contextlib.suppress(TypeError):
+                return StructuredArray(intervals, item_type=Interval)
+
+            with contextlib.suppress(TypeError):
+                return StructuredArray([Interval(*interval) for interval in intervals], item_type=Interval)
+
+            with contextlib.suppress(TypeError):
+                return StructuredArray.from_array(intervals, item_type=Interval)
+
+            msg = (
+                "Could not parse intervals from given input. Intervals should be a list of Interval objects, a 2D "
+                "numpy array, or a StructuredArray of Interval."
+            )
+            raise TypeError(msg)
+
+        try:
+            return StructuredArray.from_array(intervals, Interval)
+        except Exception as e:
+            msg = "Could not parse intervals from given input."
+            raise TypeError(msg) from e
 
     def __len__(self) -> int:
         return len(self.intervals)
@@ -92,9 +163,9 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
             unit=self.unit,
             category=self.category,
             description=description,
-            derived_from=[*self.derived_from, self],
             intervals=intervals,
             values=values,
+            default_partial_inclusion=self.default_partial_inclusion,
         )
 
     def select_by_time(
@@ -128,12 +199,6 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
         """
         newlabel = newlabel or self.label
 
-        if start_time is None and end_time is None:
-            copy_ = copy.deepcopy(self)
-            copy_.derived_from.append(self)
-            copy_.label = newlabel
-            return copy_
-
         partial_inclusion = partial_inclusion or self.default_partial_inclusion
 
         selection_start = start_time or self.intervals[0].start_time
@@ -157,9 +222,9 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
             name=self.name,
             unit=self.unit,
             category=self.category,
-            derived_from=[*self.derived_from, self],
             intervals=list(filtered_intervals),
             values=values,
+            default_partial_inclusion=self.default_partial_inclusion,
         )
 
     @staticmethod
@@ -228,7 +293,6 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
             unit=self.unit,
             category=self.category,
             description=self.description,
-            derived_from=[*self.derived_from, *other.derived_from, self, other],
             intervals=self.intervals + other.intervals,
             values=new_values,
         )

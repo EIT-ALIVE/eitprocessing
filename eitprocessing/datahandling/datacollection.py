@@ -93,18 +93,6 @@ class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
             )
             raise KeyError(msg)
 
-    def get_loaded_data(self) -> dict[str, V]:
-        """Return all data that was directly loaded from disk."""
-        return {k: v for k, v in self.items() if v.loaded}
-
-    def get_data_derived_from(self, obj: V) -> dict[str, V]:
-        """Return all data that was derived from a specific source."""
-        return {k: v for k, v in self.items() if any(obj is item for item in v.derived_from)}
-
-    def get_derived_data(self) -> dict[str, V]:
-        """Return all data that was derived from any source."""
-        return {k: v for k, v in self.items() if v.derived_from}
-
     def concatenate(self: Self, other: Self) -> Self:
         """Concatenate this collection with an equivalent collection.
 

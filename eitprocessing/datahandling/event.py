@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class Event:
     """Single time point event registered during an EIT measurement."""
 

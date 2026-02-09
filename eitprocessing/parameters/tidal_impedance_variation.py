@@ -3,7 +3,7 @@ import sys
 import warnings
 from dataclasses import InitVar, dataclass, field
 from functools import singledispatchmethod
-from typing import Final, Literal, NoReturn
+from typing import Final, Literal
 
 import numpy as np
 
@@ -13,6 +13,7 @@ from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.intervaldata import IntervalData
 from eitprocessing.datahandling.sequence import Sequence
 from eitprocessing.datahandling.sparsedata import SparseData
+from eitprocessing.datahandling.structured_array import StructuredArray
 from eitprocessing.features.breath_detection import BreathDetection
 from eitprocessing.features.pixel_breath import PixelBreath
 from eitprocessing.parameters import ParameterCalculation
@@ -73,7 +74,7 @@ class TIV(ParameterCalculation):
     def compute_parameter(
         self,
         data: ContinuousData | EITData,
-    ) -> NoReturn:
+    ) -> SparseData:
         """Compute the tidal impedance variation per breath on either ContinuousData or EITData, depending on the input.
 
         Args:
@@ -142,7 +143,6 @@ class TIV(ParameterCalculation):
             category="impedance difference",
             time=[breath.middle_time for breath in breaths.values if breath is not None],
             description="Tidal impedance variation determined on continuous data",
-            derived_from=[continuous_data],
             values=tiv_values,
         )
         if store:
@@ -203,7 +203,7 @@ class TIV(ParameterCalculation):
             msg = f"Invalid {tiv_timing}. The tiv_timing must be either 'continuous' or 'pixel'."
             raise ValueError(msg)
 
-        data = eit_data.pixel_impedance
+        data = eit_data.values
         _, n_rows, n_cols = data.shape
 
         if tiv_timing == "pixel":
@@ -253,7 +253,6 @@ class TIV(ParameterCalculation):
             category="impedance difference",
             time=list(all_pixels_breath_timings),
             description="Tidal impedance variation determined on pixel impedance",
-            derived_from=[eit_data],
             values=list(all_pixels_tiv_values.astype(float)),
         )
 
@@ -284,12 +283,12 @@ class TIV(ParameterCalculation):
         self,
         data: np.ndarray,
         time: np.ndarray,
-        breaths: list[Breath],
+        breaths: StructuredArray[Breath],
         tiv_method: str,
         tiv_timing: str,  # noqa: ARG002 # remove when restructuring
     ) -> list:
         # Filter out None breaths
-        breaths = np.array(breaths)
+
         valid_breath_indices = np.flatnonzero([breath is not None for breath in breaths])
         valid_breaths = breaths[valid_breath_indices]
 

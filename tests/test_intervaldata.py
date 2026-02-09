@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from eitprocessing.datahandling.intervaldata import Interval, IntervalData
+from eitprocessing.datahandling.structured_array import StructuredArray
 
 
 @pytest.fixture
@@ -77,7 +78,7 @@ def intervaldata_valuesarray_partialfalse():
 
 
 def test_post_init(intervaldata_novalues_partialtrue: IntervalData):
-    assert isinstance(intervaldata_novalues_partialtrue.intervals, list)
+    assert isinstance(intervaldata_novalues_partialtrue.intervals, StructuredArray)
     assert all(isinstance(interval, Interval) for interval in intervaldata_novalues_partialtrue.intervals)
 
 
@@ -92,11 +93,6 @@ def test_has_values(
     intervaldata_valuesarray_partialfalse: IntervalData,
 ) -> None:
     assert not intervaldata_novalues_partialtrue.has_values
-    intervaldata_novalues_partialtrue.values = []
-    assert intervaldata_novalues_partialtrue.has_values
-    intervaldata_novalues_partialtrue.values = None
-    assert not intervaldata_novalues_partialtrue.has_values
-
     assert not intervaldata_novalues_partialfalse.has_values
     assert intervaldata_valueslist_partialfalse.has_values
     assert intervaldata_valuesarray_partialfalse.has_values
@@ -162,21 +158,23 @@ def test_select_by_time(
 
 
 def test_select_by_time_values(intervaldata_valueslist_partialfalse: IntervalData):
-    assert isinstance(intervaldata_valueslist_partialfalse.values, list)
+    assert isinstance(intervaldata_valueslist_partialfalse.values, np.ndarray)
 
     sliced_copy = intervaldata_valueslist_partialfalse[:10]
     assert len(sliced_copy.intervals) == len(sliced_copy.values)
-    assert sliced_copy.values == intervaldata_valueslist_partialfalse.values[:10]
+    assert np.all(sliced_copy.values == intervaldata_valueslist_partialfalse.values[:10])
 
 
 def test_concatenate(intervaldata_novalues_partialtrue: IntervalData):
     sliced_copy_1 = intervaldata_novalues_partialtrue[:10]
     sliced_copy_2 = intervaldata_novalues_partialtrue[10:20]
+    assert isinstance(sliced_copy_1.intervals, StructuredArray)
 
     assert len(sliced_copy_1) == 10
     assert len(sliced_copy_2) == 10
 
     concatenated = sliced_copy_1 + sliced_copy_2
+    assert isinstance(concatenated.intervals, StructuredArray)
     assert len(concatenated) == 20
     assert concatenated == sliced_copy_1.concatenate(sliced_copy_2)
 
@@ -197,8 +195,8 @@ def test_concatenate_values_list(intervaldata_valueslist_partialfalse: IntervalD
 
     concatenated = sliced_copy_1 + sliced_copy_2
     assert len(concatenated.intervals) == len(concatenated.values)
-    assert isinstance(intervaldata_valueslist_partialfalse.values, list)
-    assert concatenated.values == intervaldata_valueslist_partialfalse.values[:20]
+    assert isinstance(intervaldata_valueslist_partialfalse.values, np.ndarray)
+    assert np.all(concatenated.values == intervaldata_valueslist_partialfalse.values[:20])
 
 
 def test_concatenate_values_numpy(intervaldata_valuesarray_partialfalse: IntervalData):
@@ -215,5 +213,7 @@ def test_concatenate_values_type_mismatch(
     intervaldata_valueslist_partialfalse: IntervalData,
     intervaldata_valuesarray_partialfalse: IntervalData,
 ):
-    with pytest.raises(TypeError):
-        intervaldata_valueslist_partialfalse[:10] + intervaldata_valuesarray_partialfalse[10:]
+    intervaldata_valueslist_partialfalse[:10] + intervaldata_valuesarray_partialfalse[10:]
+
+
+# TODO: add tests for IntervalData selection and concatenation with StructuredArray

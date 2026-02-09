@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from eitprocessing.datahandling.continuousdata import DataContainer
+from eitprocessing.datahandling import DataContainer
 
 
 class ParameterCalculation(ABC):

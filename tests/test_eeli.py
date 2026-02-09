@@ -18,10 +18,10 @@ def create_continuous_data_object():
     def internal(sample_frequency: float, duration: float, frequency: float) -> ContinuousData:
         time, values = _make_cosine_wave(sample_frequency, duration, frequency)
         return ContinuousData(
-            "label",
-            "name",
-            "unit",
-            "impedance",
+            label="label",
+            name="name",
+            unit="unit",
+            category="impedance",
             time=time,
             values=values,
             sample_frequency=sample_frequency,
@@ -119,12 +119,9 @@ def test_with_data(draeger_20hz_healthy_volunteer_pressure_pod: Sequence, pytest
 
 def test_non_impedance_data(draeger_20hz_healthy_volunteer_pressure_pod: Sequence) -> None:
     cd = draeger_20hz_healthy_volunteer_pressure_pod.continuous_data["global_impedance_(raw)"]
-    original_category = cd.category
 
     _ = EELI().compute_parameter(cd)
 
-    cd.category = "foo"
+    cd = cd.update(category="foo")
     with pytest.raises(ValueError, match="This method will only work on 'impedance' data, not 'foo'."):
         _ = EELI().compute_parameter(cd)
-
-    cd.category = original_category

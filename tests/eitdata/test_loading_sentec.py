@@ -29,8 +29,8 @@ def test_load_sentec_single_file(
     assert isinstance(eit_data, EITData)
     assert np.isclose(eit_data.sample_frequency, 50.2, rtol=2e-2), "Sample frequency should be approximately 50.2 Hz"
     assert len(eit_data.time) > 0, "Time axis should not be empty"
-    assert len(eit_data.time) == len(eit_data.pixel_impedance), "Length of time axis should match number of frames"
-    assert len(eit_data) == len(eit_data.pixel_impedance), "Length of EITData should match number of frames"
+    assert len(eit_data.time) == len(eit_data.values), "Length of time axis should match number of frames"
+    assert len(eit_data) == len(eit_data.values), "Length of EITData should match number of frames"
 
     assert len(sequence.continuous_data) == 0, "Sentec data should not have continuous data channels"
     assert len(sequence.sparse_data) == 0, "Sentec data should not have sparse data channels"

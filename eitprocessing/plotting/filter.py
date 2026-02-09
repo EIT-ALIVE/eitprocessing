@@ -202,19 +202,12 @@ class FilterPlotting:
                 unfiltered_signal = unfiltered_data
                 filtered_signal = filtered_data
                 sample_frequency_ = sample_frequency
-            case ContinuousData(), ContinuousData():
+            case (ContinuousData(), ContinuousData()) | (EITData(), EITData()):
                 unfiltered_signal = unfiltered_data.values
                 filtered_signal = filtered_data.values
                 sample_frequency_ = unfiltered_data.sample_frequency
                 if sample_frequency is not MISSING:
-                    msg = "Sample frequency should not be provided when using ContinuousData."
-                    raise ValueError(msg)
-            case EITData(), EITData():
-                unfiltered_signal = unfiltered_data.pixel_impedance
-                filtered_signal = filtered_data.pixel_impedance
-                sample_frequency_ = unfiltered_data.sample_frequency
-                if sample_frequency is not MISSING:
-                    msg = "Sample frequency should not be provided when using EITData."
+                    msg = "Sample frequency should not be provided when using ContinuousData or EITData."
                     raise ValueError(msg)
             case _:
                 msg = "Unfiltered and filtered data must be either numpy arrays, ContinuousData, or EITData."

@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 import sys
 import warnings
-from dataclasses import InitVar, dataclass, field, replace
+from dataclasses import InitVar, dataclass, field
 from dataclasses import replace as dataclass_replace
 from typing import TYPE_CHECKING, TypeVar, overload
 
@@ -189,7 +189,7 @@ class PixelMask:  # noqa: PLW1641
         elif isinstance(changes["plot_config"], dict):
             changes["plot_config"] = self._plot_config.update(**changes["plot_config"])
         label = changes.pop("label", None)
-        return replace(self, label=label, **changes)
+        return dataclass_replace(self, label=label, **changes)
 
     update = __replace__
     # TODO: add tests for update
@@ -206,9 +206,8 @@ class PixelMask:  # noqa: PLW1641
     def apply(self, data, **kwargs):
         """Apply pixel mask to data, returning a copy of the object with pixel values masked.
 
-        Data can be a numpy array, an EITData object or PixelMap object. In case of an EITData object, the mask will be
-        applied to the `pixel_impedance` attribute. In case of a PixelMap, the mask will be applied to the `values`
-        attribute.
+        Data can be a numpy array, an EITData object or PixelMap object. In case of an EITData or PixelMap object, the
+        mask will be applied to the `values` attribute.
 
         The input data can have any dimension. The mask is applied to the last two dimensions. The size of the last two
         dimensions must match the size of the dimensions of the mask, and will generally (but do not have to) have the
@@ -241,9 +240,7 @@ class PixelMask:  # noqa: PLW1641
         match data:
             case np.ndarray():
                 return transform_and_mask(data)
-            case EITData():
-                return dataclass_replace(data, pixel_impedance=transform_and_mask(data.pixel_impedance), **kwargs)
-            case PixelMap():
+            case EITData() | PixelMap():
                 return data.update(values=transform_and_mask(data.values), **kwargs)
             case _:
                 msg = f"Data should be an array, or EITData or PixelMap object, not {type(data)}."
