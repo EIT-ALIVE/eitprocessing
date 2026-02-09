@@ -1,6 +1,6 @@
 import copy
 from dataclasses import dataclass, field
-from typing import Any, NamedTuple, TypeVar
+from typing import Any, TypeVar
 
 import numpy as np
 from typing_extensions import Self
@@ -12,11 +12,17 @@ from eitprocessing.datahandling.namedtuple_array import NamedTupleArray, Nested
 T = TypeVar("T", bound="IntervalData")
 
 
-class Interval(NamedTuple):
+@dataclass(frozen=True)
+class Interval:
     """A tuple containing the start time and end time of an interval."""
 
     start_time: float
     end_time: float
+
+    def __post_init__(self):
+        if self.start_time >= self.end_time:
+            msg = f"Interval start time ({self.start_time:.2f}) must be less than end time ({self.end_time:.2f})."
+            raise ValueError(msg)
 
     @property
     def duration(self) -> float:
