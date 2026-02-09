@@ -1,4 +1,3 @@
-import itertools
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -9,8 +8,9 @@ from scipy import signal
 
 from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.continuousdata import ContinuousData
-from eitprocessing.datahandling.intervaldata import IntervalData
+from eitprocessing.datahandling.intervaldata import Interval, IntervalData
 from eitprocessing.datahandling.sequence import Sequence
+from eitprocessing.datahandling.structured_array import StructuredArray
 from eitprocessing.features.moving_average import MovingAverage
 
 
@@ -116,12 +116,13 @@ class BreathDetection:
             valley_indices,
         )
         breaths = self._remove_breaths_around_invalid_data(breaths, time, sample_frequency, invalid_data_indices)
+        intervals = StructuredArray.from_array(breaths.to_array()[:, [0, 2]], Interval)
         breaths_container = IntervalData(
             label=result_label,
             name="Breaths as determined by BreathDetection",
             unit=None,
             category="breath",
-            intervals=[(breath.start_time, breath.end_time) for breath in breaths],
+            intervals=intervals,
             values=breaths,
         )
 
@@ -370,56 +371,35 @@ class BreathDetection:
         time: np.ndarray,
         peak_indices: np.ndarray,
         valley_indices: np.ndarray,
-    ) -> list[Breath]:
-        return [
-            Breath(time[start], time[middle], time[end])
-            for middle, (start, end) in zip(
-                peak_indices,
-                itertools.pairwise(valley_indices),
-                strict=True,
-            )
-        ]
+    ) -> StructuredArray[Breath]:
+        times = time[np.column_stack([valley_indices[:-1], peak_indices, valley_indices[1:]])]
+        return StructuredArray.from_array(times, Breath)
 
     def _remove_breaths_around_invalid_data(
         self,
-        breaths: list[Breath],
+        breaths: StructuredArray[Breath],
         time: np.ndarray,
         sample_frequency: float,
         invalid_data_indices: np.ndarray,
-    ) -> list[Breath]:
-        """Remove breaths overlapping with invalid data.
-
-        Breaths that start within a window length (given by invalid_data_removal_window_length) of invalid data are
-        removed.
-
-        Args:
-            breaths: list of detected breath objects
-            time: time axis belonging to the data
-            sample_frequency: sample frequency of the data and time
-            invalid_data_indices: indices of invalid data points
-        """
-        # TODO: write more general(ized) method of determining invalid data
-
-        new_breaths = breaths[:]
-
+    ) -> StructuredArray[Breath]:
+        """Remove breaths overlapping with invalid data."""
         if not len(invalid_data_indices):
-            return new_breaths
+            return breaths[:]
 
-        invalid_data_values = np.zeros(time.shape)
-        invalid_data_values[invalid_data_indices] = 1  # gives the value 1 to each invalid datapoint
+        invalid_data_values = np.zeros_like(time)
+        invalid_data_values[invalid_data_indices] = 1
 
         window_length = math.ceil(self.invalid_data_removal_window_length * sample_frequency)
 
-        for breath in new_breaths[:]:
+        indices_to_keep = []
+        for i, breath in enumerate(breaths):
             breath_start_minus_window = max(0, np.argmax(time == breath.start_time) - window_length)
             breath_end_plus_window = min(len(invalid_data_values), np.argmax(time == breath.end_time) + window_length)
 
-            # if no invalid datapoints are within the window, np.max() will return 0
-            # if any invalid datapoints are within the window, np.max() will return 1
-            if np.max(invalid_data_values[breath_start_minus_window:breath_end_plus_window]):
-                new_breaths.remove(breath)
+            if not np.max(invalid_data_values[breath_start_minus_window:breath_end_plus_window]):
+                indices_to_keep.append(i)
 
-        return new_breaths
+        return breaths[indices_to_keep]
 
     @staticmethod
     def _fill_nan_with_nearest_neighbour(data: np.ndarray) -> np.ndarray:
