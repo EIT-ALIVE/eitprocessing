@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 
-from eitprocessing.datahandling import FrozenDataContainer
+from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 from eitprocessing.utils.frozen_array import freeze_array
 
@@ -19,7 +19,7 @@ T = TypeVar("T", bound="ContinuousData")
 
 
 @dataclass(eq=False, frozen=True)
-class ContinuousData(FrozenDataContainer, SelectByTime):
+class ContinuousData(DataContainer, SelectByTime):
     """Container for data with a continuous time axis.
 
     Continuous data is assumed to be sequential (i.e. a single data point at each time point, sorted by time) and

@@ -24,7 +24,7 @@ class Interval(NamedTuple):
         return self.end_time - self.start_time
 
 
-@dataclass(eq=False)
+@dataclass(eq=False, frozen=True)
 class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
     """Container for interval data existing over a period of time.
 
@@ -63,9 +63,12 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
     default_partial_inclusion: bool = field(repr=False, default=False)
 
     def __post_init__(self) -> None:
-        self.intervals = self._parse_intervals(self.intervals)
+        object.__setattr__(self, "intervals", self._parse_intervals(self.intervals))
 
-        if self.has_values and (lv := len(self.values)) != (lt := len(self.intervals)):
+        if self.values is not None and len(self.values) == 0:
+            object.__setattr__(self, "values", None)
+
+        if self.values is not None and (lv := len(self.values)) != (lt := len(self.intervals)):
             msg = f"The number of time points ({lt}) does not match the number of values ({lv})."
             raise ValueError(msg)
 
@@ -152,11 +155,6 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
             newlabel: A new label for the copied object.
         """
         newlabel = newlabel or self.label
-
-        if start_time is None and end_time is None:
-            copy_ = copy.deepcopy(self)
-            copy_.label = newlabel
-            return copy_
 
         partial_inclusion = partial_inclusion or self.default_partial_inclusion
 

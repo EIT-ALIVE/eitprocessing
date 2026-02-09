@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 import numpy as np
 
-from eitprocessing.datahandling import FrozenDataContainer
+from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.mixins.slicing import SelectByTime
 from eitprocessing.utils.frozen_array import freeze_array
@@ -22,7 +22,7 @@ T = TypeVar("T", bound="EITData")
 
 
 @dataclass(eq=False, frozen=True)
-class EITData(FrozenDataContainer, SelectByTime):
+class EITData(DataContainer, SelectByTime):
     """Container for EIT impedance data.
 
     This class holds the pixel impedance from an EIT measurement, as well as metadata describing the measurement. The

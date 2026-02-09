@@ -11,7 +11,7 @@ from eitprocessing.datahandling.mixins.slicing import SelectByTime
 T = TypeVar("T", bound="SparseData")
 
 
-@dataclass(eq=False)
+@dataclass(eq=False, frozen=True)
 class SparseData(DataContainer, SelectByTime):
     """Container for data related to individual time points.
 
