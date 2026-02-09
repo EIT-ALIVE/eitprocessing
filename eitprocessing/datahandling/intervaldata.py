@@ -1,4 +1,7 @@
+import contextlib
 import copy
+import itertools
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import Any, TypeVar
 
@@ -7,7 +10,7 @@ from typing_extensions import Self
 
 from eitprocessing.datahandling import DataContainer
 from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer, SelectByIndex
-from eitprocessing.datahandling.namedtuple_array import NamedTupleArray, Nested
+from eitprocessing.datahandling.structured_array import StructuredArray
 
 T = TypeVar("T", bound="IntervalData")
 
@@ -63,8 +66,8 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
     name: str = field(compare=False, repr=False)
     unit: str | None = field(metadata={"check_equivalence": True}, repr=False)
     category: str = field(metadata={"check_equivalence": True}, repr=False)
-    intervals: NamedTupleArray[Interval] = field(repr=False)
-    values: list[Any] | None = field(repr=False, default=None)
+    intervals: StructuredArray[Interval] = field(repr=False)
+    values: list[Any] | np.ndarray | None | StructuredArray = field(repr=False, default=None)
     description: str = field(compare=False, default="", repr=False)
     default_partial_inclusion: bool = field(repr=False, default=False)
 
@@ -78,26 +81,59 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
             msg = f"The number of time points ({lt}) does not match the number of values ({lv})."
             raise ValueError(msg)
 
+        if isinstance(self.values, list):
+            try:
+                object.__setattr__(self, "values", StructuredArray(self.values))
+            except TypeError:
+                object.__setattr__(self, "values", np.array(self.values))
+
+    def __iter__(self) -> Iterator[tuple[Interval, Any | None]]:
+        if self.values is not None:
+            return iter(zip(self.intervals, self.values, strict=True))
+
+        return iter(zip(self.intervals, itertools.repeat(None), strict=False))
+
     @staticmethod
     def _parse_intervals(
-        intervals: list[Interval] | Nested[Interval] | np.ndarray | NamedTupleArray[Interval],
-    ) -> NamedTupleArray[Interval]:
-        """Parse intervals into a NamedTupleArray of Interval."""
-        if isinstance(intervals, NamedTupleArray):
-            if intervals.dtype is not Interval:
-                msg = f"Expected intervals of type 'Interval', got '{intervals.dtype.__name__}'"
+        intervals: list[Interval] | np.ndarray | StructuredArray[Interval],
+    ) -> StructuredArray[Interval]:
+        """Parse intervals into a StructuredArray of Interval."""
+        if isinstance(intervals, StructuredArray):
+            if intervals.item_type is not Interval:
+                msg = f"Expected intervals of type 'Interval', got '{intervals.dtype}'"
                 raise TypeError(msg)
+            if intervals.items.ndim != 2 or intervals.items.shape[1] != 2:  # noqa: PLR2004
+                msg = f"Intervals should be a 1D array of Interval, got {intervals.items.ndim + 1}D array."
             return intervals
 
         if isinstance(intervals, np.ndarray):
+            if intervals.ndim != 2 or intervals.shape[1] != 2:  # noqa: PLR2004
+                msg = f"Intervals should be a 2D array (1D array of Interval data), got {intervals.ndim}D array."
+                raise ValueError(msg)
             try:
-                return NamedTupleArray.from_numpy_array(intervals, Interval)
+                return StructuredArray.from_array(intervals, item_type=Interval)
             except ValueError as e:
                 msg = f"Could not parse intervals from numpy array with dtype '{intervals.dtype}'"
                 raise TypeError(msg) from e
 
+        if isinstance(intervals, list | tuple):
+            with contextlib.suppress(TypeError):
+                return StructuredArray(intervals, item_type=Interval)
+
+            with contextlib.suppress(TypeError):
+                return StructuredArray([Interval(*interval) for interval in intervals], item_type=Interval)
+
+            with contextlib.suppress(TypeError):
+                return StructuredArray.from_array(intervals, item_type=Interval)
+
+            msg = (
+                "Could not parse intervals from given input. Intervals should be a list of Interval objects, a 2D "
+                "numpy array, or a StructuredArray of Interval."
+            )
+            raise TypeError(msg)
+
         try:
-            return NamedTupleArray.from_nested(intervals, Interval)
+            return StructuredArray.from_array(intervals, Interval)
         except Exception as e:
             msg = "Could not parse intervals from given input."
             raise TypeError(msg) from e
@@ -129,6 +165,7 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
             description=description,
             intervals=intervals,
             values=values,
+            default_partial_inclusion=self.default_partial_inclusion,
         )
 
     def select_by_time(
@@ -187,6 +224,7 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
             category=self.category,
             intervals=list(filtered_intervals),
             values=values,
+            default_partial_inclusion=self.default_partial_inclusion,
         )
 
     @staticmethod
