@@ -1,5 +1,5 @@
 from functools import reduce
-from pathlib import Path
+from pathlib import Path, PurePath
 
 from eitprocessing.datahandling.datacollection import DataCollection
 from eitprocessing.datahandling.eitdata import EITData, Vendor
@@ -7,7 +7,7 @@ from eitprocessing.datahandling.sequence import Sequence
 
 
 def load_eit_data(
-    path: str | Path | list[str | Path],
+    path: str | PurePath | list[str | PurePath],
     vendor: Vendor | str,
     label: str | None = None,
     name: str | None = None,
@@ -78,7 +78,7 @@ def load_eit_data(
     interval_datasets: list[DataCollection] = []
 
     for single_path in paths:
-        single_path.resolve(strict=True)  # raise error if any file does not exist
+        Path(single_path).resolve(strict=True)  # raise error if any file does not exist
 
     for single_path in paths:
         loaded_data = load_from_single_path(
