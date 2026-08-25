@@ -1,7 +1,77 @@
 import pytest
 
+from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.loading import load_eit_data
+from eitprocessing.datahandling.mixins.slicing import NotIterable, SelectByIndex
 from eitprocessing.datahandling.sequence import Sequence
+
+
+def test_select_by_index_is_not_iterable():
+    """The opt-out is inherited by every sliceable class, so a new one can not forget it."""
+    assert issubclass(SelectByIndex, NotIterable)
+
+
+@pytest.mark.parametrize(
+    ("data_object", "attribute"),
+    [
+        ("continuous_data", "values"),
+        ("eit_data", "pixel_impedance"),
+        ("sparse_data", "values"),
+        ("interval_data", "values"),
+        ("empty_sequence", None),
+    ],
+    indirect=["data_object"],
+)
+def test_iteration_is_refused(data_object: NotIterable, attribute: str | None):
+    """Without `__iter__`, iteration falls back to `__getitem__` and never terminates.
+
+    Each of these raises rather than hanging, which is what the test is really checking.
+    """
+    with pytest.raises(TypeError, match=f"`{type(data_object).__name__}` objects are not iterable") as excinfo:
+        list(data_object)
+
+    if attribute:
+        assert f"Iterate over the `{attribute}` attribute instead." in str(excinfo.value)
+    else:
+        assert "Iterate over" not in str(excinfo.value)
+
+
+def test_iteration_is_refused_in_every_form(continuous_data: ContinuousData):
+    with pytest.raises(TypeError, match="`ContinuousData` objects are not iterable"):
+        iter(continuous_data)
+
+    with pytest.raises(TypeError, match="`ContinuousData` objects are not iterable"):
+        for _item in continuous_data:
+            pass
+
+    with pytest.raises(TypeError, match="`ContinuousData` objects are not iterable"):
+        _first, _second = continuous_data
+
+    with pytest.raises(TypeError, match="`ContinuousData` objects are not iterable"):
+        sum(continuous_data)
+
+
+def test_slicing_still_works_without_iteration(continuous_data: ContinuousData):
+    assert len(continuous_data) == 10
+    assert len(continuous_data[2:5]) == 3
+    assert continuous_data[2:5] == continuous_data.select_by_index(2, 5)
+    assert list(continuous_data.values) == list(range(10))
+
+
+def test_data_collection_still_iterates_over_keys(draeger_20hz_healthy_volunteer: Sequence):
+    """`DataCollection` is a `UserDict` and does not slice by index, so it stays iterable."""
+    collection = draeger_20hz_healthy_volunteer.eit_data
+
+    assert not isinstance(collection, NotIterable)
+    assert list(collection) == list(collection.keys())
+
+
+def test_sequence_data_still_iterates_over_labels(draeger_20hz_healthy_volunteer: Sequence):
+    """`Sequence` is not iterable, but its `data` accessor is."""
+    assert list(draeger_20hz_healthy_volunteer.data) == list(draeger_20hz_healthy_volunteer.data.keys())
+
+    with pytest.raises(TypeError, match="`Sequence` objects are not iterable"):
+        list(draeger_20hz_healthy_volunteer)
 
 
 @pytest.mark.parametrize(

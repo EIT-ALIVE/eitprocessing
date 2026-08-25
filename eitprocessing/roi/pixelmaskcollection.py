@@ -9,6 +9,7 @@ from frozendict import frozendict
 from typing_extensions import Self
 
 from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.mixins.arrays import NotAnArray
 from eitprocessing.datahandling.pixelmap import PixelMap
 from eitprocessing.roi import PixelMask
 
@@ -16,7 +17,7 @@ T = TypeVar("T", bound=EITData | PixelMap)
 
 
 @dataclass(frozen=True)
-class PixelMaskCollection:
+class PixelMaskCollection(NotAnArray):
     """A collection of pixel masks, each representing a specific region of interest (ROI) in the EIT data.
 
     This class allows for the application of multiple masks to numpy arrays, EIT data or pixel maps, enabling the

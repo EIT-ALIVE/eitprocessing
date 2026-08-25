@@ -170,7 +170,7 @@ class WatershedLungspace:
             included_peaks = np.argwhere(included_marker_indices)
             excluded_peaks = np.argwhere(peaks_loc_bool & ~included_marker_indices)
 
-            included_watershed_regions = np.where(included_region, watershed_regions, np.nan)
+            included_watershed_regions = np.where(included_region.mask, watershed_regions, np.nan)
 
             capture("included peaks", included_peaks)
             capture("excluded peaks", excluded_peaks)

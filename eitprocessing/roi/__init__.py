@@ -21,6 +21,7 @@ import numpy as np
 from typing_extensions import Self
 
 from eitprocessing.datahandling.eitdata import EITData
+from eitprocessing.datahandling.mixins.arrays import NotAnArray
 from eitprocessing.datahandling.pixelmap import PixelMap
 
 if TYPE_CHECKING:
@@ -30,7 +31,7 @@ T = TypeVar("T", np.ndarray, "EITData", "PixelMap")
 
 
 @dataclass(frozen=True)
-class PixelMask:  # noqa: PLW1641
+class PixelMask(NotAnArray):  # noqa: PLW1641
     """Mask pixels by selecting or weighing them individually.
 
     A mask is a 2D array with a value for each pixel. Most often, this value is NaN (`np.nan`, 'not a number') or 1, and
@@ -79,7 +80,7 @@ class PixelMask:  # noqa: PLW1641
 
     """
 
-    mask: np.ndarray
+    mask: np.ndarray = field(metadata={"array_attribute": True})
     plot_config: InitVar[PixelMapPlotConfig]
     label: str | None = None
     keep_zeros: InitVar[bool] = field(default=False, kw_only=True)
