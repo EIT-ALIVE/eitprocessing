@@ -54,7 +54,7 @@ class IntervalData(DataContainer, SelectByIndex, HasTimeIndexer):
     unit: str | None = field(metadata={"check_equivalence": True}, repr=False)
     category: str = field(metadata={"check_equivalence": True}, repr=False)
     intervals: list[Interval | tuple[float, float]] = field(repr=False)
-    values: list[Any] | None = field(repr=False, default=None)
+    values: list[Any] | None = field(repr=False, default=None, metadata={"array_attribute": True})
     parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True}, repr=False)
     derived_from: list[Any] = field(default_factory=list, compare=False, repr=False)
     description: str = field(compare=False, default="", repr=False)

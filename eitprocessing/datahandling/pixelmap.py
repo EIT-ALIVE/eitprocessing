@@ -23,8 +23,9 @@ configuration in an immutable and chainable way, and supports partial updates of
 only a single plotting configuration).
 
 Mathematical Operations:
-    `PixelMap` instances support basic mathematical operations (+, -, *, /) with other `PixelMap` instances, arrays, or
-    scalar values. The operations are applied element-wise to the underlying values.
+    `PixelMap` instances support basic mathematical operations (+, -, *, /) with other `PixelMap` instances or scalar
+    values. The operations are applied element-wise to the underlying values. Arrays are not supported: convert them
+    with `PixelMap(values)` first, so that shape and type are validated explicitly.
 
     - Addition (+): Returns a `PixelMap` with values added element-wise.
 
@@ -36,8 +37,8 @@ Mathematical Operations:
       warning.
 
     When operating with another `PixelMap` of any type, operations typically return the base PixelMap type, except for
-    subtraction which returns a DifferenceMap. When operating with scalars or arrays, operations return the same type as
-    the original `PixelMap`.
+    subtraction which returns a DifferenceMap. When operating with scalars, operations return the same type as the
+    original `PixelMap`.
 
     Note: Some `PixelMap` subclasses (like `TIVMap` and `PerfusionMap`) do not allow negative values. Operations that
     might produce negative values with these maps will display appropriate warnings.
@@ -54,6 +55,7 @@ import numpy as np
 from numpy import typing as npt
 from typing_extensions import Self
 
+from eitprocessing.datahandling.mixins.arrays import NotAnArray
 from eitprocessing.utils import make_capture
 
 if TYPE_CHECKING:
@@ -67,7 +69,7 @@ PixelMapT = TypeVar("PixelMapT", bound="PixelMap")
 
 
 @dataclass(frozen=True)
-class PixelMap:
+class PixelMap(NotAnArray):
     """Map representing a single value for each pixel.
 
     At initialization, values are conveted to a 2D numpy array of floats. The values are immutable after initialization,
@@ -88,7 +90,7 @@ class PixelMap:
         allow_negative_values (bool): Whether negative values are allowed in the pixel map.
     """
 
-    values: np.ndarray
+    values: np.ndarray = field(metadata={"array_attribute": True})
     _: KW_ONLY
     label: str | None = None
     plot_config: InitVar[PixelMapPlotConfig]
@@ -428,21 +430,60 @@ class PixelMap:
 
     update = __replace__
 
-    def _validate_other(self, other: npt.ArrayLike | float | PixelMap) -> np.ndarray | float:
-        other_values = other.values if isinstance(other, PixelMap) else other
+    #: Ufuncs backing an arithmetic operator, mapped to the reflected operator handling `other <operator> pixel_map`.
+    _reflected_operators: ClassVar[dict[str, str]] = {
+        "add": "__radd__",
+        "subtract": "__rsub__",
+        "multiply": "__rmul__",
+        "divide": "__rtruediv__",
+    }
 
-        if isinstance(other, (float, int)):
+    def __array_ufunc__(self, ufunc: np.ufunc, method: str, *inputs, **kwargs) -> PixelMap:  # noqa: RET503
+        """Handle `other <operator> pixel_map`, and refuse all other numpy operations.
+
+        `PixelMap` is not an array (see `NotAnArray`), so numpy operations on it are refused. The exception is an
+        arithmetic operator with the pixel map on the right hand side of a non-pixel map, e.g.
+        `np.float64(3) * pixel_map`. Numpy routes those here rather than deferring to Python's reflected operator
+        protocol, so they are forwarded to the reflected operator, which accepts scalars and rejects arrays with a
+        helpful message. Calling a ufunc on two pixel maps, e.g. `np.multiply(map_a, map_b)`, is refused: use the
+        operator instead.
+        """
+        if (
+            method == "__call__"
+            and not kwargs
+            and len(inputs) == 2  # noqa: PLR2004, ignore hardcoded value
+            and inputs[1] is self
+            and not isinstance(inputs[0], PixelMap)
+            and (reflected := self._reflected_operators.get(ufunc.__name__)) is not None
+        ):
+            return getattr(self, reflected)(inputs[0])
+
+        self._refuse_array_conversion(f" (attempted `numpy.{ufunc.__name__}`)")
+
+    def _validate_other(self, other: float | PixelMap) -> np.ndarray | float:
+        """Check that `other` can be combined with this pixel map, and return the values to operate on.
+
+        Pixel maps can only be combined with other pixel maps of the same shape, or with scalars. Arrays are
+        deliberately rejected: an array carries no label or plotting configuration, and silently treating it as a
+        pixel map hides shape and unit mistakes. Convert it explicitly with `PixelMap(array)` instead.
+        """
+        if isinstance(other, (int, float, np.number)):
             return other
 
-        other_values = np.array(other_values)
+        if not isinstance(other, PixelMap):
+            msg = (
+                f"Can't combine `{type(self).__name__}` with `{type(other).__name__}`. Pixel maps can only be "
+                "combined with other pixel maps or with scalars. Convert an array with `PixelMap(values)` first."
+            )
+            raise TypeError(msg)
 
-        if (os := other_values.shape) != (ss := self.values.shape):
+        if (os := other.values.shape) != (ss := self.values.shape):
             msg = f"Shape of PixelMaps (self: {ss}, other: {os}) do not match."
             raise ValueError(msg)
 
-        return other_values
+        return other.values
 
-    def __add__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
+    def __add__(self, other: float | PixelMap) -> PixelMap:
         new_values = self.values + self._validate_other(other)
         if isinstance(other, PixelMap):
             return PixelMap(new_values)
@@ -450,17 +491,17 @@ class PixelMap:
 
     __radd__ = __add__
 
-    def __sub__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
+    def __sub__(self, other: float | PixelMap) -> PixelMap:
         new_values = self.values - self._validate_other(other)
         if isinstance(other, PixelMap):
             return DifferenceMap(new_values)
         return self.update(values=new_values, label=None)
 
-    def __rsub__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
+    def __rsub__(self, other: float | PixelMap) -> PixelMap:
         new_values = -self.values + self._validate_other(other)
         return self.update(values=new_values, label=None)
 
-    def __mul__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
+    def __mul__(self, other: float | PixelMap) -> PixelMap:
         new_values = self.values * self._validate_other(other)
         if isinstance(other, PixelMap):
             return PixelMap(new_values)
@@ -468,7 +509,7 @@ class PixelMap:
 
     __rmul__ = __mul__
 
-    def __truediv__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
+    def __truediv__(self, other: float | PixelMap) -> PixelMap:
         other_values = self._validate_other(other)
         if isinstance(other_values, np.ndarray) and 0 in other_values:
             warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning, stacklevel=2)
@@ -480,7 +521,7 @@ class PixelMap:
             return PixelMap(new_values)
         return self.update(values=new_values, label=None)
 
-    def __rtruediv__(self, other: npt.ArrayLike | float | PixelMap) -> PixelMap:
+    def __rtruediv__(self, other: float | PixelMap) -> PixelMap:
         other_values = self._validate_other(other)
         if 0 in self.values:
             warnings.warn("Dividing by 0 will result in `np.nan` value.", UserWarning, stacklevel=2)

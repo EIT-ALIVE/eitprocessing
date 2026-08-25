@@ -3,11 +3,12 @@ from dataclasses import dataclass
 
 from typing_extensions import Self
 
+from eitprocessing.datahandling.mixins.arrays import NotAnArray
 from eitprocessing.datahandling.mixins.equality import Equivalence
 
 
 @dataclass(eq=False)
-class DataContainer(Equivalence):
+class DataContainer(Equivalence, NotAnArray):
     """Base class for data container classes."""
 
     def __bool__(self):

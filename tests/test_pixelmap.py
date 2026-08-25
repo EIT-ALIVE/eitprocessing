@@ -1,6 +1,8 @@
 import copy
+import operator as op
 import sys
 import warnings
+from collections.abc import Callable
 from dataclasses import FrozenInstanceError
 
 import frozendict
@@ -9,6 +11,7 @@ import pytest
 from matplotlib import pyplot as plt
 from matplotlib.colors import CenteredNorm, Colormap, Normalize
 from matplotlib.ticker import PercentFormatter, ScalarFormatter
+from numpy import typing as npt
 from numpy.exceptions import ComplexWarning
 
 from eitprocessing.datahandling.pixelmap import (
@@ -24,6 +27,7 @@ from eitprocessing.datahandling.pixelmap import (
 from eitprocessing.plotting import _PLOT_CONFIG_REGISTRY, reset_plot_config, set_plot_config_parameters
 from eitprocessing.plotting.helpers import AbsolutePercentFormatter, AbsoluteScalarFormatter
 from eitprocessing.plotting.pixelmap import PixelMapPlotConfig
+from eitprocessing.roi import PixelMask
 
 
 def test_init_values():
@@ -504,6 +508,80 @@ def test_div():
         pm2_div_pm1 = pm2 / pm1
     assert isinstance(pm2_div_pm1, PixelMap)
     assert np.array_equal(pm2_div_pm1.values, [[np.nan, 2, 3 / 2, 4 / 3]], equal_nan=True)
+
+
+MATCH_NOT_COMBINABLE = "Pixel maps can only be combined with other pixel maps or with scalars"
+
+
+@pytest.mark.parametrize(
+    "other",
+    [
+        pytest.param(np.array([[1.0, 2.0, 3.0, 4.0]]), id="array"),
+        pytest.param(np.array([[1.0, 2.0]]), id="array of different shape"),
+        pytest.param([[1, 2, 3, 4]], id="nested list"),
+        pytest.param(np.arange(4.0), id="1D array"),
+    ],
+)
+@pytest.mark.parametrize("operator", [op.add, op.sub, op.mul, op.truediv])
+def test_operators_reject_arrays(operator: Callable, other: npt.ArrayLike):
+    """Pixel maps combine with pixel maps and scalars, but never with raw arrays."""
+    pm = PerfusionMap([[0.0, 1.0, 2.0, 3.0]])
+
+    with pytest.raises(TypeError, match=MATCH_NOT_COMBINABLE):
+        _ = operator(pm, other)
+
+    with pytest.raises(TypeError, match=MATCH_NOT_COMBINABLE):
+        _ = operator(other, pm)
+
+
+@pytest.mark.parametrize("operator", [op.add, op.sub, op.mul, op.truediv])
+def test_operators_reject_other_types(operator: Callable):
+    pm = PerfusionMap([[1.0, 2.0]])
+
+    with pytest.raises(TypeError, match=MATCH_NOT_COMBINABLE):
+        _ = operator(pm, "not a pixel map")
+
+    with pytest.raises(TypeError, match=MATCH_NOT_COMBINABLE):
+        _ = operator(pm, PixelMask(np.ones((1, 2))))
+
+
+@pytest.mark.parametrize("scalar_type", [int, float, np.int64, np.float64])
+@pytest.mark.parametrize(
+    ("operator", "expected"),
+    [
+        (op.add, [[3.0, 5.0]]),
+        (op.mul, [[2.0, 6.0]]),
+        (op.sub, [[-1.0, 1.0]]),
+        (op.truediv, [[0.5, 1.5]]),
+    ],
+)
+def test_operators_accept_scalars_on_either_side(operator: Callable, expected: list, scalar_type: type):
+    """Numpy scalars do not defer to Python's reflected operators, so `__array_ufunc__` handles them."""
+    pm = PerfusionMap([[1.0, 3.0]])
+    scalar = scalar_type(2)
+
+    result = operator(pm, scalar)
+    assert isinstance(result, PerfusionMap)
+    assert np.array_equal(result.values, expected)
+
+    # The reflected operators compute `scalar <operator> pixel_map`, which differs for non-commutative operators.
+    reflected = operator(scalar, pm)
+    assert isinstance(reflected, PerfusionMap)
+    assert np.array_equal(reflected.values, operator(np.array([[2.0, 2.0]]), pm.values))
+
+
+@pytest.mark.parametrize(
+    "function",
+    [np.mean, np.sin, np.asarray, np.nanmax, lambda pm: np.stack([pm]), lambda pm: np.multiply(pm, pm)],
+)
+def test_numpy_functions_are_refused(function: Callable):
+    """A pixel map is not an array; numpy should refuse it rather than build an object array."""
+    with pytest.raises(TypeError, match="`PixelMap` objects can not be used as an array"):
+        function(PixelMap([[1.0, 2.0]]))
+
+
+def test_numpy_functions_work_on_values():
+    assert np.mean(PixelMap([[1.0, 3.0]]).values) == pytest.approx(2.0)
 
 
 def test_nan():

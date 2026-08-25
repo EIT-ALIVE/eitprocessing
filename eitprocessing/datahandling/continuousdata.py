@@ -45,7 +45,7 @@ class ContinuousData(DataContainer, SelectByTime):
     parameters: dict[str, Any] = field(default_factory=dict, repr=False, metadata={"check_equivalence": True})
     derived_from: Any | list[Any] = field(default_factory=list, repr=False, compare=False)
     time: np.ndarray = field(kw_only=True, repr=False)
-    values: np.ndarray = field(kw_only=True, repr=False)
+    values: np.ndarray = field(kw_only=True, repr=False, metadata={"array_attribute": True})
     sample_frequency: float | None = field(kw_only=True, repr=False, metadata={"check_equivalence": True}, default=None)
 
     def __post_init__(self) -> None:

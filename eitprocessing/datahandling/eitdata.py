@@ -48,7 +48,7 @@ class EITData(DataContainer, SelectByTime):
     label: str | None = field(default=None, compare=False, metadata={"check_equivalence": True})
     description: str = field(default="", compare=False, repr=False)
     name: str | None = field(default=None, compare=False, repr=False)
-    pixel_impedance: np.ndarray = field(repr=False, kw_only=True)
+    pixel_impedance: np.ndarray = field(repr=False, kw_only=True, metadata={"array_attribute": True})
     suppress_simulated_warning: InitVar[bool] = False
 
     def __post_init__(self, suppress_simulated_warning: bool) -> None:

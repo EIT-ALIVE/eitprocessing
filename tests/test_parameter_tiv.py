@@ -74,7 +74,7 @@ def mock_continuous_data():
         category="relative impedance",
         description="Global impedance created for testing TIV parameter",
         parameters={},
-        derived_from="mock_eit_data",
+        derived_from=["mock_eit_data"],
         time=np.linspace(0, 18, (18 * 1000), endpoint=False),
         values=mock_global_impedance(),
         sample_frequency=1000,

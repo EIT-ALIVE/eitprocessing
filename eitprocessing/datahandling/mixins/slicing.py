@@ -10,16 +10,40 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 import numpy as np
 
 if TYPE_CHECKING:
-    from typing_extensions import Self
+    from typing_extensions import Never, Self
 
 
-class SelectByIndex(ABC):
+class NotIterable:
+    """Mixin class that prevents iteration through the legacy sequence protocol.
+
+    A class that implements `__getitem__` but not `__iter__` is iterable whether it wants to be or not: `iter()` falls
+    back to calling `__getitem__` with 0, 1, 2, ... until `IndexError` is raised. For a class whose `__getitem__`
+    slices rather than returning single elements, that is never what the caller meant. Each call returns a copy of the
+    whole object holding a single sample, which is quadratic, and an out-of-range index returns an empty copy rather
+    than raising `IndexError`, so `list(obj)` and `for item in obj` never terminate at all.
+
+    Defining `__iter__` opts out of that fallback, so iteration raises a `TypeError` explaining what to iterate over
+    instead.
+    """
+
+    def __iter__(self) -> Never:
+        """Refuse to iterate, rather than falling back to `__getitem__`."""
+        msg = f"`{type(self).__name__}` objects are not iterable."
+        if attribute := getattr(self, "_array_attribute", None):
+            msg += f" Iterate over the `{attribute}` attribute instead."
+        raise TypeError(msg)
+
+
+class SelectByIndex(NotIterable, ABC):
     """Adds slicing functionality to subclass by implementing `__getitem__`.
 
     Subclasses must implement a `_sliced_copy` function that defines what should
     happen when the object is sliced. This class ensures that when calling a
     slice between square brackets (as e.g. done for lists) then return the
     expected sliced object.
+
+    Subscripting means slicing here, not element access, so subclasses are not sequences. `NotIterable` makes that
+    explicit by blocking the iteration Python would otherwise infer from `__getitem__`.
     """
 
     label: str

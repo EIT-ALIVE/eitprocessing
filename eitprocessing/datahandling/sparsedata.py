@@ -43,7 +43,7 @@ class SparseData(DataContainer, SelectByTime):
     description: str = field(compare=False, default="", repr=False)
     parameters: dict[str, Any] = field(default_factory=dict, metadata={"check_equivalence": True}, repr=False)
     derived_from: list[Any] = field(default_factory=list, compare=False, repr=False)
-    values: Any | None = None
+    values: Any | None = field(default=None, metadata={"array_attribute": True})
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self.label}')"
