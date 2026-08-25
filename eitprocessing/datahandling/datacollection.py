@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 from eitprocessing.datahandling.continuousdata import ContinuousData
 from eitprocessing.datahandling.eitdata import EITData
 from eitprocessing.datahandling.intervaldata import IntervalData
+from eitprocessing.datahandling.mixins.arrays import NotAnArray
 from eitprocessing.datahandling.mixins.equality import Equivalence
 from eitprocessing.datahandling.mixins.slicing import HasTimeIndexer
 from eitprocessing.datahandling.sparsedata import SparseData
@@ -18,7 +19,7 @@ V = TypeVar("V", EITData, ContinuousData, SparseData, IntervalData)
 V_classes = V.__constraints__
 
 
-class DataCollection(Equivalence, UserDict, HasTimeIndexer, Generic[V]):
+class DataCollection(Equivalence, UserDict, HasTimeIndexer, NotAnArray, Generic[V]):
     """A collection of a single type of data with unique labels.
 
     A DataCollection functions largely as a dictionary, but requires a data_type argument, which must be one of the data
