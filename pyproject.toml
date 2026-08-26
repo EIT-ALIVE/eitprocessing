@@ -110,6 +110,7 @@ eitprocessing = ["config/*.yaml", "py.typed"]
 output-format = "concise"
 line-length = 120
 extend-include = ["*.ipynb"]
+target-version = "py310"
 
 [tool.ruff.lint]
 select = ["ALL"]
