@@ -5,6 +5,7 @@ import mmap
 import sys
 import warnings
 from functools import partial
+from pathlib import Path, PurePath
 from typing import TYPE_CHECKING, NamedTuple
 from warnings import catch_warnings
 
@@ -21,8 +22,6 @@ from eitprocessing.datahandling.loading.binreader import BinReader
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from numpy.typing import NDArray
 
 load_draeger_data = partial(load_eit_data, vendor=Vendor.DRAEGER)
@@ -31,13 +30,13 @@ SAMPLE_FREQUENCY_ESTIMATION_PRECISION = 4
 
 
 def load_from_single_path(  # noqa: PLR0915
-    path: Path,
+    path: PurePath,
     sample_frequency: float | None = None,
     first_frame: int = 0,
     max_frames: int | None = None,
 ) -> dict[str, DataCollection]:
     """Load Dräger EIT data from path."""
-    file_size = path.stat().st_size
+    file_size = Path(path).stat().st_size
 
     frame_size: int
     medibus_fields: list
@@ -88,7 +87,7 @@ def load_from_single_path(  # noqa: PLR0915
     phases: list[tuple[float, int]] = []
     medibus_data = np.zeros((len(medibus_fields), n_frames), dtype=np.float32)
 
-    with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
+    with Path(path).open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
         fh.seek(first_frame_to_load * frame_size)
         reader = BinReader(fh)
         previous_marker = None

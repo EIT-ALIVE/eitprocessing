@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import warnings
 from functools import partial
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -15,7 +16,7 @@ from eitprocessing.datahandling.loading import load_eit_data
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
-    from pathlib import Path
+    from pathlib import PurePath
 
     from numpy.typing import NDArray
 
@@ -30,7 +31,7 @@ load_timpel_data = partial(load_eit_data, vendor=Vendor.TIMPEL)
 
 
 def load_from_single_path(
-    path: Path,
+    path: PurePath,
     sample_frequency: float | None = TIMPEL_SAMPLE_FREQUENCY,
     first_frame: int = 0,
     max_frames: int | None = None,
@@ -41,7 +42,7 @@ def load_from_single_path(
 
     try:
         data: NDArray = np.loadtxt(
-            str(path),
+            str(Path(path)),
             dtype=float,
             delimiter=",",
             skiprows=first_frame,

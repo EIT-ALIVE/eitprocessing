@@ -5,6 +5,7 @@ import os
 import warnings
 from enum import IntEnum
 from functools import partial
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -18,7 +19,7 @@ from eitprocessing.datahandling.loading.binreader import BinReader
 from eitprocessing.datahandling.sparsedata import SparseData
 
 if TYPE_CHECKING:
-    from pathlib import Path
+    from pathlib import PurePath
 
     from numpy.typing import NDArray
 
@@ -28,7 +29,7 @@ load_sentec_data = partial(load_eit_data, vendor=Vendor.SENTEC)
 
 
 def load_from_single_path(
-    path: Path,
+    path: PurePath,
     sample_frequency: float | None = None,
     first_frame: int = 0,
     max_frames: int | None = None,
@@ -36,7 +37,7 @@ def load_from_single_path(
     """Load Sentec EIT data from path."""
     time: list[float] = []
     index = 0
-    with path.open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
+    with Path(path).open("br") as fo, mmap.mmap(fo.fileno(), length=0, access=mmap.ACCESS_READ) as fh:
         file_length = os.fstat(fo.fileno()).st_size
         reader = BinReader(fh, endian="little")
         version = reader.uint8()

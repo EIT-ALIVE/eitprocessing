@@ -1,6 +1,6 @@
 import sys
 import tempfile
-from pathlib import Path
+from pathlib import Path, PurePath
 
 import numpy as np
 import pytest
@@ -79,6 +79,10 @@ def test_load_draeger(
     assert sequence == load_eit_data(sequence_path, vendor="draeger"), (
         "Loading without sample frequency should yield the same data"
     )
+
+    path = sequence.eit_data["raw"].path
+    assert isinstance(path, PurePath), "EITData path should be a PurePath object"
+    assert not isinstance(path, Path), "EITData path should be a PurePath object"
 
 
 def test_draeger_20hz_healthy_volunteer_2_differ(
@@ -187,7 +191,7 @@ def test_event_on_first_frame(draeger_20hz_healthy_volunteer: Sequence):
     with tempfile.NamedTemporaryFile(**kwargs) as temporary_file:
         # Create a temporary file, that is removed after the context manager is closed
         tempfile_path = Path(temporary_file.name)
-        with draeger_20hz_healthy_volunteer.eit_data["raw"].path.open("rb") as original_file:
+        with Path(draeger_20hz_healthy_volunteer.eit_data["raw"].path).open("rb") as original_file:
             original_file.seek(ignore_bytes)  # skip frames before the event
             temporary_file.write(original_file.read())  # write remaining data to temp file
 
