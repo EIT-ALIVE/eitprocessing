@@ -1,6 +1,7 @@
 name: Build and Test
 env:
   ZENODO_RECORD_ID: 17423608
+
 on:
   push:
     branches:
@@ -15,8 +16,26 @@ on:
     branches:
       - main
       - develop
+
 jobs:
+  constants:
+    name: Set constants
+    runs-on: ubuntu-latest
+    outputs:
+      ZENODO_RECORD_ID: ${{ steps.output_env.outputs.ZENODO_RECORD_ID }}
+    steps:
+      - id: output_env
+        run: echo "ZENODO_RECORD_ID=${{ env.ZENODO_RECORD_ID }}" >> $GITHUB_OUTPUT
+  prepare_test_data:
+    name: Prepare test data
+    needs: constants
+    uses: ./.github/workflows/prepare_test_data.yml
+    secrets: inherit
+    with:
+      zenodo_record_id: ${{ needs.constants.outputs.ZENODO_RECORD_ID }}
+
   test_and_build:
+    needs: prepare_test_data
     if: github.event.pull_request.draft == false
     runs-on: ${{ matrix.os }}
     strategy:
@@ -32,31 +51,14 @@ jobs:
           dependencies: testing
           python-version: ${{ matrix.python-version }}
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set data dir
-        shell: bash
-        id: set-path
-        run: echo "data_dir=$GITHUB_WORKSPACE/test_data" >> "$GITHUB_OUTPUT"
-      - name: Restore dataset cache
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.set-path.outputs.data_dir }}
-          key: eitprocessing-testdata-zenodo.${{ env.ZENODO_RECORD_ID }}
-      - name: Install zenodo-get
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: python3 -m pip install zenodo-get
-        shell: bash
-      - name: Download test dataset
-        shell: bash
-        if: steps.cache.outputs['cache-hit'] != 'true'
+      - name: Download test data archive from release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p ${{ steps.set-path.outputs.data_dir }}
-          cd ${{ steps.set-path.outputs.data_dir }}
-          zenodo_get $ZENODO_RECORD_ID
-          cd -
-      - name: Uninstall zenodo-get
-        if: steps.cache.outputs['cache-hit'] != 'true'
-        run: python3 -m pip uninstall --yes zenodo-get
-        shell: bash
+          gh release download testdata_zenodo.${{ env.ZENODO_RECORD_ID }} --pattern "test_data.tar.zst"
+      - name: Extract test data
+        run: |
+          tar -x -f test_data.tar.zst
+          rm test_data.tar.zst
       - name: Run pytest
         run: pytest -v
