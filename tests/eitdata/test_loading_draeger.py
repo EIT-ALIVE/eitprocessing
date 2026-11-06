@@ -80,6 +80,8 @@ def test_load_draeger(
         "Loading without sample frequency should yield the same data"
     )
 
+    assert len(sequence[:100]) == 100
+
 
 def test_draeger_20hz_healthy_volunteer_2_differ(
     draeger_20hz_healthy_volunteer: Sequence, draeger_20hz_healthy_volunteer_fixed_rr: Sequence

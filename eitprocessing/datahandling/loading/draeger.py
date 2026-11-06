@@ -154,7 +154,7 @@ def load_from_single_path(  # noqa: PLR0915
             unit=None,
             category="minvalue",
             derived_from=[eit_data],
-            time=np.array([t for t, d in phases if d == -1]),
+            time=np.array([time[i] for i, d in phases if d == -1]),
         ),
     )
     sparsedata_collection.add(
@@ -164,15 +164,15 @@ def load_from_single_path(  # noqa: PLR0915
             unit=None,
             category="maxvalue",
             derived_from=[eit_data],
-            time=np.array([t for t, d in phases if d == 1]),
+            time=np.array([time[i] for i, d in phases if d == 1]),
         ),
     )
     if events:
-        time_, events_ = zip(*events, strict=True)
-        time = np.array(time_)
+        event_idxs, events_ = zip(*events, strict=True)
+        event_time = time[list(event_idxs)]
         events = list(events_)
     else:
-        time, events = np.array([]), []
+        event_time, events = np.array([]), []
     sparsedata_collection.add(
         SparseData(
             label="events_(draeger)",
@@ -180,7 +180,7 @@ def load_from_single_path(  # noqa: PLR0915
             unit=None,
             category="event",
             derived_from=[eit_data],
-            time=time,
+            time=event_time,
             values=events,
         ),
     )
@@ -311,12 +311,12 @@ def _read_frame(
     # Therefore, check whether the event marker has changed with
     # respect to the most recent event. If so, create a new event.
     if ((previous_marker is not None) and (event_marker > previous_marker)) or (index == 0 and event_text):
-        events.append((frame_time, Event(event_marker, event_text)))
+        events.append((index, Event(event_marker, event_text)))
     if timing_error:
         warnings.warn("A timing error was encountered during loading.", RuntimeWarning, stacklevel=2)
         # TODO: expand on what timing errors are in some documentation.
     if min_max_flag in (1, -1):
-        phases.append((frame_time, min_max_flag))
+        phases.append((index, min_max_flag))
 
     return event_marker
 
