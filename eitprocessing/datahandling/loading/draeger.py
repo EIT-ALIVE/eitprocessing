@@ -51,9 +51,8 @@ def load_from_single_path(  # noqa: PLR0915
             break
     else:
         msg = (
-            f"File size {file_size} of file {path!s} does not match the supported *.bin file formats.\n"
-            "Currently this package does not support loading files containing "
-            "esophageal pressure or other non-standard data. "
+            f"File size {file_size} of file {path!s} does not match the supported *.bin file formats. "
+            "Files exported using SW 1.2 and SW 1.3 are supported.\n"
             "Make sure this is a valid and uncorrupted Dräger data file."
         )
         raise OSError(msg)
