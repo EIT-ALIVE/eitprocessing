@@ -244,15 +244,21 @@ class BreathDetection:
         Returns:
             A tuple (peak_indices, peak_values) with edge cases removed.
         """
-        if max(data[: valley_indices[0]]) < moving_average[valley_indices[0]]:
-            # remove the first valley, if the data before that valley is not
-            # high enough to be sure it's a valley
-            valley_indices = np.delete(valley_indices, 0)
+        while True:
+            if max(data[: valley_indices[0]]) < moving_average[valley_indices[0]]:
+                # remove the first valley, if the data before that valley is not
+                # high enough to be sure it's a valley
+                valley_indices = np.delete(valley_indices, 0)
+            else:
+                break
 
-        if max(data[valley_indices[-1] :]) < moving_average[valley_indices[-1]]:
-            # remove the last valley, if the data after that valley is not high
-            # enough to be sure it's a valley
-            valley_indices = np.delete(valley_indices, -1)
+        while True:
+            if max(data[valley_indices[-1] :]) < moving_average[valley_indices[-1]]:
+                # remove the last valley, if the data after that valley is not high
+                # enough to be sure it's a valley
+                valley_indices = np.delete(valley_indices, -1)
+            else:
+                break
 
         # remove peaks that come before the first valley
         keep_peaks = peak_indices > valley_indices[0]

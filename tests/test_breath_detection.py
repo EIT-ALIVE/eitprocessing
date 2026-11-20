@@ -46,6 +46,13 @@ test_data_remove_edge_cases = [
         np.array([3, 5]),
         np.array([2, 4, 6]),
     ),
+    (  # test removal of multiple last valleys
+        np.array([1, 3, 5, 9]),
+        np.array([2, 4, 6, 7, 8]),
+        np.array([*[1] * 7, 3, 3, 1]),
+        np.array([3, 5]),
+        np.array([2, 4, 6]),
+    ),
 ]
 
 
