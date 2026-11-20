@@ -1,11 +1,10 @@
-import itertools
 import warnings
 
 import numpy as np
 
 from eitprocessing.datahandling.breath import Breath
 from eitprocessing.datahandling.eitdata import EITData
-from eitprocessing.datahandling.pixelmap import PendelluftMap, PixelMap
+from eitprocessing.datahandling.pixelmap import PendelluftMap
 from eitprocessing.features import breath_detection
 from eitprocessing.features.pixel_breath import PixelBreath
 from eitprocessing.parameters.pendelluft import PendelluftResult
@@ -15,6 +14,7 @@ MIN_MEAN_PENDELLUFT_VALUE = 0
 MAX_MEAN_PENDELLUFT_VALUE = 0.15
 
 
+@dataclass(frozen=True)
 class PendelluftAdler:
     """Pendelluft calculation following Adler et al.
 
@@ -22,9 +22,13 @@ class PendelluftAdler:
     https://doi.org/10.1088/1361-6579/ad7fca
     """
 
+    early_pendelluft_percentile: float = 5.0
+
     def apply(
-        self, eit_data: EITData, captures: dict | None = None, early_pendelluft_percentile: float = 5.0
-    ) -> PendelluftMap:
+        self,
+        eit_data: EITData,
+        captures: dict | None = None,
+    ) -> PendelluftResult:
         """Calculate pendelluft (FRIC) following Adler et al.
 
         Steps:
@@ -34,12 +38,11 @@ class PendelluftAdler:
         - Calculate breathwise and pixelwise FRIC.
 
         Args:
-            sequence (Sequence): Data container with EIT signals.
-            preprocessing_method (Literal["emc", "adler"]): Preprocessing method used.
+            eit_data: EITData object to calculate the pendelluft values in
             captures (dict): Dictionary to store captures for visualization/debugging.
 
         Returns:
-            pendelluft_adler_mean (float): Mean pendelluft value (FRIC_mean).
+            PendelluftResult: container with output values
         """
         capture = make_capture(captures)
 
