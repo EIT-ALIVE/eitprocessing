@@ -1,4 +1,4 @@
-from pathlib import Path
+from pathlib import Path, PurePath
 
 import numpy as np
 import pytest
@@ -55,6 +55,9 @@ def test_load_sentec_single_file(
         label="something else",
     ), "Loading with a different label should yield same data"
 
+    assert isinstance(sequence.eit_data["raw"].path, PurePath), "EITData path should be a PurePath object"
+    assert not isinstance(sequence.eit_data["raw"].path, Path), "EITData path should be a PurePath object"
+
 
 @pytest.mark.parametrize(
     ("sequence_a_fixture_name", "sequence_b_fixture_name", "sequence_merge_fixture_name"),
@@ -93,6 +96,13 @@ def test_load_sentec_multiple_files(
     )
     assert sequence_merged[len(sequence_a) :] == sequence_b, (
         "Second part of merged sequence should match second individual sequence"
+    )
+
+    assert all(isinstance(path_, PurePath) for path_ in sequence_merged.eit_data["raw"].path), (
+        "EITData path should be a PurePath object"
+    )
+    assert not any(isinstance(path_, Path) for path_ in sequence_merged.eit_data["raw"].path), (
+        "EITData path should not be a Path object"
     )
 
 

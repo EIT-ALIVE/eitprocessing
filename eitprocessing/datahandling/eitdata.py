@@ -3,7 +3,7 @@ from __future__ import annotations
 import warnings
 from dataclasses import InitVar, dataclass, field
 from enum import Enum
-from pathlib import Path
+from pathlib import PurePath
 from typing import TYPE_CHECKING, Any, TypeVar
 
 import numpy as np
@@ -40,7 +40,7 @@ class EITData(DataContainer, SelectByTime):
         pixel_impedance: Impedance values for each pixel at each frame.
     """  # TODO: fix docstring
 
-    path: str | Path | list[Path | str] = field(compare=False, repr=False)
+    path: str | PurePath | list[PurePath | str] = field(compare=False, repr=False)
     nframes: int = field(repr=False)
     time: np.ndarray = field(repr=False)
     sample_frequency: float = field(metadata={"check_equivalence": True}, repr=False)
@@ -94,16 +94,16 @@ class EITData(DataContainer, SelectByTime):
 
     @staticmethod
     def ensure_path_list(
-        path: str | Path | list[str | Path],
-    ) -> list[Path]:
+        path: str | PurePath | list[str | PurePath],
+    ) -> list[PurePath]:
         """Return the path or paths as a list.
 
-        The path of any EITData object can be a single str/Path or a list of str/Path objects. This method returns a
-        list of Path objects given either a str/Path or list of str/Paths.
+        The path of any EITData object can be a single str/PurePath or a list of str/PurePath objects. This method
+        returns a list of PurePath objects given either a str/PurePath or list of str/PurePaths.
         """
         if isinstance(path, list):
-            return [Path(p) for p in path]
-        return [Path(path)]
+            return [PurePath(p) for p in path]
+        return [PurePath(path)]
 
     def __add__(self: Self, other: Self) -> Self:
         return self.concatenate(other)

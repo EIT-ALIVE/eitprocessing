@@ -1,3 +1,5 @@
+from pathlib import Path, PurePath
+
 import pytest
 
 from eitprocessing.datahandling.eitdata import EITData, Vendor
@@ -24,6 +26,9 @@ def test_loading_timpel(
 
     loaded_using_enum_vendor = load_eit_data(sequence.eit_data["raw"].path, vendor=Vendor.TIMPEL, label="timpel")
     assert sequence == loaded_using_enum_vendor
+
+    assert isinstance(sequence.eit_data["raw"].path, PurePath), "EITData path should be a PurePath object"
+    assert not isinstance(sequence.eit_data["raw"].path, Path), "EITData path should be a PurePath object"
 
 
 def test_loading_timpel_multiple_files():
